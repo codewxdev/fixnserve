@@ -1,0 +1,42 @@
+<?php
+
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Role\PermissionController;
+use App\Http\Controllers\Role\RoleController;
+use App\Http\Controllers\Role\RolePermissionController;
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:api')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
+});
+
+Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
+
+    Route::get('/roles/{role?}', [RoleController::class, 'index']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::put('/roles/{role}', [RoleController::class, 'update']);
+    Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
+
+    // Permissions CRUD
+    Route::get('/permissions/{permission?}', [PermissionController::class, 'index']);
+    Route::post('/permissions', [PermissionController::class, 'store']);
+    Route::put('/permissions/{permission}', [PermissionController::class, 'update']);
+    Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy']);
+
+    // Role-Permission CRUD (assign/remove)
+    Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
+    Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
+    Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
+
+    // USER → ROLE
+    Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);
+    // USER → DIRECT PERMISSIONS (optional)
+    Route::post('/users/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
+    // User roles + permissions
+    Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
+    Route::get('/users/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
+});
