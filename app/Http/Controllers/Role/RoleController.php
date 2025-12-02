@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Role;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\Role;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -42,6 +42,4 @@ class RoleController extends Controller
 
         return ApiResponse::success(null, 'Role deleted');
     }
-
-
 }
