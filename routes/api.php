@@ -1,12 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Auth\PasswordResetCodeController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
 use App\Http\Controllers\Role\UserRoleController;
-use Illuminate\Support\Facades\Route;
- 
+use Illuminate\Routing\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -15,6 +15,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
+    Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
+    Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
 });
 
 Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
@@ -43,3 +46,5 @@ Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
     Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
     Route::get('/users/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
 });
+// Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
+// Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);
