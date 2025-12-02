@@ -8,7 +8,6 @@ use App\Http\Controllers\Role\RolePermissionController;
 use App\Http\Controllers\Role\UserRoleController;
 use Illuminate\Routing\Route;
 
-
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
 
@@ -47,5 +46,5 @@ Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
     Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
     Route::get('/users/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
 });
-Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
-Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);
+// Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
+// Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);
