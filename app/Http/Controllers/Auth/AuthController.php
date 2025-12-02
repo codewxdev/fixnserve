@@ -4,12 +4,22 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use JWTAuth;
 
 class AuthController extends Controller
 {
+
+    public function index(){
+        return view('Auth.login');
+    }
+
+    public function forget(){
+        return view('Auth.forgetPassword');
+    }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -43,6 +53,7 @@ class AuthController extends Controller
         $user = auth()->user();
 
         return response()->json([
+            'status'=> true,
             'user' => $user,
             'token' => $token,
         ]);
