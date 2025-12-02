@@ -44,8 +44,6 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user,
-            'roles' => $user->getRoleNames(),
-            'permissions' => $user->getAllPermissions()->pluck('name'),
             'token' => $token,
         ]);
     }
