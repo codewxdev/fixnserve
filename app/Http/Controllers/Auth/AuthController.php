@@ -10,6 +10,16 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    public function index()
+    {
+        return view('Auth.login');
+    }
+
+    public function forget()
+    {
+        return view('Auth.forgetPassword');
+    }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -32,21 +42,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // public function login(Request $request)
-    // {
-    //     $credentials = $request->only('email', 'password');
-
-    //     if (! $token = JWTAuth::attempt($credentials)) {
-    //         return response()->json(['error' => 'Invalid Credentials'], 401);
-    //     }
-
-    //     $user = auth()->user();
-
-    //     return response()->json([
-    //         'user' => $user,
-    //         'token' => $token,
-    //     ]);
-    // }
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -56,13 +51,12 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
-
         // Get user roles and permissions
         $roles = $user->getRoleNames();
         $permissions = $user->getAllPermissions()->pluck('name');
         // Check if user is Super Admin
         $isSuperAdmin = $user->hasRole('Super Admin');
-        $isAdmin = $user->hasRole('Admin');
+        // $isAdmin = $user->hasRole('Admin');
 
         // Create custom claims based on roles
         $customClaims = [
@@ -97,6 +91,7 @@ class AuthController extends Controller
         }
 
         return response()->json($response);
+
     }
 
     public function me()
