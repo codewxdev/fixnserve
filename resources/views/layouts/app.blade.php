@@ -36,7 +36,7 @@
          }
 
          body {
-             font-family: 'Inter', sans-serif;
+             font-family: 'Poppins', sans-serif;
              background-color: #f8fafc;
          }
 
@@ -79,7 +79,7 @@
      <!-- Alpine.js state for sidebar -->
      <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
          <!--Sidebar-->
-         <x-partials.sidebar/>
+         <x-partials.sidebar />
 
          <!-- Main Content Area -->
          <div x-bind:class="{ 'ml-64': sidebarOpen, 'ml-20': !sidebarOpen }" class="transition-all duration-300">
@@ -89,7 +89,6 @@
                  class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20">
 
                  <div class="flex items-center">
-                     <!-- Sidebar Toggle Button -->
                      <button @click="sidebarOpen = !sidebarOpen"
                          class="text-slate-600 hover:text-blue-500 transition-colors mr-4 focus:outline-none">
                          <svg x-show="sidebarOpen" class="w-6 h-6" fill="none" stroke="currentColor"
@@ -106,11 +105,73 @@
                      <h1 class="text-xl font-semibold text-slate-800">Admin Panel</h1>
                  </div>
 
-                 <!-- User Profile/Notifications -->
-                 <div class="flex items-center space-x-4">
-                     <span class="text-slate-600 font-medium hidden sm:inline">Super Admin</span>
-                     <img class="w-10 h-10 rounded-full object-cover border-2 border-blue-400"
-                         src="https://placehold.co/150x150/3b82f6/ffffff?text=SA" alt="Admin Profile">
+                 <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                     <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                         <span class="text-slate-600 font-medium hidden sm:inline">Super Admin</span>
+                         <img class="w-10 h-10 rounded-full object-cover border-2 border-blue-400"
+                             src="https://placehold.co/150x150/3b82f6/ffffff?text=SA" alt="Admin Profile">
+                     </button>
+
+                     <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                         x-transition:leave="transition ease-in duration-75"
+                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                         class="absolute right-0 mt-2 w-60 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden">
+
+                         <div class="p-4 bg-blue-50 border-b border-blue-100">
+                             <p class="text-sm font-semibold text-slate-800">Super Admin</p>
+                             <p class="text-xs text-slate-500">superadmin@fixnserve.com</p>
+                         </div>
+
+                         <div class="py-1">
+                             <div
+                                 class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center border-b border-gray-100">
+                                 <span>Role:</span>
+                                 <span
+                                     class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs">Super
+                                     Admin</span>
+                             </div>
+                             <div class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center">
+                                 <span>User ID:</span>
+                                 <span class="font-mono text-xs text-slate-500">#001</span>
+                             </div>
+
+                             <hr class="border-gray-100 my-1">
+
+                             <a href="#"
+                                 class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 transition-colors">
+                                 <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                 </svg>
+                                 Profile Settings
+                             </a>
+                             <a href="#"
+                                 class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 transition-colors">
+                                 <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                         d="M15 17h5l-1.405-2.81A3 3 0 0018 11.237V9c0-1.368-.592-2.735-1.353-3.794m-9.792 0C7.592 5.265 8 6.632 8 8v3.237a3 3 0 00-.6 1.745L4 17h5m-1.892-4.276a1 1 0 011.784 0M12 21a2 2 0 002-2v-1.764c0-.92-.38-1.777-1.002-2.398M12 21v-2a4 4 0 00-4-4">
+                                     </path>
+                                 </svg>
+                                 Notifications
+                             </a>
+
+                             <hr class="border-gray-100 my-1">
+
+                             <button @click="logout"
+                                 class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium text-left">
+                                 <svg class="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor"
+                                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                                     </path>
+                                 </svg>
+                                 Logout
+                             </button>
+                         </div>
+                     </div>
                  </div>
              </header>
 
@@ -127,6 +188,55 @@
          // Placeholder for main JS logic and Alpine init
      </script>
      @yield('scripts')
+
+     
+     <script>
+    function logout() {
+
+        // Disable the button to prevent multiple clicks
+        const logoutBtn = event.target;
+        logoutBtn.disabled = true;
+        logoutBtn.innerText = "Logging out...";
+
+        // Get token saved during login
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            // If no token, logout locally
+            localStorage.clear();
+            window.location.href = "/auth/login";
+            return;
+        }
+
+        // Call API using fetch
+        fetch("http://127.0.0.1:8000/api/auth/logout", {
+            method: "POST",
+            headers: {
+                "Authorization": "Bearer " + token,
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            // Clear all stored authentication data
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            // Redirect to login page
+            window.location.href = "/auth/login";
+        })
+        .catch(error => {
+            console.error("Logout Error:", error);
+
+            // Even if server fails, logout user locally
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+
+            window.location.href = "/auth/login";
+        });
+    }
+</script>
 
  </body>
 
