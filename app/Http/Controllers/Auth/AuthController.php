@@ -12,14 +12,6 @@ use JWTAuth;
 class AuthController extends Controller
 {
 
-    public function index(){
-        return view('Auth.login');
-    }
-
-    public function forget(){
-        return view('Auth.forgetPassword');
-    }
-
     public function register(Request $request)
     {
         $request->validate([
