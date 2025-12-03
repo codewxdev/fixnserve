@@ -6,7 +6,7 @@ use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
 use App\Http\Controllers\Role\UserRoleController;
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
@@ -24,13 +24,13 @@ Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
 
     Route::get('/roles/{role?}', [RoleController::class, 'index']);
     Route::post('/roles', [RoleController::class, 'store']);
-    Route::put('/roles/{role}', [RoleController::class, 'update']);
+    Route::post('/roles/{role}', [RoleController::class, 'update']);
     Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
 
     // Permissions CRUD
     Route::get('/permissions/{permission?}', [PermissionController::class, 'index']);
     Route::post('/permissions', [PermissionController::class, 'store']);
-    Route::put('/permissions/{permission}', [PermissionController::class, 'update']);
+    Route::post('/permissions/{permission}', [PermissionController::class, 'update']);
     Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy']);
 
     // Role-Permission CRUD (assign/remove)

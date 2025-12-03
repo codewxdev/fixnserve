@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Correct way to register middleware aliases in Laravel 11/12
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
+            'super.admin' => \App\Http\Middleware\CheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);

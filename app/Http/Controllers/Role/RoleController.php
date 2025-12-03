@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Role;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\Role;
+// use App\Models\Role;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -30,7 +31,9 @@ class RoleController extends Controller
 
     public function update(Request $request, Role $role)
     {
+
         $request->validate(['name' => 'required|unique:roles,name,'.$role->id]);
+
         $role->update(['name' => $request->name]);
 
         return ApiResponse::success($role, 'Role updated');
