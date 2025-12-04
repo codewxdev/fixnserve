@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\LoginHistory;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -43,6 +44,31 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
+        $agent = $request->header('User-Agent');
+        $device = 'Unknown';
+        $platform = 'Unknown';
+        $browser = 'Unknown';
+
+        if ($agent) {
+            $agentParser = new \Jenssegers\Agent\Agent;
+            $agentParser->setUserAgent($agent);
+            $device = $agentParser->device();
+            $platform = $agentParser->platform();
+            $browser = $agentParser->browser();
+        }
+
+        // Save login history
+        LoginHistory::create([
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $agent,
+            'device' => $device,
+            'platform' => $platform,
+            'browser' => $browser,
+            'token' => $token,
+            'login_at' => now(),
+        ]);
+
         // Get user roles and permissions
 
         if ($user->is_2fa_enabled) {
@@ -61,8 +87,16 @@ class AuthController extends Controller
         return response()->json(auth()->user());
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
+        $user = auth()->user();
+        $token = $request->bearerToken();
+
+        // Update logout_at
+        LoginHistory::where('user_id', $user->id)
+            ->where('token', $token)
+            ->latest()
+            ->update(['logout_at' => now()]);
         auth()->logout();
 
         return response()->json(['message' => 'Logged out']);
@@ -140,5 +174,13 @@ class AuthController extends Controller
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
         ]);
+    }
+
+    public function loginHistory(Request $request)
+    {
+        $user = auth()->user();
+        $history = $user->loginHistories()->orderBy('login_at', 'desc')->get();
+
+        return response()->json($history);
     }
 }

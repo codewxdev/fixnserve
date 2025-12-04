@@ -49,4 +49,7 @@ Route::middleware(['auth:api', 'role:Super Admin', '2fa'])->group(function () {
     // User roles + permissions
     Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
     Route::get('/users/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
+
+    Route::get('/login-history', [AuthController::class, 'loginHistory'])->middleware('auth:api', '2fa');
+
 });

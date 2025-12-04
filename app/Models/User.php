@@ -97,18 +97,6 @@ class User extends Authenticatable implements JWTSubject
             ->implode('');
     }
 
-    /**
-     * Use UUID for JWT identifier
-     */
-    // public function getJWTIdentifier()
-    // {
-    //     return $this->uuid; // UUID use karein JWT ke liye
-    // }
-
-    // public function getJWTCustomClaims(): array
-    // {
-    //     return [];
-    // }
     public function getJWTIdentifier()
     {
         return $this->getKey(); // returns primary key = id
@@ -120,5 +108,10 @@ class User extends Authenticatable implements JWTSubject
             'uuid' => $this->uuid,
             'roles' => $this->getRoleNames(),
         ];
+    }
+
+    public function loginHistories()
+    {
+        return $this->hasMany(LoginHistory::class);
     }
 }
