@@ -40,7 +40,7 @@ class AuthController extends Controller
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
-
+        
         $user = auth()->user();
         // Get user roles and permissions
         $roles = $user->getRoleNames();
@@ -80,7 +80,7 @@ class AuthController extends Controller
             $response['access_level'] = 'super_admin';
 
         }
-
+ 
         return response()->json(['status'=>true, $response]);
 
     }

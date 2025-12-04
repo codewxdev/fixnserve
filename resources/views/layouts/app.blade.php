@@ -72,6 +72,7 @@
          /* End: resources/css/dashboard.css */
      </style>
      {{-- Note: In a real Laravel project, you would use: <link rel="stylesheet" href="{{ mix('css/dashboard.css') }}">   --}}
+   @stack('styles')
  </head>
 
  <body class="antialiased">
@@ -80,7 +81,7 @@
      <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
          <!--Sidebar-->
          <x-partials.sidebar />
-
+         
          <!-- Main Content Area -->
          <div x-bind:class="{ 'ml-64': sidebarOpen, 'ml-20': !sidebarOpen }" class="transition-all duration-300">
 
@@ -118,26 +119,24 @@
                          x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                          class="absolute right-0 mt-2 w-60 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden">
 
-                         <div class="p-4 bg-blue-50 border-b border-blue-100">
-                             <p class="text-sm font-semibold text-slate-800">Super Admin</p>
-                             <p class="text-xs text-slate-500">superadmin@fixnserve.com</p>
+                         <div class="p-4 bg-blue-50 border-b border-blue-100" x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
+                             <p class="text-sm font-semibold text-slate-800" x-text="user?.roles[0]">Super Admin</p>
+                             <p class="text-xs text-slate-500" x-text="user?.email">superadmin@fixnserve.com</p>
                          </div>
 
-                         <div class="py-1">
+                         <div class="py-1" x-data="{ user: JSON.parse(localStorage.getItem('user')) }" >
                              <div
                                  class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center border-b border-gray-100">
                                  <span>Role:</span>
                                  <span
-                                     class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs">Super
-                                     Admin</span>
+                                     class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs" x-text="user?.roles[0]"> </span>
                              </div>
                              <div class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center">
                                  <span>User ID:</span>
-                                 <span class="font-mono text-xs text-slate-500">#001</span>
+                                 <span class="font-mono text-xs text-slate-500" x-text="user?.id">#009</span>
                              </div>
-
+                            
                              <hr class="border-gray-100 my-1">
-
                              <a href="#"
                                  class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 transition-colors">
                                  <svg class="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor"
@@ -184,59 +183,57 @@
 
      <!-- Main JS file (Chart initialization goes here) -->
      {{-- Note: In a real Laravel project, you would use: <script src="{{ mix('js/app.js') }}"></script>  --}}
+
+     @stack('scripts')
+
      <script>
-         // Placeholder for main JS logic and Alpine init
+ 
+         function logout() {
+
+             // Disable the button to prevent multiple clicks
+             const logoutBtn = event.target;
+             logoutBtn.disabled = true;
+             logoutBtn.innerText = "Logging out...";
+
+             // Get token saved during login
+             const token = localStorage.getItem("token");
+
+             if (!token) {
+                 // If no token, logout locally
+                 localStorage.clear();
+                 window.location.href = "/auth/login";
+                 return;
+             }
+
+             // Call API using fetch
+             fetch("http://127.0.0.1:8000/api/auth/logout", {
+                     method: "POST",
+                     headers: {
+                         "Authorization": "Bearer " + token,
+                         "Content-Type": "application/json"
+                     }
+                 })
+                 .then(response => response.json())
+                 .then(data => {
+
+                     // Clear all stored authentication data
+                     localStorage.removeItem("token");
+                     localStorage.removeItem("user");
+
+                     // Redirect to login page
+                     window.location.href = "/auth/login";
+                 })
+                 .catch(error => {
+                     console.error("Logout Error:", error);
+
+                     // Even if server fails, logout user locally
+                     localStorage.removeItem("token");
+                     localStorage.removeItem("user");
+
+                     window.location.href = "/auth/login";
+                 });
+         }
      </script>
-     @yield('scripts')
-
-     
-     <script>
-    function logout() {
-
-        // Disable the button to prevent multiple clicks
-        const logoutBtn = event.target;
-        logoutBtn.disabled = true;
-        logoutBtn.innerText = "Logging out...";
-
-        // Get token saved during login
-        const token = localStorage.getItem("token");
-
-        if (!token) {
-            // If no token, logout locally
-            localStorage.clear();
-            window.location.href = "/auth/login";
-            return;
-        }
-
-        // Call API using fetch
-        fetch("http://127.0.0.1:8000/api/auth/logout", {
-            method: "POST",
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-
-            // Clear all stored authentication data
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
-            // Redirect to login page
-            window.location.href = "/auth/login";
-        })
-        .catch(error => {
-            console.error("Logout Error:", error);
-
-            // Even if server fails, logout user locally
-            localStorage.removeItem("token");
-            localStorage.removeItem("user");
-
-            window.location.href = "/auth/login";
-        });
-    }
-</script>
 
  </body>
 
