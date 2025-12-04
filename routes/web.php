@@ -10,7 +10,7 @@ use Laravel\Fortify\Features;
 
 
 Route::get('/', function () {
-    return view('dashboard.index');
+    return view('admin.dashboard.index');
 })->name('home');
 
 
@@ -18,3 +18,7 @@ Route::get('/', function () {
 Route::get('/auth/login',[FrontAuthController::class, 'index'])->name('login.index');
 Route::get('/auth/forget/password',[FrontAuthController::class, 'forget'])->name('forget.password');
 Route::get('/auth/password/reset',[FrontAuthController::class, 'reset'])->name('reset.password');
+
+
+ 
+
