@@ -11,11 +11,11 @@ class UserRoleController extends Controller
     public function assignRole(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_uuid' => 'required|exists:users,uuid',
             'role' => 'required|exists:roles,name',
         ]);
 
-        $user = User::findOrFail($request->user_id);
+        $user = User::where('uuid', $request->user_uuid)->firstOrFail();
         $user->syncRoles([$request->role]); // overwrite roles
 
         return response()->json([
@@ -29,11 +29,11 @@ class UserRoleController extends Controller
     public function assignPermissionsToUser(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_uuid' => 'required|exists:users,uuid',
             'permissions' => 'required|array',
         ]);
 
-        $user = User::findOrFail($request->user_id);
+        $user = User::where('uuid', $request->user_uuid)->firstOrFail();
         $user->syncPermissions($request->permissions);
 
         return response()->json([
@@ -46,7 +46,7 @@ class UserRoleController extends Controller
     // Get user roles
     public function getUserRoles($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $id)->firstOrFail();
 
         return response()->json([
             'status' => true,
@@ -57,7 +57,7 @@ class UserRoleController extends Controller
     // Get user permissions (including via roles)
     public function getUserPermissions($id)
     {
-        $user = User::findOrFail($id);
+        $user = User::where('uuid', $id)->firstOrFail();
 
         return response()->json([
             'status' => true,

@@ -9,19 +9,21 @@ use App\Http\Controllers\Role\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
 Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
 Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
 Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
+Route::post('/2fa/enable', [AuthController::class, 'enable2FA'])->middleware('auth:api');
+Route::post('/2fa/verify', [AuthController::class, 'verify2FA'])->middleware('throttle:2fa');
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-  
+
 });
 
-Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
+Route::middleware(['auth:api', 'role:Super Admin', '2fa'])->group(function () {
 
     Route::get('/roles/{role?}', [RoleController::class, 'index']);
     Route::post('/roles', [RoleController::class, 'store']);
@@ -41,11 +43,10 @@ Route::middleware(['auth:api', 'role:Super Admin'])->group(function () {
 
     // USER → ROLE
     Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);
+
     // USER → DIRECT PERMISSIONS (optional)
     Route::post('/users/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
     // User roles + permissions
     Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
     Route::get('/users/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
 });
-// Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
-// Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);

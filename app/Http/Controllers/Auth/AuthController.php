@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use PragmaRX\Google2FA\Google2FA;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-
     public function register(Request $request)
     {
         $request->validate([
@@ -28,6 +28,7 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
+
             'user' => $user,
             'token' => $token,
         ]);
@@ -43,45 +44,15 @@ class AuthController extends Controller
 
         $user = auth()->user();
         // Get user roles and permissions
-        $roles = $user->getRoleNames();
-        $permissions = $user->getAllPermissions()->pluck('name');
-        // Check if user is Super Admin
-        $isSuperAdmin = $user->hasRole('Super Admin');
-        // $isAdmin = $user->hasRole('Admin');
 
-        // Create custom claims based on roles
-        $customClaims = [
-            'roles' => $roles,
-            'permissions' => $permissions,
-            'is_super_admin' => $isSuperAdmin,
-            'user_id' => $user->id,
-        ];
-
-        // Generate token with custom claims
-        $tokenWithClaims = JWTAuth::claims($customClaims)->fromUser($user);
-
-        // Return response based on role
-        $response = [
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
+        if ($user->is_2fa_enabled) {
+            return response()->json([
+                'status' => '2fa_required',
                 'email' => $user->email,
-                'roles' => $roles,
-                'is_super_admin' => $isSuperAdmin,
-            ],
-            'token' => $tokenWithClaims,
-            'token_type' => 'bearer',
-            'expires_in' => JWTAuth::factory()->getTTL() * 60,
-        ];
-
-        // Add extra data for Super Admin
-        if ($isSuperAdmin) {
-            $response['admin_access'] = true;
-            $response['access_level'] = 'super_admin';
-
+            ]);
         }
 
-        return response()->json($response);
+        return $this->respondWithToken($token);
 
     }
 
@@ -100,5 +71,74 @@ class AuthController extends Controller
     public function refresh()
     {
         return response()->json(['token' => auth()->refresh()]);
+    }
+
+    public function enable2FA(Request $request)
+    {
+        $google2fa = new Google2FA;
+
+        $secret = $google2fa->generateSecretKey();
+
+        // Save to DB
+        $user = $request->user();
+        $user->google2fa_secret = $secret;
+        $user->is_2fa_enabled = false; // OTP verify hone ke baad 1
+        $user->save(); // important!
+
+        $qrCodeUrl = $google2fa->getQRCodeUrl(
+            'FixnServe',
+            $request->user()->email,
+            $secret
+        );
+
+        return response()->json([
+            'secret' => $secret,
+            'qrcode_url' => $qrCodeUrl,
+        ]);
+    }
+
+    public function verify2FA(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'otp' => 'required',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if (! $user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $google2fa = new Google2FA;
+
+        $valid = $google2fa->verifyKey($user->google2fa_secret, $request->otp);
+
+        if (! $valid) {
+            return response()->json(['error' => 'Invalid OTP'], 401);
+        }
+
+        // ✅ OTP valid → enable 2FA for future logins
+        if (! $user->is_2fa_enabled) {
+            $user->is_2fa_enabled = 1;
+            $user->save();
+        }
+
+        // OTP valid → JWT generate
+        $token = auth()->login($user);
+
+        return response()->json([
+            'status' => 'success',
+            'token' => $token,
+            'user' => $user,
+        ]);
+    }
+
+    protected function respondWithToken($token)
+    {
+        return response()->json([
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
+        ]);
     }
 }

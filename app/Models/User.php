@@ -3,18 +3,33 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Spatie\Permission\Traits\HasRoles;
-use Tymon\JWTAuth\Contracts\JWTSubject; // Add this line
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable; // HasRoles is used here
+    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
+
+    // UUID ke liye trait use karein
+    use HasUuids;
+
+    /**
+     * Specify which column gets UUID
+     */
+    protected $uuidColumn = 'uuid';
+
+    /**
+     * Remove these lines - auto-increment id use kareinge
+     * public $incrementing = false;
+     * protected $keyType = 'string';
+     */
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +40,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'uuid', // Add UUID to fillable
     ];
 
     /**
@@ -34,12 +50,9 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $hidden = [
         'password',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
         'remember_token',
         'created_at',
         'updated_at',
-        'two_factor_confirmed_at',
         'email_verified_at',
     ];
 
@@ -57,6 +70,22 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Get columns that should receive UUIDs
+     */
+    public function uniqueIds(): array
+    {
+        return ['uuid']; // Sirf UUID column ko UUID assign karein
+    }
+
+    /**
+     * Use UUID for route model binding
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'uuid'; // Routes mein UUID use karein
+    }
+
+    /**
      * Get the user's initials
      */
     public function initials(): string
@@ -68,13 +97,28 @@ class User extends Authenticatable implements JWTSubject
             ->implode('');
     }
 
+    /**
+     * Use UUID for JWT identifier
+     */
+    // public function getJWTIdentifier()
+    // {
+    //     return $this->uuid; // UUID use karein JWT ke liye
+    // }
+
+    // public function getJWTCustomClaims(): array
+    // {
+    //     return [];
+    // }
     public function getJWTIdentifier()
     {
-        return $this->getKey();
+        return $this->getKey(); // returns primary key = id
     }
 
-    public function getJWTCustomClaims()
+    public function getJWTCustomClaims(): array
     {
-        return [];
+        return [
+            'uuid' => $this->uuid,
+            'roles' => $this->getRoleNames(),
+        ];
     }
 }
