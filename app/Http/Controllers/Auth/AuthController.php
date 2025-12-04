@@ -15,13 +15,14 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'first_name' => 'required',
+            'last_name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'name' => $request->first_name + $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -182,5 +183,28 @@ class AuthController extends Controller
         $history = $user->loginHistories()->orderBy('login_at', 'desc')->get();
 
         return response()->json($history);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'dob' => 'nullable|date',
+            'gender' => 'nullable|in:male,female,other',
+            'current_address' => 'nullable|string',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string',
+            'state' => 'nullable|string',
+            'zipcode' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'User updated successfully',
+            'data' => $user,
+        ]);
     }
 }

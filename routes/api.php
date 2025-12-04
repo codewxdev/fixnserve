@@ -15,6 +15,7 @@ Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verif
 Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
 Route::post('/2fa/enable', [AuthController::class, 'enable2FA'])->middleware('auth:api');
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA'])->middleware('throttle:2fa');
+Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile'])->middleware('throttle:2fa');
 
 Route::middleware('auth:api')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
@@ -22,7 +23,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
 
 });
-
 Route::middleware(['auth:api', 'role:Super Admin', '2fa'])->group(function () {
 
     Route::get('/roles/{role?}', [RoleController::class, 'index']);
