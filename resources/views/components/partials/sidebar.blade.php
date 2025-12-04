@@ -20,7 +20,7 @@
 
                 <!-- Dashboard Link (Non-collapsible, Active Example) -->
                 <li>
-                    <a href="/dashboard"
+                    <a href="{{ route('dashboard.index') }}"
                         class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 nav-active transition duration-150">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
@@ -66,8 +66,8 @@
                         x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
                         x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
                         class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Customer Details</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"> Order History</a></li>
+                        <li><a href="{{ route('customer.index') }}" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Customer Details</a></li>
+                        <li><a href="{{ route('order.history') }}" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"> Order History</a></li>
                         <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Payment History</a></li>
                         <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Wallet Transactions</a></li>
                         <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Saved Providers</a></li>

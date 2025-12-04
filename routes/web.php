@@ -11,7 +11,7 @@ use Laravel\Fortify\Features;
 
 Route::get('/', function () {
     return view('admin.dashboard.index');
-})->name('home');
+})->name('dashboard.index');
 
 
 // Authentication Routes

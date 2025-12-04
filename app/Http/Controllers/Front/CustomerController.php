@@ -12,5 +12,8 @@ class CustomerController extends Controller
         return view('admin.customers.index');
     }
 
-    
+     public function order_history(){
+        return view('admin.customers.order_history');
+    }
+
 }
