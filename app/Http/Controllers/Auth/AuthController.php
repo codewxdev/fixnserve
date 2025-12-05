@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
+use Twilio\Rest\Client;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -18,7 +19,7 @@ class AuthController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -76,6 +77,7 @@ class AuthController extends Controller
             return response()->json([
                 'status' => '2fa_required',
                 'email' => $user->email,
+                'access_token' => $token,
             ]);
         }
 
@@ -191,7 +193,7 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'dob' => 'nullable|date',
-            'gender' => 'nullable|in:male,female,other',
+            'gender' => 'nullable|string',
             'current_address' => 'nullable|string',
             'address' => 'nullable|string',
             'city' => 'nullable|string',
@@ -200,11 +202,77 @@ class AuthController extends Controller
             'phone' => 'nullable|string|max:20',
         ]);
 
-        $user->update($validated);
+        if (isset($validated['phone'])) {
+
+            if (is_null($user->phone)) {
+                // Pehli dafa phone add ho raha hai → OTP bhejo
+                $user->pending_phone = $validated['phone'];
+
+                // Random OTP generate
+                $otp = rand(100000, 999999);
+
+                $user->phone_otp = $otp;
+                // sendOtpSMS($validated['phone'], $otp);
+
+                // Yahan SMS gateway (Twilio / local API) call karna hota hai
+                // SMS::send($validated['phone'], "Your OTP: $otp");
+
+            } else {
+                // Phone already exists → update NAHI hoga
+                unset($validated['phone']);
+            }
+        }
+
+        foreach ($validated as $key => $value) {
+            if (! is_null($value)) {   // Only update if value provided
+                $user->{$key} = $value;
+            }
+        }
+
+        $user->save();
 
         return response()->json([
-            'message' => 'User updated successfully',
+            'message' => 'User profile updated successfully!',
             'data' => $user,
+        ]);
+    }
+
+    public function verifyPhoneOtp(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|numeric',
+        ]);
+
+        $user = auth()->user();
+
+        if ($user->phone_otp != $request->otp) {
+            return response()->json([
+                'message' => 'Invalid OTP',
+            ], 422);
+        }
+
+        // Successful verification
+        $user->phone = $user->pending_phone;
+        $user->pending_phone = null;
+        $user->phone_otp = null;
+        $user->phone_verified_at = now();
+        $user->save();
+
+        return response()->json([
+            'message' => 'Phone verified successfully!',
+            'data' => $user,
+        ]);
+    }
+
+    public function sendOtpSMS($phone, $otp)
+    {
+        $sid = env('TWILIO_SID');
+        $token = env('TWILIO_TOKEN');
+        $twilio = new Client($sid, $token);
+
+        $twilio->messages->create($phone, [
+            'from' => env('TWILIO_NUMBER'),
+            'body' => "Your verification code is: $otp",
         ]);
     }
 }
