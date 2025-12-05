@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class RolePermissionController extends Controller
 {
     public function index(){
-        return view('admin.role_permission.index');
+        return view('Admin.role_permission.index');
     }
 }

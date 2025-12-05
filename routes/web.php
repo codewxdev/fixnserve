@@ -10,7 +10,7 @@ use Laravel\Fortify\Features;
 
 
 Route::get('/', function () {
-    return view('admin.dashboard.index');
+    return view('Admin.dashboard.index');
 })->name('dashboard.index');
 
 
