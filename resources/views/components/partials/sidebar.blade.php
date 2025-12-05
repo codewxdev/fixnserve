@@ -31,7 +31,7 @@
                             x-cloak>Dashboard</span>
                     </a>
                 </li>
-
+                <!-- 2. Customers -->
                 <li>
                     <a href="{{ route('customer.index') }}"
                         class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
@@ -44,174 +44,49 @@
                             x-cloak>Customers</span>
                     </a>
                 </li>
-                <!-- === COLLAPSIBLE MENU ITEMS START HERE === -->
-
-                <!-- 1. Customers -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 21v-2a4 4 0 00-3-3.87m-7 0A4 4 0 004 19v2m8-10a4 4 0 110-8 4 4 0 010 8z" />
-                        </svg>
-
-                        <!-- Name -->
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300 text-left flex-1"
-                            x-cloak>Customers</span>
-
-                        <!-- Arrow Icon (Only show when sidebar is open) -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="{{ route('customer.index') }}" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Customer Details</a></li>
-                        <li><a href="{{ route('order.history') }}" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"> Order History</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Payment History</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Wallet Transactions</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Saved Providers</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Complaints / Support Tickets</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Refund Requests</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Ban / Suspend User</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Login History</a></li>
-                        <li><a href="#" class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Device & Sessions</a></li>
-                    </ul>
-                </li> --}}
-
                 <!-- 2. Service Providers -->
-                <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
+                <li>
+                    <a href="{{ route('provider.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 7h18v10H3V7zm5-4h8v4H8V3z" />
                         </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>Service
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Service
                             Providers</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">All
-                                Providers</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Service
-                                Categories</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Commissions</a>
-                        </li>
-                    </ul>
+                    </a>
                 </li>
-
                 <!-- 3. Professional Experts -->
-                <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
+                <li>
+                    <a href="{{ route('professional.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 8a4 4 0 110 8 4 4 0 010-8zm0-6l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4l2-4z" />
                         </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1"
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
                             x-cloak>Professional Experts</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Expert
-                                List</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Approvals</a>
-                        </li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Skill
-                                Sets</a></li>
-                    </ul>
+                    </a>
                 </li>
-
                 <!-- 4. Consultants -->
-                <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
+                <li>
+                    <a href="{{ route('consultant.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" />
                         </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1"
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
                             x-cloak>Consultants</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">All
-                                Consults</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Pending
-                                Requests</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Earnings</a>
-                        </li>
-                    </ul>
+                    </a>
                 </li>
+
+
+                <!-- === COLLAPSIBLE MENU ITEMS START HERE === -->
 
                 <!-- 5. Mart Vendors -->
                 <li x-data="{ open: false }">
@@ -327,7 +202,7 @@
                         <li><a href="#"
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Admin
                                 Users</a></li>
-                        <li><a href="#"
+                        <li><a href="{{ route('role.permission.index') }}"
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Roles
                                 & Permissions</a></li>
                         <li><a href="#"
@@ -548,6 +423,18 @@
                     </ul>
                 </li>
 
+                <li>
+                    <a href="{{ route('role.permission.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 7h18v10H3V7zm5-4h8v4H8V3z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Roles & Permissions</span>
+                    </a>
+                </li>
                 <!-- === COLLAPSIBLE MENU ITEMS END HERE === -->
 
             </ul>

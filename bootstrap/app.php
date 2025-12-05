@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function(): void {
             Route::namespace('admin')->group(base_path('routes/admin/customer.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/provider.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/professional.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/role_permission.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/consultant.php'));
            
         }
     )
