@@ -31,7 +31,7 @@
                 </nav>
 
                 {{-- Page title & Subtitle --}}
-                <h1 class="text-3xl font-extrabold text-slate-900 leading-tight">Roles & Permissions Management</h1>
+                <h1 class="text-3xl font-bold text-slate-900 leading-tight">Roles & Permissions Management</h1>
                 <p class="text-lg text-slate-600 mt-1">Control system access and security across the platform.</p>
             </div>
             <div class="div">
@@ -63,7 +63,7 @@
         <hr class="border-slate-200">
 
         {{-- B. Overview Statistics (Top Insight Cards) --}}
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {{-- Card 1: Total Roles (Hardcoded) --}}
             <div
                 class="bg-white p-5 rounded-2xl shadow-xl transition-all duration-300 ease-in-out transform hover:shadow-2xl hover:-translate-y-0.5 border border-slate-100">
@@ -265,7 +265,7 @@
                                         <th scope="col" class="px-6 py-3 text-center w-36 relative">
                                             <span class="font-bold text-slate-800">Super Admin</span>
                                             <span
-                                                class="absolute top-0 right-0 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 translate-x-3 -translate-y-2">Core</span>
+                                                class="absolute top-3 right-1 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 translate-x-3 -translate-y-2">Core</span>
                                             <div class="mt-1 flex justify-center space-x-2">
                                                 <button onclick="openManagePermissions('Super Admin')"
                                                     title="Manage Permissions"

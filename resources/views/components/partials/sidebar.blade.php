@@ -21,7 +21,7 @@
                 <!-- Dashboard Link (Non-collapsible, Active Example) -->
                 <li>
                     <a href="{{ route('dashboard.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 nav-active transition duration-150">
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('dashboard.index') ? 'nav-active' : '' }}">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -34,7 +34,7 @@
                 <!-- 2. Customers -->
                 <li>
                     <a href="{{ route('customer.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('customer.index') ? 'nav-active' : '' }}">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -47,7 +47,7 @@
                 <!-- 2. Service Providers -->
                 <li>
                     <a href="{{ route('provider.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('provider.index') ? 'nav-active' : '' }}">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -61,7 +61,7 @@
                 <!-- 3. Professional Experts -->
                 <li>
                     <a href="{{ route('professional.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('professional.index') ? 'nav-active' : '' }}">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -74,7 +74,7 @@
                 <!-- 4. Consultants -->
                 <li>
                     <a href="{{ route('consultant.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('consultant.index') ? 'nav-active' : '' }}">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,12 +84,125 @@
                             x-cloak>Consultants</span>
                     </a>
                 </li>
+                <!-- 5. Mart Vendors -->
+                <li>
+                    <a href="{{ route('mart.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('mart.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 9l1-5h16l1 5M4 9v11h16V9M9 22V12h6v10" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300" x-cloak>Mart
+                            Vendors</span>
+                    </a>
+                </li>
+                <!-- 6. Riders -->
+                <li>
+                    <a href="{{ route('rider.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('rider.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 18a3 3 0 110-6 3 3 0 010 6zm14 0a3 3 0 110-6 3 3 0 010 6zM5 15h6l3-6h4" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Riders</span>
+                    </a>
+                </li>
+
+                <!-- 6. Service management -->
+                <li>
+                    <a href="{{ route('service.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('service.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 2l7 4v4c0 5-3.5 9.5-7 10-3.5-.5-7-5-7-10V6l7-4zm0 8a3 3 0 110 6 3 3 0 010-6z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Service Management</span>
+                    </a>
+                </li>
+
+                <!-- 6. Finance  -->
+                <li>
+                    <a href="{{ route('finance.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('finance.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 7h18v10H3V7zm13 3h3v4h-3v-4z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Financial System</span>
+                    </a>
+                </li>
+
+                <!-- 9. Complaint & Refund System -->
+                <li>
+                    <a href="{{ route('car.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('car.index') ? 'nav-active' : '' }}">
+                        <!-- Icon -->
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v4m0 4h.01M12 2a10 10 0 110 20 10 10 0 010-20z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Complaint & Refund System</span>
+                    </a>
+                </li>
+
+                <!-- 10. Reports and Analytics -->
+                <li>
+                    <a href="{{ route('report.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('report.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 12h2v6H5v-6zm6-4h2v10h-2V8zm6 2h2v8h-2v-8z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Reports
+                            and Analytics</span>
+                    </a>
+                </li>
+
+                <!-- 11. CMS & Settings -->
+                <li>
+                    <a href="{{ route('cms.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('cms.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15a3 3 0 110-6 3 3 0 010 6zm8.94-2a1 1 0 000-2l-2.1-.35a6.99 6.99 0 00-.78-1.88l1.26-1.78a1 1 0 00-1.42-1.42l-1.78 1.26a7 7 0 00-1.88-.78L14 3.06a1 1 0 00-2 0l-.35 2.1a7 7 0 00-1.88.78L8 4.68a1 1 0 00-1.42 1.42l1.26 1.78a6.99 6.99 0 00-.78 1.88L4.06 10a1 1 0 000 2l2.1.35c.14.66.38 1.29.78 1.88l-1.26 1.78a1 1 0 001.42 1.42l1.78-1.26c.59.4 1.22.64 1.88.78l.35 2.1a1 1 0 002 0l.35-2.1c.66-.14 1.29-.38 1.88-.78l1.78 1.26a1 1 0 001.42-1.42l-1.26-1.78c.4-.59.64-1.22.78-1.88l2.1-.35z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>CMS &
+                            Settings</span>
+                    </a>
+                </li>
+
+                   <!-- 12. Notifications Engine -->
+                <li>
+                    <a href="{{ route('notification.index') }}"
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('notification.index') ? 'nav-active' : '' }}">
+                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15a3 3 0 110-6 3 3 0 010 6zm8.94-2a1 1 0 000-2l-2.1-.35a6.99 6.99 0 00-.78-1.88l1.26-1.78a1 1 0 00-1.42-1.42l-1.78 1.26a7 7 0 00-1.88-.78L14 3.06a1 1 0 00-2 0l-.35 2.1a7 7 0 00-1.88.78L8 4.68a1 1 0 00-1.42 1.42l1.26 1.78a6.99 6.99 0 00-.78 1.88L4.06 10a1 1 0 000 2l2.1.35c.14.66.38 1.29.78 1.88l-1.26 1.78a1 1 0 001.42 1.42l1.78-1.26c.59.4 1.22.64 1.88.78l.35 2.1a1 1 0 002 0l.35-2.1c.66-.14 1.29-.38 1.88-.78l1.78 1.26a1 1 0 001.42-1.42l-1.26-1.78c.4-.59.64-1.22.78-1.88l2.1-.35z" />
+                        </svg>
+                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
+                            x-cloak>Notifications Engine</span>
+                    </a>
+                </li>
 
 
                 <!-- === COLLAPSIBLE MENU ITEMS START HERE === -->
 
                 <!-- 5. Mart Vendors -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -127,10 +240,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Inventory</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- 6. Riders -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -168,10 +281,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Payouts</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- 7. Admin Management -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -209,10 +322,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Activity
                                 Logs</a></li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- 8. Financial System -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -253,10 +366,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Tax
                                 Reports</a></li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- 9. Complaint & Refund System -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -294,10 +407,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Resolution
                                 History</a></li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- 10. Reports and Analytics -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -336,10 +449,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Service
                                 Metrics</a></li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <!-- 11. CMS & Settings -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -378,11 +491,10 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Email
                                 Templates</a></li>
                     </ul>
-                </li>
-
+                </li> --}}
 
                 <!-- 12. Notifications Engine -->
-                <li x-data="{ open: false }">
+                {{-- <li x-data="{ open: false }">
                     <button @click="open = !open"
                         class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
                         <!-- Icon -->
@@ -421,11 +533,11 @@
                                 class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Logs</a>
                         </li>
                     </ul>
-                </li>
+                </li> --}}
 
                 <li>
                     <a href="{{ route('role.permission.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
+                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('role.permission.index') ? 'nav-active' : '' }}">
                         <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                             xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

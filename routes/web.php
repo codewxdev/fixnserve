@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
 
-Route::get('/', function () {
+Route::get('/', function() {
     return view('Admin.dashboard.index');
 })->name('dashboard.index');
 

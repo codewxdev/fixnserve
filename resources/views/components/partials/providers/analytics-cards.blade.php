@@ -16,7 +16,7 @@
             <p class="text-sm font-medium text-gray-500">{{ $stat['title'] }}</p>
             <i class="{{ $stat['icon'] }} text-2xl text-{{ $stat['color'] }}-500 opacity-70"></i>
         </div>
-        <p class="text-3xl font-bold text-gray-900 mt-1">{{ $stat['value'] }}</p>
+        <p class="text-xl font-bold text-gray-900 mt-1">{{ $stat['value'] }}</p>
     </div>
 </div>
 @endforeach

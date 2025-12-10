@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="px-6 py-8 md:px-10 lg:px-12">
-        <h1 class="text-3xl font-extrabold tracking-tight text-gray-900 mb-8">
+        <h1 class="text-3xl font-bold  text-gray-900 mb-8">
             Professional Experts Management
         </h1>
 

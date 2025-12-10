@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="space-y-6">
-        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
             Service Provider Management 
         </h1>
 
@@ -54,6 +54,7 @@
 @endsection
 
 @push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Custom styles for premium shadow and typography */
         .shadow-xl {

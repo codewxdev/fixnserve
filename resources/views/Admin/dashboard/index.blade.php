@@ -5,12 +5,12 @@
 
     <section class="mb-10">
         <h3 class="text-2xl font-semibold text-slate-800 mb-5">Key Performance Indicators</h3>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
 
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Total Orders</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">4,281</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">4,281</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-green-600 font-semibold">+18.5%</span>
@@ -28,7 +28,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Total Revenue</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">$45,390</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">$45,390</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-green-600 font-semibold">+12.1%</span>
@@ -45,7 +45,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Service Requests</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">5,120</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">5,120</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-red-600 font-semibold">-1.2%</span>
@@ -63,7 +63,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Total Users</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">18,340</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">18,340</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-green-600 font-semibold">+5.5%</span>
@@ -80,7 +80,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Total Providers</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">1,120</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">1,120</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-yellow-600 font-semibold">0.0%</span>
@@ -99,7 +99,7 @@
                 class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36 border-l-4 border-red-500">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Pending KYC</p>
-                    <p class="text-3xl font-extrabold text-red-600 mt-1">45</p>
+                    <p class="text-xl font-bold text-red-600 mt-1">45</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-red-600 font-semibold">+3.1%</span>
@@ -117,7 +117,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Live Orders</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">15</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">15</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-slate-500 font-semibold">Today</span>
@@ -134,7 +134,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Active Riders</p>
-                    <p class="text-3xl font-extrabold text-slate-900 mt-1">210</p>
+                    <p class="text-xl font-bold text-slate-900 mt-1">210</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-green-600 font-semibold">Online</span>
@@ -152,7 +152,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Withdraw Requests</p>
-                    <p class="text-3xl font-extrabold text-yellow-600 mt-1">12</p>
+                    <p class="text-xl font-bold   mt-1">12</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-slate-500 font-semibold">Pending</span>
@@ -170,7 +170,7 @@
             <div class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36">
                 <div>
                     <p class="text-sm font-medium text-slate-500">Refund Requests</p>
-                    <p class="text-3xl font-extrabold text-yellow-600 mt-1">8</p>
+                    <p class="text-3xl font-bold   mt-1">8</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-slate-500 font-semibold">In Review</span>
@@ -188,7 +188,7 @@
                 class="pro-card p-6 bg-white rounded-xl shadow-md flex flex-col justify-between h-36 border-l-4 border-red-500">
                 <div>
                     <p class="text-sm font-medium text-slate-500">SLA Alerts</p>
-                    <p class="text-3xl font-extrabold text-red-600 mt-1">3</p>
+                    <p class="text-xl font-bold  mt-1">3</p>
                 </div>
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-red-600 font-semibold">Critical</span>
@@ -204,9 +204,6 @@
 
         </div>
     </section>
-
-    ---
-
     <section class="mb-10">
         <h3 class="text-2xl font-semibold text-slate-800 mb-5">Performance Charts</h3>
 
@@ -280,7 +277,7 @@
 
     </section>
 
-    ---
+  
 
     <section class="mb-10">
         <h3 class="text-2xl font-semibold text-slate-800 mb-5">Key Activity & Queues</h3>
