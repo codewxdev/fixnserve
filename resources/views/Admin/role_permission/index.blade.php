@@ -56,14 +56,12 @@
                     Create New Permission
                 </button>
             </div>
-
-
         </header>
 
         <hr class="border-slate-200">
 
         {{-- B. Overview Statistics (Top Insight Cards) --}}
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
             {{-- Card 1: Total Roles (Hardcoded) --}}
             <div
                 class="bg-white p-5 rounded-2xl shadow-xl transition-all duration-300 ease-in-out transform hover:shadow-2xl hover:-translate-y-0.5 border border-slate-100">

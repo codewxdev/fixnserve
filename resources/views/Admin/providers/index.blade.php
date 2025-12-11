@@ -3,7 +3,7 @@
 @section('content')
     <div class="space-y-6">
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
-            Service Provider Management 
+            Service Provider Management
         </h1>
 
         {{-- 1. Provider Analytics Summary (Top Widgets) --}}
@@ -24,7 +24,8 @@
             <div class="p-5">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-xl font-semibold text-gray-800">Current Providers</h2>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150">
+                    <button
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow-md transition duration-150">
                         <i class="fas fa-plus mr-1"></i> Add New Provider
                     </button>
                 </div>
@@ -34,36 +35,47 @@
             {{-- 5. Pagination --}}
             <div class="p-5 border-t border-gray-100 flex justify-between items-center text-sm text-gray-600">
                 <div class="text-xs text-gray-500">
-                    Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">4,520</span> results
+                    Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span
+                        class="font-medium">4,520</span> results
                 </div>
                 <nav class="flex items-center space-x-1">
-                    <a href="#" class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500 transition duration-150">&laquo; Previous</a>
+                    <a href="#"
+                        class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500 transition duration-150">&laquo;
+                        Previous</a>
                     <span class="px-3 py-1 bg-blue-600 text-white rounded-lg font-semibold shadow-md">1</span>
-                    <a href="#" class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500">2</a>
-                    <a href="#" class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500">3</a>
-                    <a href="#" class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500">Next &raquo;</a>
+                    <a href="#"
+                        class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500">2</a>
+                    <a href="#"
+                        class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500">3</a>
+                    <a href="#"
+                        class="px-3 py-1 border border-gray-300 rounded-lg text-gray-600 hover:bg-blue-50 hover:border-blue-500">Next
+                        &raquo;</a>
                 </nav>
             </div>
 
         </div>
 
     </div>
-    
+
     {{-- 6. Side Panel for Provider Full Details --}}
     <x-partials.providers.details-slide-over />
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Custom styles for premium shadow and typography */
         .shadow-xl {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02); /* Deeper but softer shadow */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            /* Deeper but softer shadow */
         }
 
         .slide-over-panel {
             transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Beautiful animation */
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Beautiful animation */
         }
 
         .slide-over-panel.open {
@@ -78,6 +90,230 @@
 @endpush
 
 @push('scripts')
+   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const rows = document.querySelectorAll("tbody tr");
+
+        // --- Rate Slider UI Update Logic ---
+        const rateMinSlider = document.getElementById("rate-slider-min");
+        const rateMaxSlider = document.getElementById("rate-slider-max");
+        const rateMinDisplay = document.getElementById("rate-min");
+        const rateMaxDisplay = document.getElementById("rate-max");
+
+        // Function to update the displayed rate values
+        function updateRateDisplay() {
+            const minVal = parseInt(rateMinSlider.value);
+            const maxVal = parseInt(rateMaxSlider.value);
+
+            // Ensure min slider cannot pass max slider
+            if (minVal > maxVal) {
+                rateMinSlider.value = maxVal;
+                rateMinDisplay.textContent = maxVal;
+            } else {
+                rateMinDisplay.textContent = minVal;
+            }
+
+            rateMaxDisplay.textContent = maxVal === 500 ? '500+' : maxVal;
+        }
+
+        // Initial update
+        updateRateDisplay();
+
+        // Attach listeners for rate slider interaction
+        rateMinSlider.addEventListener("input", updateRateDisplay);
+        rateMaxSlider.addEventListener("input", updateRateDisplay);
+        // --- End Rate Slider UI Update Logic ---
+
+
+        function applyFilters() {
+
+            const search = document.getElementById("search").value.toLowerCase().trim();
+            const category = document.getElementById("category").value.toLowerCase().trim();
+            const verification = document.getElementById("verification").value.toLowerCase().trim();
+            const degreeStatus = document.getElementById("degree_status").value.toLowerCase().trim();
+            const availability = document.getElementById("availability").value.toLowerCase().trim();
+            
+            // Get rate values directly from the input element values
+            const rateMin = parseInt(document.getElementById("rate-slider-min").value);
+            const rateMax = parseInt(document.getElementById("rate-slider-max").value);
+            
+            const country = document.getElementById("country").value.toLowerCase().trim();
+
+            rows.forEach(row => {
+
+                // Get all text content for general search
+                const text = row.innerText.toLowerCase();
+
+                // 1. Get Expertise Category (from td:nth-child(2) > div:first-child)
+                const rowCategory = row.querySelector("td:nth-child(2) .font-semibold")
+                    ?.textContent.toLowerCase().trim() || "";
+
+                // 2. Get Availability Status (from td:nth-child(3) > span)
+                const rowAvailability = row.querySelector("td:nth-child(3) .availability-status")
+                    ?.textContent.toLowerCase().trim() || "";
+
+                // 3. Get KYC Status (from td:nth-child(4) > div:nth-child(1) > span)
+                const rowVerification = row.querySelector("td:nth-child(4) .kyc-status span")
+                    ?.textContent.toLowerCase().trim() || "";
+
+                // 4. Get Degree Status (from td:nth-child(4) > div:nth-child(2) > span)
+                const rowDegreeStatus = row.querySelector("td:nth-child(4) .degree-status span")
+                    ?.textContent.toLowerCase().trim() || "";
+
+                // 5. Get Hourly Rate (from td:nth-child(2) .rate-value) and parse it to an integer
+                const rateText = row.querySelector("td:nth-child(2) .rate-value")
+                    ?.textContent.replace("$", "").replace("/hr", "").trim() || "0";
+                const rowRate = parseInt(rateText);
+
+                // --- Filtering Logic ---
+                let show = true;
+
+                // Filter 1: Search (Name, Email, Phone - using all row text)
+                if (search && !text.includes(search)) show = false;
+                
+                // Filter 2: Expertise Category
+                if (category && rowCategory !== category) show = false;
+
+                // Filter 3: Verification Status (KYC)
+                if (verification) {
+                    // Normalize filter values: pending KYC = pending
+                    const normalizedVerification = verification.replace('pending kyc', 'pending');
+                    if (rowVerification !== normalizedVerification) show = false;
+                }
+                
+                // Filter 4: Degree Validation
+                if (degreeStatus) {
+                    // Normalize filter values: pending review = pending
+                    const normalizedDegreeStatus = degreeStatus.replace('pending review', 'pending');
+                    if (rowDegreeStatus !== normalizedDegreeStatus) show = false;
+                }
+
+                // Filter 5: Availability Status
+                if (availability && rowAvailability !== availability) show = false;
+
+                // Filter 6: Hourly Rate Range
+                if (rowRate < rateMin || rowRate > rateMax) show = false;
+
+                // Filter 7: Country (Service Zone - currently uses all row text)
+                // NOTE: To make this work accurately, you must add the country/region name inside the table row data.
+                if (country && !text.includes(country)) show = false; 
+                // Consider adding a hidden <td> with the Country/Service Zone data for accurate filtering.
+
+                // Apply visibility
+                row.style.display = show ? "" : "none";
+            });
+        }
+
+        // Apply Filters button
+        document.getElementById("apply-filters").addEventListener("click", applyFilters);
+
+        // Live filtering (optional) - Add updateRateDisplay to the list
+        document.querySelectorAll("#filter-form input, #filter-form select").forEach(el => {
+            el.addEventListener("input", function() {
+                updateRateDisplay(); // Update rate display on slider change
+                applyFilters();
+            });
+            el.addEventListener("change", applyFilters); // Use change for selects and date
+        });
+
+        // Reset Filters
+        document.getElementById("reset-filters").addEventListener("click", function() {
+            document.getElementById("filter-form").reset();
+            updateRateDisplay(); // Reset the displayed range values
+            applyFilters();
+        });
+        
+        // Initial filter run on load (to correctly set the slider ranges)
+        applyFilters();
+
+    });
+</script>
+
+
+    {{-- <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const form = document.getElementById("filter-form");
+            const resetBtn = document.getElementById("reset-filters");
+            const rows = document.querySelectorAll("tbody tr");
+
+            function applyFilters() {
+
+                const search = document.getElementById("search").value.toLowerCase();
+                const category = document.getElementById("category").value.toLowerCase();
+                const verification = document.getElementById("verification").value.toLowerCase();
+                const degreeStatus = document.getElementById("degree_status").value.toLowerCase();
+                const availability = document.getElementById("availability").value.toLowerCase();
+                const rateMin = parseInt(document.getElementById("rate-slider-min").value);
+                const rateMax = parseInt(document.getElementById("rate-slider-max").value);
+                const country = document.getElementById("country").value.toLowerCase();
+                const dateJoined = document.getElementById("date_joined").value;
+
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+
+                    const rowCategory = row.querySelector("td:nth-child(2) div.text-sm").innerText
+                        .toLowerCase();
+                    const rowVerification = row.querySelector("td:nth-child(4)").innerText.toLowerCase();
+                    const rowAvailability = row.querySelector("td:nth-child(3)").innerText.toLowerCase();
+                    const rateText = row.querySelector("td:nth-child(2) .text-indigo-600").innerText
+                        .replace("$", "").replace("/hr", "").trim();
+                    const rowRate = parseInt(rateText);
+
+                    let show = true;
+
+                    // search filter
+                    if (search && !text.includes(search)) show = false;
+
+                    // category
+                    if (category && !rowCategory.includes(category)) show = false;
+
+                    // verification
+                    if (verification && !rowVerification.includes(verification)) show = false;
+
+                    // degree validation
+                    if (degreeStatus && !rowVerification.includes(degreeStatus)) show = false;
+
+                    // availability
+                    if (availability && !rowAvailability.includes(availability)) show = false;
+
+                    // hourly rate range
+                    if (rowRate < rateMin || rowRate > rateMax) show = false;
+
+                    // country filter (optional for now)
+                    if (country && !text.includes(country)) show = false;
+
+                    // date joined (your static HTML does not have dates — add later)
+                    if (dateJoined) {
+                        // if you add dates in table rows later, compare here
+                    }
+
+                    row.style.display = show ? "" : "none";
+                });
+            }
+
+            // run filters when form submitted
+            form.addEventListener("submit", function(e) {
+                e.preventDefault();
+                applyFilters();
+            });
+
+            // LIVE filtering on inputs
+            form.querySelectorAll("input, select").forEach(el => {
+                el.addEventListener("input", applyFilters);
+                el.addEventListener("change", applyFilters);
+            });
+
+            // reset button
+            resetBtn.addEventListener("click", function() {
+                form.reset();
+                applyFilters();
+            });
+
+        });
+    </script> --}}
+
     <script>
         // Global state for selected provider data (simulating reactive framework)
         let currentProviderData = {};
@@ -95,8 +331,9 @@
         window.openProviderDetails = function(providerId) {
             // 1. Show Loading State (Optional, but professional)
             slideOverTitle.textContent = 'Loading...';
-            slideOverContent.innerHTML = '<div class="text-center py-10 text-gray-500"><i class="fas fa-sync-alt fa-spin mr-2"></i> Fetching Provider Data...</div>';
-            
+            slideOverContent.innerHTML =
+                '<div class="text-center py-10 text-gray-500"><i class="fas fa-sync-alt fa-spin mr-2"></i> Fetching Provider Data...</div>';
+
             // 2. Open Panel
             slideOver.classList.add('open');
             slideOverOverlay.classList.remove('hidden');
@@ -108,8 +345,9 @@
                 currentProviderData = dummyData;
 
                 slideOverTitle.textContent = 'Provider Details: ' + dummyData.name;
-                slideOverContent.innerHTML = generateSlideOverContent(dummyData); // Function below generates content
-                
+                slideOverContent.innerHTML = generateSlideOverContent(
+                    dummyData); // Function below generates content
+
             }, 500); // 500ms delay for fetching simulation
         }
 
@@ -118,7 +356,7 @@
             slideOverOverlay.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
             // Clear content after closing for next load
-            slideOverTitle.textContent = ''; 
+            slideOverTitle.textContent = '';
             slideOverContent.innerHTML = '';
         }
 
@@ -131,7 +369,7 @@
         // This makes the dropdown logic more robust for multiple instances
         document.addEventListener('click', (e) => {
             const isButton = e.target.closest('.action-dropdown-btn');
-            
+
             // Close all dropdowns
             document.querySelectorAll('.action-dropdown-menu').forEach(menu => {
                 if (!isButton || menu.parentNode !== isButton.closest('.relative')) {
@@ -160,10 +398,21 @@
                 kycStatus: 'Verified',
                 earnings: '45,800.00',
                 violations: 0,
-                kyc: [
-                    { doc: 'National ID', status: 'Verified', date: '2023-01-20' },
-                    { doc: 'Background Check', status: 'Verified', date: '2023-01-25' },
-                    { doc: 'Proof of Address', status: 'Pending', date: null }
+                kyc: [{
+                        doc: 'National ID',
+                        status: 'Verified',
+                        date: '2023-01-20'
+                    },
+                    {
+                        doc: 'Background Check',
+                        status: 'Verified',
+                        date: '2023-01-25'
+                    },
+                    {
+                        doc: 'Proof of Address',
+                        status: 'Pending',
+                        date: null
+                    }
                 ],
                 skills: ['Pipe Fitting', 'Drain Cleaning', 'Water Heater Repair'],
                 location: '24.8607° N, 66.9905° E (Karachi Zone A)',
@@ -185,13 +434,13 @@
                         <h4 class="font-semibold text-gray-800 flex items-center mb-3"><i class="fas fa-file-contract mr-2 text-yellow-600"></i> KYC & Document Status</h4>
                         <ul class="space-y-2">
                             ${data.kyc.map(doc => `
-                                <li class="flex justify-between text-sm">
-                                    <span>${doc.doc}:</span>
-                                    <span class="font-medium ${doc.status === 'Verified' ? 'text-green-600' : 'text-yellow-600'} flex items-center">
-                                        <i class="fas ${doc.status === 'Verified' ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i> ${doc.status}
-                                    </span>
-                                </li>
-                            `).join('')}
+                                                <li class="flex justify-between text-sm">
+                                                    <span>${doc.doc}:</span>
+                                                    <span class="font-medium ${doc.status === 'Verified' ? 'text-green-600' : 'text-yellow-600'} flex items-center">
+                                                        <i class="fas ${doc.status === 'Verified' ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i> ${doc.status}
+                                                    </span>
+                                                </li>
+                                            `).join('')}
                         </ul>
                         <button class="mt-4 text-xs font-medium text-blue-500 hover:text-blue-700">Review Documents</button>
                     </div>
@@ -232,7 +481,3 @@
         }
     </script>
 @endpush
-
- 
- 
- 

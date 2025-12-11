@@ -99,7 +99,7 @@
         <div class="flex flex-col md:flex-row gap-4 mb-8">
             {{-- Search Input --}}
             <div class="relative flex-grow">
-                <input type="text" id="customer-search" placeholder="Search by name, email, or ID..."
+                <input type="text" id="customerSearch" placeholder="Search by name, email, or ID..."
                     class="w-full p-3 pl-10 border border-gray-300 rounded-xl shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out">
                 <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -393,6 +393,25 @@
 
 
 @push('scripts')
+<script>
+document.getElementById("customerSearch").addEventListener("keyup", function () {
+    const value = this.value.toLowerCase();
+    const rows = document.querySelectorAll(".customer-table tbody tr");
+
+    rows.forEach(row => {
+        const name = row.querySelector("td .text-sm.font-medium").innerText.toLowerCase();
+        const email = row.querySelector("td:nth-child(2) .text-sm").innerText.toLowerCase();
+        const anyText = row.innerText.toLowerCase(); // also search total text
+
+        if (name.includes(value) || email.includes(value) || anyText.includes(value)) {
+            row.style.display = "";
+        } else {
+            row.style.display = "none";
+        }
+    });
+});
+</script>
+
     <script>
         let currentCustomerData = null;
         let currentCustomerId = null;
