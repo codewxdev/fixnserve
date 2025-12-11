@@ -72,22 +72,26 @@
             <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Service Pack Directory</h2>
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-10 gap-3 items-center">
                 
-                {{-- Search --}}
-                <div class="col-span-2 lg:col-span-3">
+                 
+                <div class="col-span-2 lg:col-span-3 shadow-sm rounded-xl shadow-black/70 relative">
+                    {{-- Search --}}
+                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                    </div>
                     <input type="text" placeholder="Search service name, category, or ID..."
                            class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-cyan-500 focus:border-cyan-500 shadow-sm" />
                 </div>
 
                 {{-- Filters --}}
-                <select class="col-span-2 form-select rounded-xl text-sm border-gray-300 shadow-sm py-2 px-3">
+                <select class="col-span-2 form-select rounded-xl shadow-sm shadow-black/70 border-gray-300 py-2 px-3">
                     <option>Main Category</option>
                     <option>Home Repair</option>
                 </select>
-                <select class="col-span-2 form-select rounded-xl text-sm border-gray-300 shadow-sm py-2 px-3">
+                <select class="col-span-2 form-select rounded-xl shadow-sm shadow-black/70 border-gray-300  py-2 px-3">
                     <option>Subcategory</option>
                     <option>Plumbing</option>
                 </select>
-                <select class="col-span-2 form-select rounded-xl text-sm border-gray-300 shadow-sm py-2 px-3">
+                <select class="col-span-2 form-select rounded-xl shadow-sm shadow-black/70 border-gray-300 py-2 px-3">
                     <option>Pricing Engine</option>
                     <option>Dynamic</option>
                     <option>Fixed</option>

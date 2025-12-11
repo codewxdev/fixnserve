@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 {{-- Assume 'app' layout includes necessary Tailwind CSS and Alpine.js setup --}}
+{{-- NOTE: This also assumes Font Awesome is included in your project (e.g., via a CDN or local package). --}}
 
 @section('content')
 
@@ -14,7 +15,8 @@
     <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 border-b border-gray-200">
         <div class="mb-4 sm:mb-0">
             <h1 class="text-2xl md:text-3xl font-bold text-gray-900 flex items-center">
-                <svg class="w-6 h-6 md:w-8 md:h-8 mr-3 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.418A9 9 0 0112 21c-4.97 0-9-4.03-9-9s4.03-9 9-9c1.099 0 2.155.195 3.144.572m.356 2.052L21 17M13 14h.01"></path></svg>
+                {{-- Font Awesome Icon: Balance Scale (For Resolution/Justice) --}}
+                <i class="fa-solid fa-scale-balanced fa-xl mr-3 text-yellow-600"></i>
                 Dispute Resolution Center
             </h1>
             <p class="text-xs sm:text-sm text-gray-500 mt-1">Manage complaints, appeals, investigation workflows, and refund decisions.</p>
@@ -22,7 +24,8 @@
         <div class="flex flex-wrap gap-2"> 
             <button @click="currentView = 'rules'" :class="{'bg-gray-200 text-gray-800 border-gray-400': currentView === 'rules'}" 
                     class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition duration-150 ease-in-out shadow-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                {{-- Font Awesome Icon: File Contract (For Rules/Agreements) --}}
+                <i class="fa-solid fa-file-contract w-4 h-4 mr-2"></i>
                 Auto-Refund Rules
             </button>
         </div>
@@ -31,11 +34,12 @@
     {{-- 2. Dispute Summary Cards (Focus on Speed and Urgency) --}}
     <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
         @php
+            // Original icons: folder, upload, clock, alert
             $cards = [
-                ['title' => 'Open Cases', 'value' => '45', 'icon' => 'folder', 'color' => 'blue', 'trend' => 'Normal'],
-                ['title' => 'Awaiting Evidence', 'value' => '12', 'icon' => 'upload', 'color' => 'indigo', 'trend' => 'Low Risk'],
-                ['title' => 'Awaiting Moderation', 'value' => '8', 'icon' => 'clock', 'color' => 'orange', 'trend' => 'Time Critical'],
-                ['title' => 'Escalated Cases', 'value' => '3', 'icon' => 'alert', 'color' => 'red', 'trend' => 'Urgent Action'],
+                ['title' => 'Open Cases', 'value' => '45', 'icon_fa' => 'fa-folder-open', 'color' => 'blue', 'trend' => 'Normal'],
+                ['title' => 'Awaiting Evidence', 'value' => '12', 'icon_fa' => 'fa-cloud-arrow-up', 'color' => 'indigo', 'trend' => 'Low Risk'],
+                ['title' => 'Awaiting Moderation', 'value' => '8', 'icon_fa' => 'fa-hourglass-half', 'color' => 'orange', 'trend' => 'Time Critical'],
+                ['title' => 'Escalated Cases', 'value' => '3', 'icon_fa' => 'fa-triangle-exclamation', 'color' => 'red', 'trend' => 'Urgent Action'],
             ];
         @endphp
         
@@ -57,17 +61,23 @@
         <div x-show="currentView === 'queue'" class="space-y-4">
             <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Active Complaint Queue</h2>
             
-            {{-- Queue Filters --}}
+            {{-- Queue Filters (Assuming search box should have an icon) --}}
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-center pb-4 border-b border-gray-100">
-                <input type="text" placeholder="Search ID, Order, or User..."
-                       class="col-span-2 block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-yellow-500 focus:border-yellow-500 shadow-sm" />
-                <select class="col-span-1 form-select rounded-xl text-sm border-gray-300 shadow-sm py-2">
+                <div class="relative col-span-2">
+                    {{-- Font Awesome Icon: Search --}}
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                    </div>
+                    <input type="text" placeholder="Search ID, Order, or User..."
+                        class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-yellow-500 focus:border-yellow-500 shadow-sm rounded-xl shadow-black/70" />
+                </div>
+                <select class="col-span-1 form-select rounded-xl px-2 shadow-black/70 border-gray-300 shadow-sm py-2">
                     <option>All Statuses</option>
                     <option>Submitted</option>
                     <option>Investigating</option>
                     <option>Appeal</option>
                 </select>
-                <select class="col-span-1 form-select rounded-xl text-sm border-gray-300 shadow-sm py-2">
+                <select class="col-span-1 form-select rounded-xl shadow-black/70 border-gray-300 shadow-sm px-2 py-2">
                     <option>Risk Level</option>
                     <option>High (Urgent)</option>
                     <option>Medium</option>
@@ -130,7 +140,8 @@
                                 <button @click.stop="openDisputeId = 4521" 
                                         class="p-2 rounded-full text-white bg-yellow-600 hover:bg-yellow-700 shadow-md transition duration-150 ease-in-out" 
                                         title="Investigate Case">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    {{-- Font Awesome Icon: Eye (For View/Investigate) --}}
+                                    <i class="fa-solid fa-eye w-5 h-5"></i>
                                 </button>
                             </td>
                         </tr>
@@ -160,7 +171,8 @@
                                 <button @click.stop="openDisputeId = 4522" 
                                         class="p-2 rounded-full text-white bg-yellow-600 hover:bg-yellow-700 shadow-md transition duration-150 ease-in-out" 
                                         title="Investigate Case">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    {{-- Font Awesome Icon: Eye (For View/Investigate) --}}
+                                    <i class="fa-solid fa-eye w-5 h-5"></i>
                                 </button>
                             </td>
                         </tr>
@@ -198,14 +210,15 @@
                 </div>
 
                 <button class="col-span-1 md:col-span-2 flex items-center justify-center p-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 border-dashed border-2 border-gray-300 transition duration-150 ease-in-out">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    {{-- Font Awesome Icon: Plus --}}
+                    <i class="fa-solid fa-plus w-4 h-4 mr-2"></i>
                     Add New Auto-Refund Rule
                 </button>
             </div>
         </div>
     </div>
     
-    {{-- 4. Dispute Detail Slide-Over Panel --}}
+    {{-- 4. Dispute Detail Slide-Over Panel (No icons were in this section, only the close button) --}}
     <div x-show="openDisputeId !== null" 
          x-transition:enter="ease-in-out duration-500" 
          x-transition:leave="ease-in-out duration-500" 
@@ -231,7 +244,8 @@
                                     Case Investigation (DIS-<span x-text="openDisputeId"></span>)
                                 </h2>
                                 <button type="button" class="rounded-md text-yellow-200 hover:text-white" @click="openDisputeId = null">
-                                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                    {{-- Font Awesome Icon: Times/XMark (For Close) --}}
+                                    <i class="fa-solid fa-xmark h-6 w-6"></i>
                                 </button>
                             </div>
                             <p class="text-sm text-yellow-200 mt-1">Complaint: Item Not as Described</p>
@@ -284,7 +298,7 @@
                             {{-- Timeline Tab Content --}}
                             <div x-show="detailTab === 'timeline'" class="space-y-4">
                                 <h3 class="font-semibold text-gray-900">Case History / Escalation Path</h3>
-                                <ol class="relative border-s border-gray-200 ml-3">                  
+                                <ol class="relative border-s border-gray-200 ml-3">                  
                                     <li class="mb-4 ms-6">
                                         <span class="absolute flex items-center justify-center w-3 h-3 bg-gray-200 rounded-full -start-1.5 ring-4 ring-white"></span>
                                         <h3 class="mb-1 text-sm font-semibold text-gray-900">Appeal Submitted</h3>

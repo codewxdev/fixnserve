@@ -313,12 +313,64 @@
 </div>
 
 @endsection
+ 
 
 @push('scripts')
 <script>
-    // Simple JavaScript function to toggle the slide-over panel visibility
+    // Get the slide-over element once for efficiency
+    const slideOver = document.getElementById('consultant-detail-slideover');
+    
+    // Simple JavaScript function to close the slide-over panel
     function closeSlideOver() {
-        document.getElementById('consultant-detail-slideover').style.display = 'none';
+        slideOver.style.display = 'none';
     }
+
+    // New function to open the slide-over (assuming you have one, 
+    // but the table click handler handles it for now)
+    // function openSlideOver() {
+    //     slideOver.style.display = 'block';
+    // }
+
+    // --- FIX for clicking outside to close ---
+    
+    // Add a single event listener to the entire document
+    document.addEventListener('click', function(event) {
+        // Check if the slide-over is currently visible
+        if (slideOver.style.display === 'block' || slideOver.style.display === '') {
+            // Check if the click occurred outside the slide-over's content panel
+            // The content panel is the inner-most div responsible for the visible part.
+            // Using a specific class/ID on the content panel is better, but 
+            // based on your structure, we target the parent with the 'pointer-events-auto' class.
+            
+            const slideOverContent = slideOver.querySelector('.pointer-events-auto');
+            
+            // If the clicked element is NOT the close button (which calls closeSlideOver)
+            // AND the clicked element is NOT inside the slideOverContent
+            // AND the clicked element is NOT the trigger element (the table row)
+            if (slideOverContent && !slideOverContent.contains(event.target)) {
+                // The click was outside the content area, so close it.
+                // We also check that the click target is not the trigger for opening it
+                // to avoid immediate closing. The background click is already handled by
+                // the `onclick="closeSlideOver()"` on the backdrop div.
+                // This logic is mainly for clicks outside the backdrop but not the content area.
+
+                // A safer way is to check if the click target IS the backdrop:
+                if (event.target === slideOver) {
+                     closeSlideOver();
+                }
+            }
+        }
+    });
+    
+    // A much cleaner way which already exists in your HTML is to use the backdrop:
+    // <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" onclick="closeSlideOver()"></div>
+    // This handles the closing when clicking on the greyed-out background.
+
+    // To handle general outside clicks *and* prevent clicks inside the slide-over from closing it, 
+    // you should simply ensure the slide-over content doesn't propagate clicks to the document/window.
+    
+    // The previous listener you tried to add is removed/replaced:
+    // REMOVED: if(document.getElementById('consultant-detail-slideover').style.display == 'none'){ ... }
+    
 </script>
 @endpush
