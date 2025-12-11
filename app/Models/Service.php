@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Service extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'category_id',
+        'price_per_hour',
+        'fee',
+        'description',
+        'status',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
+    public function subcategories()
+    {
+        return $this->belongsToMany(Subcategory::class, 'service_subcategories');
+    }
+
+    public function provider()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+}
