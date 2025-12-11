@@ -55,168 +55,219 @@
     <hr class="border-gray-200">
 
     {{-- 3. Main Content Area: Complaint Queue or Rules --}}
-    <div class="mt-8 bg-white p-4 sm:p-6 rounded-xl shadow-2xl border border-gray-100">
-        
-        {{-- Complaint Queue View --}}
-        <div x-show="currentView === 'queue'" class="space-y-4">
-            <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Active Complaint Queue</h2>
-            
-            {{-- Queue Filters (Assuming search box should have an icon) --}}
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-center pb-4 border-b border-gray-100">
-                <div class="relative col-span-2">
-                    {{-- Font Awesome Icon: Search --}}
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
-                    </div>
-                    <input type="text" placeholder="Search ID, Order, or User..."
-                        class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-yellow-500 focus:border-yellow-500 shadow-sm rounded-xl shadow-black/70" />
-                </div>
-                <select class="col-span-1 form-select rounded-xl px-2 shadow-black/70 border-gray-300 shadow-sm py-2">
-                    <option>All Statuses</option>
-                    <option>Submitted</option>
-                    <option>Investigating</option>
-                    <option>Appeal</option>
-                </select>
-                <select class="col-span-1 form-select rounded-xl shadow-black/70 border-gray-300 shadow-sm px-2 py-2">
-                    <option>Risk Level</option>
-                    <option>High (Urgent)</option>
-                    <option>Medium</option>
-                </select>
-            </div>
+   {{-- 3. Main Content Area: Complaint Queue or Rules (Wrap in Alpine data) --}}
+<div x-data="{
+    // Filter State
+    searchQuery: '',
+    statusFilter: 'All Statuses',
+    riskLevelFilter: 'Risk Level',
+    
+    // Sample Data
+    complaints: [
+        { id: 4521, orderId: 'ORD-90123', type: 'Item significantly Not as Described', requested: 'Full Refund ($120.00)', status: 'Awaiting Reply', deadline: 'Awaiting Reply', submitted: '3 days ago', risk: 'High', escalated: true, statusColor: 'orange' },
+        { id: 4522, orderId: 'SVC-5001', type: 'Rider was 30 mins late', requested: '20% Discount ($15.00)', status: 'Investigating', deadline: 'Tomorrow', submitted: '1 day ago', risk: 'Medium', escalated: false, statusColor: 'blue' },
+        { id: 4523, orderId: 'ORD-90124', type: 'Wrong item delivered', requested: 'Replacement', status: 'Submitted', deadline: 'Today', submitted: '1 hour ago', risk: 'Medium', escalated: false, statusColor: 'green' },
+        { id: 4524, orderId: 'ORD-90125', type: 'Rider was rude', requested: 'Warning/Action', status: 'Appeal', deadline: 'Pending', submitted: '5 days ago', risk: 'Low', escalated: false, statusColor: 'purple' },
+    ],
 
-            {{-- Complaint List Table (Action-Heavy) --}}
-            <div class="overflow-x-auto pt-4"> 
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            {{-- Col 1: Dispute Info --}}
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
-                                Case ID / Order
-                            </th>
-                            
-                            {{-- Col 2: Complaint Details --}}
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px]">
-                                Complaint Type / Requested
-                            </th>
-                            
-                            {{-- Col 3: Status & Timeline --}}
-                            <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
-                                Status
-                            </th>
-                            
-                            {{-- Col 4: Actions (Sticky Right) --}}
-                            <th class="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 border-l border-gray-200 min-w-[120px]">
-                                Action
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
-                        
-                        {{-- Sample High-Risk Complaint --}}
-                        <tr class="hover:bg-red-50/50 transition duration-150 ease-in-out group">
+    // Filtering Logic
+    filteredComplaints() {
+        return this.complaints.filter(complaint => {
+            // 1. Search Filter (ID, Order ID, Type)
+            const searchMatch = this.searchQuery === '' || 
+                complaint.id.toString().includes(this.searchQuery.toLowerCase()) || 
+                complaint.orderId.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                complaint.type.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+            // 2. Status Filter
+            const statusMatch = this.statusFilter === 'All Statuses' || 
+                complaint.status === this.statusFilter;
+
+            // 3. Risk Level Filter
+            let riskLevelMatch = true;
+            if (this.riskLevelFilter !== 'Risk Level') {
+                const requiredRisk = this.riskLevelFilter.split(' ')[0]; // Extract 'High', 'Medium'
+                riskLevelMatch = complaint.risk === requiredRisk;
+            }
+
+            return searchMatch && statusMatch && riskLevelMatch;
+        });
+    },
+
+    // Utility for status colors
+    getStatusClasses(statusColor) {
+        return {
+            'orange': 'font-semibold text-orange-600',
+            'blue': 'font-semibold text-blue-600',
+            'green': 'font-semibold text-green-600',
+            'purple': 'font-semibold text-purple-600',
+        }[statusColor] || 'font-semibold text-gray-700';
+    },
+
+    // Utility for risk/escalation badge colors
+    getRiskBadgeColor(risk) {
+        return {
+            'High': 'bg-red-100 text-red-800',
+            'Medium': 'bg-yellow-100 text-yellow-800',
+            'Low': 'bg-green-100 text-green-800',
+        }[risk];
+    },
+}" class="mt-8 bg-white p-4 sm:p-6 rounded-xl shadow-2xl border border-gray-100">
+    
+    {{-- Complaint Queue View --}}
+    <div x-show="currentView === 'queue'" class="space-y-4">
+        <h2 class="text-lg sm:text-xl font-semibold text-gray-800">Active Complaint Queue</h2>
+        
+        {{-- Queue Filters (Bound with x-model) --}}
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 items-center pb-4 border-b border-gray-100">
+            <div class="relative col-span-2">
+                {{-- Search Input (Bound with x-model) --}}
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                </div>
+                <input type="text" placeholder="Search ID, Order, or User..."
+                    x-model.debounce.300ms="searchQuery"
+                    class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-yellow-500 focus:border-yellow-500 shadow-sm rounded-xl shadow-black/70" />
+            </div>
+            <select x-model="statusFilter"
+                class="col-span-1 form-select rounded-xl px-2 shadow-black/70 border-gray-300 shadow-sm py-2 text-sm focus:ring-yellow-500 focus:border-yellow-500">
+                <option value="All Statuses">All Statuses</option>
+                <option>Submitted</option>
+                <option>Investigating</option>
+                <option>Appeal</option>
+                <option>Awaiting Reply</option>
+            </select>
+            <select x-model="riskLevelFilter"
+                class="col-span-1 form-select rounded-xl shadow-black/70 border-gray-300 shadow-sm px-2 py-2 text-sm focus:ring-yellow-500 focus:border-yellow-500">
+                <option value="Risk Level">Risk Level</option>
+                <option>High (Urgent)</option>
+                <option>Medium</option>
+                <option>Low</option>
+            </select>
+            
+            {{-- Reset Button --}}
+            <div class="col-span-1 flex justify-end">
+                <button @click="statusFilter = 'All Statuses'; riskLevelFilter = 'Risk Level'; searchQuery = ''"
+                    class="w-full px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-150 ease-in-out">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        {{-- Complaint List Table (Dynamic) --}}
+        <div class="overflow-x-auto pt-4"> 
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
+                            Case ID / Order
+                        </th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px]">
+                            Complaint Type / Requested
+                        </th>
+                        <th class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[150px]">
+                            Status
+                        </th>
+                        <th class="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 border-l border-gray-200 min-w-[120px]">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-100">
+                    
+                    {{-- Dynamic Complaint Rows --}}
+                    <template x-for="complaint in filteredComplaints()" :key="complaint.id">
+                        <tr :class="complaint.risk === 'High' ? 'hover:bg-red-50/50' : 'hover:bg-yellow-50/50'"
+                            class="transition duration-150 ease-in-out group">
+
                             {{-- COL 1: Dispute Info --}}
                             <td class="px-3 sm:px-6 py-3 whitespace-nowrap">
-                                <p class="text-sm font-semibold text-red-700">DIS-4521 <span class="text-xs font-normal text-gray-400">(Awaiting Reply)</span></p>
-                                <p class="text-xs text-gray-500 mt-1">Order: ORD-90123</p>
+                                <p class="text-sm font-semibold" 
+                                    :class="complaint.risk === 'High' ? 'text-red-700' : 'text-gray-900'">
+                                    <span x-text="`DIS-${complaint.id}`"></span> 
+                                    <span x-show="complaint.status === 'Awaiting Reply'" 
+                                        class="text-xs font-normal text-gray-400">(Awaiting Reply)</span>
+                                </p>
+                                <p class="text-xs text-gray-500 mt-1" x-text="`Order: ${complaint.orderId}`"></p>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mt-1"
+                                    :class="getRiskBadgeColor(complaint.risk)" x-text="complaint.risk + ' Risk'">
+                                </span>
                             </td>
 
                             {{-- COL 2: Complaint Details --}}
                             <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
-                                <p class="font-bold text-gray-700">Item significantly Not as Described</p>
-                                <p class="text-xs text-blue-600 mt-1">Requested: Full Refund ($120.00)</p>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 mt-1">
+                                <p class="font-bold text-gray-700" x-text="complaint.type"></p>
+                                <p class="text-xs text-blue-600 mt-1" x-text="`Requested: ${complaint.requested}`"></p>
+                                <span x-show="complaint.escalated" 
+                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-800 mt-1">
                                     Escalated
                                 </span>
                             </td>
 
                             {{-- COL 3: Status & Timeline --}}
                             <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
-                                <p class="font-semibold text-orange-600">Provider Reply Due</p>
-                                <p class="text-xs text-gray-400 mt-1">Submitted: 3 days ago</p>
+                                <p :class="getStatusClasses(complaint.statusColor)" x-text="complaint.status"></p>
+                                <p class="text-xs text-gray-400 mt-1" x-text="`Submitted: ${complaint.submitted}`"></p>
+                                <p class="text-xs text-gray-500 mt-1" x-text="`Deadline: ${complaint.deadline}`"></p>
                             </td>
 
                             {{-- COL 4: Actions (Sticky) --}}
-                            <td class="px-3 sm:px-6 py-3 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-red-50/50">
-                                <button @click.stop="openDisputeId = 4521" 
-                                        class="p-2 rounded-full text-white bg-yellow-600 hover:bg-yellow-700 shadow-md transition duration-150 ease-in-out" 
-                                        title="Investigate Case">
-                                    {{-- Font Awesome Icon: Eye (For View/Investigate) --}}
+                            <td class="px-3 sm:px-6 py-3 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200"
+                                :class="complaint.risk === 'High' ? 'group-hover:bg-red-50/50' : 'group-hover:bg-yellow-50/50'">
+                                <button @click.stop="openDisputeId = complaint.id" 
+                                    class="p-2 rounded-full text-white bg-yellow-600 hover:bg-yellow-700 shadow-md transition duration-150 ease-in-out" 
+                                    title="Investigate Case">
                                     <i class="fa-solid fa-eye w-5 h-5"></i>
                                 </button>
                             </td>
                         </tr>
-                        
-                        {{-- Sample Normal Complaint --}}
-                        <tr class="hover:bg-yellow-50/50 transition duration-150 ease-in-out group">
-                            {{-- COL 1: Dispute Info --}}
-                            <td class="px-3 sm:px-6 py-3 whitespace-nowrap">
-                                <p class="text-sm font-semibold text-gray-900">DIS-4522</p>
-                                <p class="text-xs text-gray-500 mt-1">Order: SVC-5001</p>
-                            </td>
-
-                            {{-- COL 2: Complaint Details --}}
-                            <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
-                                <p class="font-bold text-gray-700">Rider was 30 mins late</p>
-                                <p class="text-xs text-blue-600 mt-1">Requested: 20% Discount ($15.00)</p>
-                            </td>
-
-                            {{-- COL 3: Status & Timeline --}}
-                            <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
-                                <p class="font-semibold text-blue-600">Investigating</p>
-                                <p class="text-xs text-gray-400 mt-1">Deadline: Tomorrow</p>
-                            </td>
-
-                            {{-- COL 4: Actions (Sticky) --}}
-                            <td class="px-3 sm:px-6 py-3 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-yellow-50/50">
-                                <button @click.stop="openDisputeId = 4522" 
-                                        class="p-2 rounded-full text-white bg-yellow-600 hover:bg-yellow-700 shadow-md transition duration-150 ease-in-out" 
-                                        title="Investigate Case">
-                                    {{-- Font Awesome Icon: Eye (For View/Investigate) --}}
-                                    <i class="fa-solid fa-eye w-5 h-5"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        {{-- Auto-Refund Rules View --}}
-        <div x-show="currentView === 'rules'" class="space-y-6">
-            <h2 class="text-xl font-semibold text-gray-800">Automated Refund Rules Configuration</h2>
-            <p class="text-gray-600">Configure rules for instant customer resolution and reduce manual moderation.</p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                
-                {{-- Rule 1 --}}
-                <div class="p-4 bg-green-50 rounded-xl border-l-4 border-green-500 shadow-md">
-                    <p class="font-bold text-green-800">Rule #1: Late Service/Rider</p>
-                    <p class="text-sm text-gray-700 mt-1">If Rider/Service is **30 minutes or more** late, automatically apply a **20% discount** (max $20) to the customer wallet. Exemptions: Peak Hours.</p>
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="text-xs text-gray-500">Status: Active</span>
-                        <button class="text-sm text-green-600 hover:underline">Edit Rule</button>
-                    </div>
-                </div>
-
-                {{-- Rule 2 --}}
-                <div class="p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500 shadow-md">
-                    <p class="font-bold text-blue-800">Rule #2: Out-of-Stock Replacement</p>
-                    <p class="text-sm text-gray-700 mt-1">If substituted item is **25% cheaper** than original, automatically refund the **price difference** to customer wallet.</p>
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="text-xs text-gray-500">Status: Active</span>
-                        <button class="text-sm text-blue-600 hover:underline">Edit Rule</button>
-                    </div>
-                </div>
-
-                <button class="col-span-1 md:col-span-2 flex items-center justify-center p-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 border-dashed border-2 border-gray-300 transition duration-150 ease-in-out">
-                    {{-- Font Awesome Icon: Plus --}}
-                    <i class="fa-solid fa-plus w-4 h-4 mr-2"></i>
-                    Add New Auto-Refund Rule
-                </button>
-            </div>
+                    </template>
+                    
+                    {{-- No Results Row --}}
+                    <tr x-show="filteredComplaints().length === 0">
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500 font-medium">
+                            No complaints match your current filters or search query.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+
+    {{-- Auto-Refund Rules View (Unchanged - Static Configuration) --}}
+    <div x-show="currentView === 'rules'" class="space-y-6">
+        <h2 class="text-xl font-semibold text-gray-800">Automated Refund Rules Configuration</h2>
+        <p class="text-gray-600">Configure rules for instant customer resolution and reduce manual moderation. </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            {{-- Rule 1 --}}
+            <div class="p-4 bg-green-50 rounded-xl border-l-4 border-green-500 shadow-md">
+                <p class="font-bold text-green-800">Rule #1: Late Service/Rider</p>
+                <p class="text-sm text-gray-700 mt-1">If Rider/Service is **30 minutes or more** late, automatically apply a **20% discount** (max $20) to the customer wallet. Exemptions: Peak Hours.</p>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="text-xs text-gray-500">Status: Active</span>
+                    <button class="text-sm text-green-600 hover:underline">Edit Rule</button>
+                </div>
+            </div>
+
+            {{-- Rule 2 --}}
+            <div class="p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500 shadow-md">
+                <p class="font-bold text-blue-800">Rule #2: Out-of-Stock Replacement</p>
+                <p class="text-sm text-gray-700 mt-1">If substituted item is **25% cheaper** than original, automatically refund the **price difference** to customer wallet.</p>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="text-xs text-gray-500">Status: Active</span>
+                    <button class="text-sm text-blue-600 hover:underline">Edit Rule</button>
+                </div>
+            </div>
+
+            <button class="col-span-1 md:col-span-2 flex items-center justify-center p-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 border-dashed border-2 border-gray-300 transition duration-150 ease-in-out">
+                <i class="fa-solid fa-plus w-4 h-4 mr-2"></i>
+                Add New Auto-Refund Rule
+            </button>
+        </div>
+    </div>
+</div>
     
     {{-- 4. Dispute Detail Slide-Over Panel (No icons were in this section, only the close button) --}}
     <div x-show="openDisputeId !== null" 

@@ -10,7 +10,7 @@
         </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-100">
-        
+
         <tr class="hover:bg-gray-50 transition duration-150">
             <td class="px-4 py-4 whitespace-nowrap">
                 <div class="flex items-center">
@@ -24,16 +24,16 @@
 
             <td class="px-4 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900 font-semibold">Lawyer</div>
-                <div class="text-xs text-gray-500 mt-1">Rate: <span class="font-medium text-indigo-600">$180/hr</span></div>
+                <div class="text-xs text-gray-500 mt-1">Rate: <span class="font-medium text-indigo-600 rate-value">$180/hr</span></div>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-center">
-                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Online</span>
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 availability-status">Online</span>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-center">
-                <div class="text-xs text-gray-700">KYC: <span class="font-semibold text-green-600">Verified</span></div>
-                <div class="text-xs text-gray-700">Degree: <span class="font-semibold text-green-600">Validated</span></div>
+                <div class="text-xs text-gray-700 kyc-status">KYC: <span class="font-semibold text-green-600">Verified</span></div>
+                <div class="text-xs text-gray-700 degree-status">Degree: <span class="font-semibold text-green-600">Validated</span></div>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-right">
@@ -46,7 +46,7 @@
                 <button class="text-red-600 hover:text-red-900 transition duration-150">Suspend</button>
             </td>
         </tr>
-        
+
         <tr class="hover:bg-gray-50 transition duration-150">
             <td class="px-4 py-4 whitespace-nowrap">
                 <div class="flex items-center">
@@ -60,16 +60,16 @@
 
             <td class="px-4 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900 font-semibold">Architect</div>
-                <div class="text-xs text-gray-500 mt-1">Rate: <span class="font-medium text-indigo-600">$250/hr</span></div>
+                <div class="text-xs text-gray-500 mt-1">Rate: <span class="font-medium text-indigo-600 rate-value">$250/hr</span></div>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-center">
-                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">Busy</span>
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800 availability-status">Busy</span>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-center">
-                <div class="text-xs text-gray-700">KYC: <span class="font-semibold text-yellow-600">Pending</span></div>
-                <div class="text-xs text-gray-700">Degree: <span class="font-semibold text-green-600">Validated</span></div>
+                <div class="text-xs text-gray-700 kyc-status">KYC: <span class="font-semibold text-yellow-600">Pending</span></div>
+                <div class="text-xs text-gray-700 degree-status">Degree: <span class="font-semibold text-green-600">Validated</span></div>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-right">
@@ -96,16 +96,16 @@
 
             <td class="px-4 py-4 whitespace-nowrap">
                 <div class="text-sm text-gray-900 font-semibold">Accountant</div>
-                <div class="text-xs text-gray-500 mt-1">Rate: <span class="font-medium text-indigo-600">$120/hr</span></div>
+                <div class="text-xs text-gray-500 mt-1">Rate: <span class="font-medium text-indigo-600 rate-value">$120/hr</span></div>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-center">
-                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">Offline</span>
+                <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 availability-status">Offline</span>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-center">
-                <div class="text-xs text-gray-700">KYC: <span class="font-semibold text-red-600">Rejected</span></div>
-                <div class="text-xs text-gray-700">Degree: <span class="font-semibold text-yellow-600">Pending</span></div>
+                <div class="text-xs text-gray-700 kyc-status">KYC: <span class="font-semibold text-red-600">Rejected</span></div>
+                <div class="text-xs text-gray-700 degree-status">Degree: <span class="font-semibold text-yellow-600">Pending</span></div>
             </td>
 
             <td class="px-4 py-4 whitespace-nowrap text-right">
@@ -118,6 +118,5 @@
                 <button class="text-indigo-600 hover:text-indigo-900 transition duration-150">Validate Docs</button>
             </td>
         </tr>
-        
     </tbody>
 </table>

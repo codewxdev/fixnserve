@@ -119,71 +119,126 @@
         <hr class="border-gray-200">
 
         {{-- Main Content Area: Filters and Table --}}
-        <div class="mt-8 bg-white p-4 sm:p-6 rounded-xl shadow-2xl border border-gray-100">
+        <div x-data="{
+            // Filter State
+            searchText: '',
+            availabilityFilter: 'Availability',
+            kycFilter: 'KYC Status',
+            vehicleFilter: 'Vehicle Type',
+        
+            // Sample Data (Replace with your server-side data fetch)
+            riders: [
+                { id: 201, name: 'Rider John Doe', tag: 'RDR-201', vehicleType: 'Bike', license: 'ABC-789', contact: '+1 (555) 123-4567', kyc: 'Verified', availability: 'Online', shift: '8h 30m Shift', deliveries: 34, rating: 4.7, earnings: 1540, penalties: 40, withdrawalStatus: 'Pending', img: 'https://via.placeholder.com/150/ef4444/ffffff?text=JD' },
+                { id: 202, name: 'Rider Sarah Ahmed', tag: 'RDR-202', vehicleType: 'Car', license: 'XYZ-101', contact: '+1 (555) 987-6543', kyc: 'Pending', availability: 'Offline', shift: 'Last Online: 1h ago', deliveries: 0, rating: 4.9, earnings: 3200, penalties: 10, withdrawalStatus: 'Ready', img: 'https://via.placeholder.com/150/10b981/ffffff?text=SA' },
+                { id: 203, name: 'Rider Mike Thompson', tag: 'RDR-203', vehicleType: 'Bike', license: 'TUK-404', contact: '+1 (555) 777-8888', kyc: 'Verified', availability: 'On-Trip', shift: 'Est. complete: 10m', deliveries: 12, rating: 4.5, earnings: 875, penalties: 0, withdrawalStatus: 'Ready', img: 'https://via.placeholder.com/150/f97316/ffffff?text=MT' },
+                { id: 204, name: 'Rider Emily Chen', tag: 'RDR-204', vehicleType: 'Car', license: 'UVW-222', contact: '+1 (555) 333-2222', kyc: 'Verified', availability: 'Online', shift: '1h 15m Shift', deliveries: 5, rating: 4.8, earnings: 350, penalties: 0, withdrawalStatus: 'Ready', img: 'https://via.placeholder.com/150/000000/ffffff?text=EC' },
+            ],
+        
+            // Filtering Logic
+            filteredRiders() {
+                return this.riders.filter(rider => {
+                    // 1. Search Filter (Search name, ID, or vehicle/license)
+                    const searchMatch = this.searchText === '' ||
+                        rider.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
+                        rider.tag.toLowerCase().includes(this.searchText.toLowerCase()) ||
+                        rider.license.toLowerCase().includes(this.searchText.toLowerCase());
+        
+                    // 2. Availability Filter
+                    const availabilityMatch = this.availabilityFilter === 'Availability' ||
+                        rider.availability === this.availabilityFilter;
+        
+                    // 3. KYC Status Filter
+                    const kycMatch = this.kycFilter === 'KYC Status' ||
+                        rider.kyc === this.kycFilter.replace('Verified', 'Verified').replace('Pending', 'Pending'); // Clean up option value
+        
+                    // 4. Vehicle Type Filter
+                    const vehicleMatch = this.vehicleFilter === 'Vehicle Type' ||
+                        rider.vehicleType === this.vehicleFilter;
+        
+                    return searchMatch && availabilityMatch && kycMatch && vehicleMatch;
+                });
+            },
+        
+            // Reset Function
+            resetFilters() {
+                this.searchText = '';
+                this.availabilityFilter = 'Availability';
+                this.kycFilter = 'KYC Status';
+                this.vehicleFilter = 'Vehicle Type';
+            },
+        
+            // Utility for status badges
+            getAvailabilityColor(status) {
+                return {
+                    'Online': 'bg-green-500 text-white',
+                    'Offline': 'bg-gray-500 text-white',
+                    'On-Trip': 'bg-blue-500 text-white',
+                } [status];
+            },
+            getKYCColor(status) {
+                return {
+                    'Verified': 'bg-green-100 text-green-800',
+                    'Pending': 'bg-yellow-100 text-yellow-800',
+                } [status];
+            },
+        }" class="mt-8 bg-white p-4 sm:p-6 rounded-xl shadow-2xl border border-gray-100">
 
-            {{-- 5. Filters / Search Bar (Responsive) --}}
             <div
                 class="sticky top-0 z-10 bg-white pt-1 pb-4 -mx-4 sm:-mx-6 px-4 sm:px-6 border-b border-gray-100 shadow-sm rounded-t-xl">
                 <h2 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4">Rider Directory</h2>
                 <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-10 gap-3 items-center">
 
-                    {{-- Search --}}
                     <div class="col-span-2 lg:col-span-3 rounded-xl shadow-sm shadow-black/70">
                         <input type="text" placeholder="Search rider name, ID, vehicle..."
-                            class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-red-500 focus:border-red-500 shadow-sm" />
+                            x-model.debounce.300ms="searchText"
+                            class="block w-full text-sm pl-4 pr-4 py-2 border-gray-300 rounded-xl focus:ring-red-500 focus:border-red-500 shadow-sm" />
                     </div>
 
-                    {{-- Filters --}}
-                    <select class="col-span-2 form-select rounded-xl  border-gray-300 shadow-sm shadow-black/70 py-2 px-3">
-                        <option>Availability</option>
+                    <select x-model="availabilityFilter"
+                        class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/70 py-2 px-3 text-sm focus:ring-red-500 focus:border-red-500">
+                        <option disabled>Availability</option>
                         <option>Online</option>
                         <option>Offline</option>
+                        <option>On-Trip</option>
                     </select>
-                    <select class="col-span-2 form-select rounded-xl  border-gray-300 shadow-sm shadow-black/70 py-2 px-3">
-                        <option>KYC Status</option>
+                    <select x-model="kycFilter"
+                        class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/70 py-2 px-3 text-sm focus:ring-red-500 focus:border-red-500">
+                        <option disabled>KYC Status</option>
                         <option>Verified</option>
                         <option>Pending</option>
                     </select>
-                    <select class="col-span-2 form-select rounded-xl  border-gray-300 shadow-sm shadow-black/70 py-2 px-3">
-                        <option>Vehicle Type</option>
+                    <select x-model="vehicleFilter"
+                        class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/70 py-2 px-3 text-sm focus:ring-red-500 focus:border-red-500">
+                        <option disabled>Vehicle Type</option>
                         <option>Bike</option>
                         <option>Car</option>
                     </select>
 
-                    {{-- Reset Button --}}
                     <div class="col-span-2 sm:col-span-1 flex justify-end">
-                        <button
-                            class="px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-150 ease-in-out">
+                        <button @click="resetFilters"
+                            class="w-full px-3 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-150 ease-in-out">
                             Reset
                         </button>
                     </div>
                 </div>
             </div>
 
-            {{-- 3. Rider List Table (High-Density, Scrollable, Sticky Actions) --}}
             <div class="overflow-x-auto mt-4">
                 <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50  ">
+                    <thead class="bg-gray-50">
                         <tr>
-                            {{-- Col 1: Rider Info (Wide) --}}
                             <th
                                 class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[280px]">
                                 Rider Info / Vehicle
                             </th>
-
-                            {{-- Col 2: Performance & Availability --}}
                             <th
                                 class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[300px]">
                                 Performance & Status
                             </th>
-
-                            {{-- Col 3: Earnings & Penalties --}}
                             <th
                                 class="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
                                 Finance
                             </th>
-
-                            {{-- Col 4: Actions (Sticky Right) --}}
                             <th
                                 class="px-3 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 border-l border-gray-200 min-w-[150px]">
                                 Actions
@@ -192,103 +247,109 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
 
-                        {{-- Sample Rider Row --}}
-                        <tr class="hover:bg-red-50/50 transition duration-150 ease-in-out group">
+                        <template x-for="rider in filteredRiders()" :key="rider.id">
+                            <tr class="hover:bg-red-50/50 transition duration-150 ease-in-out group">
 
-                            {{-- COL 1: Rider Info / Vehicle --}}
-                            <td class="px-3 sm:px-6 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <img class="h-10 w-10 rounded-full object-cover shadow-sm mr-3 flex-shrink-0"
-                                        src="https://via.placeholder.com/150/ef4444/ffffff?text=RJ" alt="Rider Photo">
-                                    <div>
-                                        <div class="text-sm font-semibold text-gray-900 group-hover:text-red-600 truncate">
-                                            Rider John Doe (RDR-201)
-                                        </div>
-                                        <div class="flex items-center text-xs space-x-2 mt-1">
-                                            {{-- Vehicle Detail --}}
-                                            <span class="text-gray-500">Bike | ABC-789</span>
-                                            {{-- KYC Status --}}
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                KYC Verified
-                                            </span>
-                                        </div>
-                                        <p class="text-xs text-gray-400 mt-1">Contact: +1 (555) 123-4567</p>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- COL 2: Performance & Availability --}}
-                            <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
-                                <div class="grid grid-cols-2 gap-2 w-full">
-                                    {{-- Availability/Shift --}}
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Availability / Shift</p>
-                                        <div class="flex items-center space-x-1 mt-1">
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-500 text-white">Online</span>
-                                            <span class="text-xs text-gray-700">| 8h 30m Shift</span>
+                                <td class="px-3 sm:px-6 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <img class="h-10 w-10 rounded-full object-cover shadow-sm mr-3 flex-shrink-0"
+                                            :src="rider.img" :alt="rider.name">
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900 group-hover:text-red-600 truncate"
+                                                x-text="`${rider.name} (${rider.tag})`">
+                                            </div>
+                                            <div class="flex items-center text-xs space-x-2 mt-1">
+                                                <span class="text-gray-500"
+                                                    x-text="`${rider.vehicleType} | ${rider.license}`"></span>
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                                                    :class="getKYCColor(rider.kyc)" x-text="`KYC ${rider.kyc}`">
+                                                </span>
+                                            </div>
+                                            <p class="text-xs text-gray-400 mt-1" x-text="`Contact: ${rider.contact}`"></p>
                                         </div>
                                     </div>
-                                    {{-- Orders/Rating --}}
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Orders / Rating</p>
-                                        <p class="font-bold text-gray-700 text-sm">34 Deliveries (Today)</p>
-                                        <div class="flex items-center text-xs text-gray-600 mt-1">
-                                            <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor"
-                                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                </td>
+
+                                <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
+                                    <div class="grid grid-cols-2 gap-2 w-full">
+                                        <div>
+                                            <p class="text-xs font-medium text-gray-400 uppercase">Availability / Shift</p>
+                                            <div class="flex items-center space-x-1 mt-1">
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                                    :class="getAvailabilityColor(rider.availability)"
+                                                    x-text="rider.availability"></span>
+                                                <span class="text-xs text-gray-700" x-text="`| ${rider.shift}`"></span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-medium text-gray-400 uppercase">Orders / Rating</p>
+                                            <p class="font-bold text-gray-700 text-sm"
+                                                x-text="`${rider.deliveries} Deliveries (Today)`"></p>
+                                            <div class="flex items-center text-xs text-gray-600 mt-1">
+                                                <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor"
+                                                    viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="`${rider.rating} (Avg)`"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
+                                    <p class="text-xs font-medium text-gray-400 uppercase">Total Earnings</p>
+                                    <p class="font-extrabold text-lg text-red-700"
+                                        x-text="`$${rider.earnings.toLocaleString()}`">
+                                    </p>
+                                    <p class="text-xs text-pink-600 mt-1" x-text="`Penalties: $${rider.penalties}`"></p>
+                                    <p class="text-xs mt-1"
+                                        :class="{ 'text-orange-500': rider
+                                            .withdrawalStatus === 'Pending', 'text-green-500': rider
+                                                .withdrawalStatus === 'Ready' }"
+                                        x-text="`${rider.withdrawalStatus} Withdrawal`"></p>
+                                </td>
+
+                                <td
+                                    class="px-3 sm:px-6 py-3 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-red-50/50">
+                                    <div class="flex justify-end space-x-2">
+                                        <button @click.stop="openRiderId = rider.id; currentTab = 'profile'"
+                                            class="p-2 rounded-full text-white bg-red-600 hover:bg-red-700 shadow-md transition duration-150 ease-in-out"
+                                            title="View Full Details">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                                                 </path>
                                             </svg>
-                                            4.7 (Avg)
-                                        </div>
+                                        </button>
+                                        <button
+                                            class="p-2 rounded-full text-blue-500 hover:bg-blue-50 transition duration-150 ease-in-out hidden sm:block"
+                                            title="Live Tracking">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z">
+                                                </path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            </svg>
+                                        </button>
                                     </div>
-                                </div>
-                            </td>
+                                </td>
+                            </tr>
+                        </template>
 
-                            {{-- COL 3: Earnings & Penalties --}}
-                            <td class="px-3 sm:px-6 py-3 text-sm text-gray-500">
-                                <p class="text-xs font-medium text-gray-400 uppercase">Total Earnings</p>
-                                <p class="font-extrabold text-lg text-red-700">$1,540</p>
-                                <p class="text-xs text-pink-600 mt-1">Penalties: $40</p>
-                                <p class="text-xs text-orange-500 mt-1">Withdrawal Pending</p>
-                            </td>
-
-                            {{-- COL 4: Actions (Sticky) --}}
-                            <td
-                                class="px-3 sm:px-6 py-3 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-red-50/50">
-                                <div class="flex justify-end space-x-2">
-                                    {{-- View Details (Primary Action) --}}
-                                    <button @click.stop="openRiderId = 201; currentTab = 'profile'"
-                                        class="p-2 rounded-full text-white bg-red-600 hover:bg-red-700 shadow-md transition duration-150 ease-in-out"
-                                        title="View Full Details">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    {{-- Live Map --}}
-                                    <button
-                                        class="p-2 rounded-full text-blue-500 hover:bg-blue-50 transition duration-150 ease-in-out hidden sm:block"
-                                        title="Live Tracking">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z">
-                                            </path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+                        <tr x-show="filteredRiders().length === 0">
+                            <td colspan="4" class="px-6 py-8 text-center text-gray-500 font-medium">
+                                No riders match your current filters or search query.
                             </td>
                         </tr>
-                        {{-- End Sample Rider Row --}}
                     </tbody>
                 </table>
             </div>

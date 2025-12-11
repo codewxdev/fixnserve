@@ -138,7 +138,60 @@
 
 
         {{-- 🎨 3. Main Content Area: Filters and Table --}}
-        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl border border-gray-100">
+        <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl border border-gray-100" x-data="{
+            // 1. Filter State
+            searchTerm: '',
+            categoryFilter: '',
+            statusFilter: '',
+            stockAlertFilter: '',
+            dateAddedFilter: '2025-12-01', // Initial value from your HTML
+            openVendorId: null, // For view details button
+        
+            // 2. Data Storage (Will be populated by x-init)
+            vendors: [],
+        
+            // 3. Filter/Search Logic
+            get filteredVendors() {
+                return this.vendors.filter(vendor => {
+                    const searchMatch = (
+                        vendor.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
+                        vendor.id.toString().includes(this.searchTerm) ||
+                        vendor.contact.toLowerCase().includes(this.searchTerm.toLowerCase())
+                    );
+        
+                    const categoryMatch = this.categoryFilter === '' || vendor.category === this.categoryFilter;
+                    const statusMatch = this.statusFilter === '' || vendor.status === this.statusFilter;
+        
+                    const stockMatch = (
+                        this.stockAlertFilter === '' ||
+                        (this.stockAlertFilter === 'OOS Only' && vendor.alerts.oos > 0) ||
+                        (this.stockAlertFilter === 'Low Stock' && vendor.alerts.low > 0)
+                    );
+        
+                    // For date filtering (simple example: only show vendors added before the selected date)
+                    const dateMatch = new Date(vendor.dateAdded) <= new Date(this.dateAddedFilter);
+        
+        
+                    return searchMatch && categoryMatch && statusMatch && stockMatch && dateMatch;
+                });
+            },
+        
+            // 4. Reset Function
+            resetFilters() {
+                this.searchTerm = '';
+                this.categoryFilter = '';
+                this.statusFilter = '';
+                this.stockAlertFilter = '';
+                this.dateAddedFilter = '2025-12-01'; // Reset to initial date
+            }
+        }"
+            x-init="// 5. Initial Data Load (Simulate data fetch)
+            vendors = [
+                { id: 1001, name: 'SuperMart Groceries', category: 'Grocery', status: 'Active', rating: 4.8, reviews: '1.2k', orders: 45000, prepTime: 15, products: 1500, alerts: { oos: 12, low: 45 }, earnings: '120,500', pending: '1,200', contact: 'john.doe@email.com', dateAdded: '2025-11-20' },
+                { id: 1002, name: 'Electro Tech', category: 'Electronics', status: 'Inactive', rating: 4.5, reviews: '800', orders: 20000, prepTime: 30, products: 500, alerts: { oos: 0, low: 10 }, earnings: '80,000', pending: '500', contact: 'jane.smith@email.com', dateAdded: '2025-12-05' },
+                { id: 1003, name: 'Fashion Hub', category: 'Fashion', status: 'Active', rating: 4.9, reviews: '2.5k', orders: 60000, prepTime: 10, products: 3000, alerts: { oos: 0, low: 0 }, earnings: '250,000', pending: '0', contact: 'alex@fashion.com', dateAdded: '2025-12-10' },
+                { id: 1004, name: 'Quick Supplies', category: 'Grocery', status: 'Pending', rating: 4.1, reviews: '150', orders: 1000, prepTime: 45, products: 100, alerts: { oos: 25, low: 0 }, earnings: '5,000', pending: '100', contact: 'supplier@quick.com', dateAdded: '2025-11-15' },
+            ];">
 
             {{-- 🎨 3.1. Filters / Search Bar (Improved Responsiveness) --}}
             <div
@@ -149,7 +202,8 @@
                     {{-- Search (Col-span 3 for prominence) --}}
                     <div class="col-span-2 sm:col-span-2 lg:col-span-3 relative shadow-sm shadow-black/70">
                         <input type="text" placeholder="Search vendor name, ID, or contact..."
-                            class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150" />
+                            class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150"
+                            x-model.debounce.300ms="searchTerm" {{-- ** Alpine.js Binding ** --}} />
                         <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -159,38 +213,39 @@
 
                     {{-- Filters (More standardized look) --}}
                     <select
-                        class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50
- py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                        style="">
+                        class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50 py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+                        x-model="categoryFilter" {{-- ** Alpine.js Binding ** --}}>
                         <option value="">All Categories</option>
-                        <option>Grocery</option>
-                        <option>Electronics</option>
-                        <option>Fashion</option>
+                        <option value="Grocery">Grocery</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Fashion">Fashion</option>
                     </select>
                     <select
-                        class="col-span-2 form-select rounded-xl  border-gray-300   shadow-sm shadow-black/50 py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500">
+                        class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50 py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+                        x-model="statusFilter" {{-- ** Alpine.js Binding ** --}}>
                         <option value="">All Statuses</option>
-                        <option>Active</option>
-                        <option>Inactive</option>
-                        <option>Pending</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Pending">Pending</option>
                     </select>
                     <select
-                        class="col-span-1 form-select rounded-xl  border-gray-300 shadow-sm shadow-black/50 py-2 px-4 focus:ring-indigo-500 focus:border-indigo-500">
+                        class="col-span-1 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50 py-2 px-4 focus:ring-indigo-500 focus:border-indigo-500"
+                        x-model="stockAlertFilter" {{-- ** Alpine.js Binding ** --}}>
                         <option value="">Stock Alert</option>
-                        <option>OOS Only</option>
-                        <option>Low Stock</option>
+                        <option value="OOS Only">OOS Only</option>
+                        <option value="Low Stock">Low Stock</option>
                     </select>
 
                     {{-- Date Added (Hidden on smaller screens to save space) --}}
                     <div class="col-span-2 hidden lg:block rounded-xl shadow-sm shadow-black/50 border-gray-300">
                         <input type="date"
                             class="form-input w-full rounded-xl text-sm border-gray-300 shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                            value="2025-12-01">
+                            x-model="dateAddedFilter" {{-- ** Alpine.js Binding ** --}}>
                     </div>
 
                     {{-- Reset Button (Right-aligned) --}}
                     <div class="col-span-2 sm:col-span-1 flex justify-end">
-                        <button
+                        <button @click="resetFilters" {{-- ** Alpine.js Action ** --}}
                             class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-150 ease-in-out">
                             <span class="hidden sm:inline">Reset</span>
                             <svg class="w-4 h-4 sm:ml-1 inline-block" fill="none" stroke="currentColor"
@@ -230,195 +285,132 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
 
-                        {{-- Sample Vendor Row (Wrapped in a foreach loop in a real app) --}}
-                        <tr class="hover:bg-indigo-50/50 transition duration-150 ease-in-out group">
+                        {{-- ** Alpine.js Loop & Filter ** --}}
+                        <template x-for="vendor in filteredVendors" :key="vendor.id">
+                            <tr class="hover:bg-indigo-50/50 transition duration-150 ease-in-out group">
 
-                            {{-- COL 1: Vendor Info & Status (Sticky Left) --}}
-                            <td
-                                class="px-4 sm:px-6 py-4 whitespace-nowrap sticky left-0 bg-white group-hover:bg-indigo-50/50 border-r border-gray-200 z-10">
-                                <div class="flex items-center">
-                                    <img class="h-10 w-10 rounded-lg object-cover shadow-md ring-1 ring-gray-200 mr-3 flex-shrink-0"
-                                        src="https://via.placeholder.com/150/4f46e5/ffffff?text=GS" alt="Store Logo">
-                                    <div>
-                                        <div
-                                            class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 truncate">
-                                            SuperMart Groceries
+                                {{-- COL 1: Vendor Info & Status (Sticky Left) --}}
+                                <td
+                                    class="px-4 sm:px-6 py-4 whitespace-nowrap sticky left-0 bg-white group-hover:bg-indigo-50/50 border-r border-gray-200 z-10">
+                                    <div class="flex items-center">
+                                        <img class="h-10 w-10 rounded-lg object-cover shadow-md ring-1 ring-gray-200 mr-3 flex-shrink-0"
+                                            :src="`https://via.placeholder.com/150/4f46e5/ffffff?text=${vendor.name.charAt(0)}${vendor.name.split(' ')[1] ? vendor.name.split(' ')[1].charAt(0) : ''}`"
+                                            :alt="`${vendor.name} Logo`">
+                                        <div>
+                                            <div class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 truncate"
+                                                x-text="vendor.name">
+                                            </div>
+                                            <div class="flex items-center text-xs space-x-2 mt-1">
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                                                    :class="{
+                                                        'bg-pink-100 text-pink-800': vendor.category === 'Grocery',
+                                                        'bg-blue-100 text-blue-800': vendor.category === 'Electronics',
+                                                        'bg-purple-100 text-purple-800': vendor.category === 'Fashion'
+                                                    }"
+                                                    x-text="vendor.category">
+                                                </span>
+                                                <span
+                                                    class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                                    :class="{
+                                                        'bg-green-100 text-green-800': vendor.status === 'Active',
+                                                        'bg-red-100 text-red-800': vendor.status === 'Inactive',
+                                                        'bg-yellow-100 text-yellow-800': vendor.status === 'Pending'
+                                                    }"
+                                                    x-text="vendor.status">
+                                                </span>
+                                            </div>
+                                            <div class="flex items-center mt-1 text-xs text-gray-600">
+                                                <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor"
+                                                    viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <path
+                                                        d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                                    </path>
+                                                </svg>
+                                                <span x-text="`${vendor.rating} (${vendor.reviews} Reviews)`"></span>
+                                            </div>
                                         </div>
-                                        <div class="flex items-center text-xs space-x-2 mt-1">
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-                                                Grocery
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                                Active
-                                            </span>
+                                    </div>
+                                </td>
+
+                                {{-- COL 2: Key Metrics & Financials (Stacked) --}}
+                                <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">
+                                    <div class="grid grid-cols-2 gap-y-2 gap-x-4 w-full">
+                                        {{-- Orders/Packing --}}
+                                        <div>
+                                            <p class="text-xs font-medium text-gray-400 uppercase">Orders / Prep Time</p>
+                                            <p class="font-bold text-gray-700 text-sm"
+                                                x-text="`${vendor.orders.toLocaleString()} Total`"></p>
+                                            <p class="text-xs text-green-600" x-text="`Avg ${vendor.prepTime} mins`"></p>
                                         </div>
-                                        <div class="flex items-center mt-1 text-xs text-gray-600">
-                                            <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor"
-                                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                        {{-- Inventory --}}
+                                        <div>
+                                            <p class="text-xs font-medium text-gray-400 uppercase">Inventory / Alerts</p>
+                                            <p class="font-bold text-gray-700 text-sm"
+                                                x-text="`${vendor.products.toLocaleString()} Products`"></p>
+                                            <p class="text-xs"
+                                                :class="{
+                                                    'text-red-500': vendor.alerts.oos > 0 || vendor.alerts.low >
+                                                        0,
+                                                    'text-gray-500': vendor.alerts.oos === 0 && vendor.alerts.low ===
+                                                        0
+                                                }"
+                                                x-text="`${vendor.alerts.oos} OOS / ${vendor.alerts.low} Low`">
+                                            </p>
+                                        </div>
+                                        {{-- Finance (Full width) --}}
+                                        <div class="col-span-2 border-t border-gray-100 pt-2">
+                                            <p class="text-xs font-medium text-gray-400 uppercase">Total Earnings / Pending
+                                            </p>
+                                            <p class="font-extrabold text-lg text-indigo-700"
+                                                x-text="`$${vendor.earnings}`"></p>
+                                            <p class="text-xs text-red-500"
+                                                x-text="`Pending Withdrawal: $${vendor.pending}`"></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {{-- COL 3: Actions (Sticky Right) --}}
+                                <td
+                                    class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-indigo-50/50 z-10">
+                                    <div class="flex justify-end space-x-2">
+                                        {{-- View Details Button is the primary action --}}
+                                        <button @click.stop="openVendorId = vendor.id; currentTab = 'profile'"
+                                            class="p-2 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/50 transition duration-150 ease-in-out transform hover:scale-105"
+                                            title="View Full Details">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                                                 </path>
                                             </svg>
-                                            4.8 (1.2k Reviews)
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- COL 2: Key Metrics & Financials (Stacked) --}}
-                            <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">
-                                <div class="grid grid-cols-2 gap-y-2 gap-x-4 w-full">
-                                    {{-- Orders/Packing --}}
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Orders / Prep Time</p>
-                                        <p class="font-bold text-gray-700 text-sm">45,000 Total</p>
-                                        <p class="text-xs text-green-600">Avg 15 mins</p>
-                                    </div>
-                                    {{-- Inventory --}}
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Inventory / Alerts</p>
-                                        <p class="font-bold text-gray-700 text-sm">1,500 Products</p>
-                                        <p class="text-xs text-red-500">12 OOS / 45 Low</p>
-                                    </div>
-                                    {{-- Finance (Full width) --}}
-                                    <div class="col-span-2 border-t border-gray-100 pt-2">
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Total Earnings / Pending</p>
-                                        <p class="font-extrabold text-lg text-indigo-700">$120,500</p>
-                                        <p class="text-xs text-red-500">Pending Withdrawal: $1,200</p>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- COL 3: Actions (Sticky Right) --}}
-                            <td
-                                class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-indigo-50/50 z-10">
-                                <div class="flex justify-end space-x-2">
-                                    {{-- View Details Button is the primary action --}}
-                                    <button @click.stop="openVendorId = 1; currentTab = 'profile'"
-                                        class="p-2 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/50 transition duration-150 ease-in-out transform hover:scale-105"
-                                        title="View Full Details">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    {{-- Edit Button (Less prominent) --}}
-                                    <button
-                                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition duration-150 ease-in-out hidden sm:block"
-                                        title="Edit Store">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-indigo-50/50 transition duration-150 ease-in-out group">
-
-                            {{-- COL 1: Vendor Info & Status (Sticky Left) --}}
-                            <td
-                                class="px-4 sm:px-6 py-4 whitespace-nowrap sticky left-0 bg-white group-hover:bg-indigo-50/50 border-r border-gray-200 z-10">
-                                <div class="flex items-center">
-                                    <img class="h-10 w-10 rounded-lg object-cover shadow-md ring-1 ring-gray-200 mr-3 flex-shrink-0"
-                                        src="https://via.placeholder.com/150/4f46e5/ffffff?text=GS" alt="Store Logo">
-                                    <div>
-                                        <div
-                                            class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 truncate">
-                                            SuperMart Groceries
-                                        </div>
-                                        <div class="flex items-center text-xs space-x-2 mt-1">
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-pink-100 text-pink-800">
-                                                Grocery
-                                            </span>
-                                            <span
-                                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-800">
-                                                Active
-                                            </span>
-                                        </div>
-                                        <div class="flex items-center mt-1 text-xs text-gray-600">
-                                            <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor"
-                                                viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                                <path
-                                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                                        </button>
+                                        {{-- Edit Button (Less prominent) --}}
+                                        <button
+                                            class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition duration-150 ease-in-out hidden sm:block"
+                                            title="Edit Store">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
                                                 </path>
                                             </svg>
-                                            4.8 (1.2k Reviews)
-                                        </div>
+                                        </button>
                                     </div>
-                                </div>
-                            </td>
-
-                            {{-- COL 2: Key Metrics & Financials (Stacked) --}}
-                            <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">
-                                <div class="grid grid-cols-2 gap-y-2 gap-x-4 w-full">
-                                    {{-- Orders/Packing --}}
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Orders / Prep Time</p>
-                                        <p class="font-bold text-gray-700 text-sm">45,000 Total</p>
-                                        <p class="text-xs text-green-600">Avg 15 mins</p>
-                                    </div>
-                                    {{-- Inventory --}}
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Inventory / Alerts</p>
-                                        <p class="font-bold text-gray-700 text-sm">1,500 Products</p>
-                                        <p class="text-xs text-red-500">12 OOS / 45 Low</p>
-                                    </div>
-                                    {{-- Finance (Full width) --}}
-                                    <div class="col-span-2 border-t border-gray-100 pt-2">
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Total Earnings / Pending</p>
-                                        <p class="font-extrabold text-lg text-indigo-700">$120,500</p>
-                                        <p class="text-xs text-red-500">Pending Withdrawal: $1,200</p>
-                                    </div>
-                                </div>
-                            </td>
-
-                            {{-- COL 3: Actions (Sticky Right) --}}
-                            <td
-                                class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-indigo-50/50 z-10">
-                                <div class="flex justify-end space-x-2">
-                                    {{-- View Details Button is the primary action --}}
-                                    <button @click.stop="openVendorId = 1; currentTab = 'profile'"
-                                        class="p-2 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/50 transition duration-150 ease-in-out transform hover:scale-105"
-                                        title="View Full Details">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    {{-- Edit Button (Less prominent) --}}
-                                    <button
-                                        class="p-2 rounded-full text-gray-500 hover:bg-gray-100 transition duration-150 ease-in-out hidden sm:block"
-                                        title="Edit Store">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        {{-- End Sample Vendor Row --}}
-
-                        {{-- Repeat the <tr>...</tr> block for more vendors --}}
+                                </td>
+                            </tr>
+                        </template>
+                        {{-- ** End Alpine.js Loop & Filter ** --}}
 
                     </tbody>
                 </table>
+
+                {{-- No Results Message --}}
+                <div x-show="filteredVendors.length === 0" class="text-center py-10 text-gray-500 italic">
+                    No vendors match your current filter criteria. Try adjusting your search or filters.
+                </div>
             </div>
         </div>
 

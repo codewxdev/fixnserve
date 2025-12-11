@@ -1,6 +1,5 @@
 <form id="filter-form" class="space-y-6">
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-6 xl:grid-cols-9 items-end">
-
         <div class="lg:col-span-2 xl:col-span-3">
             <label for="search" class="block text-sm font-medium text-gray-700">Search Name, Email, or Phone</label>
             <div class="mt-1">
@@ -16,7 +15,7 @@
                 <option>Accountant</option>
                 <option>Architect</option>
                 <option>HR Expert</option>
-                </select>
+            </select>
         </div>
 
         <div>
@@ -38,7 +37,7 @@
                 <option value="rejected">Rejected</option>
             </select>
         </div>
-        
+
         <div>
             <label for="availability" class="block text-sm font-medium text-gray-700">Availability Status</label>
             <select id="availability" name="availability" class="mt-1 block w-full rounded-md border-gray-300 py-2.5 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm">
@@ -67,7 +66,7 @@
                 <option>USA</option>
                 <option>Canada</option>
                 <option>UK</option>
-                </select>
+            </select>
         </div>
 
         <div>
@@ -80,7 +79,7 @@
         <button type="button" id="reset-filters" class="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none">
             Reset Filters
         </button>
-        <button type="submit" class="rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none">
+        <button type="button" id="apply-filters" class="rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none">
             Apply Filters
         </button>
     </div>
