@@ -89,9 +89,9 @@
 @endphp
 
 @section('content')
-    <div class="p-6 sm:p-10 min-h-screen bg-gray-50">
+    <div class="p-6 sm:p-4 min-h-screen bg-gray-50">
         <header class="mb-8">
-            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Customer Management </h1>
+            <h1 class="text-3xl font-extrabold text-gray-900">Customer Management </h1>
             <p class="mt-1 text-lg text-gray-500">Overview and comprehensive management of all registered customers.</p>
         </header>
 
@@ -354,6 +354,9 @@
 
 @push('styles')
     <style>
+        h1{
+            font-family: 'Inter' !important;
+        }
         /* Custom Styles for Professional Look */
         .table-container {
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);

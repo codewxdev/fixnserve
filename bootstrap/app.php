@@ -13,6 +13,18 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function(): void {
             Route::namespace('admin')->group(base_path('routes/admin/customer.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/provider.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/professional.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/role_permission.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/consultant.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/mart.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/rider.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/service.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/finance.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/car.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/report.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/cms.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/notification.php'));
            
         }
     )
