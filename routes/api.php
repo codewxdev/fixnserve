@@ -6,6 +6,12 @@ use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
 use App\Http\Controllers\Role\UserRoleController;
+use App\Http\Controllers\ServiceProvider\CategoryController;
+use App\Http\Controllers\ServiceProvider\PortfolioController;
+use App\Http\Controllers\ServiceProvider\ServiceController;
+use App\Http\Controllers\ServiceProvider\ServiceProviderController;
+use App\Http\Controllers\ServiceProvider\SkillController;
+use App\Http\Controllers\ServiceProvider\SubcategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -53,4 +59,63 @@ Route::middleware(['auth:api', 'role:Super Admin', '2fa'])->group(function () {
 
     Route::get('/login-history', [AuthController::class, 'loginHistory'])->middleware('auth:api', '2fa');
 
+    // -------------------------
+    // CATEGORY CRUD
+    // -------------------------
+    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::post('/categories', [CategoryController::class, 'store']);
+    Route::get('/categories/{id}', [CategoryController::class, 'show']);
+    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
+
+    // -------------------------
+    // SUBCATEGORY CRUD
+    // -------------------------
+    Route::get('/subcategories', [SubcategoryController::class, 'index']);
+    Route::post('/subcategories', [SubcategoryController::class, 'store']);
+    Route::get('/subcategories/{id}', [SubcategoryController::class, 'show']);
+    Route::post('/subcategories/{id}', [SubcategoryController::class, 'update']);
+    Route::delete('/subcategories/{id}', [SubcategoryController::class, 'destroy']);
+
+    // -------------------------
+    // SKILL CRUD
+    // -------------------------
+    Route::get('/skills', [SkillController::class, 'index']);
+    Route::post('/skills', [SkillController::class, 'store']);
+    Route::get('/skills/{id}', [SkillController::class, 'show']);
+    Route::put('/skills/{id}', [SkillController::class, 'update']);
+    Route::delete('/skills/{id}', [SkillController::class, 'destroy']);
+
+    // / Update Service Status
+    Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
+
 });
+Route::prefix('service-provider')->middleware('auth:api')->group(function () {
+    // SERVICE CRUD
+    // -------------------------
+    Route::get('/services', [ServiceController::class, 'index']);
+    Route::post('/services', [ServiceController::class, 'store']);
+    Route::get('/services/{id}', [ServiceController::class, 'show']);
+    Route::put('/services/{id}', [ServiceController::class, 'update']);
+    Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+
+    // -------------------------
+    // SERVICE PROVIDER PROFILE SETUP
+    // -------------------------
+
+    Route::post('/categories-subcategories', [ServiceProviderController::class, 'saveCategoriesAndSubcategories']);
+
+});
+Route::prefix('skills')->group(function () {
+    Route::post('/add', [SkillController::class, 'addSkills'])->middleware('auth:api');
+});
+Route::get('/skill/suggested', [SkillController::class, 'suggested']);
+Route::get('/skill/search', [SkillController::class, 'search']);
+Route::prefix('portfolios')->middleware('auth:api')->group(function () {
+    Route::get('', [PortfolioController::class, 'index']);
+    Route::post('', [PortfolioController::class, 'store']);
+    Route::get('/{id}', [PortfolioController::class, 'show']);
+    Route::post('/{id}', [PortfolioController::class, 'update']);
+    Route::delete('/{portfolio}', [PortfolioController::class, 'destroy']);
+});
+Route::post('/language', [PortfolioController::class, 'addLanguage']);

@@ -16,14 +16,14 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email|unique:users',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $request->first_name + $request->last_name,
+            'name' => $request->first_name.' '.$request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -31,10 +31,11 @@ class AuthController extends Controller
         $token = JWTAuth::fromUser($user);
 
         return response()->json([
-
+            'status' => true,
+            'message' => 'User registered successfully',
             'user' => $user,
-            'token' => $token,
-        ]);
+            'access_token' => $token,
+        ], 201);
     }
 
     public function login(Request $request)
@@ -73,10 +74,21 @@ class AuthController extends Controller
 
         // Get user roles and permissions
 
-        if ($user->is_2fa_enabled) {
+        if ($user->hasRole(['Admin', 'Super Admin'])) {
+
+            if ($user->is_2fa_enabled) {
+                return response()->json([
+                    'status' => '2fa_required',
+                    'email' => $user->email,
+                    'access_token' => $token,
+                    'message' => 'Admin 2FA verification required.',
+                ]);
+            }
+
+            // If admin 2FA is NOT enabled → force enable
             return response()->json([
-                'status' => '2fa_required',
-                'email' => $user->email,
+                'status' => 'enable_2fa',
+                'message' => 'Admin account must enable 2FA.',
                 'access_token' => $token,
             ]);
         }
@@ -200,6 +212,8 @@ class AuthController extends Controller
             'state' => 'nullable|string',
             'zipcode' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+
         ]);
 
         if (isset($validated['phone'])) {
@@ -223,8 +237,24 @@ class AuthController extends Controller
             }
         }
 
+        if ($request->hasFile('image')) {
+
+            // Delete old image if exists
+            if ($user->image && \Storage::exists('public/profile_images/'.$user->image)) {
+                \Storage::delete('public/profile_images/'.$user->image);
+            }
+
+            // Save new image
+            $file = $request->file('image');
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+
+            $file->storeAs('public/profile_images/', $filename);
+
+            $user->image = $filename;
+        }
+
         foreach ($validated as $key => $value) {
-            if (! is_null($value)) {   // Only update if value provided
+            if (! is_null($value) && $key !== 'image') {   // Only update if value provided
                 $user->{$key} = $value;
             }
         }
@@ -232,8 +262,14 @@ class AuthController extends Controller
         $user->save();
 
         return response()->json([
-            'message' => 'User profile updated successfully!',
-            'data' => $user,
+            'status' => true,
+            'message' => 'Profile updated successfully!',
+            'data' => [
+                'user' => $user,
+                'profile_image_url' => $user->image
+                    ? asset('storage/profile_images/'.$user->image)
+                    : null,
+            ],
         ]);
     }
 

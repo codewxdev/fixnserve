@@ -114,4 +114,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(LoginHistory::class);
     }
+
+    public function skills()
+    {
+        return $this->belongsToMany(Skill::class, 'user_skills', 'user_id', 'skill_id');
+    }
+
+    public function languages()
+    {
+        return $this->hasMany(UserLanguage::class);
+    }
 }
