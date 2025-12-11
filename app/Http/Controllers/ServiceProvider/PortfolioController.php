@@ -162,17 +162,26 @@ class PortfolioController extends Controller
 
     public function addLanguage(Request $request)
     {
+        $request->validate([
+            'languages' => 'required|array',
+            'languages.*.language' => 'required|string',
+            'languages.*.proficiency' => 'required|string',
+        ]);
+
         $user = auth()->user();
-        $user->language = $request->language;
-        $user->proficiency = $request->proficiency; // fixed typo
-        $user->save();
+
+        $saved = [];
+
+        foreach ($request->languages as $lang) {
+            $saved[] = $user->languages()->create([
+                'language' => $lang['language'],
+                'proficiency' => $lang['proficiency'],
+            ]);
+        }
 
         return response()->json([
-            'message' => 'Language added successfully',
-            'language' => [
-                'language' => $user->language,
-                'proficiency' => $user->proficiency,
-            ],
+            'message' => 'Languages added successfully',
+            'data' => $saved,
         ]);
     }
 }

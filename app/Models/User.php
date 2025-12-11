@@ -124,4 +124,59 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserLanguage::class);
     }
+
+    public function educations()
+    {
+        return $this->hasMany(UserEducation::class);
+    }
+
+    public function certificates()
+    {
+        return $this->hasMany(UserCertificate::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(UserPayment::class);
+    }
+
+    /**
+     * Get user's default payment method.
+     */
+    public function defaultPayment()
+    {
+        return $this->hasOne(UserPayment::class)->where('is_default', true);
+    }
+
+    /**
+     * Get active payment methods.
+     */
+    public function activePayments()
+    {
+        return $this->payments()->active();
+    }
+
+    /**
+     * Get card payment methods.
+     */
+    public function cardPayments()
+    {
+        return $this->payments()->byMethod('card');
+    }
+
+    /**
+     * Get JazzCash payment methods.
+     */
+    public function jazzcashPayments()
+    {
+        return $this->payments()->byMethod('jazzcash');
+    }
+
+    /**
+     * Get EasyPaisa payment methods.
+     */
+    public function easypaisaPayments()
+    {
+        return $this->payments()->byMethod('easypaisa');
+    }
 }
