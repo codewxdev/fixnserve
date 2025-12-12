@@ -90,147 +90,6 @@
 @endpush
 
 @push('scripts')
-   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-
-        const rows = document.querySelectorAll("tbody tr");
-
-        // --- Rate Slider UI Update Logic ---
-        const rateMinSlider = document.getElementById("rate-slider-min");
-        const rateMaxSlider = document.getElementById("rate-slider-max");
-        const rateMinDisplay = document.getElementById("rate-min");
-        const rateMaxDisplay = document.getElementById("rate-max");
-
-        // Function to update the displayed rate values
-        function updateRateDisplay() {
-            const minVal = parseInt(rateMinSlider.value);
-            const maxVal = parseInt(rateMaxSlider.value);
-
-            // Ensure min slider cannot pass max slider
-            if (minVal > maxVal) {
-                rateMinSlider.value = maxVal;
-                rateMinDisplay.textContent = maxVal;
-            } else {
-                rateMinDisplay.textContent = minVal;
-            }
-
-            rateMaxDisplay.textContent = maxVal === 500 ? '500+' : maxVal;
-        }
-
-        // Initial update
-        updateRateDisplay();
-
-        // Attach listeners for rate slider interaction
-        rateMinSlider.addEventListener("input", updateRateDisplay);
-        rateMaxSlider.addEventListener("input", updateRateDisplay);
-        // --- End Rate Slider UI Update Logic ---
-
-
-        function applyFilters() {
-
-            const search = document.getElementById("search").value.toLowerCase().trim();
-            const category = document.getElementById("category").value.toLowerCase().trim();
-            const verification = document.getElementById("verification").value.toLowerCase().trim();
-            const degreeStatus = document.getElementById("degree_status").value.toLowerCase().trim();
-            const availability = document.getElementById("availability").value.toLowerCase().trim();
-            
-            // Get rate values directly from the input element values
-            const rateMin = parseInt(document.getElementById("rate-slider-min").value);
-            const rateMax = parseInt(document.getElementById("rate-slider-max").value);
-            
-            const country = document.getElementById("country").value.toLowerCase().trim();
-
-            rows.forEach(row => {
-
-                // Get all text content for general search
-                const text = row.innerText.toLowerCase();
-
-                // 1. Get Expertise Category (from td:nth-child(2) > div:first-child)
-                const rowCategory = row.querySelector("td:nth-child(2) .font-semibold")
-                    ?.textContent.toLowerCase().trim() || "";
-
-                // 2. Get Availability Status (from td:nth-child(3) > span)
-                const rowAvailability = row.querySelector("td:nth-child(3) .availability-status")
-                    ?.textContent.toLowerCase().trim() || "";
-
-                // 3. Get KYC Status (from td:nth-child(4) > div:nth-child(1) > span)
-                const rowVerification = row.querySelector("td:nth-child(4) .kyc-status span")
-                    ?.textContent.toLowerCase().trim() || "";
-
-                // 4. Get Degree Status (from td:nth-child(4) > div:nth-child(2) > span)
-                const rowDegreeStatus = row.querySelector("td:nth-child(4) .degree-status span")
-                    ?.textContent.toLowerCase().trim() || "";
-
-                // 5. Get Hourly Rate (from td:nth-child(2) .rate-value) and parse it to an integer
-                const rateText = row.querySelector("td:nth-child(2) .rate-value")
-                    ?.textContent.replace("$", "").replace("/hr", "").trim() || "0";
-                const rowRate = parseInt(rateText);
-
-                // --- Filtering Logic ---
-                let show = true;
-
-                // Filter 1: Search (Name, Email, Phone - using all row text)
-                if (search && !text.includes(search)) show = false;
-                
-                // Filter 2: Expertise Category
-                if (category && rowCategory !== category) show = false;
-
-                // Filter 3: Verification Status (KYC)
-                if (verification) {
-                    // Normalize filter values: pending KYC = pending
-                    const normalizedVerification = verification.replace('pending kyc', 'pending');
-                    if (rowVerification !== normalizedVerification) show = false;
-                }
-                
-                // Filter 4: Degree Validation
-                if (degreeStatus) {
-                    // Normalize filter values: pending review = pending
-                    const normalizedDegreeStatus = degreeStatus.replace('pending review', 'pending');
-                    if (rowDegreeStatus !== normalizedDegreeStatus) show = false;
-                }
-
-                // Filter 5: Availability Status
-                if (availability && rowAvailability !== availability) show = false;
-
-                // Filter 6: Hourly Rate Range
-                if (rowRate < rateMin || rowRate > rateMax) show = false;
-
-                // Filter 7: Country (Service Zone - currently uses all row text)
-                // NOTE: To make this work accurately, you must add the country/region name inside the table row data.
-                if (country && !text.includes(country)) show = false; 
-                // Consider adding a hidden <td> with the Country/Service Zone data for accurate filtering.
-
-                // Apply visibility
-                row.style.display = show ? "" : "none";
-            });
-        }
-
-        // Apply Filters button
-        document.getElementById("apply-filters").addEventListener("click", applyFilters);
-
-        // Live filtering (optional) - Add updateRateDisplay to the list
-        document.querySelectorAll("#filter-form input, #filter-form select").forEach(el => {
-            el.addEventListener("input", function() {
-                updateRateDisplay(); // Update rate display on slider change
-                applyFilters();
-            });
-            el.addEventListener("change", applyFilters); // Use change for selects and date
-        });
-
-        // Reset Filters
-        document.getElementById("reset-filters").addEventListener("click", function() {
-            document.getElementById("filter-form").reset();
-            updateRateDisplay(); // Reset the displayed range values
-            applyFilters();
-        });
-        
-        // Initial filter run on load (to correctly set the slider ranges)
-        applyFilters();
-
-    });
-</script>
-
-
     {{-- <script>
         document.addEventListener("DOMContentLoaded", function() {
 
@@ -315,6 +174,78 @@
     </script> --}}
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const rows = document.querySelectorAll("tbody tr");
+
+            function applyFilters() {
+
+                const search = document.getElementById("searchInput").value.toLowerCase().trim();
+                const category = document.getElementById("categoryFilter").value.toLowerCase().trim();
+                const kyc = document.getElementById("kycFilter").value.toLowerCase().trim();
+                const availability = document.getElementById("availabilityFilter").value.toLowerCase().trim();
+                const dateFilter = document.getElementById("dateFilter").value; // YYYY-MM-DD
+
+                rows.forEach(row => {
+
+                    const text = row.innerText.toLowerCase(); // for search
+
+                    // Extract values from row
+                    const rowCategory = row.querySelector("td:nth-child(2) .font-semibold")?.innerText
+                        .toLowerCase().trim() || "";
+                    const rowAvailability = row.querySelector(".availability-status")?.innerText
+                        .toLowerCase().trim() || "";
+                    const rowKyc = row.querySelector(".kyc-status span")?.innerText.toLowerCase().trim() ||
+                        "";
+
+                    // If date exists in table (optional)
+                    const rowDate = row.getAttribute("data-joined") || "";
+                    // You can add: <tr data-joined="2024-01-21">
+
+                    let show = true;
+
+                    // 1. Text search (name, phone, email)
+                    if (search && !text.includes(search)) show = false;
+
+                    // 2. Category
+                    if (category && rowCategory !== category) show = false;
+
+                    // 3. KYC status
+                    if (kyc && rowKyc !== kyc) show = false;
+
+                    // 4. Availability
+                    if (availability && rowAvailability !== availability) show = false;
+
+                    // 5. Date filter
+                    if (dateFilter && rowDate !== dateFilter) show = false;
+
+                    // Apply row visibility
+                    row.style.display = show ? "" : "none";
+                });
+            }
+
+            // Listen to all filters live
+            document.querySelectorAll("#searchInput, #categoryFilter, #kycFilter, #availabilityFilter, #dateFilter")
+                .forEach(el => {
+                    el.addEventListener("input", applyFilters);
+                    el.addEventListener("change", applyFilters);
+                });
+
+            // Reset Filters
+            document.getElementById("resetFilters").addEventListener("click", function() {
+                document.getElementById("searchInput").value = "";
+                document.getElementById("categoryFilter").value = "";
+                document.getElementById("kycFilter").value = "";
+                document.getElementById("availabilityFilter").value = "";
+                document.getElementById("dateFilter").value = "";
+
+                applyFilters();
+            });
+
+            // Initial filtering on page load
+            applyFilters();
+        });
+
         // Global state for selected provider data (simulating reactive framework)
         let currentProviderData = {};
 
@@ -434,13 +365,13 @@
                         <h4 class="font-semibold text-gray-800 flex items-center mb-3"><i class="fas fa-file-contract mr-2 text-yellow-600"></i> KYC & Document Status</h4>
                         <ul class="space-y-2">
                             ${data.kyc.map(doc => `
-                                                <li class="flex justify-between text-sm">
-                                                    <span>${doc.doc}:</span>
-                                                    <span class="font-medium ${doc.status === 'Verified' ? 'text-green-600' : 'text-yellow-600'} flex items-center">
-                                                        <i class="fas ${doc.status === 'Verified' ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i> ${doc.status}
-                                                    </span>
-                                                </li>
-                                            `).join('')}
+                                                            <li class="flex justify-between text-sm">
+                                                                <span>${doc.doc}:</span>
+                                                                <span class="font-medium ${doc.status === 'Verified' ? 'text-green-600' : 'text-yellow-600'} flex items-center">
+                                                                    <i class="fas ${doc.status === 'Verified' ? 'fa-check-circle' : 'fa-hourglass-half'} mr-1"></i> ${doc.status}
+                                                                </span>
+                                                            </li>
+                                                        `).join('')}
                         </ul>
                         <button class="mt-4 text-xs font-medium text-blue-500 hover:text-blue-700">Review Documents</button>
                     </div>
