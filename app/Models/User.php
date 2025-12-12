@@ -40,6 +40,7 @@ class User extends Authenticatable implements JWTSubject
         'name',
         'email',
         'password',
+        'mode',
         'uuid', // Add UUID to fillable
     ];
 
@@ -66,6 +67,8 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'mode' => 'boolean', // Add this line
+
         ];
     }
 
@@ -183,5 +186,10 @@ class User extends Authenticatable implements JWTSubject
     public function notificationSettings()
     {
         return $this->hasOne(UserNotification::class);
+    }
+
+    public function transportation()
+    {
+        return $this->hasOne(UserTransportation::class);
     }
 }

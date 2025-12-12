@@ -15,90 +15,102 @@ use App\Http\Controllers\ServiceProvider\SubcategoryController;
 use App\Http\Controllers\ServiceProvider\UserEducationController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
+use App\Http\Controllers\ServiceProvider\UserTransportationController;
 use Illuminate\Support\Facades\Route;
 
+// Public Routes (No authentication required)
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
 Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
 Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
 Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
-Route::post('/2fa/enable', [AuthController::class, 'enable2FA'])->middleware('auth:api');
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
-Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
-Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
 Route::get('/skill/suggested', [SkillController::class, 'suggested']);
 Route::get('/skill/search', [SkillController::class, 'search']);
 
-Route::middleware('auth:api')->group(function () {
+// Main Authenticated Routes Group with User Status Check
+Route::middleware(['auth:api', 'user.active'])->group(function () {
+
+    // Auth Routes
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
+    Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
+    Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
 
-});
-Route::middleware(['auth:api', 'role:Super Admin', '2fa'])->group(function () {
-    Route::apiResource('roles', RoleController::class);
-    Route::apiResource('permissions', PermissionController::class);
-    // Role-Permission CRUD (assign/remove)
-    Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
-    Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
-    Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
-    // USER → ROLE
-    Route::post('/users/assign-role', [UserRoleController::class, 'assignRole']);
-    // USER → DIRECT PERMISSIONS (optional)
-    Route::post('/users/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
-    // User roles + permissions
-    Route::get('/users/{id}/roles', [UserRoleController::class, 'getUserRoles']);
-    Route::get('/users/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
-    Route::get('/login-history', [AuthController::class, 'loginHistory'])->middleware('auth:api', '2fa');
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('subcategories', SubcategoryController::class);
-    Route::apiResource('skills', SkillController::class);
-    // / Update Service Status
-    Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
-});
-Route::prefix('service-provider')->middleware('auth:api')->group(function () {
-    Route::apiResource('services', ServiceController::class);
-    Route::post('/categories-subcategories', [ServiceProviderController::class, 'saveCategoriesAndSubcategories']);
-});
-Route::prefix('skills')->group(function () {
-    Route::post('/add', [SkillController::class, 'addSkills'])->middleware('auth:api');
-});
-Route::prefix('portfolios')->middleware('auth:api')->group(function () {
-    Route::apiResource('portfolios', PortfolioController::class);
-});
-Route::middleware(['auth'])->group(function () {
-    Route::post('/language', [PortfolioController::class, 'addLanguage']);
-    // Get complete profile (educations + certificates)
-    Route::get('/education', [UserEducationController::class, 'getProfile']);
-    // Store education with optional certificates
-    Route::post('/education', [UserEducationController::class, 'storeProfile']);
-    // Education CRUD
-    Route::post('/education/{id}', [UserEducationController::class, 'updateEducation']);
-    Route::delete('/education/{id}', [UserEducationController::class, 'deleteEducation']);
-    // Certificates operations
-    Route::post('/certificates/upload', [UserEducationController::class, 'uploadCertificates']);
-    Route::delete('/certificates/{id}', [UserEducationController::class, 'deleteCertificate']);
-    Route::get('/certificates/download/{id}', [UserEducationController::class, 'downloadCertificate']);
-});
-Route::middleware(['auth:api'])->prefix('payments')->group(function () {
-    // Get all payment methods
-    Route::get('/', [UserPaymentController::class, 'index']);
-    // Add new payment method
-    Route::post('/', [UserPaymentController::class, 'store']);
-    // Set as default
-    Route::post('/{id}/set-default', [UserPaymentController::class, 'setDefault']);
-    // Delete payment method
-    Route::delete('/{id}', [UserPaymentController::class, 'destroy']);
-    // Get by type
-    Route::get('/type/{type}', [UserPaymentController::class, 'byType']);
-});
+    Route::middleware(['service.provider'])->group(function () {
+        Route::post('/language', [PortfolioController::class, 'addLanguage']);
+        Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
 
-Route::middleware(['auth:api'])->prefix('notifications')->group(function () {
-    // Get notification settings
-    Route::get('/', [UserNotificationController::class, 'getSettings']);
+        // Service Provider Routes
+        Route::prefix('service-provider')->group(function () {
+            Route::apiResource('services', ServiceController::class);
+            Route::post('/categories-subcategories', [ServiceProviderController::class, 'saveCategoriesAndSubcategories']);
+            Route::post('/update/account', [ServiceProviderController::class, 'updateAccount']);
+            Route::post('/update/mode', [ServiceProviderController::class, 'updateMode']);
+        });
+        // Skills Routes
+        Route::prefix('skills')->group(function () {
+            Route::post('/add', [SkillController::class, 'addSkills']);
+        });
+        // Portfolio Routes
+        Route::prefix('portfolios')->group(function () {
+            Route::apiResource('portfolios', PortfolioController::class);
+        });
+        // Education & Certificates Routes
+        Route::prefix('education')->group(function () {
+            Route::get('/', [UserEducationController::class, 'getProfile']);
+            Route::post('/', [UserEducationController::class, 'storeProfile']);
+            Route::post('/{id}', [UserEducationController::class, 'updateEducation']);
+            Route::delete('{id}', [UserEducationController::class, 'deleteEducation']);
+        });
+        Route::prefix('certificates')->group(function () {
+            Route::post('/upload', [UserEducationController::class, 'uploadCertificates']);
+            Route::delete('/{id}', [UserEducationController::class, 'deleteCertificate']);
+            Route::get('/download/{id}', [UserEducationController::class, 'downloadCertificate']);
+        });
+        // Payment Routes
+        Route::prefix('payments')->group(function () {
+            Route::get('/', [UserPaymentController::class, 'index']);
+            Route::post('/', [UserPaymentController::class, 'store']);
+            Route::post('/{id}/set-default', [UserPaymentController::class, 'setDefault']);
+            Route::delete('/{id}', [UserPaymentController::class, 'destroy']);
+            Route::get('/type/{type}', [UserPaymentController::class, 'byType']);
+        });
 
-    // Set all notifications at once
-    Route::post('/set-all', [UserNotificationController::class, 'setNotificationSettings']);
+        // Notification Routes
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [UserNotificationController::class, 'getSettings']);
+            Route::post('/set-all', [UserNotificationController::class, 'setNotificationSettings']);
+        });
+        Route::prefix('transportations')->group(function () {
+            // Get transportation settings
+            Route::get('/', [UserTransportationController::class, 'getTransportations']);
+            // Update transportation settings
+            Route::post('/', [UserTransportationController::class, 'updateTransportations']);
+        });
+
+    });
+
+    // Super Admin Routes (with additional checks)
+    Route::middleware(['role:Super Admin', '2fa'])->group(function () {
+        Route::apiResource('roles', RoleController::class);
+        Route::apiResource('permissions', PermissionController::class);
+        Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
+        Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
+        Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
+        Route::prefix('users')->group(function () {
+            Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
+            Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
+            Route::get('/{id}/roles', [UserRoleController::class, 'getUserRoles']);
+            Route::get('/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
+        });
+        Route::get('/login-history', [AuthController::class, 'loginHistory']);
+        Route::apiResource('categories', CategoryController::class);
+        Route::apiResource('subcategories', SubcategoryController::class);
+        Route::apiResource('skills', SkillController::class);
+        Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
+    });
 });
 
 // /////////////////////////////////////////extra code//////////////////////////////////////

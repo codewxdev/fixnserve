@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__.'/../routes/api.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function(): void {
+        then: function (): void {
             Route::namespace('admin')->group(base_path('routes/admin/customer.php'));
             Route::namespace('admin')->group(base_path('routes/admin/provider.php'));
             Route::namespace('admin')->group(base_path('routes/admin/professional.php'));
@@ -25,7 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::namespace('admin')->group(base_path('routes/admin/report.php'));
             Route::namespace('admin')->group(base_path('routes/admin/cms.php'));
             Route::namespace('admin')->group(base_path('routes/admin/notification.php'));
-           
+
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
@@ -36,6 +36,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             '2fa' => \App\Http\Middleware\Ensure2FAEnabled::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'user.active' => \App\Http\Middleware\CheckUserStatus::class,
+            'service.provider' => \App\Http\Middleware\CheckServiceProviderRole::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

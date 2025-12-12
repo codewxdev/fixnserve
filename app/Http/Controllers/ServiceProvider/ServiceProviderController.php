@@ -81,4 +81,49 @@ class ServiceProviderController extends Controller
             'message' => 'Categories and subcategories saved successfully',
         ], 200);
     }
+
+    public function updateAccount(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'status' => 'sometimes|in:deleted,deactive',
+        ]);
+
+        if ($request->has('status')) {
+            $user->status = $request->status;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Account Status updated successfully',
+            'data' => "Status is $user->status",
+        ], 200);
+    }
+
+    public function updateMode(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'mode' => 'required|boolean', // یا 'required|in:0,1'
+        ]);
+
+        $user->update([
+            'mode' => $request->mode,
+        ]);
+
+        $modeText = $user->mode ? 'Online' : 'Offline';
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Account mode updated successfully',
+            'data' => [
+                'mode' => $user->mode,
+                'mode_text' => $modeText,
+            ],
+        ], 200);
+    }
 }
