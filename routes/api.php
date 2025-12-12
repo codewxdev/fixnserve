@@ -13,6 +13,7 @@ use App\Http\Controllers\ServiceProvider\ServiceProviderController;
 use App\Http\Controllers\ServiceProvider\SkillController;
 use App\Http\Controllers\ServiceProvider\SubcategoryController;
 use App\Http\Controllers\ServiceProvider\UserEducationController;
+use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -90,6 +91,14 @@ Route::middleware(['auth:api'])->prefix('payments')->group(function () {
     Route::delete('/{id}', [UserPaymentController::class, 'destroy']);
     // Get by type
     Route::get('/type/{type}', [UserPaymentController::class, 'byType']);
+});
+
+Route::middleware(['auth:api'])->prefix('notifications')->group(function () {
+    // Get notification settings
+    Route::get('/', [UserNotificationController::class, 'getSettings']);
+
+    // Set all notifications at once
+    Route::post('/set-all', [UserNotificationController::class, 'setNotificationSettings']);
 });
 
 // /////////////////////////////////////////extra code//////////////////////////////////////

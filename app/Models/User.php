@@ -179,4 +179,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->payments()->byMethod('easypaisa');
     }
+
+    public function notificationSettings()
+    {
+        return $this->hasOne(UserNotification::class);
+    }
 }
