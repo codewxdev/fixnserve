@@ -3,6 +3,7 @@
 
 <head class="fn-head">
     <meta charset="UTF-8" class="fn-meta-charset">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" class="fn-meta-viewport">
     <title class="fn-title">FixnServe | Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com" class="fn-script-tailwind"></script>
@@ -13,6 +14,7 @@
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" class="fn-link-fontawesome" />
     <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}" class="fn-link-responsive">
+    
 
     <style class="fn-style-custom">
         /* ... existing styles ... */

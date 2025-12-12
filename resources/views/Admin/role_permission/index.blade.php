@@ -1765,31 +1765,31 @@
                     </button>
                 </header>
 
-                <form class="space-y-4">
+                <form id="addRoleForm" class="space-y-4">
                     <div>
                         <label for="role_name" class="block text-sm font-medium text-slate-700 mb-1">Role Name</label>
                         <input type="text" id="role_name" placeholder="e.g., Marketing Analyst"
                             class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm"
                             required>
                     </div>
-                   
                 </form>
 
                 <footer class="flex justify-end space-x-3 pt-4">
-                    <button onclick="document.getElementById('addRoleModal').classList.add('hidden')" type="button"
-                        class="px-5 py-2 text-sm font-medium rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+                    <button type="button" onclick="document.getElementById('addRoleModal').classList.add('hidden')"
+                        class="px-5 py-2 text-sm font-medium rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200">
                         Cancel
                     </button>
-                    <button type="submit"
-                        class="px-5 py-2 text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-md">
+                    <button id="submitRoleBtn" form="addRoleForm" type="submit"
+                        class="px-5 py-2 text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-md">
                         Create Role & Assign Permissions
                     </button>
                 </footer>
+
             </div>
         </div>
     </div>
 
-    {{-- Add New Role Modal --}}
+    {{-- Add New permission Modal --}}
     <div id="addPermissionModal"
         class="hidden fixed inset-0 bg-slate-900/50 z-[60] flex items-center justify-center transition-opacity duration-300">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg m-4 transition-transform duration-300 transform scale-95"
@@ -1806,27 +1806,29 @@
                     </button>
                 </header>
 
-                <form class="space-y-4">
+                <form id="addPermissionForm" class="space-y-4">
                     <div>
-                        <label for="role_name" class="block text-sm font-medium text-slate-700 mb-1">Permission Name</label>
-                        <input type="text" id="role_name" placeholder="e.g., Marketing Analyst"
-                            class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 transition-colors shadow-sm"
+                        <label for="permission_name" class="block text-sm font-medium text-slate-700 mb-1">
+                            Permission Name
+                        </label>
+                        <input type="text" id="permission_name" placeholder="e.g., edit posts"
+                            class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm"
                             required>
                     </div>
-                   
                 </form>
 
                 <footer class="flex justify-end space-x-3 pt-4">
-                    <button onclick="document.getElementById('addPermissionModal').classList.add('hidden')"
-                        type="button"
-                        class="px-5 py-2 text-sm font-medium rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors">
+                    <button type="button"
+                        onclick="document.getElementById('addPermissionModal').classList.add('hidden')"
+                        class="px-5 py-2 text-sm font-medium rounded-xl text-slate-700 bg-slate-100 hover:bg-slate-200">
                         Cancel
                     </button>
-                    <button type="submit"
-                        class="px-5 py-2 text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-md">
-                        Create Role & Assign Permissions
+                    <button id="submitPermissionBtn" form="addPermissionForm" type="submit"
+                        class="px-5 py-2 text-sm font-medium rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-md">
+                        Create Permission
                     </button>
                 </footer>
+
             </div>
         </div>
     </div>
@@ -1893,39 +1895,229 @@
 
 @push('scripts')
     <script>
-        // Toggle between Matrix and Card View
-        function switchView(view) {
-            document.getElementById('matrix-view').classList.toggle('hidden', view !== 'matrix');
-            document.getElementById('cards-view').classList.toggle('hidden', view !== 'cards');
+        // A simple function to simulate a Toaster notification (You must implement the actual UI for this)
+        function showToaster(message, type = 'success') {
+            // ... (Your existing showToaster function code) ...
+            console.log(`[Toaster ${type.toUpperCase()}] ${message}`);
 
-            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
-                btn.classList.remove('active-view-btn', 'text-indigo-600');
-                btn.classList.add('text-slate-500', 'hover:text-indigo-600');
+            const toasterContainer = document.getElementById('toaster-container') || document.body;
+
+            const toast = document.createElement('div');
+            toast.className =
+                `fixed bottom-4 right-4 p-4 rounded-lg shadow-lg text-white z-[70] transition-opacity duration-300 ${type === 'success' ? 'bg-green-500' : 'bg-red-600'}`;
+            toast.textContent = message;
+
+            toasterContainer.appendChild(toast);
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Function to display server-side validation errors
+        function displayFormErrors(formId, errors) {
+            // ... (Your existing displayFormErrors function code) ...
+            const form = document.getElementById(formId);
+
+            // Clear previous errors
+            form.querySelectorAll('.error-message').forEach(el => el.remove());
+            form.querySelectorAll('.border-red-500').forEach(el => {
+                el.classList.remove('border-red-500');
+                el.classList.add('border-slate-300');
             });
 
-            const activeBtn = document.getElementById(`toggle-${view}`);
-            activeBtn.classList.add('active-view-btn', 'text-indigo-600');
-            activeBtn.classList.remove('text-slate-500', 'hover:text-indigo-600');
+            // 2. Add validation from API and if data is validated so submit form
+            for (const [field, messages] of Object.entries(errors)) {
+                // Find the input element using its ID (which must match the field name returned by the API)
+                // Note: The permission form maps 'name' API error to 'permission_name' input ID.
+                const inputId = (formId === 'addPermissionForm' && field === 'name') ? 'permission_name' : field;
+                const input = form.querySelector(`#${inputId}`);
+
+                if (input) {
+                    // Apply error styling
+                    input.classList.add('border-red-500');
+                    input.classList.remove('border-slate-300');
+
+                    // Create and append error message
+                    const errorElement = document.createElement('p');
+                    errorElement.classList.add('text-xs', 'text-red-500', 'mt-1', 'error-message');
+                    errorElement.textContent = messages.join(' ');
+                    input.parentNode.appendChild(errorElement);
+                }
+            }
         }
 
-        // Slide-Over functionality
-        function openManagePermissions(roleName) {
-            // Update modal content
-            document.getElementById('slideover-role-name').textContent = roleName;
+        // --- Defer Execution until DOM is loaded (The Fix) ---
+        document.addEventListener('DOMContentLoaded', function() {
 
-            // Show the slide-over
-            document.getElementById('managePermissionsSlideover').classList.remove('hidden');
-            document.getElementById('slideover-backdrop').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('slideover-panel').classList.remove('translate-x-full');
-        }
+            // --- Main Submission Handlers ---
 
-        function closeManagePermissions() {
-            // Hide the slide-over
-            document.getElementById('slideover-backdrop').classList.add('opacity-0', 'pointer-events-none');
-            document.getElementById('slideover-panel').classList.add('translate-x-full');
-            setTimeout(() => {
-                document.getElementById('managePermissionsSlideover').classList.add('hidden');
-            }, 300); // Wait for transition
-        }
+            // Handle Role Creation Form Submission
+            // This line will now work because 'addRoleForm' is guaranteed to exist
+            document.getElementById('addRoleForm').addEventListener('submit', async function(event) {
+                event.preventDefault(); // Stop default HTML submission
+
+                const submitButton = document.getElementById('submitRoleBtn');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+
+                // 1. Collect form data
+                const formData = {
+                    name: document.getElementById('role_name').value.trim()
+                };
+
+                // 1. Call API of store
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/api/roles', {
+                        method: 'POST',
+                        body: JSON.stringify(formData),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // UNCOMMENT AND ENSURE THIS META TAG EXISTS IN YOUR HTML LAYOUT
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                .content,
+                        },
+                    });
+
+                    const responseData = await response.json();
+                    console.log(response);
+
+                    if (response.status === 422) {
+                        // 2. Validation Failed
+                        displayFormErrors('addRoleForm', responseData.errors);
+                        showToaster('Role creation failed due to validation errors.', 'error');
+                    } else if (response.ok) {
+                        // 2. Data Validated & Submitted
+                        // 3. Success Message
+                        showToaster(`Role "${formData.name}" created successfully!`, 'success');
+
+                        // Reset and close modal
+                        this.reset();
+                        document.getElementById('addRoleModal').classList.add('hidden');
+                        // TODO: Add logic to refresh your roles data table
+                    } else {
+                        // General Server Error (e.g., 500)
+                        showToaster(`Server Error: ${responseData.message || 'Could not create role.'}`,
+                            'error');
+                    }
+                } catch (error) {
+                    showToaster('A network error occurred. Check your connection.', 'error');
+                    console.error('Error submitting role form:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Create Role & Assign Permissions';
+                }
+            });
+
+
+            // Handle Permission Creation Form Submission
+            // This line will now work because 'addPermissionForm' is guaranteed to exist
+            document.getElementById('addPermissionForm').addEventListener('submit', async function(event) {
+                event.preventDefault(); // Stop default HTML submission
+
+                const submitButton = document.getElementById('submitPermissionBtn');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Submitting...';
+
+                // 1. Collect form data
+                const formData = {
+                    name: document.getElementById('permission_name').value.trim()
+                };
+
+                // 1. Call API of store
+                try {
+                    const response = await fetch('http://127.0.0.1:8000/api/permissions', {
+                        method: 'POST',
+                        body: JSON.stringify(formData),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 
+                        },
+                    });
+
+                    const responseData = await response.json();
+
+                    if (response.status === 422) {
+                        // 2. Validation Failed 
+                        const mappedErrors = {};
+                        if (responseData.errors && responseData.errors.name) {
+                            mappedErrors.permission_name = responseData.errors.name;
+                        } else {
+                            // If API returns a different field name, handle it here
+                            displayFormErrors('addPermissionForm', responseData.errors);
+                        }
+                        displayFormErrors('addPermissionForm', mappedErrors);
+                        showToaster('Permission creation failed due to validation errors.', 'error');
+                    } else if (response.ok) {
+                        // 2. Data Validated & Submitted
+                        // 3. Success Message
+                        showToaster(`Permission "${formData.name}" created successfully!`, 'success');
+
+                        // Reset and close modal
+                        this.reset();
+                        document.getElementById('addPermissionModal').classList.add('hidden');
+                        // TODO: Add logic to refresh your permissions data table
+                    } else {
+                        // General Server Error (e.g., 500)
+                        showToaster(
+                            `Server Error: ${responseData.message || 'Could not create permission.'}`,
+                            'error');
+                    }
+                } catch (error) {
+                    showToaster('A network error occurred. Check your connection.', 'error');
+                    console.error('Error submitting permission form:', error);
+                } finally {
+                    submitButton.disabled = false;
+                    submitButton.textContent =
+                        'Create Role & Assign Permissions'; // Update button text to be contextually correct
+                }
+            });
+
+            // Other functions like switchView, openManagePermissions, closeManagePermissions 
+            // can also be placed here if they interact with DOM elements guaranteed to exist after loading.
+
+            // Toggle between Matrix and Card View
+            function switchView(view) {
+                document.getElementById('matrix-view').classList.toggle('hidden', view !== 'matrix');
+                document.getElementById('cards-view').classList.toggle('hidden', view !== 'cards');
+
+                document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+                    btn.classList.remove('active-view-btn', 'text-indigo-600');
+                    btn.classList.add('text-slate-500', 'hover:text-indigo-600');
+                });
+
+                const activeBtn = document.getElementById(`toggle-${view}`);
+                activeBtn.classList.add('active-view-btn', 'text-indigo-600');
+                activeBtn.classList.remove('text-slate-500', 'hover:text-indigo-600');
+            }
+
+            // Slide-Over functionality
+            function openManagePermissions(roleName) {
+                // Update modal content
+                document.getElementById('slideover-role-name').textContent = roleName;
+
+                // Show the slide-over
+                document.getElementById('managePermissionsSlideover').classList.remove('hidden');
+                document.getElementById('slideover-backdrop').classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('slideover-panel').classList.remove('translate-x-full');
+            }
+
+            function closeManagePermissions() {
+                // Hide the slide-over
+                document.getElementById('slideover-backdrop').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('slideover-panel').classList.add('translate-x-full');
+                setTimeout(() => {
+                    document.getElementById('managePermissionsSlideover').classList.add('hidden');
+                }, 300); // Wait for transition
+            }
+            // Make these available globally if needed by onclick attributes in HTML
+            window.switchView = switchView;
+            window.openManagePermissions = openManagePermissions;
+            window.closeManagePermissions = closeManagePermissions;
+
+
+        }); // End of DOMContentLoaded
     </script>
 @endpush
