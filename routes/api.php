@@ -94,8 +94,8 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 
     // Super Admin Routes (with additional checks)
     Route::middleware(['role:Super Admin', '2fa'])->group(function () {
-        Route::apiResource('roles', RoleController::class);
-        Route::apiResource('permissions', PermissionController::class);
+        // Route::apiResource('roles', RoleController::class);
+        // Route::apiResource('permissions', PermissionController::class);
         Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
         Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
         Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
@@ -164,3 +164,6 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 // Route::get('/{id}', [PortfolioController::class, 'show']);
 // Route::post('/{id}', [PortfolioController::class, 'update']);
 // Route::delete('/{portfolio}', [PortfolioController::class, 'destroy']);
+
+Route::apiResource('roles', RoleController::class);
+Route::apiResource('permissions', PermissionController::class);
