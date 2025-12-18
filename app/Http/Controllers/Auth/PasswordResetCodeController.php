@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Mail\ResetPasswordCodeMail;
 use App\Models\PasswordResetCode;
@@ -28,13 +29,11 @@ class PasswordResetCodeController extends Controller
             'code' => $code,
             'expires_at' => Carbon::now()->addMinutes(10),
         ]);
-        // send otp email
+
+        // Send OTP email
         Mail::to($request->email)->send(new ResetPasswordCodeMail($code));
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Reset code sent to your email',
-        ]);
+        return ApiResponse::success(null, 'Reset code sent to your email');
     }
 
     // STEP 2 — Verify OTP
@@ -52,10 +51,10 @@ class PasswordResetCodeController extends Controller
             ->first();
 
         if (! $record) {
-            return response()->json(['status' => false, 'message' => 'Invalid or expired code'], 422);
+            return ApiResponse::error('Invalid or expired code', 422);
         }
 
-        return response()->json(['status' => true, 'message' => 'Code verified']);
+        return ApiResponse::success(null, 'Code verified');
     }
 
     // STEP 3 — Reset Password
@@ -64,7 +63,13 @@ class PasswordResetCodeController extends Controller
         $request->validate([
             'email' => 'required|email|exists:users,email',
             'code' => 'required',
-            'password' => 'required|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&]).+$/', // 1 uppercase, 1 lowercase, 1 number, 1 special
+            ],
         ]);
 
         $record = PasswordResetCode::where('email', $request->email)
@@ -74,7 +79,7 @@ class PasswordResetCodeController extends Controller
             ->first();
 
         if (! $record) {
-            return response()->json(['status' => false, 'message' => 'Invalid or expired code'], 422);
+            return ApiResponse::error('Invalid or expired code', 422);
         }
 
         $user = User::where('email', $request->email)->first();
@@ -86,10 +91,6 @@ class PasswordResetCodeController extends Controller
         // Login user using JWT
         $token = auth('api')->login($user);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Password reset successful',
-            'token' => $token,
-        ]);
+        return ApiResponse::success(['access_token' => $token], 'Password reset successful');
     }
 }

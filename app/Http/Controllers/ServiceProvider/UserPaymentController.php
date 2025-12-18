@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ServiceProvider;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\UserPayment;
 use Illuminate\Http\Request;
@@ -20,11 +21,7 @@ class UserPaymentController extends Controller
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $payments,
-            'message' => 'Payment methods retrieved successfully.',
-        ]);
+        return ApiResponse::success($payments, 'Payment methods retrieved successfully');
     }
 
     /**
@@ -71,33 +68,23 @@ class UserPaymentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed.',
-            ], 422);
+            return ApiResponse::error($validator->errors(), 422, 'Validation failed.');
         }
 
         $data = $request->all();
         $data['user_id'] = Auth::id();
 
-        // Add CVV hash for cards
         if ($request->payment_method === 'card' && $request->has('cvv')) {
-            $data['cvv_hash'] = $request->cvv; // Will be hashed by mutator
+            $data['cvv_hash'] = $request->cvv;
         }
 
         $payment = UserPayment::create($data);
 
-        // If this is set as default, update others
         if ($request->is_default) {
             $payment->markAsDefault();
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $payment,
-            'message' => 'Payment method added successfully.',
-        ], 201);
+        return ApiResponse::success($payment, 'Payment method added successfully', 201);
     }
 
     /**
@@ -108,10 +95,7 @@ class UserPaymentController extends Controller
         $payment = Auth::user()->payments()->findOrFail($id);
         $payment->markAsDefault();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Payment method set as default.',
-        ]);
+        return ApiResponse::success(null, 'Payment method set as default');
     }
 
     /**
@@ -121,22 +105,14 @@ class UserPaymentController extends Controller
     {
         $payment = Auth::user()->payments()->findOrFail($id);
 
-        // Don't allow deleting if it's the only payment method
         $totalPayments = Auth::user()->payments()->active()->count();
-
         if ($totalPayments <= 1) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Cannot delete the only payment method.',
-            ], 400);
+            return ApiResponse::error('Cannot delete the only payment method.', 400);
         }
 
         $payment->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Payment method deleted successfully.',
-        ]);
+        return ApiResponse::success(null, 'Payment method deleted successfully');
     }
 
     /**
@@ -147,10 +123,7 @@ class UserPaymentController extends Controller
         $validTypes = ['card', 'jazzcash', 'easypaisa', 'bank_transfer'];
 
         if (! in_array($type, $validTypes)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Invalid payment type.',
-            ], 400);
+            return ApiResponse::error('Invalid payment type.', 400);
         }
 
         $payments = Auth::user()->payments()
@@ -158,10 +131,6 @@ class UserPaymentController extends Controller
             ->byMethod($type)
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $payments,
-            'message' => ucfirst($type).' payment methods retrieved.',
-        ]);
+        return ApiResponse::success($payments, ucfirst($type).' payment methods retrieved');
     }
 }

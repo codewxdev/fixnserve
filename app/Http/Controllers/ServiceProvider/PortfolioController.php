@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ServiceProvider;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Portfolio;
 use Illuminate\Http\Request;
@@ -13,34 +14,25 @@ class PortfolioController extends Controller
     {
         $user = auth()->user();
 
-        // Only service providers can update
         if (! $user->hasRole('service provider')) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Only service providers can see portfolio.',
-            ], 403);
+            return ApiResponse::error('Only service providers can see portfolio.', 403);
         }
 
         $portfolios = Portfolio::where('user_id', $user->id)->latest()->get();
 
-        return response()->json([
-            'success' => true,
+        return ApiResponse::success([
             'user_id' => $user->id,
-            'role' => $user->role,
+            'role' => $user->roles->pluck('name'),
             'portfolios' => $portfolios,
-        ]);
+        ], 'Portfolios fetched successfully');
     }
 
     public function store(Request $request)
     {
-        // Ensure skills is interpreted as an array
         $skills = $request->skills;
 
         if (! is_array($skills)) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Skills must be an array of skill IDs.',
-            ], 422);
+            return ApiResponse::error('Skills must be an array of skill IDs.', 422);
         }
 
         $validated = $request->validate([
@@ -60,46 +52,33 @@ class PortfolioController extends Controller
             'project_title' => $validated['title'],
             'description' => $validated['description'],
             'image' => $validated['image'] ?? null,
-            'role' => $request->input('role', 'Developer'), // or whatever default
+            'role' => $request->input('role', 'Developer'),
             'user_id' => auth()->id(),
-            'status' => 'draft', // or from request
+            'status' => 'draft',
         ]);
 
-        // Attach skills to pivot table (each skill gets its own row)
         $portfolio->skills()->sync($validated['skills']);
 
-        return response()->json([
-            'message' => 'Portfolio created successfully',
-            'portfolio' => $portfolio->load('skills'),
-        ]);
+        return ApiResponse::success($portfolio->load('skills'), 'Portfolio created successfully', 201);
     }
 
     public function show($id)
     {
         $portfolio = Portfolio::with('skills')->findOrFail($id);
 
-        return response()->json([
-            'success' => true,
-            'portfolio' => $portfolio, // note: singular
-        ]);
+        return ApiResponse::success($portfolio, 'Portfolio fetched successfully');
     }
 
     public function update(Request $request, $id)
     {
         $user = auth()->user();
 
-        // Only service providers can update
         if (! $user->hasRole('service provider')) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Only service providers can update portfolio.',
-            ], 403);
+            return ApiResponse::error('Only service providers can update portfolio.', 403);
         }
 
-        // Find the portfolio first
         $portfolio = Portfolio::findOrFail($id);
 
-        // Validate request
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -109,7 +88,6 @@ class PortfolioController extends Controller
             'status' => 'required|in:draft,published',
         ]);
 
-        // Handle image upload
         if ($request->hasFile('image')) {
             if ($portfolio->image) {
                 Storage::disk('public')->delete($portfolio->image);
@@ -117,35 +95,26 @@ class PortfolioController extends Controller
             $portfolio->image = $request->file('image')->store('portfolio/images', 'public');
         }
 
-        // Update basic fields
         $portfolio->update([
-            'title' => $validated['title'],
+            'project_title' => $validated['title'],
             'description' => $validated['description'],
             'status' => $validated['status'],
-            'image' => $portfolio->image, // already updated if new file uploaded
+            'image' => $portfolio->image,
         ]);
 
-        // Sync skills if provided
         if (! empty($validated['skills'])) {
             $portfolio->skills()->sync($validated['skills']);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Portfolio updated successfully',
-            'portfolio' => $portfolio->load('skills'),
-        ]);
+        return ApiResponse::success($portfolio->load('skills'), 'Portfolio updated successfully');
     }
 
     public function destroy(Portfolio $portfolio)
     {
         $user = auth()->user();
-        // Only service providers can update
+
         if (! $user->hasRole('service provider')) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Only service providers can delete portfolio',
-            ], 403);
+            return ApiResponse::error('Only service providers can delete portfolio.', 403);
         }
 
         if ($portfolio->image) {
@@ -154,10 +123,7 @@ class PortfolioController extends Controller
 
         $portfolio->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Portfolio deleted successfully',
-        ]);
+        return ApiResponse::success(null, 'Portfolio deleted successfully');
     }
 
     public function addLanguage(Request $request)
@@ -169,7 +135,6 @@ class PortfolioController extends Controller
         ]);
 
         $user = auth()->user();
-
         $saved = [];
 
         foreach ($request->languages as $lang) {
@@ -179,9 +144,6 @@ class PortfolioController extends Controller
             ]);
         }
 
-        return response()->json([
-            'message' => 'Languages added successfully',
-            'data' => $saved,
-        ]);
+        return ApiResponse::success($saved, 'Languages added successfully');
     }
 }

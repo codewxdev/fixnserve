@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ServiceProvider;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Subcategory;
 use Illuminate\Http\Request;
@@ -10,28 +11,28 @@ class SubcategoryController extends Controller
 {
     public function index()
     {
-        $sub = Subcategory::with('category')->get();
+        $subcategories = Subcategory::with('category')->get();
 
-        return response()->json($sub);
+        return ApiResponse::success($subcategories, 'Subcategories fetched successfully');
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'category_id' => 'required|exists:categories,id',
-            'name' => 'required',
+            'name' => 'required|string|max:255',
         ]);
 
-        $sub = Subcategory::create($request->all());
+        $sub = Subcategory::create($request->only(['category_id', 'name']));
 
-        return response()->json($sub);
+        return ApiResponse::success($sub, 'Subcategory created successfully', 201);
     }
 
     public function show($id)
     {
         $sub = Subcategory::findOrFail($id);
 
-        return response()->json($sub);
+        return ApiResponse::success($sub, 'Subcategory fetched successfully');
     }
 
     public function update(Request $request, $id)
@@ -45,13 +46,17 @@ class SubcategoryController extends Controller
 
         $sub->update($request->only(['category_id', 'name']));
 
-        return response()->json($sub, 200);
+        return ApiResponse::success($sub, 'Subcategory updated successfully');
     }
 
     public function destroy($id)
     {
-        Subcategory::destroy($id);
+        $deleted = Subcategory::destroy($id);
 
-        return response()->json(['message' => 'Deleted']);
+        if ($deleted) {
+            return ApiResponse::success(null, 'Subcategory deleted successfully');
+        }
+
+        return ApiResponse::error('Subcategory not found', 404);
     }
 }
