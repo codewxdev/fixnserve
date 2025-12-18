@@ -85,8 +85,37 @@ class SkillController extends Controller
         ]);
 
         $user = auth()->user();
-        $user->skills()->sync($request->skills);
 
-        return ApiResponse::success($user->skills()->get(), 'Skills updated successfully');
+        // Already attached skills
+        $existingSkillIds = $user->skills()->pluck('skills.id')->toArray();
+
+        // Sirf new skills (duplicates remove)
+        $newSkills = array_diff($request->skills, $existingSkillIds);
+
+        // Agar kuch naya add hi nahi ho raha
+        if (empty($newSkills)) {
+            return ApiResponse::success(
+                $user->skills()->get(),
+                'No new skills to add'
+            );
+        }
+
+        // Total skills limit check
+        $totalSkills = count($existingSkillIds) + count($newSkills);
+
+        if ($totalSkills > 5) {
+            return ApiResponse::error(
+                'You can add maximum 5 skills only.',
+                422
+            );
+        }
+
+        // Attach only new skills
+        $user->skills()->attach($newSkills);
+
+        return ApiResponse::success(
+            $user->skills()->get(),
+            'Skills added successfully'
+        );
     }
 }
