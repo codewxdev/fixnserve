@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\LoginHistory;
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
 use Twilio\Rest\Client;
@@ -19,16 +21,30 @@ class AuthController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/',
+            ],
         ]);
+        DB::transaction(function () use ($request, &$user, &$token) {
 
-        $user = User::create([
-            'name' => $request->first_name.' '.$request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            $user = User::create([
+                'name' => $request->first_name.' '.$request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0,
+                'currency' => 'PKR',
+            ]);
 
-        $token = JWTAuth::fromUser($user);
+            // ===== Generate JWT Token =====
+            $token = JWTAuth::fromUser($user);
+        });
 
         return response()->json([
             'status' => true,
@@ -40,7 +56,21 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'login' => 'required',
+            'password' => 'required',
+        ]);
+
+        $login = $request->login;
+
+        // Detect email or phone
+        $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $credentials = [
+            $fieldType => $login,
+            'password' => $request->password,
+        ];
+        // $credentials = $request->only('email', 'password', 'phone');
 
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);

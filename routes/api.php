@@ -16,6 +16,7 @@ use App\Http\Controllers\ServiceProvider\UserEducationController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Models\Country;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes (No authentication required)
@@ -27,6 +28,12 @@ Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPasswo
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 Route::get('/skill/suggested', [SkillController::class, 'suggested']);
 Route::get('/skill/search', [SkillController::class, 'search']);
+Route::get('/countries', function () {
+    return response()->json([
+        'success' => true,
+        'data' => Country::orderBy('name')->get(),
+    ]);
+});
 
 // Main Authenticated Routes Group with User Status Check
 Route::middleware(['auth:api', 'user.active'])->group(function () {
