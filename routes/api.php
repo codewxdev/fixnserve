@@ -17,6 +17,7 @@ use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
 use App\Models\Country;
+use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes (No authentication required)
@@ -34,7 +35,12 @@ Route::get('/countries', function () {
         'data' => Country::orderBy('name')->get(),
     ]);
 });
-
+Route::get('/currences', function () {
+    return response()->json([
+        'success' => true,
+        'data' => Currency::orderBy('name')->get(),
+    ]);
+});
 // Main Authenticated Routes Group with User Status Check
 Route::middleware(['auth:api', 'user.active'])->group(function () {
 
