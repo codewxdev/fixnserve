@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            NotificationTypeSeeder::class,
+        ]);
+        $this->call([
             CurrencySeeder::class,
         ]);
         // User::factory(10)->create();

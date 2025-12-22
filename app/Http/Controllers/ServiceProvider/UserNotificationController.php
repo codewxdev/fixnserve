@@ -4,71 +4,165 @@ namespace App\Http\Controllers\ServiceProvider;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
+use App\Models\NotificationType;
 use App\Models\UserNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class UserNotificationController extends Controller
 {
     /**
-     * Get user's notification settings
+     * Get user's notification settings for all types
      */
-    public function getSettings()
+    public function getUserNotificationSettings()
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        $notification = UserNotification::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'email' => true,
-                'sms' => false,
-                'push' => false,
-            ]
-        );
+            // Get all notification types
+            $notificationTypes = NotificationType::get();
 
-        return ApiResponse::success($notification, 'Notification settings retrieved successfully');
+            $userSettings = [];
+
+            foreach ($notificationTypes as $type) {
+                // Get or create user setting for this notification type
+                $userNotification = UserNotification::firstOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'notification_type_id' => $type->id,
+                    ],
+                    [
+                        'email' => $type->default_channels['email'] ?? true,
+                        'sms' => $type->default_channels['sms'] ?? false,
+                        'push' => $type->default_channels['push'] ?? false,
+                    ]
+                );
+
+                $userSettings[] = [
+                    'notification_type' => $type,
+                    'settings' => [
+                        'id' => $userNotification->id,
+                        'email' => (bool) $userNotification->email,
+                        'sms' => (bool) $userNotification->sms,
+                        'push' => (bool) $userNotification->push,
+                    ],
+                ];
+            }
+
+            return ApiResponse::success([
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ],
+                'notification_settings' => $userSettings,
+            ], 'User notification settings retrieved successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::error('Failed to retrieve notification settings: '.$e->getMessage(), 500);
+        }
     }
 
     /**
-     * Set notification settings - user can update any combination of fields
+     * Update user's notification settings for a specific type
      */
-    public function setNotificationSettings(Request $request)
+    public function updateNotificationSettings(Request $request)
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        $request->validate([
-            'email' => 'sometimes|in:0,1,true,false',
-            'sms' => 'sometimes|in:0,1,true,false',
-            'push' => 'sometimes|in:0,1,true,false',
-        ]);
+            $validator = Validator::make($request->all(), [
+                'notification_type_id' => 'required|exists:notification_types,id',
+                'email' => 'sometimes|boolean',
+                'sms' => 'sometimes|boolean',
+                'push' => 'sometimes|boolean',
+            ]);
 
-        $data = [];
+            if ($validator->fails()) {
+                return ApiResponse::error('Validation failed', 422, $validator->errors());
+            }
 
-        if ($request->has('email')) {
-            $data['email'] = filter_var($request->email, FILTER_VALIDATE_BOOLEAN);
+            // Get notification type to access defaults if needed
+            $notificationType = NotificationType::find($request->notification_type_id);
+
+            $userNotification = UserNotification::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'notification_type_id' => $request->notification_type_id,
+                ],
+                [
+                    'email' => $request->has('email')
+                        ? $request->boolean('email')
+                        : ($notificationType->default_channels['email'] ?? true),
+                    'sms' => $request->has('sms')
+                        ? $request->boolean('sms')
+                        : ($notificationType->default_channels['sms'] ?? false),
+                    'push' => $request->has('push')
+                        ? $request->boolean('push')
+                        : ($notificationType->default_channels['push'] ?? false),
+                ]
+            );
+
+            return ApiResponse::success([
+                'settings' => $userNotification,
+            ], 'Notification settings updated successfully');
+
+        } catch (\Exception $e) {
+            return ApiResponse::error('Failed to update notification settings: '.$e->getMessage(), 500);
         }
+    }
 
-        if ($request->has('sms')) {
-            $data['sms'] = filter_var($request->sms, FILTER_VALIDATE_BOOLEAN);
+    /**
+     * Reset user's notification settings to defaults for a specific type
+     */
+    public function resetToDefaults($notificationTypeId = null)
+    {
+        try {
+            $user = Auth::user();
+
+            if ($notificationTypeId) {
+                // Reset specific notification type
+                $notificationType = NotificationType::findOrFail($notificationTypeId);
+
+                $userNotification = UserNotification::updateOrCreate(
+                    [
+                        'user_id' => $user->id,
+                        'notification_type_id' => $notificationTypeId,
+                    ],
+                    [
+                        'email' => $notificationType->default_channels['email'] ?? true,
+                        'sms' => $notificationType->default_channels['sms'] ?? false,
+                        'push' => $notificationType->default_channels['push'] ?? false,
+                    ]
+                );
+
+                $message = 'Notification settings reset to defaults for '.$notificationType->name;
+            } else {
+                // Reset all notification types
+                $notificationTypes = NotificationType::get();
+
+                foreach ($notificationTypes as $type) {
+                    UserNotification::updateOrCreate(
+                        [
+                            'user_id' => $user->id,
+                            'notification_type_id' => $type->id,
+                        ],
+                        [
+                            'email' => $type->default_channels['email'] ?? true,
+                            'sms' => $type->default_channels['sms'] ?? false,
+                            'push' => $type->default_channels['push'] ?? false,
+                        ]
+                    );
+                }
+
+                $message = 'All notification settings reset to defaults';
+            }
+
+            return ApiResponse::success(null, $message);
+
+        } catch (\Exception $e) {
+            return ApiResponse::error('Failed to reset settings: '.$e->getMessage(), 500);
         }
-
-        if ($request->has('push')) {
-            $data['push'] = filter_var($request->push, FILTER_VALIDATE_BOOLEAN);
-        }
-
-        if (empty($data)) {
-            return ApiResponse::error('No settings provided for update.', 400);
-        }
-
-        $notification = UserNotification::updateOrCreate(
-            ['user_id' => $user->id],
-            array_merge([
-                'email' => true,
-                'sms' => false,
-                'push' => false,
-            ], $data)
-        );
-
-        return ApiResponse::success($notification, 'Notification settings updated successfully');
     }
 }

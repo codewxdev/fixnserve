@@ -41,7 +41,14 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'mode',
-        'uuid', // Add UUID to fillable
+        'uuid',
+        'lat',           // Added
+        'lon',
+        'country_id',  // Only country_id needed now
+        // Added        // Added
+        'phone_status',  // Added
+        'rating',        // Added
+        'favourite', // Add UUID to fillable
     ];
 
     /**
@@ -183,13 +190,45 @@ class User extends Authenticatable implements JWTSubject
         return $this->payments()->byMethod('easypaisa');
     }
 
-    public function notificationSettings()
-    {
-        return $this->hasOne(UserNotification::class);
-    }
-
     public function transportation()
     {
         return $this->hasOne(UserTransportation::class);
+    }
+
+    public function notificationSettings()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    // Get settings for a specific notification type
+    public function getNotificationSettings($typeSlug)
+    {
+        return $this->notificationSettings()
+            ->whereHas('notificationType', function ($q) use ($typeSlug) {
+                $q->where('slug', $typeSlug);
+            })
+            ->first();
+    }
+
+    // Create default notification settings for a user
+    public function createDefaultNotificationSettings()
+    {
+        $types = NotificationType::where('is_active', true)->get();
+
+        foreach ($types as $type) {
+            $this->notificationSettings()->updateOrCreate(
+                ['notification_type_id' => $type->id],
+                [
+                    'email' => $type->default_channels['email'] ?? true,
+                    'sms' => $type->default_channels['sms'] ?? false,
+                    'push' => $type->default_channels['push'] ?? false,
+                ]
+            );
+        }
+    }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
     }
 }

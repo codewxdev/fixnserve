@@ -7,6 +7,7 @@ use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
 use App\Http\Controllers\Role\UserRoleController;
 use App\Http\Controllers\ServiceProvider\CategoryController;
+use App\Http\Controllers\ServiceProvider\NotificationTypeController;
 use App\Http\Controllers\ServiceProvider\PortfolioController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
 use App\Http\Controllers\ServiceProvider\ServiceProviderController;
@@ -29,6 +30,9 @@ Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPasswo
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 Route::get('/skill/suggested', [SkillController::class, 'suggested']);
 Route::get('/skill/search', [SkillController::class, 'search']);
+Route::apiResource('notification-types', NotificationTypeController::class);
+// routes/api.php
+
 Route::get('/countries', function () {
     return response()->json([
         'success' => true,
@@ -93,9 +97,15 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 
         // Notification Routes
         Route::prefix('notifications')->group(function () {
-            Route::get('/', [UserNotificationController::class, 'getSettings']);
-            Route::post('/set-all', [UserNotificationController::class, 'setNotificationSettings']);
+            // Get all settings for logged-in user
+            Route::get('/settings', [UserNotificationController::class, 'getUserNotificationSettings']);
+            // Update settings for a specific type
+            Route::post('/settings/update', [UserNotificationController::class, 'updateNotificationSettings']);
+            // Reset to defaults
+            Route::post('/settings/reset', [UserNotificationController::class, 'resetToDefaults']);
+
         });
+
         Route::prefix('transportations')->group(function () {
             // Get transportation settings
             Route::get('/', [UserTransportationController::class, 'getTransportations']);
