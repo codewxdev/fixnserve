@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Country;
 use App\Models\LoginHistory;
 use App\Models\User;
 use App\Models\Wallet;
@@ -241,28 +242,35 @@ class AuthController extends Controller
             'city' => 'nullable|string',
             'state' => 'nullable|string',
             'zipcode' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
+            'country_id' => 'nullable|integer|exists:countries,id', // Added country_id
+            'phone' => 'nullable|string|regex:/^[0-9]+$/',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
         ]);
+        if (! empty($validated['phone']) && ! empty($validated['country_id'])) {
 
+            $country = Country::find($validated['country_id']);
+
+            if ($country && strlen($validated['phone']) != $country->phone_length) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Phone number must be {$country->phone_length} digits for selected country.",
+                ], 422);
+            }
+        }
         if (isset($validated['phone'])) {
 
             if (is_null($user->phone)) {
-                // Pehli dafa phone add ho raha hai → OTP bhejo
+
                 $user->pending_phone = $validated['phone'];
 
-                // Random OTP generate
                 $otp = rand(100000, 999999);
-
                 $user->phone_otp = $otp;
+
                 // sendOtpSMS($validated['phone'], $otp);
 
-                // Yahan SMS gateway (Twilio / local API) call karna hota hai
-                // SMS::send($validated['phone'], "Your OTP: $otp");
-
             } else {
-                // Phone already exists → update NAHI hoga
+                // Phone already exists → don't update
                 unset($validated['phone']);
             }
         }

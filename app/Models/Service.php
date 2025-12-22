@@ -29,4 +29,14 @@ class Service extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function favorites()
+    {
+        return $this->morphMany(Favourite::class, 'favouritable');
+    }
+
+    public function ratings()
+    {
+        return $this->morphMany(Rating::class, 'rateable');
+    }
 }

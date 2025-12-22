@@ -231,4 +231,45 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Country::class);
     }
+
+    public function favorites()
+    {
+        return $this->hasMany(Favourite::class);
+    }
+
+    // Favourite users
+    public function favouriteUsers()
+    {
+        return $this->morphedByMany(
+            User::class,
+            'favouritable',
+            'favorites'
+        );
+    }
+
+    // Favourite services
+    public function favouriteServices()
+    {
+        return $this->morphedByMany(
+            Service::class,
+            'favouritable',
+            'favorites'
+        );
+    }
+
+    public function givenRatings()
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    // Ratings RECEIVED by user
+    public function ratings()
+    {
+        return $this->morphMany(Rating::class, 'rateable');
+    }
+
+    public function experiences()
+    {
+        return $this->hasMany(UserExperience::class);
+    }
 }

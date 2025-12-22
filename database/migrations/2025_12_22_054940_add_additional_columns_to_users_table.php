@@ -18,12 +18,6 @@ return new class extends Migration
 
             $table->enum('phone_status', ['verified', 'not_verified'])->default('not_verified')->after('country_flag');
 
-            // Rating column
-            $table->decimal('rating', 3, 2)->nullable()->default(0.00)->after('phone_status');
-
-            // Favourite column (assuming it's a boolean flag)
-            $table->boolean('favourite')->default(false)->after('rating');
-
             // Add index for better performance on frequently queried columns
             $table->index('phone_status');
             $table->index('rating');

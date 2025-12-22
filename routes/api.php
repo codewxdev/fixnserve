@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetCodeController;
+use App\Http\Controllers\FavouriteController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
@@ -14,6 +16,7 @@ use App\Http\Controllers\ServiceProvider\ServiceProviderController;
 use App\Http\Controllers\ServiceProvider\SkillController;
 use App\Http\Controllers\ServiceProvider\SubcategoryController;
 use App\Http\Controllers\ServiceProvider\UserEducationController;
+use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
@@ -54,6 +57,9 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
     Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
+    Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
+    Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
+    Route::post('/rate', [RatingController::class, 'rate']);
 
     Route::middleware(['service.provider'])->group(function () {
         Route::post('/language', [PortfolioController::class, 'addLanguage']);
@@ -114,7 +120,13 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
         });
 
     });
-
+    Route::prefix('experiences')->group(function () {
+        Route::get('/', [UserExperienceController::class, 'index']);
+        Route::post('/', [UserExperienceController::class, 'store']);
+        Route::get('/{id}', [UserExperienceController::class, 'show']);
+        Route::put('/{id}', [UserExperienceController::class, 'update']);
+        Route::delete('/{id}', [UserExperienceController::class, 'destroy']);
+    });
     // Super Admin Routes (with additional checks)
     Route::middleware(['role:Super Admin', '2fa'])->group(function () {
         // Route::apiResource('roles', RoleController::class);

@@ -11,5 +11,7 @@ class Country extends Model
         'iso2',
         'phone_code',
         'flag_url',
+        'phone_length',
+
     ];
 }
