@@ -13,6 +13,13 @@ use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
 use Twilio\Rest\Client;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use BaconQrCode\Renderer\Image\GdImageBackend; // Or GdImageBackEnd if Imagick is not installed
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+
+
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -125,7 +132,6 @@ class AuthController extends Controller
         }
 
         return $this->respondWithToken($token);
-
     }
 
     public function me()
@@ -176,6 +182,7 @@ class AuthController extends Controller
             'qrcode_url' => $qrCodeUrl,
         ]);
     }
+
 
     public function verify2FA(Request $request)
     {
@@ -278,13 +285,13 @@ class AuthController extends Controller
         if ($request->hasFile('image')) {
 
             // Delete old image if exists
-            if ($user->image && \Storage::exists('public/profile_images/'.$user->image)) {
-                \Storage::delete('public/profile_images/'.$user->image);
+            if ($user->image && \Storage::exists('public/profile_images/' . $user->image)) {
+                \Storage::delete('public/profile_images/' . $user->image);
             }
 
             // Save new image
             $file = $request->file('image');
-            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
             $file->storeAs('public/profile_images/', $filename);
 
@@ -305,7 +312,7 @@ class AuthController extends Controller
             'data' => [
                 'user' => $user,
                 'profile_image_url' => $user->image
-                    ? asset('storage/profile_images/'.$user->image)
+                    ? asset('storage/profile_images/' . $user->image)
                     : null,
             ],
         ]);

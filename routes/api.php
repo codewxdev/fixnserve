@@ -118,7 +118,6 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
             // Update transportation settings
             Route::post('/', [UserTransportationController::class, 'updateTransportations']);
         });
-
     });
     Route::prefix('experiences')->group(function () {
         Route::get('/', [UserExperienceController::class, 'index']);
@@ -131,12 +130,12 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::middleware(['role:Super Admin', '2fa'])->group(function () {
         // Route::apiResource('roles', RoleController::class);
         // Route::apiResource('permissions', PermissionController::class);
-        Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
+        // Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
         Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
         Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
         Route::prefix('users')->group(function () {
-            Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
-            Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
+            // Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
+            // Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
             Route::get('/{id}/roles', [UserRoleController::class, 'getUserRoles']);
             Route::get('/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
         });

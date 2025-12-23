@@ -14,7 +14,7 @@
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" class="fn-link-fontawesome" />
     <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}" class="fn-link-responsive">
-    
+
 
     <style class="fn-style-custom">
         /* ... existing styles ... */
@@ -85,11 +85,11 @@
             <header
                 class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20 fn-header-top-nav">
 
-                <div class="flex items-center fn-header-left-group">
+                <div class="flex items-center fn-header-left-group pl-5">
                     <button @click="sidebarOpen = !sidebarOpen"
                         class="text-slate-600 hover:text-blue-500 transition-colors mr-4 focus:outline-none fn-btn-sidebar-toggle">
-                        <svg x-show="sidebarOpen" class="w-6 h-6 fn-icon-menu-open" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg x-show="sidebarOpen" class="w-6 h-6 fn-icon-menu-open" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h7"></path>
                         </svg>
@@ -102,8 +102,10 @@
                     <h1 class="text-xl font-semibold text-slate-800 fn-header-title">Admin Panel</h1>
                 </div>
 
-                <div x-data="{ open: false }" @click.outside="open = false" class="relative fn-profile-dropdown-container">
-                    <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none fn-btn-profile-trigger">
+                <div x-data="{ open: false }" @click.outside="open = false"
+                    class="relative fn-profile-dropdown-container">
+                    <button @click="open = !open"
+                        class="flex items-center space-x-2 focus:outline-none fn-btn-profile-trigger">
                         <span class="text-slate-600 font-medium hidden sm:inline fn-profile-name">Super Admin</span>
                         <img class="w-10 h-10 rounded-full object-cover border-2 border-blue-400 fn-profile-image"
                             src="https://placehold.co/150x150/3b82f6/ffffff?text=SA" alt="Admin Profile">
@@ -115,10 +117,9 @@
                         x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
                         class="absolute right-0 mt-2 w-60 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden fn-profile-dropdown-menu">
 
-                        <div class="p-4 bg-blue-50 border-b border-blue-100 fn-dropdown-header"
-                            x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
-                            <p class="text-sm font-semibold text-slate-800 fn-dropdown-header-role"
-                                x-text="user?.roles[0]">Super Admin</p>
+                        <div class="p-4 bg-blue-50 border-b border-blue-100 fn-dropdown-header" x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
+                            <p class="text-sm font-semibold text-slate-800 fn-dropdown-header-role" x-text="user?.name">
+                                Super Admin</p>
                             <p class="text-xs text-slate-500 fn-dropdown-header-email" x-text="user?.email">
                                 superadmin@fixnserve.com</p>
                         </div>
@@ -127,10 +128,12 @@
                             <div
                                 class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center border-b border-gray-100 fn-dropdown-detail-role">
                                 <span class="fn-dropdown-detail-label">Role:</span>
-                                <span class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs fn-dropdown-detail-role-value"
-                                    x-text="user?.roles[0]"> </span>
+                                <span
+                                    class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs fn-dropdown-detail-role-value"
+                                    x-text="user?.roles[0].name"> </span>
                             </div>
-                            <div class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center fn-dropdown-detail-id">
+                            <div
+                                class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center fn-dropdown-detail-id">
                                 <span class="fn-dropdown-detail-label">User ID:</span>
                                 <span class="font-mono text-xs text-slate-500 fn-dropdown-detail-id-value"
                                     x-text="user?.id">#009</span>
@@ -185,7 +188,6 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" class="fn-script-apexcharts"></script>
 
     <script class="fn-script-logout">
-
         function logout() {
 
             // Disable the button to prevent multiple clicks

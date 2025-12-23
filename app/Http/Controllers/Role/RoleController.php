@@ -16,9 +16,14 @@ class RoleController extends Controller
         if ($role) {
             return ApiResponse::success($role, 'Role fetched successfully');
         }
-        $roles = Role::all();
+        // $roles = Role::all();
+        // ✅ CORRECT: fetch roles WITH their permissions
+        $roles = Role::with('permissions')->get();
 
-        return ApiResponse::success($roles, 'Roles fetched successfully');
+        return response()->json([
+            'data' => $roles,
+        ]);
+        // return ApiResponse::success($roles, 'Roles fetched successfully');
     }
 
     public function store(Request $request)
