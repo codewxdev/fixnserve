@@ -20,10 +20,12 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
         ]);
 
         $category = Category::create([
             'name' => $request->name,
+            'type' => $request->type,
         ]);
 
         return ApiResponse::success($category, 'Category created successfully', 201);
@@ -42,10 +44,14 @@ class CategoryController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
+
         ]);
 
         $category->update([
             'name' => $request->name,
+            'type' => $request->type,
+
         ]);
 
         return ApiResponse::success($category, 'Category updated successfully');

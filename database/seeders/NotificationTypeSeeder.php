@@ -37,7 +37,6 @@ class NotificationTypeSeeder extends Seeder
 
         foreach ($types as $type) {
             NotificationType::updateOrCreate(
-                ['slug' => $type['slug']],
                 $type
             );
         }

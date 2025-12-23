@@ -20,6 +20,7 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Models\Category;
 use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
