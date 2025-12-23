@@ -16,12 +16,11 @@ return new class extends Migration
             $table->decimal('lat', 10, 8)->nullable()->after('email');
             $table->decimal('lon', 11, 8)->nullable()->after('lat');
 
-            $table->enum('phone_status', ['verified', 'not_verified'])->default('not_verified')->after('country_flag');
+            $table->enum('phone_status', ['verified', 'not_verified'])->default('not_verified');
 
             // Add index for better performance on frequently queried columns
             $table->index('phone_status');
-            $table->index('rating');
-            $table->index('favourite');
+            
             $table->index(['lat', 'lon']); // Composite index for location queries
         });
     }
