@@ -13,32 +13,35 @@ class CategorySubcategorySeeder extends Seeder
      */
     public function run()
     {
-        // Example categories
+        // Example categories with type
         $categories = [
-            'Plumbing',
-            'Electrical',
-            'AC & Heating',
-            'Carpentry',
-            'Cleaning',
-            'Painting',
-            'Gardening',
-            'Pest Control',
-            'Roofing',
-            'Appliance Repair',
+            ['name' => 'Plumbing', 'type' => 'serviceProvider'],
+            ['name' => 'Electrical', 'type' => 'serviceProvider'],
+            ['name' => 'AC & Heating', 'type' => 'serviceProvider'],
+            ['name' => 'Carpentry', 'type' => 'serviceProvider'],
+            ['name' => 'Cleaning', 'type' => 'serviceProvider'],
+            ['name' => 'Painting', 'type' => 'serviceProvider'],
+            ['name' => 'Gardening', 'type' => 'serviceProvider'],
+            ['name' => 'Pest Control', 'type' => 'serviceProvider'],
+            ['name' => 'Roofing', 'type' => 'serviceProvider'],
+            ['name' => 'Appliance Repair', 'type' => 'serviceProvider'],
         ];
 
-        foreach ($categories as $catName) {
-            $category = Category::create(['name' => $catName]);
+        foreach ($categories as $catData) {
+            $category = Category::create([
+                'name' => $catData['name'],
+                'type' => $catData['type'],
+            ]);
 
             // 5 subcategories for each
             for ($i = 1; $i <= 5; $i++) {
                 Subcategory::create([
-                    'name' => $catName.' Sub '.$i,
+                    'name' => $catData['name'].' Sub '.$i,
                     'category_id' => $category->id,
                 ]);
             }
         }
 
-        $this->command->info('Categories & Subcategories seeded successfully!');
+        $this->command->info('Categories & Subcategories seeded successfully with type!');
     }
 }
