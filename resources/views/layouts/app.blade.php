@@ -85,7 +85,7 @@
             <header
                 class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20 fn-header-top-nav">
 
-                <div class="flex items-center fn-header-left-group">
+                <div class="flex items-center fn-header-left-group pl-5">
                     <button @click="sidebarOpen = !sidebarOpen"
                         class="text-slate-600 hover:text-blue-500 transition-colors mr-4 focus:outline-none fn-btn-sidebar-toggle">
                         <svg x-show="sidebarOpen" class="w-6 h-6 fn-icon-menu-open" fill="none"
@@ -118,7 +118,7 @@
                         <div class="p-4 bg-blue-50 border-b border-blue-100 fn-dropdown-header"
                             x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
                             <p class="text-sm font-semibold text-slate-800 fn-dropdown-header-role"
-                                x-text="user?.roles[0]">Super Admin</p>
+                                x-text="user?.name">Super Admin</p>
                             <p class="text-xs text-slate-500 fn-dropdown-header-email" x-text="user?.email">
                                 superadmin@fixnserve.com</p>
                         </div>
@@ -128,7 +128,7 @@
                                 class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center border-b border-gray-100 fn-dropdown-detail-role">
                                 <span class="fn-dropdown-detail-label">Role:</span>
                                 <span class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs fn-dropdown-detail-role-value"
-                                    x-text="user?.roles[0]"> </span>
+                                    x-text="user?.roles[0].name"> </span>
                             </div>
                             <div class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center fn-dropdown-detail-id">
                                 <span class="fn-dropdown-detail-label">User ID:</span>

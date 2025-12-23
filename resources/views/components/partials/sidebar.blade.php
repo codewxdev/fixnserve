@@ -1,554 +1,197 @@
-    <!-- Sidebar -->
-    <div x-bind:class="{ 'w-64': sidebarOpen, 'w-20': !sidebarOpen }"
-        class="sidebar fixed top-0 left-0 h-full z-30 flex flex-col text-white">
+<div x-bind:class="{ 'w-72': sidebarOpen, 'w-20': !sidebarOpen }"
+    class="sidebar fixed top-0 left-0 h-full z-30 flex flex-col bg-slate-900 border-r border-slate-800 text-white transition-all duration-300 ease-in-out shadow-2xl">
 
-        <!-- Logo -->
-        <div class="flex items-center justify-center h-16 border-b border-slate-700">
-            <span x-show="sidebarOpen"
-                class="text-xl font-extrabold tracking-wider text-blue-400 transition-opacity duration-300"
-                x-cloak>FixnServe</span>
-            <span x-show="!sidebarOpen" class="text-2xl font-extrabold text-blue-400 transition-opacity duration-300"
-                x-cloak>FS</span>
+    <div class="flex items-center pl-5 h-20 border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
+        <div x-show="sidebarOpen" class="flex items-center gap-2 transition-opacity duration-300" x-cloak>
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <span class="text-xl font-bold tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+                FixnServe
+            </span>
         </div>
-
-        <!-- Navigation Links -->
-        <nav class="flex-1 overflow-y-auto py-4">
-            <ul class="space-y-2 px-3">
-
-                <!-- Helper Component Structure for Collapsible Menu Item -->
-                <!-- The structure is repeated below for all required tabs -->
-
-                <!-- Dashboard Link (Non-collapsible, Active Example) -->
-                <li>
-                    <a href="{{ route('dashboard.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('dashboard.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 3h8v8H3V3zm10 0h8v5h-8V3zM3 13h5v8H3v-8zm7 0h11v8H10v-8z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Dashboard</span>
-                    </a>
-                </li>
-                <!-- 2. Customers -->
-                <li>
-                    <a href="{{ route('customer.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('customer.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 21v-2a4 4 0 00-3-3.87m-7 0A4 4 0 004 19v2m8-10a4 4 0 110-8 4 4 0 010 8z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Customers</span>
-                    </a>
-                </li>
-                <!-- 2. Service Providers -->
-                <li>
-                    <a href="{{ route('provider.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('provider.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 7h18v10H3V7zm5-4h8v4H8V3z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Service
-                            Providers</span>
-                    </a>
-                </li>
-                <!-- 3. Professional Experts -->
-                <li>
-                    <a href="{{ route('professional.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('professional.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8a4 4 0 110 8 4 4 0 010-8zm0-6l2 4h4l-3 3 1 4-4-2-4 2 1-4-3-3h4l2-4z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Professional Experts</span>
-                    </a>
-                </li>
-                <!-- 4. Consultants -->
-                <li>
-                    <a href="{{ route('consultant.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('consultant.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Consultants</span>
-                    </a>
-                </li>
-                <!-- 5. Mart Vendors -->
-                <li>
-                    <a href="{{ route('mart.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('mart.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9l1-5h16l1 5M4 9v11h16V9M9 22V12h6v10" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300" x-cloak>Mart
-                            Vendors</span>
-                    </a>
-                </li>
-                <!-- 6. Riders -->
-                <li>
-                    <a href="{{ route('rider.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('rider.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 18a3 3 0 110-6 3 3 0 010 6zm14 0a3 3 0 110-6 3 3 0 010 6zM5 15h6l3-6h4" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Riders</span>
-                    </a>
-                </li>
-
-                <!-- 6. Service management -->
-                <li>
-                    <a href="{{ route('service.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('service.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 2l7 4v4c0 5-3.5 9.5-7 10-3.5-.5-7-5-7-10V6l7-4zm0 8a3 3 0 110 6 3 3 0 010-6z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Service Management</span>
-                    </a>
-                </li>
-
-                <!-- 6. Finance  -->
-                <li>
-                    <a href="{{ route('finance.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('finance.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 7h18v10H3V7zm13 3h3v4h-3v-4z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Financial System</span>
-                    </a>
-                </li>
-
-                <!-- 9. Complaint & Refund System -->
-                <li>
-                    <a href="{{ route('car.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('car.index') ? 'nav-active' : '' }}">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v4m0 4h.01M12 2a10 10 0 110 20 10 10 0 010-20z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Complaint & Refund System</span>
-                    </a>
-                </li>
-
-                <!-- 10. Reports and Analytics -->
-                <li>
-                    <a href="{{ route('report.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('report.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 12h2v6H5v-6zm6-4h2v10h-2V8zm6 2h2v8h-2v-8z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Reports
-                            and Analytics</span>
-                    </a>
-                </li>
-
-                <!-- 11. CMS & Settings -->
-                <li>
-                    <a href="{{ route('cms.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('cms.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 15a3 3 0 110-6 3 3 0 010 6zm8.94-2a1 1 0 000-2l-2.1-.35a6.99 6.99 0 00-.78-1.88l1.26-1.78a1 1 0 00-1.42-1.42l-1.78 1.26a7 7 0 00-1.88-.78L14 3.06a1 1 0 00-2 0l-.35 2.1a7 7 0 00-1.88.78L8 4.68a1 1 0 00-1.42 1.42l1.26 1.78a6.99 6.99 0 00-.78 1.88L4.06 10a1 1 0 000 2l2.1.35c.14.66.38 1.29.78 1.88l-1.26 1.78a1 1 0 001.42 1.42l1.78-1.26c.59.4 1.22.64 1.88.78l.35 2.1a1 1 0 002 0l.35-2.1c.66-.14 1.29-.38 1.88-.78l1.78 1.26a1 1 0 001.42-1.42l-1.26-1.78c.4-.59.64-1.22.78-1.88l2.1-.35z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>CMS &
-                            Settings</span>
-                    </a>
-                </li>
-
-                   <!-- 12. Notifications Engine -->
-                <li>
-                    <a href="{{ route('notification.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('notification.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 15a3 3 0 110-6 3 3 0 010 6zm8.94-2a1 1 0 000-2l-2.1-.35a6.99 6.99 0 00-.78-1.88l1.26-1.78a1 1 0 00-1.42-1.42l-1.78 1.26a7 7 0 00-1.88-.78L14 3.06a1 1 0 00-2 0l-.35 2.1a7 7 0 00-1.88.78L8 4.68a1 1 0 00-1.42 1.42l1.26 1.78a6.99 6.99 0 00-.78 1.88L4.06 10a1 1 0 000 2l2.1.35c.14.66.38 1.29.78 1.88l-1.26 1.78a1 1 0 001.42 1.42l1.78-1.26c.59.4 1.22.64 1.88.78l.35 2.1a1 1 0 002 0l.35-2.1c.66-.14 1.29-.38 1.88-.78l1.78 1.26a1 1 0 001.42-1.42l-1.26-1.78c.4-.59.64-1.22.78-1.88l2.1-.35z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Notifications Engine</span>
-                    </a>
-                </li>
-
-
-                <!-- === COLLAPSIBLE MENU ITEMS START HERE === -->
-
-                <!-- 5. Mart Vendors -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9l1-5h16l1 5M4 9v11h16V9M9 22V12h6v10" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>Mart
-                            Vendors</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">All
-                                Vendors</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Product
-                                Management</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Inventory</a>
-                        </li>
-                    </ul>
-                </li> --}}
-
-                <!-- 6. Riders -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 18a3 3 0 110-6 3 3 0 010 6zm14 0a3 3 0 110-6 3 3 0 010 6zM5 15h6l3-6h4" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1"
-                            x-cloak>Riders</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">All
-                                Riders</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Rider
-                                Tracking</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Payouts</a>
-                        </li>
-                    </ul>
-                </li> --}}
-
-                <!-- 7. Admin Management -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 2l7 4v4c0 5-3.5 9.5-7 10-3.5-.5-7-5-7-10V6l7-4zm0 8a3 3 0 110 6 3 3 0 010-6z" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>Admin
-                            Management</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Admin
-                                Users</a></li>
-                        <li><a href="{{ route('role.permission.index') }}"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Roles
-                                & Permissions</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Activity
-                                Logs</a></li>
-                    </ul>
-                </li> --}}
-
-                <!-- 8. Financial System -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 7h18v10H3V7zm13 3h3v4h-3v-4z" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>Financial
-                            System</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Transactions</a>
-                        </li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Payouts</a>
-                        </li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Invoices</a>
-                        </li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Tax
-                                Reports</a></li>
-                    </ul>
-                </li> --}}
-
-                <!-- 9. Complaint & Refund System -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v4m0 4h.01M12 2a10 10 0 110 20 10 10 0 010-20z" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>Complaint
-                            & Refund System</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">New
-                                Complaints</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Pending
-                                Refunds</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Resolution
-                                History</a></li>
-                    </ul>
-                </li> --}}
-
-                <!-- 10. Reports and Analytics -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 12h2v6H5v-6zm6-4h2v10h-2V8zm6 2h2v8h-2v-8z" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>Reports
-                            and Analytics</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Sales
-                                Reports</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">User
-                                Activity</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Service
-                                Metrics</a></li>
-                    </ul>
-                </li> --}}
-
-                <!-- 11. CMS & Settings -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 15a3 3 0 110-6 3 3 0 010 6zm8.94-2a1 1 0 000-2l-2.1-.35a6.99 6.99 0 00-.78-1.88l1.26-1.78a1 1 0 00-1.42-1.42l-1.78 1.26a7 7 0 00-1.88-.78L14 3.06a1 1 0 00-2 0l-.35 2.1a7 7 0 00-1.88.78L8 4.68a1 1 0 00-1.42 1.42l1.26 1.78a6.99 6.99 0 00-.78 1.88L4.06 10a1 1 0 000 2l2.1.35c.14.66.38 1.29.78 1.88l-1.26 1.78a1 1 0 001.42 1.42l1.78-1.26c.59.4 1.22.64 1.88.78l.35 2.1a1 1 0 002 0l.35-2.1c.66-.14 1.29-.38 1.88-.78l1.78 1.26a1 1 0 001.42-1.42l-1.26-1.78c.4-.59.64-1.22.78-1.88l2.1-.35z" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1" x-cloak>CMS &
-                            Settings</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">CMS
-                                Pages</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">General
-                                Settings</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Email
-                                Templates</a></li>
-                    </ul>
-                </li> --}}
-
-                <!-- 12. Notifications Engine -->
-                {{-- <li x-data="{ open: false }">
-                    <button @click="open = !open"
-                        class="w-full flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150">
-                        <!-- Icon -->
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 22a2 2 0 002-2H10a2 2 0 002 2zm7-6V11a7 7 0 10-14 0v5l-2 2h18l-2-2z" />
-                        </svg>
-                        <!-- Name -->
-                        <span x-show="sidebarOpen"
-                            class="ml-3 font-medium transition-opacity duration-300 text-left flex-1"
-                            x-cloak>Notifications Engine</span>
-                        <!-- Arrow Icon -->
-                        <svg x-show="sidebarOpen" :class="{ 'rotate-90': open }"
-                            class="w-4 h-4 ml-auto icon-rotate flex-shrink-0" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" x-cloak>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </button>
-
-                    <!-- Subcategories -->
-                    <ul x-show="open" x-cloak
-                        x-transition:enter="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:enter-start="max-h-0 opacity-0" x-transition:enter-end="max-h-96 opacity-100"
-                        x-transition:leave="transition-all ease-in-out duration-300 overflow-hidden"
-                        x-transition:leave-start="max-h-96 opacity-100" x-transition:leave-end="max-h-0 opacity-0"
-                        class="ml-10 space-y-1 mt-1 border-l border-slate-600">
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Templates</a>
-                        </li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Send
-                                Notification</a></li>
-                        <li><a href="#"
-                                class="block py-1.5 px-3 text-sm rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">Logs</a>
-                        </li>
-                    </ul>
-                </li> --}}
-
-                <li>
-                    <a href="{{ route('role.permission.index') }}"
-                        class="flex items-center py-2 px-3 rounded-lg text-slate-300 hover:bg-slate-700 transition duration-150 {{ request()->routeIs('role.permission.index') ? 'nav-active' : '' }}">
-                        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 7h18v10H3V7zm5-4h8v4H8V3z" />
-                        </svg>
-                        <span x-show="sidebarOpen" class="ml-3 font-medium transition-opacity duration-300"
-                            x-cloak>Roles & Permissions</span>
-                    </a>
-                </li>
-                <!-- === COLLAPSIBLE MENU ITEMS END HERE === -->
-
-            </ul>
-        </nav>
+        
+        <div x-show="!sidebarOpen" class="transition-opacity duration-300" x-cloak>
+             <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <span class="text-white font-extrabold text-lg">FS</span>
+            </div>
+        </div>
     </div>
+
+    <nav class="flex-1 overflow-y-auto py-6 custom-scrollbar">
+        <ul class="space-y-1.5 px-3">
+
+            <li>
+                <a href="{{ route('dashboard.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('dashboard.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('dashboard.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Dashboard</span>
+                </a>
+            </li>
+
+            <li x-show="sidebarOpen" class="px-4 mt-6 mb-2" x-cloak>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600">User Management</span>
+            </li>
+
+            <li>
+                <a href="{{ route('customer.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('customer.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('customer.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Customers</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('provider.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('provider.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('provider.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Providers</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('professional.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('professional.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('professional.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Experts</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('consultant.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('consultant.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('consultant.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Consultants</span>
+                </a>
+            </li>
+
+             <li>
+                <a href="{{ route('mart.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('mart.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('mart.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Mart Vendors</span>
+                </a>
+            </li>
+
+             <li>
+                <a href="{{ route('rider.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('rider.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('rider.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /> 
+                         </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Riders</span>
+                </a>
+            </li>
+
+            <li x-show="sidebarOpen" class="px-4 mt-6 mb-2" x-cloak>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600">Operations</span>
+            </li>
+
+            <li>
+                <a href="{{ route('service.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('service.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('service.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Service Management</span>
+                </a> 
+            </li>
+
+            <li>
+                <a href="{{ route('finance.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('finance.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('finance.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Finance</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('car.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('car.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('car.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.368 17c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Complaints & Refunds</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('report.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('report.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('report.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Analytics</span>
+                </a>
+            </li>
+
+            <li x-show="sidebarOpen" class="px-4 mt-6 mb-2" x-cloak>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600">Configuration</span>
+            </li>
+
+            <li>
+                <a href="{{ route('cms.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('cms.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('cms.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>CMS & Settings</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('notification.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('notification.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('notification.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Notifications</span>
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('role.permission.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('role.permission.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('role.permission.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span x-show="sidebarOpen" class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Roles & Permissions</span>
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #334155; /* slate-700 */
+        border-radius: 20px;
+    }
+    .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+        background-color: #475569; /* slate-600 */
+    }
+</style>

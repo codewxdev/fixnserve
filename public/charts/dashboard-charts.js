@@ -140,6 +140,43 @@ document.addEventListener('DOMContentLoaded', function () {
     renderChart('revenue-per-category-chart', revenuePerCategoryOptions);
 
 
+  // 3. Geospatial Demand Heatmap
+    const  riderActivityHeatmap = {
+        series: [42, 47, 52, 58, 65],
+        chart: {
+            type: 'polarArea',
+            height: 350,
+        },
+        labels: ['Rose A', 'Rose B', 'Rose C', 'Rose D', 'Rose E'],
+        responsive: [{
+            breakpoint: 480,
+            options: {
+                chart: { width: 200 },
+                legend: { position: 'bottom' }
+            }
+        }],
+        // colors: ['#10b981', '#3b82f6', '#f97316', '#ef4444', '#a855f7'], // Green, Blue, Orange, Red, Purple
+        legend: { position: 'bottom' },
+        plotOptions: {
+            pie: {
+                donut: {
+                    labels: {
+                        show: true,
+                        total: {
+                            showAlways: true,
+                            show: true,
+                            label: 'Total %',
+                            formatter: function (w) {
+                                return w.globals.seriesTotals.reduce((a, b) => a + b, 0).toFixed(0) + '%'
+                            }
+                        }
+                    }
+                }
+            }
+        },
+    };
+    renderChart('rider-activity-heatmap', riderActivityHeatmap);
+
 
     // --- ORDERS CHARTS ---
 

@@ -16,9 +16,13 @@ class RoleController extends Controller
         if ($role) {
             return ApiResponse::success($role, 'Role fetched successfully');
         }
-        $roles = Role::all();
-
-        return ApiResponse::success($roles, 'Roles fetched successfully');
+        // $roles = Role::all();
+        // ✅ CORRECT: fetch roles WITH their permissions
+        $roles = Role::with('permissions')->get();
+        return response()->json([
+            'data' => $roles
+        ]);
+        // return ApiResponse::success($roles, 'Roles fetched successfully');
     }
 
     public function store(Request $request)
@@ -32,7 +36,7 @@ class RoleController extends Controller
     public function update(Request $request, Role $role)
     {
 
-        $request->validate(['name' => 'required|unique:roles,name,'.$role->id]);
+        $request->validate(['name' => 'required|unique:roles,name,' . $role->id]);
 
         $role->update(['name' => $request->name]);
 
