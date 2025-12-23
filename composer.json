@@ -10,7 +10,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "bacon/bacon-qr-code": "^3.0",
         "jenssegers/agent": "^2.6",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
@@ -36,7 +35,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+         "files": [
+        "app/Helpers/NotificationHelper.php"
+    ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -91,6 +93,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.2.12"
         }
     },
     "minimum-stability": "stable",

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ServiceProvider;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Skill;
 use Illuminate\Http\Request;
@@ -10,37 +11,29 @@ class SkillController extends Controller
 {
     public function index()
     {
-        return response()->json([
-            'status' => true,
-            'data' => Skill::all(),
-        ], 200);
+        $skills = Skill::all();
+
+        return ApiResponse::success($skills, 'Skills fetched successfully');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
         ]);
 
         $skill = Skill::create([
             'name' => $request->name,
         ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Skill created successfully',
-            'data' => $skill,
-        ], 201);
+        return ApiResponse::success($skill, 'Skill created successfully', 201);
     }
 
     public function show($id)
     {
         $skill = Skill::findOrFail($id);
 
-        return response()->json([
-            'status' => true,
-            'data' => $skill,
-        ], 200);
+        return ApiResponse::success($skill, 'Skill fetched successfully');
     }
 
     public function update(Request $request, $id)
@@ -48,16 +41,12 @@ class SkillController extends Controller
         $skill = Skill::findOrFail($id);
 
         $request->validate([
-            'name' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
         ]);
 
         $skill->update($request->only('name'));
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Skill updated successfully',
-            'data' => $skill,
-        ], 200);
+        return ApiResponse::success($skill, 'Skill updated successfully');
     }
 
     public function destroy($id)
@@ -65,39 +54,27 @@ class SkillController extends Controller
         $skill = Skill::findOrFail($id);
         $skill->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Skill deleted successfully',
-        ], 200);
+        return ApiResponse::success(null, 'Skill deleted successfully');
     }
 
     public function suggested()
     {
         $skills = Skill::limit(12)->get();
 
-        return response()->json([
-            'skills' => $skills,
-        ]);
+        return ApiResponse::success($skills, 'Suggested skills fetched successfully');
     }
 
     public function search(Request $request)
     {
         $query = trim($request->query('query'));
 
-        // If no query → return empty list
         if (! $query || $query === '') {
-            return response()->json([
-                'skills' => [],
-            ]);
+            return ApiResponse::success([], 'No skills found');
         }
 
-        // Search only matching skills
-        $skills = Skill::where('name', 'LIKE', "%{$query}%")
-            ->get();
+        $skills = Skill::where('name', 'LIKE', "%{$query}%")->get();
 
-        return response()->json([
-            'skills' => $skills,
-        ]);
+        return ApiResponse::success($skills, 'Skills fetched successfully');
     }
 
     public function addSkills(Request $request)
@@ -109,13 +86,36 @@ class SkillController extends Controller
 
         $user = auth()->user();
 
-        // Sync means: only these skills → old ones removed
-        $user->skills()->sync($request->skills);
+        // Already attached skills
+        $existingSkillIds = $user->skills()->pluck('skills.id')->toArray();
 
-        return response()->json([
-            'message' => 'Skills updated successfully',
-            'skills' => $user->skills()->get(),
-        ]);
+        // Sirf new skills (duplicates remove)
+        $newSkills = array_diff($request->skills, $existingSkillIds);
+
+        // Agar kuch naya add hi nahi ho raha
+        if (empty($newSkills)) {
+            return ApiResponse::success(
+                $user->skills()->get(),
+                'No new skills to add'
+            );
+        }
+
+        // Total skills limit check
+        $totalSkills = count($existingSkillIds) + count($newSkills);
+
+        if ($totalSkills > 5) {
+            return ApiResponse::error(
+                'You can add maximum 5 skills only.',
+                422
+            );
+        }
+
+        // Attach only new skills
+        $user->skills()->attach($newSkills);
+
+        return ApiResponse::success(
+            $user->skills()->get(),
+            'Skills added successfully'
+        );
     }
-
 }

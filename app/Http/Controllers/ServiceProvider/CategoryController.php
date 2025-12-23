@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ServiceProvider;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
@@ -10,37 +11,29 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        return response()->json([
-            'status' => true,
-            'data' => Category::all(),
-        ], 200);
+        $categories = Category::all();
+
+        return ApiResponse::success($categories, 'Categories fetched successfully');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
+            'name' => 'required|string|max:255',
         ]);
 
         $category = Category::create([
             'name' => $request->name,
         ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Category created successfully',
-            'data' => $category,
-        ], 201);
+        return ApiResponse::success($category, 'Category created successfully', 201);
     }
 
     public function show($id)
     {
         $category = Category::findOrFail($id);
 
-        return response()->json([
-            'status' => true,
-            'data' => $category,
-        ], 200);
+        return ApiResponse::success($category, 'Category fetched successfully');
     }
 
     public function update(Request $request, $id)
@@ -48,16 +41,14 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
 
         $request->validate([
-            'name' => 'nullable|string|max:255',
+            'name' => 'required|string|max:255',
         ]);
 
-        $category->update($request->name);
+        $category->update([
+            'name' => $request->name,
+        ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Category updated successfully',
-            'data' => $category,
-        ], 200);
+        return ApiResponse::success($category, 'Category updated successfully');
     }
 
     public function destroy($id)
@@ -65,9 +56,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Category deleted successfully',
-        ], 200);
+        return ApiResponse::success(null, 'Category deleted successfully');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\ServiceProvider;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\UserTransportation;
 use Illuminate\Http\Request;
@@ -9,11 +10,14 @@ use Illuminate\Support\Facades\Auth;
 
 class UserTransportationController extends Controller
 {
+    /**
+     * Get user's transportation settings
+     */
     public function getTransportations()
     {
         $user = Auth::user();
 
-        // Get or create with all false
+        // Get or create with default false
         $transportation = UserTransportation::firstOrCreate(
             ['user_id' => $user->id],
             [
@@ -25,16 +29,11 @@ class UserTransportationController extends Controller
             ]
         );
 
-        return response()->json([
-            'success' => true,
-            'data' => $transportation,
-            'message' => 'Transportation settings retrieved successfully.',
-        ]);
+        return ApiResponse::success($transportation, 'Transportation settings retrieved successfully');
     }
 
     /**
      * Add/Update transportation settings
-     * POST /api/transportations
      * User can update any combination of fields
      */
     public function updateTransportations(Request $request)
@@ -51,33 +50,14 @@ class UserTransportationController extends Controller
 
         $data = [];
 
-        // Only update fields that are provided
-        if ($request->has('bicycle')) {
-            $data['bicycle'] = $request->bicycle;
+        foreach (['bicycle', 'car', 'scooter', 'truck', 'walk'] as $field) {
+            if ($request->has($field)) {
+                $data[$field] = $request->$field;
+            }
         }
 
-        if ($request->has('car')) {
-            $data['car'] = $request->car;
-        }
-
-        if ($request->has('scooter')) {
-            $data['scooter'] = $request->scooter;
-        }
-
-        if ($request->has('truck')) {
-            $data['truck'] = $request->truck;
-        }
-
-        if ($request->has('walk')) {
-            $data['walk'] = $request->walk;
-        }
-
-        // If no data provided, return error
         if (empty($data)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No transportation settings provided for update.',
-            ], 400);
+            return ApiResponse::error('No transportation settings provided for update.', 400);
         }
 
         // Update or create transportation settings
@@ -92,10 +72,6 @@ class UserTransportationController extends Controller
             ], $data)
         );
 
-        return response()->json([
-            'success' => true,
-            'data' => $transportation,
-            'message' => 'Transportation settings updated successfully.',
-        ]);
+        return ApiResponse::success($transportation, 'Transportation settings updated successfully');
     }
 }

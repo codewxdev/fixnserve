@@ -11,6 +11,7 @@ class UserNotification extends Model
 
     protected $fillable = [
         'user_id',
+        'notification_type_id',
         'email',
         'sms',
         'push',
@@ -28,5 +29,18 @@ class UserNotification extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function notificationType()
+    {
+        return $this->belongsTo(NotificationType::class);
+    }
+
+    // Scope to get settings for specific type
+    public function scopeOfType($query, $typeSlug)
+    {
+        return $query->whereHas('notificationType', function ($q) use ($typeSlug) {
+            $q->where('slug', $typeSlug);
+        });
     }
 }

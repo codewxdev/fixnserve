@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Role;
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,11 +19,7 @@ class UserRoleController extends Controller
         $user = User::where('uuid', $request->user_uuid)->firstOrFail();
         $user->syncRoles([$request->role]); // overwrite roles
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Role assigned successfully',
-            'data' => $user->getRoleNames(),
-        ]);
+        return ApiResponse::success($user->getRoleNames(), 'Role assigned successfully');
     }
 
     // Assign direct permissions to user (optional)
@@ -36,11 +33,7 @@ class UserRoleController extends Controller
         $user = User::where('uuid', $request->user_uuid)->firstOrFail();
         $user->syncPermissions($request->permissions);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Permissions assigned directly to user',
-            'data' => $user->permissions,
-        ]);
+        return ApiResponse::success($user->permissions, 'Permissions assigned directly to user');
     }
 
     // Get user roles
@@ -48,10 +41,7 @@ class UserRoleController extends Controller
     {
         $user = User::where('uuid', $id)->firstOrFail();
 
-        return response()->json([
-            'status' => true,
-            'roles' => $user->getRoleNames(),
-        ]);
+        return ApiResponse::success($user->getRoleNames(), 'User roles fetched successfully');
     }
 
     // Get user permissions (including via roles)
@@ -59,9 +49,6 @@ class UserRoleController extends Controller
     {
         $user = User::where('uuid', $id)->firstOrFail();
 
-        return response()->json([
-            'status' => true,
-            'permissions' => $user->getAllPermissions(),
-        ]);
+        return ApiResponse::success($user->getAllPermissions(), 'User permissions fetched successfully');
     }
 }

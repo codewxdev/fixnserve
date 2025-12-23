@@ -2,20 +2,26 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetCodeController;
+use App\Http\Controllers\FavouriteController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
 use App\Http\Controllers\Role\UserRoleController;
 use App\Http\Controllers\ServiceProvider\CategoryController;
+use App\Http\Controllers\ServiceProvider\NotificationTypeController;
 use App\Http\Controllers\ServiceProvider\PortfolioController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
 use App\Http\Controllers\ServiceProvider\ServiceProviderController;
 use App\Http\Controllers\ServiceProvider\SkillController;
 use App\Http\Controllers\ServiceProvider\SubcategoryController;
 use App\Http\Controllers\ServiceProvider\UserEducationController;
+use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Models\Country;
+use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes (No authentication required)
@@ -27,7 +33,21 @@ Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPasswo
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 Route::get('/skill/suggested', [SkillController::class, 'suggested']);
 Route::get('/skill/search', [SkillController::class, 'search']);
+Route::apiResource('notification-types', NotificationTypeController::class);
+// routes/api.php
 
+Route::get('/countries', function () {
+    return response()->json([
+        'success' => true,
+        'data' => Country::orderBy('name')->get(),
+    ]);
+});
+Route::get('/currences', function () {
+    return response()->json([
+        'success' => true,
+        'data' => Currency::orderBy('name')->get(),
+    ]);
+});
 // Main Authenticated Routes Group with User Status Check
 Route::middleware(['auth:api', 'user.active'])->group(function () {
 
@@ -37,6 +57,9 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::post('/auth/refresh', [AuthController::class, 'refresh']);
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
     Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
+    Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
+    Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
+    Route::post('/rate', [RatingController::class, 'rate']);
 
     Route::middleware(['service.provider'])->group(function () {
         Route::post('/language', [PortfolioController::class, 'addLanguage']);
@@ -80,9 +103,15 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 
         // Notification Routes
         Route::prefix('notifications')->group(function () {
-            Route::get('/', [UserNotificationController::class, 'getSettings']);
-            Route::post('/set-all', [UserNotificationController::class, 'setNotificationSettings']);
+            // Get all settings for logged-in user
+            Route::get('/settings', [UserNotificationController::class, 'getUserNotificationSettings']);
+            // Update settings for a specific type
+            Route::post('/settings/update', [UserNotificationController::class, 'updateNotificationSettings']);
+            // Reset to defaults
+            Route::post('/settings/reset', [UserNotificationController::class, 'resetToDefaults']);
+
         });
+
         Route::prefix('transportations')->group(function () {
             // Get transportation settings
             Route::get('/', [UserTransportationController::class, 'getTransportations']);
@@ -90,7 +119,13 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
             Route::post('/', [UserTransportationController::class, 'updateTransportations']);
         });
     });
-
+    Route::prefix('experiences')->group(function () {
+        Route::get('/', [UserExperienceController::class, 'index']);
+        Route::post('/', [UserExperienceController::class, 'store']);
+        Route::get('/{id}', [UserExperienceController::class, 'show']);
+        Route::put('/{id}', [UserExperienceController::class, 'update']);
+        Route::delete('/{id}', [UserExperienceController::class, 'destroy']);
+    });
     // Super Admin Routes (with additional checks)
     Route::middleware(['role:Super Admin', '2fa'])->group(function () {
         // Route::apiResource('roles', RoleController::class);
@@ -164,10 +199,5 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 // Route::post('/{id}', [PortfolioController::class, 'update']);
 // Route::delete('/{portfolio}', [PortfolioController::class, 'destroy']);
 
- 
- 
-Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
-Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
- Route::apiResource('roles', RoleController::class);
-        Route::apiResource('permissions', PermissionController::class);
-         Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
+Route::apiResource('roles', RoleController::class);
+Route::apiResource('permissions', PermissionController::class);

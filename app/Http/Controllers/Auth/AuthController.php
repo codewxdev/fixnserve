@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Country;
 use App\Models\LoginHistory;
 use App\Models\User;
+use App\Models\Wallet;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use PragmaRX\Google2FA\Google2FA;
 use Twilio\Rest\Client;
@@ -26,16 +29,30 @@ class AuthController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6|confirmed',
+            'password' => [
+                'required',
+                'string',
+                'min:6',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/',
+            ],
         ]);
+        DB::transaction(function () use ($request, &$user, &$token) {
 
-        $user = User::create([
-            'name' => $request->first_name . ' ' . $request->last_name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
+            $user = User::create([
+                'name' => $request->first_name.' '.$request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+            Wallet::create([
+                'user_id' => $user->id,
+                'balance' => 0,
+                'currency' => 'PKR',
+            ]);
 
-        $token = JWTAuth::fromUser($user);
+            // ===== Generate JWT Token =====
+            $token = JWTAuth::fromUser($user);
+        });
 
         return response()->json([
             'status' => true,
@@ -47,7 +64,21 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $request->validate([
+            'login' => 'required',
+            'password' => 'required',
+        ]);
+
+        $login = $request->login;
+
+        // Detect email or phone
+        $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        $credentials = [
+            $fieldType => $login,
+            'password' => $request->password,
+        ];
+        // $credentials = $request->only('email', 'password', 'phone');
 
         if (! $token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
@@ -224,28 +255,35 @@ class AuthController extends Controller
             'city' => 'nullable|string',
             'state' => 'nullable|string',
             'zipcode' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
+            'country_id' => 'nullable|integer|exists:countries,id', // Added country_id
+            'phone' => 'nullable|string|regex:/^[0-9]+$/',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
         ]);
+        if (! empty($validated['phone']) && ! empty($validated['country_id'])) {
 
+            $country = Country::find($validated['country_id']);
+
+            if ($country && strlen($validated['phone']) != $country->phone_length) {
+                return response()->json([
+                    'status' => false,
+                    'message' => "Phone number must be {$country->phone_length} digits for selected country.",
+                ], 422);
+            }
+        }
         if (isset($validated['phone'])) {
 
             if (is_null($user->phone)) {
-                // Pehli dafa phone add ho raha hai → OTP bhejo
+
                 $user->pending_phone = $validated['phone'];
 
-                // Random OTP generate
                 $otp = rand(100000, 999999);
-
                 $user->phone_otp = $otp;
+
                 // sendOtpSMS($validated['phone'], $otp);
 
-                // Yahan SMS gateway (Twilio / local API) call karna hota hai
-                // SMS::send($validated['phone'], "Your OTP: $otp");
-
             } else {
-                // Phone already exists → update NAHI hoga
+                // Phone already exists → don't update
                 unset($validated['phone']);
             }
         }
