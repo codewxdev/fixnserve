@@ -1,0 +1,66 @@
+/* ----------------------------------------------------------------
+
+File: resources/css/dashboard.css
+
+Description: Custom styles for a modern, professional UI
+
+---------------------------------------------------------------- */
+
+/* Custom Scrollbar for a cleaner look */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #94a3b8;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+    /* Slate 500 */
+}
+
+/* Base body/font settings */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+    /* Slate 50 */
+}
+
+/* Elevated Card Style */
+.pro-card {
+    transition: all 0.3s ease-in-out;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+}
+
+.pro-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Primary Sidebar Styling */
+.sidebar {
+    transition: width 0.3s ease-in-out;
+    background-color: #1e293b;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Active Link Indicator */
+.nav-active {
+    background-color: #334155;
+    border-left: 4px solid #3b82f6;
+}
+
+/* ApexChart container styling for separation */
+#dashboard-chart {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}

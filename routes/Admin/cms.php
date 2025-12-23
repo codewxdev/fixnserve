@@ -1,0 +1,7 @@
+<?php
+
+use App\Http\Controllers\Front\CmsController;
+use Illuminate\Support\Facades\Route;
+ 
+//Consultant Module Routes
+Route::get('/cms/settings',[CmsController::class, 'index'])->name('cms.index');

@@ -1,0 +1,30 @@
+ 
+*{
+    font-family: 'Poppins';
+}
+
+:root {
+
+   /* colors variables */
+  --primary-color: #1169FB;  
+  --dark-color: #021056;
+  --gray: #F2F2F4;
+  
+  
+}
+
+
+.login-card-shadow {
+    /* A modern, professional box shadow */
+    box-shadow: 
+        0 4px 6px -1px rgba(2, 16, 86, 0.1), /* Dark color, subtle top shadow */
+        0 10px 15px -3px rgba(2, 16, 86, 0.2), /* Dark color, stronger middle shadow */
+        0 20px 25px -5px rgba(2, 16, 86, 0.3); /* Dark color, strong bottom shadow */
+}
+
+ 
+ 
+input:focus {
+    /* Using the primary brand color for the focus ring */
+    box-shadow: 0 0 0 3px rgba(17, 105, 251, 0.5); 
+}
