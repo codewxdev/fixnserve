@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetCodeController;
+use App\Http\Controllers\Consultancy\ConsultancyProfileController;
+use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Role\PermissionController;
@@ -61,6 +63,15 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
     Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
     Route::post('/rate', [RatingController::class, 'rate']);
+    // /////////////////////////consultancy routes//////////////////////////////////////
+    Route::get('/consultant/profile', [ConsultancyProfileController::class, 'show']);
+    Route::post('/consultant/profile', [ConsultancyProfileController::class, 'storeOrUpdate']);
+
+    // Week Days (Mon–Sun toggle)
+    Route::get('/consultant/week-days', [ConsultantWeekDayController::class, 'index']);
+    Route::post('/consultant/week-days', [ConsultantWeekDayController::class, 'store']);
+    Route::put('/consultant/day-availabilities', [ConsultantWeekDayController::class, 'update']);
+    Route::delete('/consultant/week-days/{id}', [ConsultantWeekDayController::class, 'destroy']);
 
     Route::middleware(['service.provider'])->group(function () {
         Route::post('/language', [PortfolioController::class, 'addLanguage']);
