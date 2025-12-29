@@ -213,3 +213,5 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 
 Route::apiResource('roles', RoleController::class);
 Route::apiResource('permissions', PermissionController::class);
+Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
+            Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);

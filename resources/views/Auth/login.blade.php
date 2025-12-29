@@ -80,12 +80,14 @@ Forgot your password?
                     "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({
-                    email: document.getElementById("email").value,
+                    login: document.getElementById("email").value,
                     password: document.getElementById("password").value
                 })
             })
             .then(res => res.json())
             .then(data => {
+                // console.log(data);
+                
                 if (data.status) {
                     // Successful login
                     localStorage.setItem('token', data.token);
@@ -299,14 +301,16 @@ Forgot your password?
                             .querySelector('meta[name="csrf-token"]').getAttribute('content') : ''
                     },
                     body: JSON.stringify({
-                        email: currentAuthEmail,
+                        login: currentAuthEmail,
                         password: document.getElementById("password").value
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
                     localStorage.setItem('api_token', data
-                    .access_token); // Assuming 'response.token' holds the value
+                    .access_token);
+                      
+                     // Assuming 'response.token' holds the value
                     if (data.status === '2fa_required') {
                         // Admin/Super Admin needs to verify 2FA before login
                         tempAccessToken = data
@@ -366,7 +370,8 @@ Forgot your password?
                 })
                 .then(res => res.json())
                 .then(data => {
-
+                 
+                  
                     if (data.status === 'setup_initiated' && data.qrcode_url) {
                         showTwoFAModal(
                             'Setup Two-Factor Authentication',

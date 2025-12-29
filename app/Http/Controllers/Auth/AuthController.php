@@ -178,6 +178,7 @@ class AuthController extends Controller
         );
 
         return response()->json([
+            'status'=>'setup_initiated',
             'secret' => $secret,
             'qrcode_url' => $qrCodeUrl,
         ]);

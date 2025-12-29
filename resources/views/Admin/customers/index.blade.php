@@ -621,12 +621,12 @@
                  <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                      <h3 class="text-lg font-bold text-slate-800 mb-4">Payment Methods</h3>
                      ${methods.length > 0 ? methods.map(m => `
-                            <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg mb-3 hover:bg-slate-50">
-                                <div class="flex items-center space-x-3">
-                                    <div class="h-10 w-14 bg-slate-200 rounded flex items-center justify-center text-xs font-bold text-slate-500 uppercase">${m.type}</div>
-                                    <div><p class="text-sm font-bold text-slate-800">**** ${m.last4 || 'N/A'}</p><p class="text-xs text-slate-500">Expires: ${m.expiry || 'N/A'}</p></div>
-                                </div>
-                            </div>`).join('') : '<p class="text-slate-500 italic">No saved payment methods.</p>'}
+                                <div class="flex items-center justify-between p-4 border border-slate-200 rounded-lg mb-3 hover:bg-slate-50">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="h-10 w-14 bg-slate-200 rounded flex items-center justify-center text-xs font-bold text-slate-500 uppercase">${m.type}</div>
+                                        <div><p class="text-sm font-bold text-slate-800">**** ${m.last4 || 'N/A'}</p><p class="text-xs text-slate-500">Expires: ${m.expiry || 'N/A'}</p></div>
+                                    </div>
+                                </div>`).join('') : '<p class="text-slate-500 italic">No saved payment methods.</p>'}
                  </div>
             `;
             }
