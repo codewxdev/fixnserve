@@ -82,7 +82,7 @@
                     </svg>
                     <span x-show="sidebarOpen"
                         class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
-                        x-cloak>Experts</span>
+                        x-cloak>Professionals</span>
                 </a>
             </li>
 
@@ -184,7 +184,7 @@
                     </svg>
                     <span x-show="sidebarOpen"
                         class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
-                        x-cloak>Analytics</span>
+                        x-cloak>Reports & Analytics</span>
                 </a>
             </li>
 

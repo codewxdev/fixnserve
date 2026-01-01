@@ -7,7 +7,7 @@
     </h1>
 
     {{-- ========================================== --}}
-    {{-- 1. ANALYTICS WIDGETS (Previously Component) --}}
+    {{-- 1. ANALYTICS WIDGETS --}}
     {{-- ========================================== --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5">
         @php
@@ -98,7 +98,6 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
-                        {{-- MOCK LOOP FOR DEMO --}}
                         @for ($i = 1; $i <= 10; $i++)
                             <tr class="hover:bg-blue-50/50 transition duration-150 ease-in-out">
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -314,7 +313,6 @@
 
     /**
      * MOCK DATA GENERATOR
-     * Includes all requested fields: Portfolio, Work History, Bookings, Addresses, etc.
      */
     function getProviderData(id) {
         return {
@@ -410,7 +408,6 @@
 
     /**
      * CONTENT GENERATOR
-     * Renders the HTML based on the data object above.
      */
     function generateSlideOverContent(data) {
         return `
@@ -470,9 +467,25 @@
                             </ul>
                         </div>
                         <div>
-                            <h4 class="text-sm font-bold text-gray-900 uppercase mb-2">Logistics</h4>
-                            <p class="text-sm text-gray-600 mb-1"><i class="fas fa-wallet mr-2 text-gray-400"></i> ${data.payment_methods.join(', ')}</p>
-                            <p class="text-sm text-gray-600"><i class="fas fa-motorcycle mr-2 text-gray-400"></i> ${data.transportation}</p>
+                            <h4 class="text-sm font-bold text-gray-900 uppercase mb-2">Logistics & Payment</h4>
+                             <p class="text-sm text-gray-600 mb-3"><i class="fas fa-motorcycle mr-2 text-gray-400"></i> ${data.transportation}</p>
+                             
+                             {{-- CHANGED: Added Container and View Details Button --}}
+                             <div class="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                                 <div class="flex justify-between items-center mb-2">
+                                     <span class="text-xs font-semibold text-gray-500 uppercase">Payment Methods</span>
+                                     <button onclick="alert('Payment Details:\\n1. Bank Transfer: IBAN PK33...\\n2. JazzCash: 0300...')" class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition font-medium">
+                                         View Details
+                                     </button>
+                                 </div>
+                                 <div class="flex flex-wrap gap-2">
+                                    ${data.payment_methods.map(pm => `
+                                        <span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
+                                            <i class="fas fa-credit-card mr-1.5 text-gray-400"></i> ${pm}
+                                        </span>
+                                    `).join('')}
+                                 </div>
+                             </div>
                         </div>
                     </div>
 
@@ -500,11 +513,24 @@
                         <div class="grid grid-cols-1 gap-4">
                             ${data.portfolio.map(proj => `
                                 <div class="flex border border-gray-100 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition">
-                                    <img src="${proj.image}" class="w-24 h-24 object-cover">
-                                    <div class="p-3 flex-1">
-                                        <h5 class="font-bold text-sm text-gray-800">${proj.name}</h5>
-                                        <p class="text-xs text-gray-500 mb-1">${proj.role} &bull; ${proj.skill}</p>
-                                        <p class="text-xs text-gray-600 line-clamp-2">${proj.desc}</p>
+                                    <img src="${proj.image}" class="w-24 h-auto object-cover">
+                                    <div class="p-3 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <h5 class="font-bold text-sm text-gray-800">${proj.name}</h5>
+                                            <p class="text-xs text-gray-500 mb-1">${proj.role} &bull; ${proj.skill}</p>
+                                            <p class="text-xs text-gray-600 line-clamp-2">${proj.desc}</p>
+                                        </div>
+                                        <div class="mt-3 flex space-x-2 pt-2 border-t border-gray-50">
+                                            <button onclick="alert('Viewing portfolio: ${proj.name}')" class="flex-1 text-center text-xs bg-blue-50 text-blue-600 px-2 py-1.5 rounded hover:bg-blue-100 transition font-medium">
+                                                <i class="fas fa-eye mr-1"></i> View
+                                            </button>
+                                            <button onclick="alert('Approved: ${proj.name}')" class="flex-1 text-center text-xs bg-green-50 text-green-600 px-2 py-1.5 rounded hover:bg-green-100 transition font-medium">
+                                                <i class="fas fa-check mr-1"></i> Approve
+                                            </button>
+                                            <button onclick="alert('Disapproved: ${proj.name}')" class="flex-1 text-center text-xs bg-red-50 text-red-600 px-2 py-1.5 rounded hover:bg-red-100 transition font-medium">
+                                                <i class="fas fa-times mr-1"></i> Reject
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             `).join('')}

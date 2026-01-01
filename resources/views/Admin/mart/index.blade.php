@@ -1,393 +1,449 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- 
-    FIX APPLIED: 
-    1. Added `isAddVendorModalOpen` to x-data.
-    2. Added `selectedVendor` getter to populate the Sidebar with real data.
-    3. Added extra dummy data (phone, address) to the vendor objects for the "Pro" sidebar view.
---}}
-<div id="vendor-management-page" class="space-y-8 p-2 md:p-4 bg-gray-100 min-h-screen" 
+<div id="mart-vendor-module" class="bg-gray-50 min-h-screen font-sans pl-4" 
     x-data="{ 
-        // 1. Sidebar & Modal State
+        // --- STATE MANAGEMENT ---
         openVendorId: null, 
-        isAddVendorModalOpen: false, // <--- NEW: Modal State
-        currentTab: 'profile',
-
-        // 2. Filter State
+        isAddVendorModalOpen: false, 
+        currentTab: 'overview',
         searchTerm: '',
         categoryFilter: '',
         statusFilter: '',
-        stockAlertFilter: '',
-        dateAddedFilter: '2025-12-01',
-    
-        // 3. Data Storage (Added phone/address for the Pro Sidebar view)
+
+        // --- REALISTIC DATA (Based on FIXORA Mart Logic) ---
         vendors: [
-            { id: 1001, name: 'SuperMart Groceries', category: 'Grocery', status: 'Active', rating: 4.8, reviews: '1.2k', orders: 45000, prepTime: 15, products: 1500, alerts: { oos: 12, low: 45 }, earnings: '120,500', pending: '1,200', contact: 'john.doe@email.com', phone: '+1 (555) 019-2834', address: '123 Market St, Denver, CO', dateAdded: '2025-11-20' },
-            { id: 1002, name: 'Electro Tech', category: 'Electronics', status: 'Inactive', rating: 4.5, reviews: '800', orders: 20000, prepTime: 30, products: 500, alerts: { oos: 0, low: 10 }, earnings: '80,000', pending: '500', contact: 'jane.smith@email.com', phone: '+1 (555) 999-1122', address: '456 Tech Park, Austin, TX', dateAdded: '2025-12-05' },
-            { id: 1003, name: 'Fashion Hub', category: 'Fashion', status: 'Active', rating: 4.9, reviews: '2.5k', orders: 60000, prepTime: 10, products: 3000, alerts: { oos: 0, low: 0 }, earnings: '250,000', pending: '0', contact: 'alex@fashion.com', phone: '+1 (555) 777-3344', address: '789 Style Ave, NY, NY', dateAdded: '2025-12-10' },
-            { id: 1004, name: 'Quick Supplies', category: 'Grocery', status: 'Pending', rating: 4.1, reviews: '150', orders: 1000, prepTime: 45, products: 100, alerts: { oos: 25, low: 0 }, earnings: '5,000', pending: '100', contact: 'supplier@quick.com', phone: '+1 (555) 555-0000', address: '321 Bulk Rd, Miami, FL', dateAdded: '2025-11-15' },
+            { 
+                id: 101, 
+                name: 'GreenValley Hypermarket', 
+                owner: 'Mr. Ahmed Khan',
+                category: 'Grocery', 
+                status: 'Active', 
+                rating: 4.8, 
+                reviews: 1240, 
+                logo: 'G',
+                color: 'emerald',
+                joined: '12 Jan, 2024',
+                contact: 'ahmed@greenvalley.com',
+                phone: '+92 300 1234567',
+                address: 'Plot 45, F-10 Markaz, Islamabad',
+                commission: 15, // Admin takes 15%
+                stats: { orders: 4520, revenue: 1250000, products: 3400 },
+                wallet: { balance: 45000, pending: 12000, last_payout: '150,000' },
+                inventory: [
+                    { name: 'Dawn Bread Large', price: 220, stock: 45, status: 'In Stock' },
+                    { name: 'Olpers Milk 1L', price: 280, stock: 12, status: 'Low Stock' },
+                    { name: 'K&Ns Nuggets', price: 950, stock: 0, status: 'Out of Stock' },
+                ],
+                recent_orders: [
+                    { id: 'ORD-9921', customer: 'Sarah Ali', total: 4500, status: 'Delivered', time: '2 hrs ago', rider: 'Bilal (Rider)' },
+                    { id: 'ORD-9922', customer: 'Usman Ghafoor', total: 1250, status: 'Processing', time: '15 mins ago', rider: 'Pending' },
+                ]
+            },
+            { 
+                id: 102, 
+                name: 'TechZone Electronics', 
+                owner: 'Kamran Akmal',
+                category: 'Electronics', 
+                status: 'Inactive', 
+                rating: 4.2, 
+                reviews: 310, 
+                logo: 'T',
+                color: 'blue',
+                joined: '05 Feb, 2024',
+                contact: 'info@techzone.pk',
+                phone: '+92 321 9876543',
+                address: 'Shop 12, Saddar Rawalpindi',
+                commission: 10, 
+                stats: { orders: 850, revenue: 4500000, products: 120 },
+                wallet: { balance: 120000, pending: 0, last_payout: '500,000' },
+                inventory: [
+                    { name: 'Samsung 55\' UHD TV', price: 125000, stock: 5, status: 'In Stock' },
+                    { name: 'Apple iPhone 15 Charger', price: 4500, stock: 0, status: 'Out of Stock' },
+                ],
+                recent_orders: [
+                    { id: 'ORD-8810', customer: 'Faizan Sheikh', total: 125000, status: 'Cancelled', time: '1 day ago', rider: 'N/A' },
+                ]
+            },
+            { 
+                id: 103, 
+                name: 'Stylo Fashion Hub', 
+                owner: 'Sana Mir',
+                category: 'Fashion', 
+                status: 'Pending', 
+                rating: 0, 
+                reviews: 0, 
+                logo: 'S',
+                color: 'pink',
+                joined: 'Today',
+                contact: 'sana@stylohub.com',
+                phone: '+92 333 5555555',
+                address: 'Blue Area, Islamabad',
+                commission: 20, 
+                stats: { orders: 0, revenue: 0, products: 0 },
+                wallet: { balance: 0, pending: 0, last_payout: '0' },
+                inventory: [],
+                recent_orders: []
+            },
         ],
     
-        // 4. Filter/Search Logic
+        // --- LOGIC ---
         get filteredVendors() {
-            return this.vendors.filter(vendor => {
-                const searchMatch = (
-                    vendor.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                    vendor.id.toString().includes(this.searchTerm) ||
-                    vendor.contact.toLowerCase().includes(this.searchTerm.toLowerCase())
-                );
-                const categoryMatch = this.categoryFilter === '' || vendor.category === this.categoryFilter;
-                const statusMatch = this.statusFilter === '' || vendor.status === this.statusFilter;
-                const stockMatch = (
-                    this.stockAlertFilter === '' ||
-                    (this.stockAlertFilter === 'OOS Only' && vendor.alerts.oos > 0) ||
-                    (this.stockAlertFilter === 'Low Stock' && vendor.alerts.low > 0)
-                );
-                const dateMatch = new Date(vendor.dateAdded) <= new Date(this.dateAddedFilter);
-                return searchMatch && categoryMatch && statusMatch && stockMatch && dateMatch;
+            return this.vendors.filter(v => {
+                const search = this.searchTerm.toLowerCase();
+                const matchesSearch = v.name.toLowerCase().includes(search) || v.contact.toLowerCase().includes(search);
+                const matchesCategory = this.categoryFilter === '' || v.category === this.categoryFilter;
+                const matchesStatus = this.statusFilter === '' || v.status === this.statusFilter;
+                return matchesSearch && matchesCategory && matchesStatus;
             });
         },
 
-        // <--- NEW: Helper to get the currently selected vendor object for the sidebar
-        get selectedVendor() {
+        get activeVendor() {
             return this.vendors.find(v => v.id === this.openVendorId) || {};
-        },
-        
-        // 5. Reset Function
-        resetFilters() {
-            this.searchTerm = '';
-            this.categoryFilter = '';
-            this.statusFilter = '';
-            this.stockAlertFilter = '';
-            this.dateAddedFilter = '2025-12-01'; 
         }
     }" 
-    x-cloak>
+    x-cloak class="p-4 md:p-8">
 
-    {{-- 🎨 1. Header (Responsive) --}}
-    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4">
-        <div class="mb-4 sm:mb-0">
-            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
-                <svg class="w-7 h-7 mr-3 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 11V7a4 4 0 00-4-4V1m4 4h10v12c0 2.21-1.79 4-4 4H4a4 4 0 01-4-4V5c0-2.21 1.79-4 4-4h12V11zM7 9h.01M17 9h.01">
-                    </path>
-                </svg>
-                Mart Vendor Management
-            </h1>
-            <p class="text-sm text-gray-500 mt-1 pl-10">Manage stores, inventory, pricing, and operations in a unified view.</p>
+    {{-- HEADER SECTION --}}
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Mart Vendors</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage Section 4.0: Inventory, Orders, and Payouts</p>
         </div>
-        <div class="flex flex-wrap gap-3">
-            {{-- CHANGE 1: Added @click to open the modal --}}
-            <button @click="isAddVendorModalOpen = true"
-                class="flex items-center px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-500/50 transition duration-300 ease-in-out transform hover:-translate-y-0.5">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Add New Vendor
+        <div class="flex gap-3">
+            <button class="px-5 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl shadow-sm hover:bg-gray-50 transition">
+                Export Report
             </button>
-            <button
-                class="flex items-center px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition duration-150 ease-in-out shadow-sm">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
-                    </path>
-                </svg>
-                Bulk Upload
+            <button @click="isAddVendorModalOpen = true" class="px-5 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Onboard Vendor
             </button>
         </div>
-    </header>
+    </div>
 
-    {{-- 🎨 2. Dashboard Summary Cards (Original Layout Preserved) --}}
-    <section class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2">
-        @php
-        $cards = [
-        ['title' => 'Total Vendors', 'value' => '2,450', 'icon' => 'users', 'color' => 'indigo', 'trend' => '+12% MoM'],
-        ['title' => 'Active Vendors', 'value' => '1,980', 'icon' => 'check-circle', 'color' => 'green', 'trend' => '85% Rate'],
-        ['title' => 'Out-of-Stock Alerts', 'value' => '45', 'icon' => 'exclamation-triangle', 'color' => 'red', 'trend' => 'Urgent Action'],
-        ['title' => 'Auto-Accept Enabled', 'value' => '1,500', 'icon' => 'cursor-click', 'color' => 'blue', 'trend' => '60% Coverage'],
-        ['title' => 'Today’s Orders', 'value' => '3,120', 'icon' => 'shopping-bag', 'color' => 'yellow', 'trend' => '+5% YoY'],
-        ['title' => 'Earnings Today', 'value' => '$15,400', 'icon' => 'cash', 'color' => 'teal', 'trend' => 'Stable'],
-        ['title' => 'Top Category', 'value' => 'Grocery', 'icon' => 'store', 'color' => 'pink', 'trend' => 'High Demand'],
-        ['title' => 'Pending Verifications', 'value' => '12', 'icon' => 'document-text', 'color' => 'orange', 'trend' => 'New Leads'],
-        ];
-        @endphp
-
-        @foreach ($cards as $card)
-        <div class="bg-white p-3 sm:p-4 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-[1.03] transition duration-300 ease-in-out border border-gray-100">
-            <div class="flex items-center justify-between">
-                <p class="text-xs font-semibold text-gray-500 truncate uppercase tracking-wider">{{ $card['title'] }}</p>
-                <span class="text-[10px] font-bold text-{{ $card['color'] }}-500 hidden sm:block">{{ $card['trend'] }}</span>
-            </div>
-            <div class="flex items-end justify-between mt-1">
-                <p class="text-xl sm:text-2xl font-bold text-gray-900">{{ $card['value'] }}</p>
-                <svg class="w-6 h-6 text-{{ $card['color'] }}-400 opacity-70 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2c0-.523-.086-1.056-.27-1.558L15 14l6-5m-6.702 1.48C14.18 10.59 15 11.135 15 12a3 3 0 11-6 0c0-.865.82-1.41 1.702-1.92l4.63-2.915a1 1 0 00.106-1.636l-.372-.25c-.27-.184-.633-.11-.82.16L12 9.45l-1.39-2.086a1 1 0 00-1.606-.098l-3 4c-.18.24-.28.52-.28.806a2 2 0 100 4v2c0 1.1.9 2 2 2h4.5a2 2 0 100-4h-4a.5.5 0 01-.5-.5v-1a.5.5 0 01.5-.5h2c.55 0 1-.45 1-1v-2c0-1.1-.9-2-2-2z"></path>
-                </svg>
-            </div>
+    {{-- METRICS OVERVIEW (Admin View) --}}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-indigo-100"></div>
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider relative z-10">Total Active Marts</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2 relative z-10">1,240</h3>
+            <p class="text-green-500 text-xs font-bold mt-2 flex items-center relative z-10">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                +12% this month
+            </p>
         </div>
-        @endforeach
-    </section>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-green-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-green-100"></div>
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider relative z-10">Total GMV (Sales)</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2 relative z-10">PKR 8.5M</h3>
+            <p class="text-green-500 text-xs font-bold mt-2 flex items-center relative z-10">
+                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                +5.4% vs last week
+            </p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-red-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-red-100"></div>
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider relative z-10">Pending Approvals</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2 relative z-10">15</h3>
+            <p class="text-red-500 text-xs font-bold mt-2 relative z-10">Action Required</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden group">
+            <div class="absolute right-0 top-0 w-24 h-24 bg-yellow-50 rounded-bl-full -mr-4 -mt-4 transition group-hover:bg-yellow-100"></div>
+            <p class="text-gray-500 text-xs font-bold uppercase tracking-wider relative z-10">Admin Commission</p>
+            <h3 class="text-3xl font-bold text-gray-900 mt-2 relative z-10">PKR 1.2M</h3>
+            <p class="text-gray-400 text-xs mt-2 relative z-10">Accumulated this month</p>
+        </div>
+    </div>
 
-    {{-- 🎨 3. Main Content Area: Filters and Table (Original Layout Preserved) --}}
-    <div class="bg-white p-4 sm:p-6 rounded-2xl shadow-2xl border border-gray-100">
-        {{-- Filters --}}
-        <div class="sticky top-0 z-20 bg-white pt-1 pb-4 -mx-4 sm:-mx-6 px-4 sm:px-4 border-b border-gray-100 shadow-sm rounded-t-xl">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Vendor Directory</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-3 items-center">
-                <div class="col-span-2 sm:col-span-2 lg:col-span-3 relative shadow-sm shadow-black/70">
-                    <input type="text" placeholder="Search vendor name, ID, or contact..." class="block w-full text-sm pl-10 pr-4 py-2 border-gray-300 rounded-xl focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition duration-150" x-model.debounce.300ms="searchTerm" />
-                    <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                </div>
-                <select class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50 py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500" x-model="categoryFilter">
+    {{-- MAIN TABLE CARD --}}
+    <div class="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+        {{-- Filters Toolbar --}}
+        <div class="p-5 border-b border-gray-100 bg-gray-50/50 grid grid-cols-1 sm:grid-cols-12 gap-4 items-center">
+            <div class="sm:col-span-5 relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                </span>
+                <input type="text" x-model="searchTerm" class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition" placeholder="Search Vendor, Owner, or ID...">
+            </div>
+            <div class="sm:col-span-3">
+                <select x-model="categoryFilter" class="block w-full pl-3 pr-10 py-2.5 text-base border-gray-200 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-xl">
                     <option value="">All Categories</option>
                     <option value="Grocery">Grocery</option>
                     <option value="Electronics">Electronics</option>
                     <option value="Fashion">Fashion</option>
                 </select>
-                <select class="col-span-2 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50 py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500" x-model="statusFilter">
+            </div>
+            <div class="sm:col-span-3">
+                <select x-model="statusFilter" class="block w-full pl-3 pr-10 py-2.5 text-base border-gray-200 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-xl">
                     <option value="">All Statuses</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                     <option value="Pending">Pending</option>
                 </select>
-                <select class="col-span-1 form-select rounded-xl border-gray-300 shadow-sm shadow-black/50 py-2 px-4 focus:ring-indigo-500 focus:border-indigo-500" x-model="stockAlertFilter">
-                    <option value="">Stock Alert</option>
-                    <option value="OOS Only">OOS Only</option>
-                    <option value="Low Stock">Low Stock</option>
-                </select>
-                <div class="col-span-2 hidden lg:block rounded-xl shadow-sm shadow-black/50 border-gray-300">
-                    <input type="date" class="form-input w-full rounded-xl text-sm border-gray-300 shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500" x-model="dateAddedFilter">
-                </div>
-                <div class="col-span-2 sm:col-span-1 flex justify-end">
-                    <button @click="resetFilters" class="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition duration-150 ease-in-out">
-                        <span class="hidden sm:inline">Reset</span>
-                        <svg class="w-4 h-4 sm:ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.582a8.001 8.001 0 01-15.356-2m0 0H15"></path></svg>
-                    </button>
-                </div>
+            </div>
+            <div class="sm:col-span-1 flex justify-end">
+                <button @click="searchTerm=''; categoryFilter=''; statusFilter=''" class="text-gray-400 hover:text-indigo-600 transition" title="Reset Filters">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.582a8.001 8.001 0 01-15.356-2m0 0H15"></path></svg>
+                </button>
             </div>
         </div>
 
         {{-- Table --}}
-        <div class="overflow-x-auto mt-4 rounded-xl border border-gray-200 shadow-md">
-            <table class="min-w-full divide-y divide-gray-200">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-100">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[280px] sticky left-0 bg-gray-50 z-10 border-r border-gray-200">Vendor & Status</th>
-                        <th class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[250px] lg:min-w-[450px]">Performance & Finance</th>
-                        <th class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider sticky right-0 bg-gray-50 z-10 border-l border-gray-200 min-w-[120px]">Actions</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Vendor Business</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Operational Stats</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Wallet & Status</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Manage</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-100">
                     <template x-for="vendor in filteredVendors" :key="vendor.id">
-                        <tr class="hover:bg-indigo-50/50 transition duration-150 ease-in-out group">
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap sticky left-0 bg-white group-hover:bg-indigo-50/50 border-r border-gray-200 z-10">
+                        <tr class="hover:bg-gray-50 transition duration-200 cursor-pointer" @click="openVendorId = vendor.id">
+                            <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <img class="h-10 w-10 rounded-lg object-cover shadow-md ring-1 ring-gray-200 mr-3 flex-shrink-0" :src="`https://via.placeholder.com/150/4f46e5/ffffff?text=${vendor.name.charAt(0)}`" :alt="vendor.name">
-                                    <div>
-                                        <div class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600 truncate" x-text="vendor.name"></div>
-                                        <div class="flex items-center text-xs space-x-2 mt-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" :class="{'bg-pink-100 text-pink-800': vendor.category === 'Grocery', 'bg-blue-100 text-blue-800': vendor.category === 'Electronics', 'bg-purple-100 text-purple-800': vendor.category === 'Fashion'}" x-text="vendor.category"></span>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold" :class="{'bg-green-100 text-green-800': vendor.status === 'Active', 'bg-red-100 text-red-800': vendor.status === 'Inactive', 'bg-yellow-100 text-yellow-800': vendor.status === 'Pending'}" x-text="vendor.status"></span>
-                                        </div>
-                                        <div class="flex items-center mt-1 text-xs text-gray-600">
-                                            <svg class="w-3 h-3 text-yellow-500 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                            <span x-text="`${vendor.rating} (${vendor.reviews} Reviews)`"></span>
-                                        </div>
+                                    <div class="flex-shrink-0 h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md" :class="`bg-${vendor.color}-500`" x-text="vendor.logo"></div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-bold text-gray-900" x-text="vendor.name"></div>
+                                        <div class="text-sm text-gray-500" x-text="vendor.owner"></div>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mt-1" x-text="vendor.category"></span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-4 sm:px-6 py-4 text-sm text-gray-500">
-                                <div class="grid grid-cols-2 gap-y-2 gap-x-4 w-full">
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Orders / Prep</p>
-                                        <p class="font-bold text-gray-700 text-sm" x-text="`${vendor.orders.toLocaleString()} Total`"></p>
-                                        <p class="text-xs text-green-600" x-text="`Avg ${vendor.prepTime} mins`"></p>
-                                    </div>
-                                    <div>
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Inv / Alerts</p>
-                                        <p class="font-bold text-gray-700 text-sm" x-text="`${vendor.products.toLocaleString()} Prods`"></p>
-                                        <p class="text-xs" :class="{'text-red-500': vendor.alerts.oos > 0 || vendor.alerts.low > 0, 'text-gray-500': vendor.alerts.oos === 0}" x-text="`${vendor.alerts.oos} OOS`"></p>
-                                    </div>
-                                    <div class="col-span-2 border-t border-gray-100 pt-2">
-                                        <p class="text-xs font-medium text-gray-400 uppercase">Earnings / Pending</p>
-                                        <p class="font-extrabold text-lg text-indigo-700" x-text="`$${vendor.earnings}`"></p>
-                                        <p class="text-xs text-red-500" x-text="`Pending: $${vendor.pending}`"></p>
-                                    </div>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 font-semibold" x-text="vendor.stats.orders + ' Orders'"></div>
+                                <div class="text-xs text-gray-500 mt-1">Inv: <span x-text="vendor.stats.products"></span> Items</div>
+                                <div class="flex items-center mt-1">
+                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <span class="text-sm text-gray-600 ml-1" x-text="vendor.rating"></span>
                                 </div>
                             </td>
-                            <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm font-medium sticky right-0 bg-white border-l border-gray-200 group-hover:bg-indigo-50/50 z-10">
-                                <div class="flex justify-end space-x-2">
-                                    <button @click.stop="openVendorId = vendor.id; currentTab = 'profile'" class="p-2 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/50 transition duration-150 ease-in-out transform hover:scale-105" title="View Full Details">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                    </button>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 font-bold" x-text="`PKR ${vendor.stats.revenue.toLocaleString()}`"></div>
+                                <div class="mt-1">
+                                    <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full" 
+                                        :class="{
+                                            'bg-green-100 text-green-800': vendor.status === 'Active',
+                                            'bg-red-100 text-red-800': vendor.status === 'Inactive',
+                                            'bg-yellow-100 text-yellow-800': vendor.status === 'Pending'
+                                        }" 
+                                        x-text="vendor.status">
+                                    </span>
                                 </div>
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button class="text-indigo-600 hover:text-indigo-900 font-semibold flex items-center justify-end w-full group-hover:underline">
+                                    Manage
+                                    <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            </td>
+                            
                         </tr>
                     </template>
                 </tbody>
             </table>
-            <div x-show="filteredVendors.length === 0" class="text-center py-10 text-gray-500 italic">No vendors match your current filter criteria.</div>
+            {{-- Empty State --}}
+            <div x-show="filteredVendors.length === 0" class="p-10 text-center text-gray-500">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No vendors found</h3>
+                <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filter options.</p>
+            </div>
         </div>
     </div>
 
     {{-- 
-        CHANGE 2: MODERN & PRO SIDEBAR 
-        (Kept original wrapper, updated inner content to be "Pro") 
+        ========================================
+        SLIDE-OVER: DETAILED VENDOR MANAGEMENT 
+        (Implements Section 4.3, 4.4, 4.5 of Doc)
+        ========================================
     --}}
-    <div x-show="openVendorId !== null" x-transition:enter="ease-in-out duration-500"
-        x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
-        x-transition:leave="ease-in-out duration-500" x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0" class="fixed inset-0 overflow-hidden z-50" 
-        aria-labelledby="slide-over-title" role="dialog" aria-modal="true" style="display: none;">
-
+    <div x-show="openVendorId !== null" class="fixed inset-0 z-50 overflow-hidden" style="display: none;">
         <div class="absolute inset-0 overflow-hidden">
-            <div x-show="openVendorId !== null" @click="openVendorId = null"
-                class="absolute inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm"></div>
+            <div x-show="openVendorId !== null" 
+                x-transition:enter="ease-in-out duration-500" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" 
+                x-transition:leave="ease-in-out duration-500" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
+                class="absolute inset-0 bg-gray-900 bg-opacity-75 backdrop-blur-sm transition-opacity" 
+                @click="openVendorId = null">
+            </div>
 
-            <div class="fixed inset-y-0 right-0 max-w-full flex">
-                <div x-show="openVendorId !== null"
-                    x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
-                    x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
-                    x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
-                    x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
-                    class="w-screen max-w-md md:max-w-xl lg:max-w-3xl">
-
-                    <div class="h-full flex flex-col bg-white shadow-xl overflow-y-scroll">
+            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                <div x-show="openVendorId !== null" 
+                    x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" 
+                    x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full" 
+                    class="pointer-events-auto w-screen max-w-2xl">
+                    
+                    <div class="flex h-full flex-col bg-white shadow-2xl">
                         
-                        {{-- PRO Header --}}
-                        <div class="relative bg-gray-900 pb-12 pt-8 px-6">
-                            <div class="flex justify-between items-start">
+                        {{-- SLIDER HEADER --}}
+                        <div class="px-6 py-6 bg-gradient-to-r from-gray-900 to-indigo-900 sm:px-8">
+                            <div class="flex items-start justify-between">
                                 <div class="flex items-center space-x-4">
-                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg" x-text="selectedVendor.name ? selectedVendor.name.charAt(0) : ''"></div>
+                                    <div class="h-16 w-16 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-3xl font-bold shadow-inner" x-text="activeVendor.logo"></div>
                                     <div>
-                                        <h2 class="text-2xl font-bold text-white tracking-tight" x-text="selectedVendor.name"></h2>
-                                        <div class="flex items-center space-x-3 mt-1 text-gray-400 text-sm">
-                                            <span x-text="selectedVendor.category"></span>
-                                            <span>•</span>
-                                            <span x-text="`Joined: ${selectedVendor.dateAdded}`"></span>
+                                        <h2 class="text-2xl font-bold text-white leading-6" x-text="activeVendor.name"></h2>
+                                        <div class="flex items-center mt-2 space-x-4 text-indigo-200 text-sm">
+                                            <span class="flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Islamabad</span>
+                                            <span class="flex items-center"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg> Verified</span>
                                         </div>
                                     </div>
                                 </div>
-                                <button @click="openVendorId = null" class="text-gray-400 hover:text-white transition">
-                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                <button type="button" class="rounded-full bg-white/10 p-2 text-white hover:bg-white/20 focus:outline-none" @click="openVendorId = null">
+                                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                                 </button>
                             </div>
-                        </div>
 
-                        {{-- Modern Tabs --}}
-                        <div class="px-6 -mt-8 relative z-10">
-                            <div class="bg-white rounded-lg shadow-md p-1 flex space-x-1 border border-gray-100">
-                                <button @click="currentTab = 'profile'" :class="currentTab === 'profile' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-500 hover:bg-gray-50'" class="flex-1 py-2.5 rounded-md text-sm font-semibold transition-all">Profile</button>
-                                <button @click="currentTab = 'inventory'" :class="currentTab === 'inventory' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-500 hover:bg-gray-50'" class="flex-1 py-2.5 rounded-md text-sm font-semibold transition-all">Inventory</button>
-                                <button @click="currentTab = 'orders'" :class="currentTab === 'orders' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-500 hover:bg-gray-50'" class="flex-1 py-2.5 rounded-md text-sm font-semibold transition-all">Orders</button>
-                                <button @click="currentTab = 'earnings'" :class="currentTab === 'earnings' ? 'bg-indigo-50 text-indigo-700 shadow-sm' : 'text-gray-500 hover:bg-gray-50'" class="flex-1 py-2.5 rounded-md text-sm font-semibold transition-all">Finance</button>
+                            {{-- TABS --}}
+                            <div class="mt-8 flex space-x-1 bg-white/10 p-1 rounded-xl">
+                                <button @click="currentTab = 'overview'" :class="currentTab === 'overview' ? 'bg-white text-gray-900 shadow' : 'text-gray-300 hover:text-white'" class="flex-1 rounded-lg py-2 text-sm font-medium transition">Overview</button>
+                                <button @click="currentTab = 'inventory'" :class="currentTab === 'inventory' ? 'bg-white text-gray-900 shadow' : 'text-gray-300 hover:text-white'" class="flex-1 rounded-lg py-2 text-sm font-medium transition">Inventory (4.3)</button>
+                                <button @click="currentTab = 'orders'" :class="currentTab === 'orders' ? 'bg-white text-gray-900 shadow' : 'text-gray-300 hover:text-white'" class="flex-1 rounded-lg py-2 text-sm font-medium transition">Orders (4.4)</button>
+                                <button @click="currentTab = 'finance'" :class="currentTab === 'finance' ? 'bg-white text-gray-900 shadow' : 'text-gray-300 hover:text-white'" class="flex-1 rounded-lg py-2 text-sm font-medium transition">Wallet (4.5)</button>
                             </div>
                         </div>
 
-                        {{-- PRO Content Body --}}
-                        <div class="p-6 flex-1 bg-gray-50/50 space-y-6">
+                        {{-- SLIDER BODY --}}
+                        <div class="flex-1 overflow-y-auto bg-gray-50 p-6">
                             
-                            {{-- Tab: Profile --}}
-                            <div x-show="currentTab === 'profile'" x-transition.opacity>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                                        <p class="text-xs font-bold text-gray-400 uppercase">Operational Status</p>
-                                        <div class="flex items-center mt-2">
-                                            <span class="h-3 w-3 rounded-full mr-2" :class="selectedVendor.status === 'Active' ? 'bg-green-500' : 'bg-red-500'"></span>
-                                            <span class="text-lg font-bold text-gray-800" x-text="selectedVendor.status"></span>
-                                        </div>
-                                    </div>
-                                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                                        <p class="text-xs font-bold text-gray-400 uppercase">Customer Rating</p>
-                                        <div class="flex items-center mt-2 text-yellow-500">
-                                            <svg class="w-6 h-6 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.012 8.73c-.783-.57-.381-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                            <span class="text-2xl font-bold text-gray-900 mr-2" x-text="selectedVendor.rating"></span>
-                                            <span class="text-sm text-gray-500" x-text="`(${selectedVendor.reviews} reviews)`"></span>
-                                        </div>
+                            {{-- TAB: OVERVIEW --}}
+                            <div x-show="currentTab === 'overview'" class="space-y-6">
+                                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">Vendor Details</h3>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div><p class="text-xs text-gray-500">Owner Name</p><p class="text-sm font-semibold text-gray-800" x-text="activeVendor.owner"></p></div>
+                                        <div><p class="text-xs text-gray-500">Phone</p><p class="text-sm font-semibold text-gray-800" x-text="activeVendor.phone"></p></div>
+                                        <div><p class="text-xs text-gray-500">Email</p><p class="text-sm font-semibold text-gray-800" x-text="activeVendor.contact"></p></div>
+                                        <div><p class="text-xs text-gray-500">Joining Date</p><p class="text-sm font-semibold text-gray-800" x-text="activeVendor.joined"></p></div>
                                     </div>
                                 </div>
-                                <div class="bg-white rounded-xl border border-gray-200 shadow-sm mt-4 overflow-hidden">
-                                    <div class="bg-gray-50 px-5 py-3 border-b border-gray-100">
-                                        <h3 class="font-bold text-gray-700">Contact Details</h3>
-                                    </div>
-                                    <div class="p-5 space-y-4">
-                                        <div class="flex items-center">
-                                            <div class="w-8 flex-shrink-0 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
-                                            <span class="text-sm text-gray-700 font-medium" x-text="selectedVendor.contact"></span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <div class="w-8 flex-shrink-0 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg></div>
-                                            <span class="text-sm text-gray-700" x-text="selectedVendor.phone || 'No phone registered'"></span>
-                                        </div>
-                                        <div class="flex items-center">
-                                            <div class="w-8 flex-shrink-0 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
-                                            <span class="text-sm text-gray-700" x-text="selectedVendor.address || 'No address registered'"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Tab: Inventory --}}
-                            <div x-show="currentTab === 'inventory'" x-transition.opacity>
-                                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                                    <div class="flex justify-between items-end mb-4">
+                                
+                                {{-- Section 4.6 Vendor Settings --}}
+                                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wide mb-4">Admin Controls</h3>
+                                    <div class="flex items-center justify-between py-2 border-b border-gray-100">
                                         <div>
-                                            <p class="text-sm text-gray-500">Total Products</p>
-                                            <p class="text-3xl font-bold text-gray-900" x-text="selectedVendor.products"></p>
+                                            <p class="text-sm font-medium text-gray-900">Vendor Status</p>
+                                            <p class="text-xs text-gray-500">Toggle to temporarily disable store.</p>
                                         </div>
-                                        <div class="text-right">
-                                            <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded font-bold" x-text="`${selectedVendor.alerts?.oos || 0} Out of Stock`"></span>
-                                        </div>
+                                        <button class="bg-green-500 relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none">
+                                            <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                                        </button>
                                     </div>
-                                    <div class="w-full bg-gray-100 rounded-full h-4 mb-2 overflow-hidden flex">
-                                        <div class="bg-green-500 h-4" style="width: 85%"></div>
-                                        <div class="bg-yellow-400 h-4" style="width: 10%"></div>
-                                        <div class="bg-red-500 h-4" style="width: 5%"></div>
-                                    </div>
-                                    <div class="flex justify-between text-xs text-gray-500 mt-2">
-                                        <span class="flex items-center"><span class="w-2 h-2 bg-green-500 rounded-full mr-1"></span> In Stock</span>
-                                        <span class="flex items-center"><span class="w-2 h-2 bg-yellow-400 rounded-full mr-1"></span> Low Stock</span>
-                                        <span class="flex items-center"><span class="w-2 h-2 bg-red-500 rounded-full mr-1"></span> OOS</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Tab: Orders --}}
-                            <div x-show="currentTab === 'orders'" x-transition.opacity>
-                                <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-                                    <h4 class="font-bold text-gray-800 mb-6">Recent Activity</h4>
-                                    <div class="border-l-2 border-gray-200 ml-3 space-y-8">
-                                        <div class="relative pl-8">
-                                            <span class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-green-500 border-2 border-white shadow"></span>
-                                            <p class="text-sm font-bold text-gray-900">Order Completed #9921</p>
-                                            <p class="text-xs text-gray-500">2 hours ago • $120.00</p>
-                                        </div>
-                                        <div class="relative pl-8">
-                                            <span class="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-blue-500 border-2 border-white shadow"></span>
-                                            <p class="text-sm font-bold text-gray-900">New Order Received #9922</p>
-                                            <p class="text-xs text-gray-500">5 hours ago • $45.50</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                             {{-- Tab: Earnings --}}
-                             <div x-show="currentTab === 'earnings'" x-transition.opacity>
-                                <div class="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-6 text-white shadow-lg">
-                                    <p class="text-gray-400 text-xs uppercase tracking-widest">Total Earnings</p>
-                                    <h3 class="text-3xl font-bold mt-1" x-text="`$${selectedVendor.earnings}`"></h3>
-                                    <div class="mt-6 pt-6 border-t border-gray-700 flex justify-between items-center">
+                                    <div class="flex items-center justify-between py-2 pt-4">
                                         <div>
-                                            <p class="text-xs text-gray-400">Available for Withdrawal</p>
-                                            <p class="text-lg font-bold text-green-400" x-text="`$${selectedVendor.pending}`"></p>
+                                            <p class="text-sm font-medium text-gray-900">Commission Rate (%)</p>
+                                            <p class="text-xs text-gray-500">Current platform fee per order.</p>
                                         </div>
-                                        <button class="bg-white text-gray-900 text-xs font-bold px-3 py-2 rounded shadow hover:bg-gray-100">Request Payout</button>
+                                        <div class="flex items-center">
+                                            <input type="number" class="w-16 rounded border-gray-300 text-sm p-1 text-center font-bold" :value="activeVendor.commission">
+                                            <span class="ml-2 text-gray-500">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- TAB: INVENTORY (Section 4.3) --}}
+                            <div x-show="currentTab === 'inventory'" class="space-y-4">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-bold text-gray-800">Product List (4.3)</h3>
+                                    <span class="text-xs bg-indigo-100 text-indigo-800 px-2 py-1 rounded" x-text="`${activeVendor.stats?.products} Total Items`"></span>
+                                </div>
+                                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                    <table class="min-w-full divide-y divide-gray-100">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-500 uppercase">Item</th>
+                                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">Price</th>
+                                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-500 uppercase">Stock</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100">
+                                            <template x-for="item in activeVendor.inventory">
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-4 py-3 text-sm font-medium text-gray-900" x-text="item.name"></td>
+                                                    <td class="px-4 py-3 text-sm text-right text-gray-600" x-text="`PKR ${item.price}`"></td>
+                                                    <td class="px-4 py-3 text-right">
+                                                        <span class="px-2 py-1 text-xs font-semibold rounded-full" 
+                                                            :class="{
+                                                                'bg-green-100 text-green-800': item.status === 'In Stock',
+                                                                'bg-yellow-100 text-yellow-800': item.status === 'Low Stock',
+                                                                'bg-red-100 text-red-800': item.status === 'Out of Stock'
+                                                            }" 
+                                                            x-text="item.status + ' (' + item.stock + ')'">
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                            <tr x-show="!activeVendor.inventory || activeVendor.inventory.length === 0">
+                                                <td colspan="3" class="px-4 py-8 text-center text-gray-500 text-sm">No inventory data available for this vendor.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {{-- TAB: ORDERS (Section 4.4) --}}
+                            <div x-show="currentTab === 'orders'" class="space-y-4">
+                                <h3 class="font-bold text-gray-800">Order Processing (4.4)</h3>
+                                <div class="space-y-3">
+                                    <template x-for="order in activeVendor.recent_orders">
+                                        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition">
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-0.5 rounded" x-text="order.id"></span>
+                                                    <p class="font-bold text-gray-900 mt-1" x-text="order.customer"></p>
+                                                    <p class="text-xs text-gray-500 mt-0.5" x-text="order.time"></p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <p class="font-bold text-indigo-600" x-text="`PKR ${order.total}`"></p>
+                                                    <span class="inline-flex mt-1 items-center px-2 py-0.5 rounded text-xs font-medium" 
+                                                        :class="{
+                                                            'bg-green-100 text-green-800': order.status === 'Delivered',
+                                                            'bg-blue-100 text-blue-800': order.status === 'Processing',
+                                                            'bg-red-100 text-red-800': order.status === 'Cancelled'
+                                                        }" x-text="order.status"></span>
+                                                </div>
+                                            </div>
+                                            <div class="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                                                <div class="text-xs text-gray-500 flex items-center">
+                                                    <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-4-4V1m4 4h10v12c0 2.21-1.79 4-4 4H4a4 4 0 01-4-4V5c0-2.21 1.79-4 4-4h12V11zM7 9h.01M17 9h.01"></path></svg>
+                                                    Assigned Rider: <span class="font-semibold text-gray-700 ml-1" x-text="order.rider"></span>
+                                                </div>
+                                                <button class="text-xs text-indigo-600 font-semibold hover:underline">View Receipt</button>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    <div x-show="!activeVendor.recent_orders || activeVendor.recent_orders.length === 0" class="text-center py-8 text-gray-500 text-sm">
+                                        No recent orders found.
+                                    </div>
+                                </div>
+                            </div>
+
+                             {{-- TAB: FINANCE (Section 4.5) --}}
+                             <div x-show="currentTab === 'finance'" class="space-y-6">
+                                <div class="bg-gradient-to-br from-gray-800 to-black rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-10 rounded-full blur-xl"></div>
+                                    <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Current Wallet Balance</p>
+                                    <h3 class="text-3xl font-bold mt-2 font-mono" x-text="`PKR ${activeVendor.wallet?.balance?.toLocaleString()}`"></h3>
+                                    
+                                    <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-700">
+                                        <div>
+                                            <p class="text-xs text-gray-400">Pending Clearance</p>
+                                            <p class="text-lg font-bold text-yellow-400" x-text="`PKR ${activeVendor.wallet?.pending?.toLocaleString()}`"></p>
+                                        </div>
+                                        <div>
+                                            <p class="text-xs text-gray-400">Last Payout</p>
+                                            <p class="text-lg font-bold text-green-400" x-text="`PKR ${activeVendor.wallet?.last_payout}`"></p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                                    <h4 class="font-bold text-gray-900 mb-4">Payout Actions</h4>
+                                    <div class="flex gap-3">
+                                        <button class="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-semibold text-sm hover:bg-indigo-700 shadow shadow-indigo-200">Process Payout</button>
+                                        <button class="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-lg font-semibold text-sm hover:bg-gray-50">View History</button>
                                     </div>
                                 </div>
                             </div>
@@ -399,78 +455,52 @@
         </div>
     </div>
 
-    {{-- 
-        CHANGE 1: NEW "ADD VENDOR" MODAL 
-        (Modern, centered, backdrop blur) 
-    --}}
-    <div x-show="isAddVendorModalOpen" style="display: none;" 
-        class="fixed inset-0 z-[60] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        
-        <div x-show="isAddVendorModalOpen" 
-            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" 
-            x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-            class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" @click="isAddVendorModalOpen = false"></div>
+    {{-- MODAL: ADD NEW VENDOR (Section 4.1 Concept) --}}
+    <div x-show="isAddVendorModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" @click="isAddVendorModalOpen = false"></div>
 
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div x-show="isAddVendorModalOpen"
-                x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
-                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-xl">
-                
-                <div class="bg-gray-50 px-4 py-5 sm:px-6 border-b border-gray-100 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-lg font-bold leading-6 text-gray-900">Add New Vendor</h3>
-                        <p class="mt-1 text-sm text-gray-500">Enter details to onboard a new partner.</p>
-                    </div>
-                    <button @click="isAddVendorModalOpen = false" class="text-gray-400 hover:text-gray-600">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
-
-                <div class="px-6 py-6 space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Vendor Name</label>
-                        <input type="text" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2.5 border" placeholder="e.g. Fresh Foods Ltd.">
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Category</label>
-                            <select class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2.5 border">
-                                <option>Grocery</option>
-                                <option>Electronics</option>
-                                <option>Fashion</option>
-                            </select>
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-indigo-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Status</label>
-                            <select class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2.5 border">
-                                <option>Active</option>
-                                <option>Pending Verification</option>
-                                <option>Inactive</option>
-                            </select>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg font-bold leading-6 text-gray-900">Onboard New Mart Vendor</h3>
+                            <div class="mt-4 space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Business Name</label>
+                                    <input type="text" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2" placeholder="e.g. Al-Fatah Grocery">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                                    <select class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border p-2">
+                                        <option>Grocery</option>
+                                        <option>Electronics</option>
+                                        <option>Mart/Convenience</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Owner Name</label>
+                                        <input type="text" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm border p-2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700">Commission %</label>
+                                        <input type="number" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm border p-2" placeholder="10">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Email Address</label>
-                        <input type="email" class="mt-1 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-2.5 border" placeholder="contact@vendor.com">
-                    </div>
                 </div>
-
-                <div class="bg-gray-50 px-6 py-4 flex flex-row-reverse">
-                    <button type="button" @click="isAddVendorModalOpen = false" class="inline-flex w-full justify-center rounded-xl bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm">Create Vendor</button>
-                    <button type="button" @click="isAddVendorModalOpen = false" class="mt-3 inline-flex w-full justify-center rounded-xl border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" class="inline-flex w-full justify-center rounded-xl bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm" @click="isAddVendorModalOpen = false">Create Account</button>
+                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 ring-1 ring-inset ring-gray-300 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" @click="isAddVendorModalOpen = false">Cancel</button>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 @endsection
-
-@push('styles')
-<style>
-    .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02); }
-    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); }
-    [x-cloak] { display: none !important; }
-</style>
-@endpush
