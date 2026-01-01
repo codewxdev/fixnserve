@@ -5,6 +5,10 @@ use App\Http\Controllers\Auth\PasswordResetCodeController;
 use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\FavouriteController;
+use App\Http\Controllers\MartVender\BusinessDocController;
+use App\Http\Controllers\MartVender\MartCategoryController;
+use App\Http\Controllers\MartVender\MartSubCategoryController;
+use App\Http\Controllers\MartVender\ProductController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
@@ -22,7 +26,6 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
-use App\Models\Category;
 use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +40,9 @@ Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 Route::get('/skill/suggested', [SkillController::class, 'suggested']);
 Route::get('/skill/search', [SkillController::class, 'search']);
 Route::apiResource('notification-types', NotificationTypeController::class);
+Route::resource('mart-categories', MartCategoryController::class);
+Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
+
 // routes/api.php
 
 Route::get('/countries', function () {
@@ -63,7 +69,22 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
     Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
     Route::post('/rate', [RatingController::class, 'rate']);
-    // /////////////////////////consultancy routes//////////////////////////////////////
+    // ///////////////////////////////mart vender routes//////////////////////////////////////
+    Route::apiResource('products', ProductController::class);
+    Route::post('/products/{id}', [ProductController::class, 'update']);
+    Route::post('/product/import', [ProductController::class, 'import']);
+    Route::prefix('business-docs')->group(function () {
+        Route::get('/', [BusinessDocController::class, 'index']);
+        Route::post('/', [BusinessDocController::class, 'store']);
+        Route::get('/{id}', [BusinessDocController::class, 'show']);
+        Route::post('/{id}', [BusinessDocController::class, 'update']);
+        Route::delete('/{id}', [BusinessDocController::class, 'destroy']);
+
+        // Admin verification
+        Route::post('/{id}/verify', [BusinessDocController::class, 'verify']);
+    });
+
+    // /////////////////////////////consultancy routes/////////////////////////////////////////
     Route::get('/consultant/profile', [ConsultancyProfileController::class, 'show']);
     Route::post('/consultant/profile', [ConsultancyProfileController::class, 'storeOrUpdate']);
 
@@ -214,4 +235,4 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 Route::apiResource('roles', RoleController::class);
 Route::apiResource('permissions', PermissionController::class);
 Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
-            Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
+Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
