@@ -22,6 +22,7 @@ class BusinessDoc extends Model
         'user_id',
         'status',
         'verified_by',
+        'fax_number'
     ];
 
     public function user()

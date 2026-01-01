@@ -39,6 +39,7 @@ class BusinessDocController extends Controller
                 'tax_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
                 'bank_statement' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
                 'other_licenses' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
+                 'fax_number' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
@@ -106,6 +107,8 @@ class BusinessDocController extends Controller
                 'tax_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
                 'bank_statement' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
                 'other_licenses' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
+                'fax_number' => 'nullable|string',
+
             ]);
 
             if ($validator->fails()) {
