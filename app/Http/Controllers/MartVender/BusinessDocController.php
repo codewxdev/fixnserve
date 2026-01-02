@@ -15,7 +15,9 @@ class BusinessDocController extends Controller
     public function index()
     {
         try {
-            $docs = BusinessDoc::with('user')->latest()->get();
+            $docs = BusinessDoc::with(['user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }])->latest()->get();
 
             return ApiResponse::success($docs, 'Business documents fetched successfully');
         } catch (Throwable $e) {
@@ -39,7 +41,7 @@ class BusinessDocController extends Controller
                 'tax_certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
                 'bank_statement' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
                 'other_licenses' => 'nullable|file|mimes:pdf,jpg,jpeg,png',
-                 'fax_number' => 'nullable|string',
+                'fax_number' => 'nullable|string',
             ]);
 
             if ($validator->fails()) {
@@ -68,7 +70,11 @@ class BusinessDocController extends Controller
     public function show($id)
     {
         try {
-            $doc = BusinessDoc::with(['user', 'verifier'])->find($id);
+            $doc = BusinessDoc::with(['user' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }, 'verifier' => function ($query) {
+                $query->select('id', 'name', 'email');
+            }])->find($id);
 
             if (! $doc) {
                 return ApiResponse::notFound('Business document not found');

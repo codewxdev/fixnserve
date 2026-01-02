@@ -12,4 +12,6 @@ class Currency extends Model
         'symbol',
         'is_active',
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

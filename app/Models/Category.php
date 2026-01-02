@@ -8,6 +8,8 @@ class Category extends Model
 {
     protected $fillable = ['name', 'type'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function subcategories()
     {
         return $this->hasMany(Subcategory::class);

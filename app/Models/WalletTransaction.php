@@ -19,6 +19,8 @@ class WalletTransaction extends Model
         'status',         // pending / success / failed
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // ===== Relationships =====
     public function wallet()
     {

@@ -42,9 +42,6 @@ Route::get('/skill/search', [SkillController::class, 'search']);
 Route::apiResource('notification-types', NotificationTypeController::class);
 Route::resource('mart-categories', MartCategoryController::class);
 Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
-
-// routes/api.php
-
 Route::get('/countries', function () {
     return response()->json([
         'success' => true,
@@ -59,7 +56,6 @@ Route::get('/currences', function () {
 });
 // Main Authenticated Routes Group with User Status Check
 Route::middleware(['auth:api', 'user.active'])->group(function () {
-
     // Auth Routes
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -83,17 +79,14 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
         // Admin verification
         Route::post('/{id}/verify', [BusinessDocController::class, 'verify']);
     });
-
     // /////////////////////////////consultancy routes/////////////////////////////////////////
     Route::get('/consultant/profile', [ConsultancyProfileController::class, 'show']);
     Route::post('/consultant/profile', [ConsultancyProfileController::class, 'storeOrUpdate']);
-
     // Week Days (Mon–Sun toggle)
     Route::get('/consultant/week-days', [ConsultantWeekDayController::class, 'index']);
     Route::post('/consultant/week-days', [ConsultantWeekDayController::class, 'store']);
     Route::put('/consultant/day-availabilities', [ConsultantWeekDayController::class, 'update']);
     Route::delete('/consultant/week-days/{id}', [ConsultantWeekDayController::class, 'destroy']);
-
     Route::middleware(['service.provider'])->group(function () {
         Route::post('/language', [PortfolioController::class, 'addLanguage']);
         Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);

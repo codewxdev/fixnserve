@@ -14,4 +14,6 @@ class MartCategory extends Model
         'description',
         'status',
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }
