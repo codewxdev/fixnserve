@@ -117,9 +117,12 @@
             <li>
                 <a href="{{ route('rider.index') }}"
                     class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('rider.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
-                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('rider.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('cooperation.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0V12m-3 .5a3 3 0 006 0v-1a1.5 1.5 0 013 0V12a5 5 0 01-10 0v-1.5" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M18 12.25l1.25 1.25a1.5 1.5 0 11-2.12 2.12L15 13.5M5 18h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                     <span x-show="sidebarOpen"
                         class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
@@ -134,11 +137,12 @@
             <li>
                 <a href="{{ route('service.index') }}"
                     class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('service.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
-                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('service.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('staff.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M18.364 18.364l1.414 1.414m-1.414-1.414A9 9 0 0112 21M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707-.707" />
                     </svg>
                     <span x-show="sidebarOpen"
                         class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Service
@@ -155,8 +159,8 @@
                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span x-show="sidebarOpen"
-                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
-                        x-cloak>Finance</span>
+                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Finance
+                        Managment</span>
                 </a>
             </li>
 
@@ -183,8 +187,8 @@
                             d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     <span x-show="sidebarOpen"
-                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
-                        x-cloak>Reports & Analytics</span>
+                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Reports
+                        & Analytics</span>
                 </a>
             </li>
 
@@ -233,7 +237,36 @@
                         Permissions</span>
                 </a>
             </li>
-
+            <li>
+                <a href="{{ route('cooperation.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('cooperation.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('your.route.name') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M14.7 12.5l.8 2a.5.5 0 01-.3.6l-2.5.8a.5.5 0 01-.6-.3l-.8-2" />
+                    </svg>
+                    <span x-show="sidebarOpen"
+                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
+                        x-cloak>Cooperation Requests</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('codashboard.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('codashboard.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('stats.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M8 21h8m-4-4v4" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M16 13V9m-4 4V7m-4 4v-2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span x-show="sidebarOpen"
+                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Mini
+                        Dashboard</span>
+                </a>
+            </li>
         </ul>
     </nav>
 </div>

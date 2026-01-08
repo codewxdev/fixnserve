@@ -19,11 +19,11 @@
          },
          settingModules: {
              system: 'System Preferences',
-             finance: 'Financial Rules (Taxes, Commissions)',
+             
              localization: 'Localization & Currencies',
              maps: 'Map & Geo Settings',
              payments: 'Payment Gateway Keys',
-             roles: 'Roles & Permissions'
+              
          }
      }" 
      x-cloak>
@@ -229,20 +229,7 @@
                         <button class="text-sm font-medium text-red-600 hover:underline mt-2">Rotate Key</button>
                     </div>
                 </div>
-
-                {{-- Roles & Permissions --}}
-                <div x-show="mainNav === 'settings' && currentModule === 'roles'" class="space-y-6">
-                    <p class="text-gray-600">Define user roles and fine-tune access control permissions.</p>
-                    <div class="p-4 border-2 border-blue-300 rounded-xl bg-blue-50">
-                        <div class="flex justify-between items-center">
-                            <p class="font-bold text-blue-700">Role: Finance Manager</p>
-                            <span class="text-xs font-bold text-blue-700">8 Users Assigned</span>
-                        </div>
-                        <p class="text-sm text-gray-700 mt-1">Permissions: Read/Write to Payments, Read-Only to Reports.</p>
-                        <button class="text-sm font-medium text-blue-600 hover:underline mt-2">Edit Permissions Matrix</button>
-                    </div>
-                </div>
-                
+ 
                 {{-- Global Save Button (Sticky Footer Style) --}}
                 <div class="sticky bottom-0 bg-white border-t -mx-8 p-4 flex justify-end">
                     <button class="px-6 py-3 text-lg font-medium text-white bg-purple-600 rounded-xl hover:bg-purple-700 shadow-xl transition duration-150 ease-in-out">

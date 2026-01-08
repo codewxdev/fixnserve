@@ -12,6 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
+            
             Route::namespace('admin')->group(base_path('routes/admin/customer.php'));
             Route::namespace('admin')->group(base_path('routes/admin/provider.php'));
             Route::namespace('admin')->group(base_path('routes/admin/professional.php'));
@@ -25,6 +26,8 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::namespace('admin')->group(base_path('routes/admin/report.php'));
             Route::namespace('admin')->group(base_path('routes/admin/cms.php'));
             Route::namespace('admin')->group(base_path('routes/admin/notification.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/cooperation.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/codashboard.php'));
 
         }
     )
