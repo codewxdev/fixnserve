@@ -14,4 +14,6 @@ class Country extends Model
         'phone_length',
 
     ];
+
+    protected $hidden = ['created_at', 'updated_at'];
 }

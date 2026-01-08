@@ -21,6 +21,8 @@ class Product extends Model
         'user_id',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function category()
     {
         return $this->belongsTo(MartCategory::class, 'category_id');

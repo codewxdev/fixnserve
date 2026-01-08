@@ -14,6 +14,8 @@ class Rating extends Model
         'review',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function rateable()
     {
         return $this->morphTo();

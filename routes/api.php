@@ -28,6 +28,7 @@ use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
 use App\Models\Country;
 use App\Models\Currency;
+use App\Models\Skill;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes (No authentication required)
@@ -42,9 +43,6 @@ Route::get('/skill/search', [SkillController::class, 'search']);
 Route::apiResource('notification-types', NotificationTypeController::class);
 Route::resource('mart-categories', MartCategoryController::class);
 Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
-
-// routes/api.php
-
 Route::get('/countries', function () {
     return response()->json([
         'success' => true,
@@ -59,7 +57,6 @@ Route::get('/currences', function () {
 });
 // Main Authenticated Routes Group with User Status Check
 Route::middleware(['auth:api', 'user.active'])->group(function () {
-
     // Auth Routes
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -83,75 +80,69 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
         // Admin verification
         Route::post('/{id}/verify', [BusinessDocController::class, 'verify']);
     });
-
     // /////////////////////////////consultancy routes/////////////////////////////////////////
     Route::get('/consultant/profile', [ConsultancyProfileController::class, 'show']);
     Route::post('/consultant/profile', [ConsultancyProfileController::class, 'storeOrUpdate']);
-
     // Week Days (Mon–Sun toggle)
     Route::get('/consultant/week-days', [ConsultantWeekDayController::class, 'index']);
     Route::post('/consultant/week-days', [ConsultantWeekDayController::class, 'store']);
     Route::put('/consultant/day-availabilities', [ConsultantWeekDayController::class, 'update']);
     Route::delete('/consultant/week-days/{id}', [ConsultantWeekDayController::class, 'destroy']);
-
-    Route::middleware(['service.provider'])->group(function () {
-        Route::post('/language', [PortfolioController::class, 'addLanguage']);
-        Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
-
-        // Service Provider Routes
-        Route::prefix('service-provider')->group(function () {
-            Route::apiResource('services', ServiceController::class);
-            Route::post('/categories-subcategories', [ServiceProviderController::class, 'saveCategoriesAndSubcategories']);
-            Route::post('/update/account', [ServiceProviderController::class, 'updateAccount']);
-            Route::post('/update/mode', [ServiceProviderController::class, 'updateMode']);
-        });
-        // Skills Routes
-        Route::prefix('skills')->group(function () {
-            Route::post('/add', [SkillController::class, 'addSkills']);
-        });
-        // Portfolio Routes
-        Route::prefix('portfolios')->group(function () {
-            Route::apiResource('portfolios', PortfolioController::class);
-        });
-        // Education & Certificates Routes
-        Route::prefix('education')->group(function () {
-            Route::get('/', [UserEducationController::class, 'getProfile']);
-            Route::post('/', [UserEducationController::class, 'storeProfile']);
-            Route::post('/{id}', [UserEducationController::class, 'updateEducation']);
-            Route::delete('{id}', [UserEducationController::class, 'deleteEducation']);
-        });
-        Route::prefix('certificates')->group(function () {
-            Route::post('/upload', [UserEducationController::class, 'uploadCertificates']);
-            Route::delete('/{id}', [UserEducationController::class, 'deleteCertificate']);
-            Route::get('/download/{id}', [UserEducationController::class, 'downloadCertificate']);
-        });
-        // Payment Routes
-        Route::prefix('payments')->group(function () {
-            Route::get('/', [UserPaymentController::class, 'index']);
-            Route::post('/', [UserPaymentController::class, 'store']);
-            Route::post('/{id}/set-default', [UserPaymentController::class, 'setDefault']);
-            Route::delete('/{id}', [UserPaymentController::class, 'destroy']);
-            Route::get('/type/{type}', [UserPaymentController::class, 'byType']);
-        });
-
-        // Notification Routes
-        Route::prefix('notifications')->group(function () {
-            // Get all settings for logged-in user
-            Route::get('/settings', [UserNotificationController::class, 'getUserNotificationSettings']);
-            // Update settings for a specific type
-            Route::post('/settings/update', [UserNotificationController::class, 'updateNotificationSettings']);
-            // Reset to defaults
-            Route::post('/settings/reset', [UserNotificationController::class, 'resetToDefaults']);
-
-        });
-
-        Route::prefix('transportations')->group(function () {
-            // Get transportation settings
-            Route::get('/', [UserTransportationController::class, 'getTransportations']);
-            // Update transportation settings
-            Route::post('/', [UserTransportationController::class, 'updateTransportations']);
-        });
+    // Route::middleware(['service.provider'])->group(function () {
+    Route::post('/language', [PortfolioController::class, 'addLanguage']);
+    Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
+    // Service Provider Routes
+    Route::prefix('service-provider')->group(function () {
+        Route::apiResource('services', ServiceController::class);
+        Route::post('/categories-subcategories', [ServiceProviderController::class, 'saveCategoriesAndSubcategories']);
+        Route::post('/update/account', [ServiceProviderController::class, 'updateAccount']);
+        Route::post('/update/mode', [ServiceProviderController::class, 'updateMode']);
     });
+    // Skills Routes
+    Route::prefix('skills')->group(function () {
+        Route::post('/add', [SkillController::class, 'addSkills']);
+    });
+    // Portfolio Routes
+    Route::prefix('portfolios')->group(function () {
+        Route::apiResource('portfolios', PortfolioController::class);
+    });
+    // Education & Certificates Routes
+    Route::prefix('education')->group(function () {
+        Route::get('/', [UserEducationController::class, 'getProfile']);
+        Route::post('/', [UserEducationController::class, 'storeProfile']);
+        Route::post('/{id}', [UserEducationController::class, 'updateEducation']);
+        Route::delete('{id}', [UserEducationController::class, 'deleteEducation']);
+    });
+    Route::prefix('certificates')->group(function () {
+        Route::post('/upload', [UserEducationController::class, 'uploadCertificates']);
+        Route::delete('/{id}', [UserEducationController::class, 'deleteCertificate']);
+        Route::get('/download/{id}', [UserEducationController::class, 'downloadCertificate']);
+    });
+    // Payment Routes
+    Route::prefix('payments')->group(function () {
+        Route::get('/', [UserPaymentController::class, 'index']);
+        Route::post('/', [UserPaymentController::class, 'store']);
+        Route::post('/{id}/set-default', [UserPaymentController::class, 'setDefault']);
+        Route::delete('/{id}', [UserPaymentController::class, 'destroy']);
+        Route::get('/type/{type}', [UserPaymentController::class, 'byType']);
+    });
+    // Notification Routes
+    Route::prefix('notifications')->group(function () {
+        // Get all settings for logged-in user
+        Route::get('/settings', [UserNotificationController::class, 'getUserNotificationSettings']);
+        // Update settings for a specific type
+        Route::post('/settings/update', [UserNotificationController::class, 'updateNotificationSettings']);
+        // Reset to defaults
+        Route::post('/settings/reset', [UserNotificationController::class, 'resetToDefaults']);
+
+    });
+    Route::prefix('transportations')->group(function () {
+        // Get transportation settings
+        Route::get('/', [UserTransportationController::class, 'getTransportations']);
+        // Update transportation settings
+        Route::post('/', [UserTransportationController::class, 'updateTransportations']);
+    });
+    // });
     Route::prefix('experiences')->group(function () {
         Route::get('/', [UserExperienceController::class, 'index']);
         Route::post('/', [UserExperienceController::class, 'store']);

@@ -16,6 +16,8 @@ class MartSubCategory extends Model
         'status',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function category()
     {
         return $this->belongsTo(MartCategory::class, 'mart_category_id');

@@ -18,6 +18,8 @@ class Portfolio extends Model
         'status',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public function skills()
     {
         return $this->belongsToMany(Skill::class, 'portfolio_skills');
