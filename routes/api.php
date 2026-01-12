@@ -26,9 +26,10 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Http\Controllers\SubscriptionEntitlementController;
+use App\Http\Controllers\SubscriptionPlanController;
 use App\Models\Country;
 use App\Models\Currency;
-use App\Models\Skill;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes (No authentication required)
@@ -169,6 +170,10 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
         Route::apiResource('skills', SkillController::class);
         Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
     });
+});
+Route::middleware(['auth:api'])->prefix('admin')->group(function () {
+    Route::apiResource('subscription-plans', SubscriptionPlanController::class);
+    Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
 });
 
 // /////////////////////////////////////////extra code//////////////////////////////////////
