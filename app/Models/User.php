@@ -49,6 +49,8 @@ class User extends Authenticatable implements JWTSubject
         'phone_status',  // Added
         'rating',        // Added
         'favourite', // Add UUID to fillable
+        'dob',
+        'gender'
     ];
 
     /**

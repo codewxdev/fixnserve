@@ -33,17 +33,18 @@
     </header>
 
     <section id="analytics-summary">
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
             @php
+            // Static Analytics (As per request, these remain visual widgets)
             $widgets = [
-                ['title' => 'Total Consultants', 'value' => '124', 'icon' => 'users', 'color' => 'indigo'],
-                ['title' => 'Active Now', 'value' => '18', 'icon' => 'user-check', 'color' => 'green'],
-                ['title' => "Today's Sessions", 'value' => '42', 'icon' => 'calendar-check', 'color' => 'blue'],
-                ['title' => 'Completed (YTD)', 'value' => '3,850', 'icon' => 'check-circle', 'color' => 'teal'],
-                ['title' => 'Billable Hours', 'value' => '845.5', 'icon' => 'clock', 'color' => 'cyan'],
-                ['title' => 'Disputes/No-show', 'value' => '3', 'icon' => 'exclamation-triangle', 'color' => 'orange'],
-                ['title' => 'Pending Refunds', 'value' => '$450', 'icon' => 'undo', 'color' => 'red'],
-                ['title' => 'Verified (KYC)', 'value' => '118', 'icon' => 'shield-alt', 'color' => 'purple'],
+                ['title' => 'Total Consultants', 'value' => $consultants->count(), 'icon' => 'users', 'color' => 'indigo'],
+                ['title' => 'Active Now', 'value' => 'NaN', 'icon' => 'user-check', 'color' => 'green'],
+                ['title' => "Today's Sessions", 'value' => 'NaN', 'icon' => 'calendar-check', 'color' => 'blue'],
+                ['title' => 'Completed (YTD)', 'value' => 'NaN', 'icon' => 'check-circle', 'color' => 'teal'],
+                ['title' => 'Billable Hours', 'value' => 'NaN', 'icon' => 'clock', 'color' => 'cyan'],
+                ['title' => 'Disputes/No-show', 'value' => 'NaN', 'icon' => 'exclamation-triangle', 'color' => 'orange'],
+                ['title' => 'Pending Refunds', 'value' => 'NaN', 'icon' => 'undo', 'color' => 'red'],
+                ['title' => 'Verified (KYC)', 'value' => 'NaN', 'icon' => 'shield-alt', 'color' => 'purple'],
             ];
             @endphp
             @foreach ($widgets as $widget)
@@ -62,44 +63,28 @@
     </section>
 
     <section id="sticky-filters" class="sticky top-0 z-10 bg-white pt-4 -mt-4 shadow-sm rounded-lg">
-        <form method="GET" action="{{ url()->current() }}"
+        {{-- Static Visual Filter --}}
+        <form method="GET" action="#"
             class="flex space-x-4 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
             <div class="relative flex-grow">
                 <i class="fa-solid fa-search w-4 h-4 absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" name="search" placeholder="Search Jacky, Mike, etc..."
-                    value="{{ request('search') }}"
+                <input type="text" id="searchInput" placeholder="Search consultants..."
                     class="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 text-sm">
             </div>
-            <select name="expertise"
+            <select
                 class="rounded-lg px-3 border border-gray-300 text-sm focus:ring-indigo-500 focus:border-indigo-500">
                 <option value="">All Expertise</option>
-                <option value="Finance" {{ request('expertise') == 'Finance' ? 'selected' : '' }}>Finance</option>
-                <option value="Technology" {{ request('expertise') == 'Technology' ? 'selected' : '' }}>Technology</option>
-                <option value="Legal" {{ request('expertise') == 'Legal' ? 'selected' : '' }}>Legal</option>
-                <option value="Health" {{ request('expertise') == 'Health' ? 'selected' : '' }}>Health</option>
+                <option value="Finance">Finance</option>
+                <option value="Technology">Technology</option>
             </select>
-            <select name="rating"
-                class="rounded-lg px-3 border border-gray-300 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">All Ratings</option>
-                <option value="4.5" {{ request('rating') == '4.5' ? 'selected' : '' }}>Top Rated (4.5+)</option>
-            </select>
-
             <button type="button"
                 class="flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition duration-150">
                 <i class="fa-solid fa-clock w-4 h-4 mr-1"></i> Availability
             </button>
-
-            <button type="submit"
+            <button type="button"
                 class="flex items-center rounded-lg border border-transparent bg-indigo-600 px-3 py-2 text-sm text-white shadow-sm hover:bg-indigo-700 transition duration-150">
                 <i class="fa-solid fa-filter w-4 h-4 mr-2"></i> Apply
             </button>
-
-            @if (request()->hasAny(['search', 'expertise', 'rating']))
-            <a href="{{ url()->current() }}"
-                class="flex items-center rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 transition duration-150">
-                <i class="fa-solid fa-trash w-4 h-4"></i>
-            </a>
-            @endif
         </form>
     </section>
 
@@ -118,60 +103,52 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200 bg-white">
-                            {{-- CHANGED: Added PHP Logic to actually FILTER the static data --}}
+                            @forelse ($consultants as $consultant)
                             @php
-                                // 1. Define the raw data
-                                $allConsultants = [
-                                    ['name' => 'Jacky Smith', 'expertise' => 'Finance', 'rating' => '4.9'],
-                                    ['name' => 'Mike Ross', 'expertise' => 'Legal', 'rating' => '4.8'],
-                                    ['name' => 'Jessica Chen', 'expertise' => 'Technology', 'rating' => '5.0'],
-                                    ['name' => 'Dr. Alex House', 'expertise' => 'Health', 'rating' => '4.7'],
-                                    ['name' => 'Sarah Connor', 'expertise' => 'Technology', 'rating' => '4.6'],
+                                // Data Preparation for JS SlideOver
+                                $jsData = [
+                                    'id' => $consultant->id,
+                                    'name' => $consultant->name,
+                                    'email' => $consultant->email,
+                                    'status' => $consultant->status,
+                                    // Missing fields in DB -> set to NaN/N/A
+                                    'expertise' => 'NaN', 
+                                    'rate' => 'NaN',
+                                    'rating' => 'NaN',
+                                    'sessions' => 'NaN',
+                                    'wallet' => 'NaN',
+                                    'recordings' => 0,
+                                    'phone' => $consultant->phone ?? 'N/A',
                                 ];
-
-                                // 2. Filter the data based on Request parameters
-                                $filteredConsultants = collect($allConsultants)->filter(function ($item) {
-                                    // Search Filter (Case insensitive)
-                                    if (request('search')) {
-                                        $search = strtolower(request('search'));
-                                        $name = strtolower($item['name']);
-                                        $expert = strtolower($item['expertise']);
-                                        if (!str_contains($name, $search) && !str_contains($expert, $search)) {
-                                            return false; 
-                                        }
-                                    }
-
-                                    // Expertise Filter
-                                    if (request('expertise') && $item['expertise'] !== request('expertise')) {
-                                        return false;
-                                    }
-
-                                    // Rating Filter (>= selected)
-                                    if (request('rating') && $item['rating'] < request('rating')) {
-                                        return false;
-                                    }
-
-                                    return true;
-                                });
+                                
+                                // Status styling
+                                $statusClass = match($consultant->status) {
+                                    'active' => 'bg-green-100 text-green-800',
+                                    'suspend' => 'bg-red-100 text-red-800',
+                                    default => 'bg-gray-100 text-gray-800',
+                                };
                             @endphp
-
-                            {{-- 3. Loop through the FILTERED results --}}
-                            @forelse ($filteredConsultants as $consultant)
                             <tr class="hover:bg-indigo-50/50 transition duration-150 group">
                                 {{-- 1. Basic Info --}}
                                 <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm">
                                     <div class="flex items-center">
-                                        <img class="h-10 w-10 rounded-full object-cover border border-gray-200"
-                                            src="https://ui-avatars.com/api/?name={{ urlencode($consultant['name']) }}&background=random&color=fff&size=128"
-                                            alt="">
+                                        <div class="h-10 w-10 flex-shrink-0">
+                                            @if($consultant->image)
+                                                <img class="h-10 w-10 rounded-full object-cover border border-gray-200" src="{{ asset($consultant->image) }}" alt="">
+                                            @else
+                                                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+                                                    {{ substr($consultant->name, 0, 1) }}
+                                                </div>
+                                            @endif
+                                        </div>
                                         <div class="ml-4">
-                                            <div class="font-medium text-gray-900">{{ $consultant['name'] }}</div>
+                                            <div class="font-medium text-gray-900">{{ $consultant->name }}</div>
                                             <div class="text-gray-500 text-xs mt-1">Specialty:
-                                                <span class="font-semibold">{{ $consultant['expertise'] }}</span>
+                                                <span class="font-semibold">NaN</span>
                                             </div>
                                             <div class="flex space-x-1 mt-1">
                                                 <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
-                                                    {{ $consultant['expertise'] }}
+                                                    NaN
                                                 </span>
                                             </div>
                                         </div>
@@ -183,11 +160,11 @@
                                     <div class="space-y-1">
                                         <div class="font-medium text-gray-900 flex items-center">
                                             <i class="fa-solid fa-calendar-days w-4 h-4 mr-1 text-indigo-500"></i>
-                                            Next: <strong class="ml-1">Today, 2:00 PM</strong>
+                                            Next: <strong class="ml-1">NaN</strong>
                                         </div>
-                                        <div class="text-gray-500">Rate: <strong>$150/hr</strong></div>
-                                        <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                                            <i class="fa-solid fa-check w-3 h-3 mr-1"></i> Available
+                                        <div class="text-gray-500">Rate: <strong>$NaN/hr</strong></div>
+                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $statusClass }}">
+                                            {{ ucfirst($consultant->status) }}
                                         </span>
                                     </div>
                                 </td>
@@ -197,12 +174,12 @@
                                     <div class="space-y-1">
                                         <div class="font-medium text-gray-900 flex items-center">
                                             <i class="fa-solid fa-star w-4 h-4 mr-1 text-yellow-400"></i>
-                                            <strong class="ml-1">{{ $consultant['rating'] }}</strong>
-                                            <span class="text-gray-400 font-normal ml-1">(120 Reviews)</span>
+                                            <strong class="ml-1">NaN</strong>
+                                            <span class="text-gray-400 font-normal ml-1">(NaN Reviews)</span>
                                         </div>
-                                        <div>Total Sessions: <strong>340</strong></div>
+                                        <div>Total Sessions: <strong>NaN</strong></div>
                                         <div class="text-xs text-red-500 flex items-center">
-                                            <i class="fa-solid fa-ban w-3 h-3 mr-1"></i> No-shows: <strong>0</strong>
+                                            <i class="fa-solid fa-ban w-3 h-3 mr-1"></i> No-shows: <strong>NaN</strong>
                                         </div>
                                     </div>
                                 </td>
@@ -212,11 +189,11 @@
                                     <div class="space-y-2">
                                         <div class="flex items-center text-gray-700">
                                             <i class="fa-solid fa-microphone-lines w-4 h-4 mr-2 text-gray-400"></i>
-                                            <span>Audio Logs: <strong>12</strong></span>
+                                            <span>Audio Logs: <strong>NaN</strong></span>
                                         </div>
                                         <div class="flex items-center text-gray-700">
                                             <i class="fa-solid fa-video w-4 h-4 mr-2 text-gray-400"></i>
-                                            <span>Video Sessions: <strong>5</strong></span>
+                                            <span>Video Sessions: <strong>NaN</strong></span>
                                         </div>
                                     </div>
                                 </td>
@@ -224,7 +201,7 @@
                                 {{-- 5. Actions --}}
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium">
                                     <div class="flex items-center justify-end space-x-3">
-                                        <button onclick="openSlideOver('{{ $consultant['name'] }}')" class="text-indigo-600 hover:text-indigo-900 transition-colors bg-indigo-50 p-2 rounded-full" title="View Details">
+                                        <button onclick="openSlideOver({{ json_encode($jsData) }})" class="text-indigo-600 hover:text-indigo-900 transition-colors bg-indigo-50 p-2 rounded-full" title="View Details">
                                             <i class="fa-solid fa-eye text-lg"></i>
                                         </button>
                                         <button class="text-gray-400 hover:text-indigo-600 transition-colors" title="Edit">
@@ -243,7 +220,7 @@
                                     <div class="flex flex-col items-center justify-center">
                                         <i class="fa-solid fa-magnifying-glass text-4xl text-gray-300 mb-3"></i>
                                         <p class="text-lg font-medium text-gray-900">No consultants found</p>
-                                        <p class="text-sm">Try adjusting your filters or search terms.</p>
+                                        <p class="text-sm">Get started by adding a new consultant.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -257,7 +234,7 @@
 </div>
 
 {{-- ========================================== --}}
-{{-- DETAIL SLIDE-OVER (Restored Content + Animations) --}}
+{{-- DETAIL SLIDE-OVER (Dynamic Content) --}}
 {{-- ========================================== --}}
 <div id="consultant-detail-slideover" class="relative z-50 invisible" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
     
@@ -275,7 +252,7 @@
                         {{-- Header --}}
                         <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-6 z-10">
                             <div class="flex items-start justify-between">
-                                <h2 class="text-2xl font-bold text-gray-900" id="slide-over-title">Jacky Smith</h2>
+                                <h2 class="text-2xl font-bold text-gray-900" id="slide-over-title">...</h2>
                                 <div class="ml-3 flex h-7 items-center">
                                     <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500" onclick="closeSlideOver()">
                                         <i class="fa-solid fa-times h-6 w-6"></i>
@@ -284,13 +261,13 @@
                             </div>
                             <div class="mt-2 flex items-center space-x-2">
                                 <span class="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
-                                    <i class="fa-solid fa-shield-alt w-4 h-4 mr-1"></i> Verified Expert
+                                    <i class="fa-solid fa-shield-alt w-4 h-4 mr-1"></i> <span id="slide-over-status">Verified Expert</span>
                                 </span>
-                                <span class="text-sm text-gray-500">ID: CNTR-9921</span>
+                                <span class="text-sm text-gray-500">ID: <span id="slide-over-id">...</span></span>
                             </div>
                         </div>
 
-                        {{-- Restored Detailed Content --}}
+                        {{-- Detailed Content --}}
                         <div class="relative flex-1 px-6 py-6">
                             <div class="space-y-8">
 
@@ -298,17 +275,17 @@
                                     <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-4 flex items-center">
                                         <i class="fa-solid fa-user w-5 h-5 mr-2 text-indigo-500"></i> Profile Overview
                                     </h3>
-                                    <p class="text-sm text-gray-600 mb-4">"A senior Financial Analyst with 12+ years experience in Corporate Law and FinTech integration. Specialized in blockchain compliance and cross-border payments."</p>
+                                    <p class="text-sm text-gray-600 mb-4">"No bio available (NaN)."</p>
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
-                                            <div class="text-sm font-medium text-gray-500">Specialty</div>
-                                            <div class="font-bold text-gray-900">Finance & Compliance</div>
+                                            <div class="text-sm font-medium text-gray-500">Email</div>
+                                            <div class="font-bold text-gray-900" id="slide-over-email">...</div>
                                         </div>
                                         <div>
                                             <div class="text-sm font-medium text-gray-500">Rating</div>
                                             <div class="font-bold text-gray-900 flex items-center">
                                                 <i class="fa-solid fa-star w-4 h-4 mr-1 text-yellow-400 fill-yellow-400"></i>
-                                                4.9
+                                                NaN
                                             </div>
                                         </div>
                                     </div>
@@ -320,18 +297,11 @@
                                     </h3>
                                     <div class="bg-gray-50 p-4 rounded-lg">
                                         <p class="text-sm font-medium text-gray-700 mb-2">Weekly Availability Calendar</p>
-                                        <div class="grid grid-cols-3 gap-2 text-center text-xs mb-3">
-                                            <div class="bg-white border p-2 rounded shadow-sm">Mon: 10am-2pm</div>
-                                            <div class="bg-white border p-2 rounded shadow-sm">Tue: 9am-5pm</div>
-                                            <div class="bg-white border p-2 rounded shadow-sm">Wed: 1pm-4pm</div>
-                                        </div>
-                                        <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center">
+                                        <p class="text-xs text-gray-500 italic">No schedule data available (NaN).</p>
+                                        <button class="text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center mt-3">
                                             <i class="fa-solid fa-plus w-4 h-4 mr-1"></i> Add/Edit Slots
                                         </button>
                                     </div>
-                                    <p class="text-xs text-orange-500 mt-2 flex items-center">
-                                        <i class="fa-solid fa-exclamation-triangle w-4 h-4 mr-1"></i> **Warning:** Slot conflict detected on Tuesday, 3 PM.
-                                    </p>
                                 </section>
 
                                 <section>
@@ -339,41 +309,7 @@
                                         <i class="fa-solid fa-video w-5 h-5 mr-2 text-indigo-500"></i> Session Recordings
                                     </h3>
                                     <div class="space-y-3">
-                                        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
-                                            <div class="flex items-center space-x-3">
-                                                <i class="fa-solid fa-film w-6 h-6 text-gray-500"></i>
-                                                <span class="text-sm font-medium text-gray-800">2024-12-23 - Compliance Audit</span>
-                                            </div>
-                                            <div class="flex items-center space-x-2">
-                                                <button class="text-indigo-600 hover:text-indigo-800 text-sm"><i class="fa-solid fa-play-circle w-5 h-5"></i></button>
-                                                <button class="text-green-600 hover:text-green-800 text-sm"><i class="fa-solid fa-download w-5 h-5"></i></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-4 flex items-center">
-                                        <i class="fa-solid fa-slash w-5 h-5 mr-2 text-orange-500"></i> No-Show & Refund Rules
-                                    </h3>
-                                    <div class="bg-yellow-50 p-4 rounded-lg mb-4">
-                                        <p class="font-medium text-sm text-yellow-800">No-Show Log Timeline (Last 5)</p>
-                                        <ul class="text-xs text-gray-600 mt-2 list-disc list-inside space-y-1">
-                                            <li>2025-11-15: Client NS. Penalty Applied: $50.</li>
-                                            <li>2025-10-01: Consultant NS. Refund Triggered.</li>
-                                        </ul>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 bg-white border rounded-lg shadow-sm">
-                                        <div class="space-y-1">
-                                            <p class="font-medium text-gray-900 flex items-center">
-                                                <i class="fa-solid fa-undo w-4 h-4 mr-2 text-red-600"></i> **Auto-Refund Rule**
-                                            </p>
-                                            <p class="text-xs text-gray-500">Trigger 50% refund if session duration < 10 mins.</p>
-                                        </div>
-                                        <label for="refund-toggle" class="relative inline-flex cursor-pointer items-center">
-                                            <input type="checkbox" id="refund-toggle" class="sr-only peer" checked>
-                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-                                        </label>
+                                        <p class="text-sm text-gray-500 italic">No recordings available (NaN).</p>
                                     </div>
                                 </section>
 
@@ -384,30 +320,16 @@
                                     <div class="grid grid-cols-3 gap-4 text-center mb-4">
                                         <div class="bg-indigo-50 p-3 rounded-lg">
                                             <div class="text-xs text-gray-500">Revenue</div>
-                                            <div class="font-bold">$24,500</div>
+                                            <div class="font-bold">$NaN</div>
                                         </div>
                                         <div class="bg-indigo-50 p-3 rounded-lg">
                                             <div class="text-xs text-gray-500">Pending</div>
-                                            <div class="font-bold">$450</div>
+                                            <div class="font-bold">$NaN</div>
                                         </div>
                                         <div class="bg-indigo-50 p-3 rounded-lg">
                                             <div class="text-xs text-gray-500">Wallet</div>
-                                            <div class="font-bold">$1,200</div>
+                                            <div class="font-bold">$NaN</div>
                                         </div>
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-4 flex items-center">
-                                        <i class="fa-solid fa-gavel w-5 h-5 mr-2 text-red-500"></i> Admin Tools
-                                    </h3>
-                                    <div class="space-y-3">
-                                        <button class="w-full justify-center flex items-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 transition">
-                                            <i class="fa-solid fa-ban w-4 h-4 mr-2"></i> Suspend Consultant Account
-                                        </button>
-                                        <button class="w-full justify-center flex items-center rounded-md bg-yellow-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-yellow-400 transition">
-                                            <i class="fa-solid fa-lock w-4 h-4 mr-2"></i> Require Re-verification (KYC)
-                                        </button>
                                     </div>
                                 </section>
 
@@ -444,8 +366,14 @@
                     </button>
                 </div>
 
-                <form action="#" method="POST"> @csrf
+                {{-- AJAX FORM --}}
+                <form id="createConsultantForm"> @csrf
                     <div class="px-4 py-6 sm:p-6">
+                        
+                        {{-- Alerts --}}
+                        <div id="successMessage" class="hidden mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative"></div>
+                        <div id="errorMessage" class="hidden mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative"></div>
+
                         <div class="space-y-5">
                             
                             {{-- Modern Input: Name --}}
@@ -457,6 +385,7 @@
                                     </div>
                                     <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow" placeholder="e.g. Jacky Smith">
                                 </div>
+                                <span class="text-xs text-red-500 error-text name_error"></span>
                             </div>
 
                             {{-- Modern Input: Email --}}
@@ -468,14 +397,16 @@
                                     </div>
                                     <input type="email" name="email" id="email" class="block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow" placeholder="jacky@example.com">
                                 </div>
+                                <span class="text-xs text-red-500 error-text email_error"></span>
                             </div>
 
-                            {{-- Grid for Select/Rate --}}
-                            <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                            {{-- Grid for Select/Rate (Data not stored in DB but kept for UI integrity) --}}
+                            {{-- <div class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
                                 <div>
                                     <label for="expertise" class="block text-sm font-semibold leading-6 text-gray-900">Expertise</label>
                                     <div class="relative mt-2">
                                         <select id="expertise" name="expertise" class="block w-full rounded-md border-0 py-2.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+                                            <option value="">Select...</option>
                                             <option>Finance</option>
                                             <option>Technology</option>
                                             <option>Legal</option>
@@ -492,14 +423,17 @@
                                         <input type="number" name="rate" id="rate" class="block w-full rounded-md border-0 py-2.5 pl-7 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
                                     </div>
                                 </div>
-                            </div>
+                            </div> --}}
 
                         </div>
                     </div>
                     
                     {{-- Footer --}}
                     <div class="bg-gray-50 px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-100">
-                        <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors sm:ml-3 sm:w-auto">Save Consultant</button>
+                        <button type="button" id="submitBtn" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors sm:ml-3 sm:w-auto">
+                            <i class="fa-solid fa-spinner fa-spin hidden mr-2" id="loadingIcon"></i>
+                            Save Consultant
+                        </button>
                         <button type="button" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto" onclick="closeAddModal()">Cancel</button>
                     </div>
                 </form>
@@ -511,59 +445,68 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     // ==========================================
-    // SIDEBAR LOGIC WITH TRANSITIONS
+    // SIDEBAR LOGIC (DYNAMIC DATA)
     // ==========================================
     const slideOver = document.getElementById('consultant-detail-slideover');
     const slideOverBackdrop = document.getElementById('slideover-backdrop');
     const slideOverPanel = document.getElementById('slideover-panel');
     const slideOverTitle = document.getElementById('slide-over-title');
+    const slideOverStatus = document.getElementById('slide-over-status');
+    const slideOverId = document.getElementById('slide-over-id');
+    const slideOverEmail = document.getElementById('slide-over-email');
 
-    function openSlideOver(name = null) {
-        if(name) slideOverTitle.textContent = name;
+    function openSlideOver(data) {
+        // Populate Data
+        slideOverTitle.textContent = data.name;
+        slideOverStatus.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+        slideOverId.textContent = 'CNTR-' + data.id;
+        slideOverEmail.textContent = data.email;
 
-        // Remove invisible first
+        // Transitions
         slideOver.classList.remove('invisible');
-
-        // Add transitions after a tiny delay to allow DOM to render the block
         setTimeout(() => {
             slideOverBackdrop.classList.remove('opacity-0');
             slideOverBackdrop.classList.add('opacity-100');
-            
             slideOverPanel.classList.remove('translate-x-full');
             slideOverPanel.classList.add('translate-x-0');
         }, 10);
     }
 
     function closeSlideOver() {
-        // Reverse transitions
         slideOverBackdrop.classList.remove('opacity-100');
         slideOverBackdrop.classList.add('opacity-0');
-        
         slideOverPanel.classList.remove('translate-x-0');
         slideOverPanel.classList.add('translate-x-full');
-
-        // Wait for CSS transition (500ms) then hide element
         setTimeout(() => {
             slideOver.classList.add('invisible');
         }, 500);
     }
 
     // ==========================================
-    // MODAL LOGIC WITH TRANSITIONS
+    // MODAL & AJAX LOGIC
     // ==========================================
     const addModal = document.getElementById('add-consultant-modal');
     const modalBackdrop = document.getElementById('modal-backdrop');
     const modalPanel = document.getElementById('modal-panel');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingIcon = document.getElementById('loadingIcon');
+    const successMessage = document.getElementById('successMessage');
+    const errorMessage = document.getElementById('errorMessage');
 
     function openAddModal() {
         addModal.classList.remove('invisible');
-        
+        // Reset form
+        document.getElementById('createConsultantForm').reset();
+        successMessage.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+
         setTimeout(() => {
             modalBackdrop.classList.remove('opacity-0');
             modalBackdrop.classList.add('opacity-100');
-
             modalPanel.classList.remove('opacity-0', 'scale-95');
             modalPanel.classList.add('opacity-100', 'scale-100');
         }, 10);
@@ -572,13 +515,50 @@
     function closeAddModal() {
         modalBackdrop.classList.remove('opacity-100');
         modalBackdrop.classList.add('opacity-0');
-
         modalPanel.classList.remove('opacity-100', 'scale-100');
         modalPanel.classList.add('opacity-0', 'scale-95');
-
         setTimeout(() => {
             addModal.classList.add('invisible');
         }, 300);
     }
+
+    // AJAX Submission
+    submitBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // UI Loading State
+        submitBtn.disabled = true;
+        loadingIcon.classList.remove('hidden');
+        successMessage.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+
+        const formData = new FormData(document.getElementById('createConsultantForm'));
+
+        axios.post("{{ route('store.consultant') }}", formData)
+            .then(response => {
+                successMessage.textContent = response.data.message;
+                successMessage.classList.remove('hidden');
+                document.getElementById('createConsultantForm').reset();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            })
+            .catch(error => {
+                submitBtn.disabled = false;
+                loadingIcon.classList.add('hidden');
+                
+                if (error.response && error.response.status === 422) {
+                    const errors = error.response.data.errors;
+                    Object.keys(errors).forEach(key => {
+                        const errorSpan = document.querySelector(`.${key}_error`);
+                        if(errorSpan) errorSpan.textContent = errors[key][0];
+                    });
+                } else {
+                    errorMessage.textContent = error.response?.data?.message || 'Something went wrong.';
+                    errorMessage.classList.remove('hidden');
+                }
+            });
+    });
 </script>
 @endpush
