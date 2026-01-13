@@ -266,6 +266,18 @@
                         class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Mini
                         Dashboard</span>
                 </a>
+                 <a href="{{ route('subscription.index') }}"
+                    class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('subscription.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('stats.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <rect x="2" y="3" width="20" height="14" rx="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                        <path d="M8 21h8m-4-4v4" stroke-linecap="round" stroke-linejoin="round" />
+                        <path d="M16 13V9m-4 4V7m-4 4v-2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span x-show="sidebarOpen"
+                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Subscription</span>
+                </a>
             </li>
         </ul>
     </nav>

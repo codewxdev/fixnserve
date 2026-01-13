@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\Front\SubscriptionController;
 use Illuminate\Support\Facades\Route;
  
 
