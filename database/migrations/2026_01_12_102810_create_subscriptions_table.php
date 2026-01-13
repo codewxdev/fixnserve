@@ -16,14 +16,14 @@ return new class extends Migration
             $table->foreignId('app_id')->constrained()->cascadeOnDelete();
             $table->foreignId('provider_id')->constrained('users');
             $table->foreignId('subscription_plan_id')->constrained();
-            $table->string('tier');
+            // $table->string('tier');
             $table->enum('subscription_status', [
                 'active',
                 'grace',
                 'suspended',
                 'cancelled',
             ]);
-            $table->enum('billing_cycle', ['monthly', 'yearly']);
+            // $table->enum('billing_cycle', ['monthly', 'yearly']);
             $table->boolean('auto_renew')->default(true);
             $table->timestamp('starts_at');
             $table->timestamp('ends_at')->nullable();

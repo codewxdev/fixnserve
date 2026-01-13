@@ -26,6 +26,7 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionEntitlementController;
 use App\Http\Controllers\SubscriptionPlanController;
 use App\Models\Country;
@@ -175,7 +176,12 @@ Route::middleware(['auth:api'])->prefix('admin')->group(function () {
     Route::apiResource('subscription-plans', SubscriptionPlanController::class);
     Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
 });
-
+Route::middleware('auth:api')->group(function () {
+    Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
+    Route::post('/unsubscribe', [SubscriptionController::class, 'cancel']);
+    Route::get('/subscription/status', [SubscriptionController::class, 'status']);
+    Route::get('/subscription/entitlements', [SubscriptionController::class, 'entitlements']);
+});
 // /////////////////////////////////////////extra code//////////////////////////////////////
 
 // Route::get('/roles/{role?}', [RoleController::class, 'index']);

@@ -274,7 +274,16 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function wallet()
-{
-    return $this->hasOne(Wallet::class);
-}
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function canSubscribeTo(int $appId): bool
+    {
+        return in_array($this->role, [
+            'service_provider',
+            'expert',
+            'consultant',
+        ]);
+    }
 }

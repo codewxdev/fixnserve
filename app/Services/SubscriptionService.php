@@ -1,57 +1,127 @@
 <?php
 
-// app/Services/SubscriptionService.php
-
 namespace App\Services;
 
 use App\Models\Subscription;
+use App\Models\SubscriptionPlan;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class SubscriptionService
 {
-    public function subscribe($user, $plan)
+    /**
+     * Create / Upgrade / Downgrade subscription
+     */
+    public function subscribe(int $userId, SubscriptionPlan $plan): Subscription
     {
-        DB::transaction(function () use ($user, $plan) {
+        return DB::transaction(function () use ($userId, $plan) {
 
-            Subscription::updateOrCreate(
+            $now = Carbon::now();
+
+            return Subscription::updateOrCreate(
                 [
-                    'user_id' => $user->id,
+                    'user_id' => $userId,
                     'app_id' => $plan->app_id,
                 ],
                 [
                     'subscription_plan_id' => $plan->id,
                     'status' => 'active',
-                    'started_at' => now(),
-                    'expires_at' => now()->addMonth(),
+                    'started_at' => $now,
+                    'expires_at' => $this->calculateExpiry($plan, $now),
+                    'grace_ends_at' => null,
                 ]
             );
         });
     }
 
-    public function cancel(Subscription $subscription)
+    /**
+     * Cancel subscription (manual or admin)
+     */
+    public function cancel(Subscription $subscription): void
     {
         $subscription->update([
             'status' => 'cancelled',
         ]);
     }
 
-    public function isActive($user, $appId): bool
+    /**
+     * Check if subscription is valid for access
+     */
+    public function isActive(int $userId, int $appId): bool
     {
-        return Subscription::where('user_id', $user->id)
+        return Subscription::where('user_id', $userId)
             ->where('app_id', $appId)
             ->whereIn('status', ['active', 'grace'])
             ->where('expires_at', '>', now())
             ->exists();
     }
 
-    public function getEntitlements($user, $appId)
+    /**
+     * Mark subscription as past due and start grace period
+     */
+    public function markPastDue(Subscription $subscription, int $graceDays = 7): void
     {
-        return Subscription::with('plan.entitlements')
-            ->where('user_id', $user->id)
+        $subscription->update([
+            'status' => 'grace',
+            'grace_ends_at' => now()->addDays($graceDays),
+        ]);
+    }
+
+    /**
+     * Expire subscription completely
+     */
+    public function expire(Subscription $subscription): void
+    {
+        $subscription->update([
+            'status' => 'expired',
+        ]);
+    }
+
+    /**
+     * Auto-renew subscription
+     */
+    public function renew(Subscription $subscription): void
+    {
+        $now = now();
+
+        $subscription->update([
+            'status' => 'active',
+            'started_at' => $now,
+            'expires_at' => $this->calculateExpiry($subscription->plan, $now),
+            'grace_ends_at' => null,
+        ]);
+    }
+
+    /**
+     * Resolve entitlements for current subscription
+     */
+    public function getEntitlements(int $userId, int $appId): array
+    {
+        $subscription = Subscription::with('plan.entitlements')
+            ->where('user_id', $userId)
             ->where('app_id', $appId)
-            ->first()
-            ?->plan
-            ?->entitlements
-            ->pluck('value', 'feature_key');
+            ->first();
+
+        if (! $subscription) {
+            return [];
+        }
+
+        return $subscription->plan
+            ->entitlements
+            ->pluck('value', 'feature_key')
+            ->toArray();
+    }
+
+    /**
+     * Calculate expiry date based on billing cycle
+     */
+    private function calculateExpiry(
+        SubscriptionPlan $plan,
+        Carbon $start
+    ): Carbon {
+        return match ($plan->billing_cycle) {
+            'monthly' => $start->copy()->addMonth(),
+            'yearly' => $start->copy()->addYear(),
+        };
     }
 }
