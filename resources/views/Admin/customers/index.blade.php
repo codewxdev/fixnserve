@@ -10,7 +10,7 @@
                 <p class="mt-1 text-slate-500">Manage profiles, orders, and service history.</p>
             </div>
 
-            <button onclick="openAddCustomerModal()"
+            <button onclick="openCreateModal()"
                 class="flex items-center justify-center space-x-2 px-5 py-2.5 bg-indigo-600 text-white rounded-lg shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all transform hover:-translate-y-0.5 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6">
@@ -64,7 +64,6 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-slate-100">
                         @forelse ($users as $customer)
-                            {{-- Prepare Data for JS (Constructing the object to match JS expectations) --}}
                             @php
                                 $statusClass = match ($customer->status) {
                                     'active' => 'bg-green-100 text-green-800',
@@ -73,7 +72,6 @@
                                     default => 'bg-yellow-100 text-yellow-800',
                                 };
 
-                                // Constructing JSON object for the Drawer
                                 $jsData = [
                                     'id' => $customer->id,
                                     'name' => $customer->name,
@@ -82,18 +80,16 @@
                                     'email' => $customer->email,
                                     'phone' => $customer->phone ?? 'N/A',
                                     'status' => $customer->status,
-                                    // Missing in DB, hardcoding 0 as requested
                                     'wallet_balance' => 0,
                                     'rewards' => 0,
-                                    // Mapping flat DB columns to nested object for JS
                                     'address' => [
                                         'current' => $customer->current_address ?? ($customer->address ?? 'N/A'),
                                         'city' => $customer->city ?? 'N/A',
                                         'state' => $customer->state ?? 'N/A',
-                                        'country' => 'N/A', // Country ID needs relationship, placeholder for now
+                                        'country' => 'N/A',
                                         'zip' => $customer->zipcode ?? 'N/A',
                                     ],
-                                    'payment_methods' => [], // Empty array as data missing in DB
+                                    'payment_methods' => [],
                                 ];
                             @endphp
 
@@ -133,19 +129,47 @@
                                 </td>
 
                                 <td class="px-6 py-4 whitespace-nowrap text-right">
-                                    {{-- Data Not Available in Table, showing 0/N/A --}}
                                     <div class="text-sm font-bold text-slate-900">
-
                                         ${{ $customer->wallet->balance }}
                                     </div>
-
                                 </td>
 
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <button onclick="showCustomerDetails({{ json_encode($jsData) }})"
-                                        class="text-indigo-600 hover:text-indigo-900 font-medium text-sm bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors">
-                                        View Details
-                                    </button>
+                                    <div class="flex items-center justify-center gap-2">
+                                        {{-- Edit Button (Triggers Edit Modal) --}}
+                                        <button onclick="openEditModal({{ json_encode($jsData) }})"
+                                            class="p-2 text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                                            title="Edit">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                </path>
+                                            </svg>
+                                        </button>
+
+                                        {{-- Delete Button --}}
+                                        <button onclick="deleteCustomer({{ $customer->id }})"
+                                            class="p-2 text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                                            title="Delete">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                </path>
+                                            </svg>
+                                        </button>
+
+                                        {{-- View Details Button --}}
+                                        <button onclick="showCustomerDetails({{ json_encode($jsData) }})"
+                                            class="p-2 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+                                            title="View Details">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -163,66 +187,189 @@
             </div>
         </div>
 
-        {{-- 
-            CREATE NEW CUSTOMER MODAL 
-            (Left as is, assuming you will wire up the form action separately)
-        --}}
-        <div id="add-customer-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
+        {{-- ======================= --}}
+        {{-- MODAL 1: CREATE CUSTOMER --}}
+        {{-- ======================= --}}
+        <div id="create-customer-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
             aria-modal="true">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
                 <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity backdrop-blur-sm"
-                    onclick="closeAddCustomerModal()"></div>
+                    onclick="closeCreateModal()"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div
                     class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                    
+                    {{-- Header --}}
                     <div class="bg-white px-6 py-6 border-b border-slate-100 flex justify-between items-center">
                         <h3 class="text-xl font-bold text-slate-800">Add New Customer</h3>
-                        <button onclick="closeAddCustomerModal()" class="text-slate-400 hover:text-slate-600">
+                        <button onclick="closeCreateModal()" class="text-slate-400 hover:text-slate-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
                     </div>
-                    {{-- Form can be updated to point to a route later --}}
+
+                    {{-- Create Form --}}
                     <form id="createCustomerForm" class="p-6 space-y-6">
+                        @csrf
+                        {{-- Messages --}}
+                        <div id="createErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4"></div>
+                        <div id="createSuccessMessage" class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
+
                         <div>
-                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Personal
-                                Information</h4>
+                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Personal Information</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label class="block text-sm font-medium text-slate-700">Full Name</label><input
-                                        type="text"
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Full Name</label>
+                                    <input type="text" name="name" id="create_name"
                                         class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border"
-                                        placeholder="John Doe"></div>
-                                <div><label class="block text-sm font-medium text-slate-700">Email</label><input
-                                        type="email"
+                                        placeholder="John Doe">
+                                    <span class="text-xs text-red-500 error-text name_error"></span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Email</label>
+                                    <input type="email" name="email" id="create_email"
                                         class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border"
-                                        placeholder="john@example.com"></div>
-                                <div><label class="block text-sm font-medium text-slate-700">Gender</label><select
+                                        placeholder="john@example.com">
+                                    <span class="text-xs text-red-500 error-text email_error"></span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Gender</label>
+                                    <select name="gender" id="create_gender"
                                         class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
-                                        <option>Male</option>
-                                        <option>Female</option>
-                                        <option>Other</option>
-                                    </select></div>
-                                <div><label class="block text-sm font-medium text-slate-700">Date of Birth</label><input
-                                        type="date"
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Date of Birth</label>
+                                    <input type="date" name="dob" id="create_dob"
                                         class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
                                 </div>
                             </div>
                         </div>
                     </form>
-                    <div class="bg-slate-50 px-6 py-4 flex flex-row-reverse gap-3">
-                        <button type="button"
-                            class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-5 py-2.5 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 sm:ml-3 sm:w-auto sm:text-sm">Create
-                            Customer</button>
-                        <button type="button" onclick="closeAddCustomerModal()"
-                            class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-5 py-2.5 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancel</button>
+
+                    {{-- Footer --}}
+                    <div class="p-6 border-t border-slate-200 flex justify-end">
+                        <button type="button" onclick="closeCreateModal()"
+                            class="mr-3 px-4 py-2 text-slate-500 hover:text-slate-700">Cancel</button>
+
+                        <button type="button" id="createSubmitBtn"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center">
+                            <svg id="createLoadingIcon" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            Save Customer
+                        </button>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        {{-- CUSTOMER DETAILS DRAWER (OFF-CANVAS) --}}
+        {{-- ===================== --}}
+        {{-- MODAL 2: EDIT CUSTOMER --}}
+        {{-- ===================== --}}
+        <div id="edit-customer-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
+            <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+                <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity backdrop-blur-sm"
+                    onclick="closeEditModal()"></div>
+                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                <div
+                    class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                    
+                    {{-- Header --}}
+                    <div class="bg-white px-6 py-6 border-b border-slate-100 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-slate-800">Edit Customer</h3>
+                        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    {{-- Edit Form --}}
+                    <form id="editCustomerForm" class="p-6 space-y-6">
+                        @csrf
+                        {{-- Hidden ID for Update --}}
+                        <input type="hidden" name="customer_id" id="edit_customer_id">
+                        {{-- Messages --}}
+                        <div id="editErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4"></div>
+                        <div id="editSuccessMessage" class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
+
+                        <div>
+                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Update Information</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Full Name</label>
+                                    <input type="text" name="name" id="edit_name"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
+                                    <span class="text-xs text-red-500 error-text name_error"></span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Email</label>
+                                    <input type="email" name="email" id="edit_email"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
+                                    <span class="text-xs text-red-500 error-text email_error"></span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Gender</label>
+                                    <select name="gender" id="edit_gender"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
+                                        <option value="male">Male</option>
+                                        <option value="female">Female</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Date of Birth</label>
+                                    <input type="date" name="dob" id="edit_dob"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    {{-- Footer --}}
+                    <div class="p-6 border-t border-slate-200 flex justify-end">
+                        <button type="button" onclick="closeEditModal()"
+                            class="mr-3 px-4 py-2 text-slate-500 hover:text-slate-700">Cancel</button>
+
+                        <button type="button" id="editSubmitBtn"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center">
+                            <svg id="editLoadingIcon" class="hidden animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            Update Customer
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        {{-- CUSTOMER DETAILS DRAWER --}}
         <div id="customer-details-drawer" class="fixed inset-0 overflow-hidden z-[60] hidden"
             aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
             <div class="absolute inset-0 overflow-hidden">
@@ -299,6 +446,136 @@
 @endpush
 
 @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        // --- 1. GLOBAL VARIABLES & FUNCTIONS ---
+        const customerBaseUrl = "{{ route('customers.store') }}"; // Base Store URL
+        const customersUrl = "{{ url('customers') }}"; // Base for Updates/Deletes
+
+        // --- CREATE MODAL LOGIC ---
+        function openCreateModal() {
+            document.getElementById('createCustomerForm').reset();
+            clearErrors('create');
+            document.getElementById('create-customer-modal').classList.remove('hidden');
+        }
+
+        function closeCreateModal() {
+            document.getElementById('create-customer-modal').classList.add('hidden');
+        }
+
+        // --- EDIT MODAL LOGIC ---
+        function openEditModal(data) {
+            // Fill Form
+            document.getElementById('edit_customer_id').value = data.id;
+            document.getElementById('edit_name').value = data.name;
+            document.getElementById('edit_email').value = data.email;
+            
+            if (data.gender) {
+                document.getElementById('edit_gender').value = data.gender.toLowerCase();
+            }
+            document.getElementById('edit_dob').value = data.dob;
+
+            clearErrors('edit');
+            document.getElementById('edit-customer-modal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-customer-modal').classList.add('hidden');
+        }
+
+        // --- HELPER: Clear Errors ---
+        function clearErrors(prefix) {
+            document.querySelectorAll(`#${prefix}CustomerForm .error-text`).forEach(el => el.innerText = '');
+            document.getElementById(`${prefix}ErrorMessage`).classList.add('hidden');
+            document.getElementById(`${prefix}SuccessMessage`).classList.add('hidden');
+        }
+
+        // --- DELETE CUSTOMER ---
+        function deleteCustomer(id) {
+            if (confirm("Are you sure you want to delete this customer?")) {
+                let url = `${customersUrl}/${id}`;
+                axios.delete(url, { headers: { 'Accept': 'application/json' } })
+                    .then(response => {
+                        alert("Customer deleted successfully!");
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Failed to delete customer.");
+                    });
+            }
+        }
+
+        // --- 2. EVENT LISTENERS ---
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // === A. HANDLE CREATE SUBMIT ===
+            const createBtn = document.getElementById('createSubmitBtn');
+            if(createBtn){
+                createBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    submitForm('create', customerBaseUrl, 'POST');
+                });
+            }
+
+            // === B. HANDLE EDIT SUBMIT ===
+            const editBtn = document.getElementById('editSubmitBtn');
+            if(editBtn){
+                editBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    let id = document.getElementById('edit_customer_id').value;
+                    let url = `${customersUrl}/${id}`;
+                    submitForm('edit', url, 'PUT');
+                });
+            }
+
+            // === COMMON SUBMIT FUNCTION ===
+            function submitForm(type, url, method) {
+                let form = document.getElementById(`${type}CustomerForm`);
+                let formData = new FormData(form);
+                let btn = document.getElementById(`${type}SubmitBtn`);
+                let loader = document.getElementById(`${type}LoadingIcon`);
+
+                // Add Method Spoofing for PUT
+                if (method === 'PUT') {
+                    formData.append('_method', 'PUT');
+                }
+
+                btn.disabled = true;
+                loader.classList.remove('hidden');
+                clearErrors(type);
+
+                axios.post(url, formData, { headers: { 'Accept': 'application/json' } })
+                .then(response => {
+                    document.getElementById(`${type}SuccessMessage`).innerText = response.data.message;
+                    document.getElementById(`${type}SuccessMessage`).classList.remove('hidden');
+                    form.reset();
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                })
+                .catch(error => {
+                    btn.disabled = false;
+                    loader.classList.add('hidden');
+
+                    if (error.response && error.response.status === 422) {
+                        let errors = error.response.data.errors;
+                        for (const [key, value] of Object.entries(errors)) {
+                            // Match input names with error class
+                            // Note: In Create form id is create_name, in Edit is edit_name, but validation key is 'name'
+                            // We look for error span inside the specific form
+                            let errorSpan = form.querySelector(`.name_error`); 
+                            // A simple hack to find specific error spans based on field name if classes are generic
+                            // or better, rely on the structure:
+                            let specificSpan = form.querySelector(`.${key}_error`);
+                            if (specificSpan) specificSpan.innerText = value[0];
+                        }
+                    } else {
+                        document.getElementById(`${type}ErrorMessage`).innerText = "Something went wrong. Please try again.";
+                        document.getElementById(`${type}ErrorMessage`).classList.remove('hidden');
+                    }
+                });
+            }
+        });
+    </script>
     <script>
         // --- Mock Data Generator for History Tabs (Since these are dynamic lists not in user table) ---
         const getMockHistory = (type) => {
@@ -403,14 +680,6 @@
                 statusFilter.addEventListener("change", filterMainTable);
             }
         });
-
-        function openAddCustomerModal() {
-            document.getElementById('add-customer-modal').classList.remove('hidden');
-        }
-
-        function closeAddCustomerModal() {
-            document.getElementById('add-customer-modal').classList.add('hidden');
-        }
 
         function showCustomerDetails(customer) {
             currentCustomer = customer;

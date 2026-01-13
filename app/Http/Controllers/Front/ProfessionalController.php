@@ -3,11 +3,42 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProfessionalRequest;
+use App\Models\User;
+use App\Services\ProfessionalService;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ProfessionalController extends Controller
 {
+    protected $professionalService;
+
+    public function __construct(ProfessionalService $professionalService)
+    {
+        $this->professionalService = $professionalService;
+    }
+
+    public function store(StoreProfessionalRequest $request): JsonResponse {
+           
+        try {
+             $professional = $this->professionalService->registerProfessional($request->validated());
+
+             return response()->json([
+                'status' => 'success',
+                'message' => 'professional created successfully with Wallet!',
+                'professional' => $professional
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Something went wrong: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function index(){
-        return view('Admin.professionals.index');
+
+        $professionals = User::role('Professional')->get();
+        return view('Admin.professionals.index',compact('professionals'));
     }
 }
