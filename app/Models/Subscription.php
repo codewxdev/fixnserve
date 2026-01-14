@@ -8,7 +8,7 @@ class Subscription extends Model
 {
     protected $fillable = [
         'app_id', 'user_id', 'subscription_plan_id',
-        'status', 'started_at', 'expires_at',
+        'subscription_status', 'starts_at', 'expires_at', 'ends_at', 'grace_ends_at', 'auto_renew',
     ];
 
     public function plan()
