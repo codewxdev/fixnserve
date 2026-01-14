@@ -19,9 +19,6 @@ class PromotionSlotController extends Controller
     {
         $data = $request->validate([
             'promotion_id' => 'required|exists:promotions,id',
-            'app_id' => 'required|integer',
-            'city_id' => 'nullable|integer',
-            'category_id' => 'nullable|integer',
             'max_slots' => 'required|integer|min:1',
             'visibility_weight' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
@@ -41,6 +38,18 @@ class PromotionSlotController extends Controller
         ]));
 
         return ApiResponse::success($promotionSlot, 'Promotion slot updated');
+    }
+
+    public function show($id)
+    {
+        $promotionSlot = PromotionSlot::find($id);
+        if (! $promotionSlot) {
+            return ApiResponse::error('Promotion slot not found', 404);
+        }
+
+        return ApiResponse::success(
+            $promotionSlot->load('promotion')
+        );
     }
 
     public function destroy(PromotionSlot $promotionSlot)

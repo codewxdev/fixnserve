@@ -14,19 +14,11 @@ return new class extends Migration
         Schema::create('promotion_slots', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('promotion_id');
-            $table->unsignedBigInteger('app_id');
-
-            $table->unsignedBigInteger('city_id')->nullable();
-            $table->unsignedBigInteger('category_id')->nullable();
-
             $table->integer('max_slots');
             $table->integer('used_slots')->default(0);
-
             $table->decimal('visibility_weight', 5, 2);
             $table->decimal('price', 10, 2);
-
             $table->timestamps();
-
             $table->foreign('promotion_id')
                 ->references('id')->on('promotions')
                 ->cascadeOnDelete();
