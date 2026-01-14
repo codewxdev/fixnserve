@@ -8,9 +8,6 @@ class PromotionSlot extends Model
 {
     protected $fillable = [
         'promotion_id',
-        'app_id',
-        'city_id',
-        'category_id',
         'max_slots',
         'used_slots',
         'visibility_weight',

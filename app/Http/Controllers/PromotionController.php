@@ -40,6 +40,17 @@ class PromotionController extends Controller
         return ApiResponse::success($promotion, 'Promotion updated');
     }
 
+    public function show($id)
+    {
+        $promotion = Promotion::find($id);
+
+        if (! $promotion) {
+            return ApiResponse::error('Promotion not found', 404);
+        }
+
+        return ApiResponse::success($promotion);
+    }
+
     public function destroy(Promotion $promotion)
     {
         $promotion->delete();
