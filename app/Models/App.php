@@ -10,6 +10,7 @@ class App extends Model
         'name',
         'app_id',
     ];
+     
 
     public function plans()
     {

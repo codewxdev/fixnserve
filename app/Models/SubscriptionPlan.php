@@ -11,6 +11,11 @@ class SubscriptionPlan extends Model
         'price', 'visibility_weight',
     ];
 
+    public function app()
+    {
+        return $this->belongsTo(App::class);
+    }
+
     public function entitlements()
     {
         return $this->hasMany(SubscriptionEntitlement::class);

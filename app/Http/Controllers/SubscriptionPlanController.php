@@ -23,6 +23,7 @@ class SubscriptionPlanController extends Controller
             'price' => 'required|numeric|min:0',
             'visibility_weight' => 'required|integer',
         ]);
+        
 
         return $service->create($data);
     }
