@@ -7,18 +7,17 @@
     </h1>
 
     {{-- ========================================== --}}
-    {{-- 1. ANALYTICS WIDGETS --}}
+    {{-- 1. ANALYTICS WIDGETS (UNCHANGED) --}}
     {{-- ========================================== --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-5">
-        {{-- Note: In a real scenario, calculate these counts from the backend --}}
         @php
         $stats = [
             ['title' => 'Total Providers', 'value' => $providers->count() ?? 0, 'icon' => 'fas fa-users', 'color' => 'blue'],
             ['title' => 'Active Providers', 'value' => $providers->where('status', 'active')->count() ?? 0, 'icon' => 'fas fa-user-check', 'color' => 'green'],
-            ['title' => 'Pending KYC', 'value' => 'NaN', 'icon' => 'fas fa-hourglass-half', 'color' => 'yellow'], // Not in DB
+            ['title' => 'Pending KYC', 'value' => 'NaN', 'icon' => 'fas fa-hourglass-half', 'color' => 'yellow'], 
             ['title' => 'Suspended', 'value' => $providers->where('status', 'suspend')->count() ?? 0, 'icon' => 'fas fa-gavel', 'color' => 'red'],
-            ['title' => 'Online Now', 'value' => 'NaN', 'icon' => 'fas fa-circle', 'color' => 'teal'], // Not in DB
-            ['title' => "Today's Earnings", 'value' => 'NaN', 'icon' => 'fas fa-dollar-sign', 'color' => 'purple'], // Not in DB
+            ['title' => 'Online Now', 'value' => 'NaN', 'icon' => 'fas fa-circle', 'color' => 'teal'], 
+            ['title' => "Today's Earnings", 'value' => 'NaN', 'icon' => 'fas fa-dollar-sign', 'color' => 'purple'], 
         ];
         @endphp
         @foreach ($stats as $stat)
@@ -39,7 +38,7 @@
     {{-- ========================================== --}}
     <div class="bg-white shadow-xl rounded-xl overflow-hidden">
 
-        {{-- FILTER BAR (Sticky) --}}
+        {{-- FILTER BAR (With Subscription Filter) --}}
         <div id="sticky-filter-bar" class="p-5 border-b border-gray-100 bg-white sticky top-0 z-10 transition duration-300 ease-in-out">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <div class="flex-shrink w-full sm:w-auto">
@@ -50,9 +49,15 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3">
+                    {{-- Subscription Filter --}}
+                    <select id="subscriptionFilter" class="p-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="all">All Plans</option>
+                        <option value="subscribed">Premium (Subscribed)</option>
+                        <option value="free">Standard (Free)</option>
+                    </select>
+
                     <select id="categoryFilter" class="p-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 focus:ring-blue-500 focus:border-blue-500">
                         <option value="">Category</option>
-                        {{-- Static for now as Categories are not in DB --}}
                         <option>N/A</option>
                     </select>
                     <select id="kycFilter" class="p-2.5 border border-gray-300 rounded-xl text-sm text-gray-600 focus:ring-blue-500 focus:border-blue-500">
@@ -94,6 +99,13 @@
                     <tbody class="bg-white divide-y divide-gray-100">
                         @forelse ($providers as $provider)
                         @php
+                            // --- FIXED: DETERMINISTIC LOGIC (No Random on Reload) ---
+                            // Uses provider ID so status stays consistent on refresh
+                            $hasSub = ($provider->id % 2 != 0); // Example: Odd IDs have subscription
+                            
+                            $planName = $hasSub ? 'Gold Pro' : 'Free';
+                            $subStatus = $hasSub ? 'subscribed' : 'free';
+
                             // Determine Status Color
                             $statusColor = match ($provider->status) {
                                 'active' => 'bg-green-100 text-green-800',
@@ -103,10 +115,9 @@
                                 default => 'bg-gray-100 text-gray-800',
                             };
                             
-                            // Image Handling
                             $image = $provider->image ? asset($provider->image) : 'https://ui-avatars.com/api/?name=' . urlencode($provider->name) . '&color=7F9CF5&background=EBF4FF';
 
-                            // Construct JSON Object for Slide Over
+                            // JSON Data
                             $jsData = [
                                 'id' => $provider->id,
                                 'name' => $provider->name ?? 'N/A',
@@ -117,7 +128,15 @@
                                 'dob' => $provider->dob ?? 'N/A',
                                 'status' => $provider->status,
                                 'join_date' => $provider->created_at ? $provider->created_at->format('M d, Y') : 'N/A',
-                                // Data not in DB set to NaN/N/A
+                                
+                                // Subscription Data
+                                'subscription' => [
+                                    'has_plan' => $hasSub,
+                                    'plan_name' => $planName,
+                                    'expires_at' => now()->addDays(30)->format('M d, Y'),
+                                    'progress' => 65 // Fixed value for demo
+                                ],
+
                                 'main_category' => 'N/A',
                                 'sub_categories' => [],
                                 'hourly_rate' => 'NaN',
@@ -144,10 +163,21 @@
                             ];
                         @endphp
 
-                        <tr class="hover:bg-blue-50/50 transition duration-150 ease-in-out">
+                        <tr class="hover:bg-blue-50/50 transition duration-150 ease-in-out" 
+                            data-subscription="{{ $subStatus }}">
+                            
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <img class="h-10 w-10 rounded-full object-cover shadow-sm ring-1 ring-gray-100" src="{{ $image }}" alt="{{ $provider->name }}">
+                                    <div class="relative">
+                                        <img class="h-10 w-10 rounded-full object-cover shadow-sm ring-1 ring-gray-100" src="{{ $image }}" alt="{{ $provider->name }}">
+                                        
+                                        {{-- FIXED: PERFECT CIRCLE STAR ICON --}}
+                                        @if($hasSub)
+                                        <div class="absolute -top-1 -right-1 h-4 w-4 bg-yellow-400 text-white rounded-full border-2 border-white shadow-sm flex items-center justify-center" title="Premium Subscriber">
+                                            <i class="fas fa-star text-[8px]"></i>
+                                        </div>
+                                        @endif
+                                    </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900 search-name">{{ $provider->name }}</div>
                                         <div class="text-xs text-gray-500">ID: #{{ $provider->id }}</div>
@@ -157,7 +187,7 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-3 py-1 inline-flex text-xs leading-5 font-medium rounded-full bg-blue-100 text-blue-800">
-                                    N/A {{-- Category Missing --}}
+                                    N/A
                                 </span>
                                 <div class="text-xs text-gray-500 mt-1">
                                     <i class="fas fa-tag text-gray-400 mr-1"></i> $NaN/hr
@@ -167,12 +197,6 @@
                                 <div class="mb-1">
                                     <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">
                                         {{ ucfirst($provider->status) }}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="inline-flex items-center text-xs font-medium text-gray-700">
-                                        {{-- Mode not in DB, assuming N/A --}}
-                                        <i class="fas fa-circle text-gray-300 text-[8px] mr-1"></i> N/A
                                     </span>
                                 </div>
                             </td>
@@ -220,9 +244,8 @@
             </div>
         </div>
 
-        {{-- PAGINATION (Assuming $providers is a paginated collection) --}}
+        {{-- PAGINATION --}}
         <div class="p-5 border-t border-gray-100">
-            {{-- Check if $providers is instance of Paginator --}}
             @if($providers instanceof \Illuminate\Pagination\LengthAwarePaginator)
                 {{ $providers->links() }} 
             @else
@@ -235,7 +258,7 @@
 </div>
 
 {{-- ========================================== --}}
-{{-- 3. SIDE PANEL (SLIDE OVER) CONTAINER --}}
+{{-- 3. SIDE PANEL (ORIGINAL SINGLE VIEW) --}}
 {{-- ========================================== --}}
 <div id="slide-over-overlay" class="fixed inset-0 bg-gray-900 bg-opacity-70 z-40 hidden transition-opacity duration-300 ease-in-out"></div>
 <div id="details-slide-over" class="slide-over-panel fixed top-0 right-0 h-full w-full sm:w-4/5 lg:w-3/5 xl:w-2/5 bg-white shadow-2xl z-50 overflow-y-auto">
@@ -295,24 +318,6 @@
                     <input type="email" name="email" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border" placeholder="e.g. john@example.com">
                     <span class="text-xs text-red-500 error-text email_error"></span>
                 </div>
-
-                 {{-- <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select name="category" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border">
-                            <option value="">Select Category</option>
-                            <option value="plumber">Plumber</option>
-                            <option value="electrician">Electrician</option>
-                            <option value="technician">Technician</option>
-                        </select>
-                        <span class="text-xs text-red-500 error-text category_error"></span>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Hourly Rate ($)</label>
-                        <input type="number" name="hourly_rate" step="0.01" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm p-2.5 border" placeholder="0.00">
-                        <span class="text-xs text-red-500 error-text hourly_rate_error"></span>
-                    </div>
-                </div>  --}}
             </form>
 
             <div class="p-6 border-t border-gray-200 flex justify-end bg-gray-50">
@@ -354,28 +359,30 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // --- 1. Filter Logic ---
+        // --- 1. Filter Logic (Updated) ---
         const rows = document.querySelectorAll("tbody tr");
 
         function applyFilters() {
             const search = document.getElementById("searchInput").value.toLowerCase().trim();
             const category = document.getElementById("categoryFilter").value.toLowerCase().trim();
             const status = document.getElementById("kycFilter").value.toLowerCase().trim();
+            const subStatus = document.getElementById("subscriptionFilter").value.toLowerCase(); // NEW
 
             rows.forEach(row => {
                 const name = row.querySelector(".search-name").innerText.toLowerCase();
-                // Status is in the 3rd column (index 2)
                 const rowStatus = row.querySelector("td:nth-child(3) span").innerText.toLowerCase();
+                const rowSub = row.getAttribute("data-subscription"); // NEW
                 
                 let show = true;
                 if (search && !name.includes(search)) show = false;
                 if (status && !rowStatus.includes(status)) show = false;
+                if (subStatus !== 'all' && rowSub !== subStatus) show = false; // NEW
                 
                 row.style.display = show ? "" : "none";
             });
         }
 
-        document.querySelectorAll("#searchInput, #categoryFilter, #kycFilter").forEach(el => {
+        document.querySelectorAll("#searchInput, #categoryFilter, #kycFilter, #subscriptionFilter").forEach(el => {
             el.addEventListener("input", applyFilters);
             el.addEventListener("change", applyFilters);
         });
@@ -383,6 +390,7 @@
             document.getElementById("searchInput").value = "";
             document.getElementById("categoryFilter").value = "";
             document.getElementById("kycFilter").value = "";
+            document.getElementById("subscriptionFilter").value = "all";
             applyFilters();
         });
 
@@ -408,41 +416,43 @@
         const successDiv = document.getElementById('createSuccessMessage');
         const loader = document.getElementById('providerLoadingIcon');
 
-        submitBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        if(submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
 
-            submitBtn.disabled = true;
-            loader.classList.remove('hidden');
-            errorDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
-            document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
+                submitBtn.disabled = true;
+                loader.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
+                successDiv.classList.add('hidden');
+                document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
 
-            let formData = new FormData(form);
+                let formData = new FormData(form);
 
-            axios.post("{{ route('store.provider') }}", formData, {
-                    headers: { 'Accept': 'application/json' }
-                })
-                .then(response => {
-                    successDiv.innerText = response.data.message || 'Provider created successfully!';
-                    successDiv.classList.remove('hidden');
-                    form.reset();
-                    setTimeout(() => { window.location.reload(); }, 1000);
-                })
-                .catch(error => {
-                    submitBtn.disabled = false;
-                    loader.classList.add('hidden');
-                    if (error.response && error.response.status === 422) {
-                        let errors = error.response.data.errors;
-                        for (const [key, value] of Object.entries(errors)) {
-                            let errorSpan = document.querySelector(`.${key}_error`);
-                            if (errorSpan) errorSpan.innerText = value[0];
+                axios.post("{{ route('store.provider') }}", formData, {
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(response => {
+                        successDiv.innerText = response.data.message || 'Provider created successfully!';
+                        successDiv.classList.remove('hidden');
+                        form.reset();
+                        setTimeout(() => { window.location.reload(); }, 1000);
+                    })
+                    .catch(error => {
+                        submitBtn.disabled = false;
+                        loader.classList.add('hidden');
+                        if (error.response && error.response.status === 422) {
+                            let errors = error.response.data.errors;
+                            for (const [key, value] of Object.entries(errors)) {
+                                let errorSpan = document.querySelector(`.${key}_error`);
+                                if (errorSpan) errorSpan.innerText = value[0];
+                            }
+                        } else {
+                            errorDiv.innerText = "Something went wrong. Please try again.";
+                            errorDiv.classList.remove('hidden');
                         }
-                    } else {
-                        errorDiv.innerText = "Something went wrong. Please try again.";
-                        errorDiv.classList.remove('hidden');
-                    }
-                });
-        });
+                    });
+            });
+        }
     });
 
     // --- 4. Modal Logic ---
@@ -458,13 +468,12 @@
         document.getElementById('create-provider-modal').classList.add('hidden');
     }
 
-    // --- 5. Slide-Over Logic (DYNAMIC) ---
+    // --- 5. Slide-Over Logic ---
     const slideOver = document.getElementById('details-slide-over');
     const slideOverOverlay = document.getElementById('slide-over-overlay');
     const slideOverContent = document.getElementById('slide-over-content');
     const slideOverTitle = document.getElementById('slide-over-title');
 
-    // Updated to accept data object directly
     window.openProviderDetails = function(data) {
         slideOverTitle.textContent = data.name;
         slideOverContent.innerHTML = generateSlideOverContent(data);
@@ -483,11 +492,7 @@
     document.getElementById('slide-over-close').addEventListener('click', window.closeProviderDetails);
     slideOverOverlay.addEventListener('click', window.closeProviderDetails);
 
-    /**
-     * CONTENT GENERATOR (Updated to handle NaN/N/A)
-     */
     function generateSlideOverContent(data) {
-        // Safe helpers for array mapping
         const skillsHtml = data.skills.length > 0 
             ? data.skills.slice(0, 5).map(skill => `<span class="px-2 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded border border-blue-100">${skill}</span>`).join('')
             : '<span class="text-xs text-gray-500 italic">No skills listed (N/A)</span>';
@@ -499,6 +504,46 @@
         const paymentHtml = data.payment_methods.length > 0
             ? data.payment_methods.map(pm => `<span class="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-medium bg-white text-gray-700 border border-gray-200 shadow-sm"><i class="fas fa-credit-card mr-1.5 text-gray-400"></i> ${pm}</span>`).join('')
             : '<span class="text-xs text-gray-500 italic">N/A</span>';
+
+        // --- NEW: Generate Subscription HTML ---
+        let subscriptionHtml = '';
+        if (data.subscription && data.subscription.has_plan) {
+            subscriptionHtml = `
+            <div class="relative overflow-hidden bg-gray-900 p-6 rounded-2xl shadow-xl text-white">
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-blue-500 rounded-full opacity-20 blur-2xl"></div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <p class="text-blue-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
+                        <h2 class="text-2xl font-extrabold text-white tracking-tight">${data.subscription.plan_name}</h2>
+                    </div>
+                    <div class="bg-blue-500/20 border border-blue-400/30 p-2 rounded-lg">
+                        <i class="fas fa-crown text-blue-300 text-lg"></i>
+                    </div>
+                </div>
+                <div class="mt-6 space-y-3">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-400">Validity</span>
+                        <span class="text-white font-medium">${data.subscription.progress}% Remaining</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full" style="width: ${data.subscription.progress}%"></div>
+                    </div>
+                    <div class="flex justify-between text-xs mt-1">
+                        <span class="text-gray-500">Auto-renews</span>
+                        <span class="text-yellow-400 font-medium">Expires: ${data.subscription.expires_at}</span>
+                    </div>
+                </div>
+            </div>`;
+        } else {
+            subscriptionHtml = `
+            <div class="flex flex-col items-center justify-center p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center">
+                <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-gray-400">
+                    <i class="fas fa-crown text-xl"></i>
+                </div>
+                <h3 class="text-sm font-bold text-gray-800">No Active Plan</h3>
+                <p class="text-gray-500 text-xs mt-1">On Free Tier.</p>
+            </div>`;
+        }
 
         return `
                 <div class="space-y-8">
@@ -576,15 +621,10 @@
                         </div>
                     </div>
 
-                    {{-- Missing Data Sections (Visual Placeholders) --}}
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-900 uppercase mb-3">Portfolio Projects</h4>
-                        <p class="text-sm text-gray-500 italic border p-4 rounded text-center bg-gray-50">No portfolio projects available (N/A)</p>
-                    </div>
-
-                    <div>
-                        <h4 class="text-sm font-bold text-gray-900 uppercase mb-3">Recent Bookings</h4>
-                         <p class="text-sm text-gray-500 italic border p-4 rounded text-center bg-gray-50">No booking history available (N/A)</p>
+                    {{-- Subscription Block (AT THE BOTTOM) --}}
+                    <div class="border-t border-gray-100 pt-6">
+                        <h4 class="text-sm font-bold text-gray-900 uppercase mb-4">Subscription Status</h4>
+                        ${subscriptionHtml}
                     </div>
                 </div>
             `;

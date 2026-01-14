@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        {{-- 2. ANALYTICS CARDS (Dynamic Loop using provided design) --}}
+        {{-- 2. ANALYTICS CARDS (Unchanged) --}}
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
             @php
                 $stats = [
@@ -36,7 +36,7 @@
                     ],
                     [
                         'label' => 'Pending KYC',
-                        'value' => $professionals->where('kyc_status', 'pending')->count(), // Assuming column exists, else 0
+                        'value' => $professionals->where('kyc_status', 'pending')->count(), 
                         'icon_bg' => 'bg-yellow-100',
                         'icon_text' => 'text-yellow-600',
                         'icon_path' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
@@ -71,13 +71,23 @@
             <form id="filter-form">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                     
-                    <div class="lg:col-span-5 relative">
+                    {{-- Search --}}
+                    <div class="lg:col-span-4 relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
                         <input type="text" id="filter-search" class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Search by name or ID...">
+                    </div>
+
+                    {{-- NEW: Subscription Filter --}}
+                    <div class="lg:col-span-2">
+                         <select id="filter-subscription" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-gray-600 sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="all">All Plans</option>
+                            <option value="subscribed">Premium (Subscribed)</option>
+                            <option value="free">Standard (Free)</option>
+                        </select>
                     </div>
 
                     <div class="lg:col-span-2">
@@ -99,13 +109,9 @@
                         </select>
                     </div>
 
-                    <div class="lg:col-span-3 flex justify-end gap-2">
-                        <button type="button" id="reset-filters" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                    <div class="lg:col-span-2 flex justify-end gap-2">
+                        <button type="button" id="reset-filters" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition w-full">
                             Reset
-                        </button>
-                        {{-- Added type button to prevent form submit --}}
-                        <button type="button" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-indigo-700 shadow-sm transition">
-                            Apply Filters
                         </button>
                     </div>
                 </div>
@@ -173,6 +179,12 @@
                     <tbody id="experts-table-body" class="bg-white divide-y divide-gray-200">
                         @forelse($professionals as $expert)
                             @php
+                                // --- SUBSCRIPTION LOGIC ---
+                                // Deterministic logic based on ID
+                                $hasSub = ($expert->id % 2 != 0); 
+                                $planName = $hasSub ? 'Diamond Expert' : 'Standard';
+                                $subStatus = $hasSub ? 'subscribed' : 'free';
+
                                 $category = $expert->specialization ?? 'General';
                                 $rate = $expert->hourly_rate ?? 0;
                                 // Map DB status to UI classes
@@ -193,10 +205,17 @@
                                     'category' => $category,
                                     'rate' => $rate,
                                     'join_date' => $expert->created_at->format('M Y'),
-                                    'kyc_status' => 'verified', // Mocking as verified for visual
+                                    'kyc_status' => 'verified',
                                     'region' => $expert->city ?? 'Remote',
                                     'email' => $expert->email,
-                                    'phone' => $expert->phone ?? 'N/A'
+                                    'phone' => $expert->phone ?? 'N/A',
+                                    // Subscription Data
+                                    'subscription' => [
+                                        'has_plan' => $hasSub,
+                                        'plan_name' => $planName,
+                                        'expires_at' => now()->addDays(30)->format('M d, Y'),
+                                        'progress' => 80
+                                    ],
                                 ];
                             @endphp
 
@@ -207,14 +226,20 @@
                                 data-rate="{{ $rate }}"
                                 data-status="{{ strtolower($expert->status) }}"
                                 data-kyc="verified" 
-                                data-region="{{ strtolower($expert->city ?? '') }}">
+                                data-region="{{ strtolower($expert->city ?? '') }}"
+                                data-subscription="{{ $subStatus }}"> {{-- Added data attribute --}}
 
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="h-10 w-10 flex-shrink-0">
-                                            <img class="h-10 w-10 rounded-full object-cover"
-                                                src="{{ $image }}"
-                                                alt="{{ $expert->name }}">
+                                        <div class="h-10 w-10 flex-shrink-0 relative">
+                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ $image }}" alt="{{ $expert->name }}">
+                                            
+                                            {{-- STAR ICON for Subscribers --}}
+                                            @if($hasSub)
+                                            <div class="absolute -top-1 -right-1 h-4 w-4 bg-yellow-400 text-white rounded-full border-2 border-white shadow-sm flex items-center justify-center" title="Premium Expert">
+                                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            </div>
+                                            @endif
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-medium text-gray-900">{{ $expert->name }}</div>
@@ -342,7 +367,7 @@
                                     </div>
                                 </section>
 
-                                {{-- Static Sections to keep design intact --}}
+                                {{-- Static Sections --}}
                                 <section class="mb-8">
                                     <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">Verification Documents</h4>
                                     <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
@@ -380,6 +405,12 @@
                                         </div>
                                     </div>
                                 </section>
+
+                                {{-- SUBSCRIPTION SECTION (At Bottom) --}}
+                                <section class="mt-8 pt-6 border-t border-gray-100">
+                                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">Subscription Status</h4>
+                                    <div id="so-subscription-container"></div>
+                                </section>
                             </div>
                         </div>
                     </div>
@@ -388,7 +419,7 @@
         </div>
     </div>
 
-    {{-- 6. CREATE EXPERT MODAL --}}
+    {{-- 6. CREATE EXPERT MODAL (Unchanged) --}}
     <div id="create-expert-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeCreateExpertModal()"></div>
@@ -417,28 +448,6 @@
                         <input type="email" name="email" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
                         <span class="text-xs text-red-500 error-text email_error"></span>
                     </div>
-
-                    {{-- <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="text" name="phone" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
-                        <span class="text-xs text-red-500 error-text phone_error"></span>
-                    </div> --}}
-
-                    {{-- <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
-                            <select name="specialization" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
-                                <option value="Legal">Legal</option>
-                                <option value="Finance">Finance</option>
-                                <option value="Architecture">Architecture</option>
-                                <option value="Technology">Technology</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Experience (Yrs)</label>
-                            <input type="number" name="experience_years" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
-                        </div>
-                    </div> --}}
                 </form>
 
                 <div class="p-6 border-t border-gray-100 flex justify-end bg-gray-50">
@@ -488,7 +497,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         
         /* -------------------------------------------------------------------------- */
-        /* 1. SLIDE OVER LOGIC (Updated to be Dynamic) */
+        /* 1. SLIDE OVER LOGIC                                                        */
         /* -------------------------------------------------------------------------- */
         const slideover = document.getElementById('expert-details-slideover');
         const backdrop = document.getElementById('slideover-backdrop');
@@ -504,6 +513,46 @@
             document.getElementById('so-region').innerText = data.region;
             document.getElementById('so-email').innerText = data.email;
             document.getElementById('so-phone').innerText = data.phone;
+
+            // Generate Subscription Card
+            const subContainer = document.getElementById('so-subscription-container');
+            if (data.subscription && data.subscription.has_plan) {
+                subContainer.innerHTML = `
+                <div class="relative overflow-hidden bg-gray-900 p-6 rounded-2xl shadow-xl text-white">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-indigo-500 rounded-full opacity-20 blur-2xl"></div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
+                            <h2 class="text-2xl font-extrabold text-white tracking-tight">${data.subscription.plan_name}</h2>
+                        </div>
+                        <div class="bg-indigo-500/20 border border-indigo-400/30 p-2 rounded-lg">
+                            <svg class="w-6 h-6 text-indigo-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        </div>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Validity</span>
+                            <span class="text-white font-medium">${data.subscription.progress}% Remaining</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full" style="width: ${data.subscription.progress}%"></div>
+                        </div>
+                        <div class="flex justify-between text-xs mt-1">
+                            <span class="text-gray-500">Auto-renews</span>
+                            <span class="text-indigo-300 font-medium">Expires: ${data.subscription.expires_at}</span>
+                        </div>
+                    </div>
+                </div>`;
+            } else {
+                subContainer.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center">
+                    <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-gray-400">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-800">No Active Plan</h3>
+                    <p class="text-gray-500 text-xs mt-1">On Free Tier.</p>
+                </div>`;
+            }
 
             // Show Panel
             slideover.classList.remove('hidden');
@@ -533,6 +582,7 @@
         const categorySelect = document.getElementById('filter-category');
         const regionSelect = document.getElementById('filter-region');
         const kycSelect = document.getElementById('filter-kyc');
+        const subFilterSelect = document.getElementById('filter-subscription'); // NEW
         const rateInput = document.getElementById('filter-rate');
         const rateDisplay = document.getElementById('rate-display');
         const statusRadios = document.querySelectorAll('.status-radio');
@@ -547,6 +597,7 @@
             const categoryValue = categorySelect.value.toLowerCase();
             const regionValue = regionSelect.value.toLowerCase();
             const kycValue = kycSelect.value.toLowerCase();
+            const subValue = subFilterSelect.value.toLowerCase(); // NEW
             const maxRate = parseInt(rateInput.value);
             
             let statusValue = 'all';
@@ -562,6 +613,7 @@
                 const category = row.dataset.category.toLowerCase();
                 const region = row.dataset.region ? row.dataset.region.toLowerCase() : '';
                 const kyc = row.dataset.kyc.toLowerCase();
+                const rowSub = row.dataset.subscription; // NEW
                 const rate = parseInt(row.dataset.rate);
                 const status = row.dataset.status.toLowerCase();
 
@@ -569,10 +621,11 @@
                 const matchesCategory = categoryValue === '' || category === categoryValue;
                 const matchesRegion = regionValue === '' || region === regionValue;
                 const matchesKyc = kycValue === '' || kyc === kycValue;
+                const matchesSub = subValue === 'all' || rowSub === subValue; // NEW
                 const matchesRate = rate <= maxRate;
                 const matchesStatus = statusValue === 'all' || status === statusValue;
 
-                if (matchesSearch && matchesCategory && matchesRegion && matchesKyc && matchesRate && matchesStatus) {
+                if (matchesSearch && matchesCategory && matchesRegion && matchesKyc && matchesRate && matchesStatus && matchesSub) {
                     row.classList.remove('hidden');
                     visibleCount++;
                 } else {
@@ -593,6 +646,7 @@
         categorySelect.addEventListener('change', filterExperts);
         regionSelect.addEventListener('change', filterExperts);
         kycSelect.addEventListener('change', filterExperts);
+        subFilterSelect.addEventListener('change', filterExperts); // NEW listener
         statusRadios.forEach(radio => radio.addEventListener('change', filterExperts));
 
         resetButton.addEventListener('click', () => {
@@ -612,41 +666,43 @@
         const successDiv = document.getElementById('createSuccessMessage');
         const loader = document.getElementById('expertLoadingIcon');
 
-        submitBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        if(submitBtn) {
+            submitBtn.addEventListener('click', function(e) {
+                e.preventDefault();
 
-            submitBtn.disabled = true;
-            loader.classList.remove('hidden');
-            errorDiv.classList.add('hidden');
-            successDiv.classList.add('hidden');
-            document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
+                submitBtn.disabled = true;
+                loader.classList.remove('hidden');
+                errorDiv.classList.add('hidden');
+                successDiv.classList.add('hidden');
+                document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
 
-            let formData = new FormData(form);
+                let formData = new FormData(form);
 
-            axios.post("{{ route('store.professional') }}", formData, {
-                headers: { 'Accept': 'application/json' }
-            })
-            .then(response => {
-                successDiv.innerText = response.data.message || 'Expert invited successfully!';
-                successDiv.classList.remove('hidden');
-                form.reset();
-                setTimeout(() => { window.location.reload(); }, 1000);
-            })
-            .catch(error => {
-                submitBtn.disabled = false;
-                loader.classList.add('hidden');
-                if (error.response && error.response.status === 422) {
-                    let errors = error.response.data.errors;
-                    for (const [key, value] of Object.entries(errors)) {
-                        let errorSpan = document.querySelector(`.${key}_error`);
-                        if (errorSpan) errorSpan.innerText = value[0];
+                axios.post("{{ route('store.professional') }}", formData, {
+                    headers: { 'Accept': 'application/json' }
+                })
+                .then(response => {
+                    successDiv.innerText = response.data.message || 'Expert invited successfully!';
+                    successDiv.classList.remove('hidden');
+                    form.reset();
+                    setTimeout(() => { window.location.reload(); }, 1000);
+                })
+                .catch(error => {
+                    submitBtn.disabled = false;
+                    loader.classList.add('hidden');
+                    if (error.response && error.response.status === 422) {
+                        let errors = error.response.data.errors;
+                        for (const [key, value] of Object.entries(errors)) {
+                            let errorSpan = document.querySelector(`.${key}_error`);
+                            if (errorSpan) errorSpan.innerText = value[0];
+                        }
+                    } else {
+                        errorDiv.innerText = "Something went wrong. Please try again.";
+                        errorDiv.classList.remove('hidden');
                     }
-                } else {
-                    errorDiv.innerText = "Something went wrong. Please try again.";
-                    errorDiv.classList.remove('hidden');
-                }
+                });
             });
-        });
+        }
     });
 
     // Modal Helpers

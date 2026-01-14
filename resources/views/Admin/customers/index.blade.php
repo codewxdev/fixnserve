@@ -22,8 +22,8 @@
 
         {{-- Search & Filters --}}
         <div
-            class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col md:flex-row gap-4 items-center">
-            <div class="relative flex-grow w-full md:w-auto">
+            class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-col lg:flex-row gap-4 items-center">
+            <div class="relative flex-grow w-full lg:w-auto">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -34,7 +34,17 @@
                     class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-colors"
                     placeholder="Search by name, ID, email...">
             </div>
-            <div class="flex gap-3 w-full md:w-auto">
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                {{-- NEW: Subscription Filter --}}
+                <select id="subscriptionFilter"
+                    class="form-select block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white">
+                    <option value="all">All Plans</option>
+                    <option value="subscribed">Has Subscription</option>
+                    <option value="free">Free / None</option>
+                </select>
+
+                {{-- Existing Status Filter --}}
                 <select id="statusFilter"
                     class="form-select block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white">
                     <option value="all">All Status</option>
@@ -45,7 +55,6 @@
                 </select>
             </div>
         </div>
-
         {{-- Main Table --}}
         <div class="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -54,6 +63,9 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Customer</th>
+                            {{-- NEW COLUMN --}}
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                                Current Plan</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Contact & Status</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -65,6 +77,12 @@
                     <tbody class="bg-white divide-y divide-slate-100">
                         @forelse ($users as $customer)
                             @php
+                                // --- MOCK SUBSCRIPTION DATA (Replace with real DB relation) ---
+                                // Example: $subscription = $customer->subscription;
+                                $hasSub = (bool) rand(0, 1); // Random for demo
+                                $planName = $hasSub ? (rand(0, 1) ? 'Gold Pro' : 'Silver Starter') : 'Free Tier';
+                                $subStatus = $hasSub ? 'subscribed' : 'free';
+
                                 $statusClass = match ($customer->status) {
                                     'active' => 'bg-green-100 text-green-800',
                                     'Ban', 'suspend' => 'bg-red-100 text-red-800',
@@ -82,6 +100,13 @@
                                     'status' => $customer->status,
                                     'wallet_balance' => 0,
                                     'rewards' => 0,
+                                    // Passing Subscription Data to JS
+                                    'subscription' => [
+                                        'has_plan' => $hasSub,
+                                        'plan_name' => $planName,
+                                        'expires_at' => now()->addDays(rand(5, 30))->format('M d, Y'),
+                                        'progress' => rand(20, 90),
+                                    ],
                                     'address' => [
                                         'current' => $customer->current_address ?? ($customer->address ?? 'N/A'),
                                         'city' => $customer->city ?? 'N/A',
@@ -93,11 +118,13 @@
                                 ];
                             @endphp
 
+                            {{-- Added data-subscription attribute for filtering --}}
                             <tr class="hover:bg-slate-50 transition-colors duration-200 customer-row"
-                                data-status="{{ strtolower($customer->status) }}">
+                                data-status="{{ strtolower($customer->status) }}" data-subscription="{{ $subStatus }}">
+
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
-                                        <div class="flex-shrink-0 h-10 w-10">
+                                        <div class="flex-shrink-0 h-10 w-10 relative">
                                             @if ($customer->image)
                                                 <img class="h-10 w-10 rounded-full object-cover shadow-md"
                                                     src="{{ asset($customer->image) }}" alt="{{ $customer->name }}">
@@ -107,6 +134,17 @@
                                                     {{ substr($customer->name, 0, 1) }}
                                                 </div>
                                             @endif
+
+                                            {{-- CROWN ICON for Subscribers --}}
+                                            @if ($hasSub)
+                                                <div class="absolute -top-1 -right-1 bg-yellow-400 text-white rounded-full p-0.5 border-2 border-white shadow-sm"
+                                                    title="Premium Subscriber">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path
+                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                    </svg>
+                                                </div>
+                                            @endif
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-semibold text-slate-900 search-name">
@@ -114,6 +152,25 @@
                                             <div class="text-xs text-slate-500 search-id">ID: #{{ $customer->id }}</div>
                                         </div>
                                     </div>
+                                </td>
+
+                                {{-- NEW PLAN COLUMN --}}
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if ($hasSub)
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                            <svg class="mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor"
+                                                viewBox="0 0 8 8">
+                                                <circle cx="4" cy="4" r="3" />
+                                            </svg>
+                                            {{ $planName }}
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
+                                            Free Tier
+                                        </span>
+                                    @endif
                                 </td>
 
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -136,7 +193,6 @@
 
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        {{-- Edit Button (Triggers Edit Modal) --}}
                                         <button onclick="openEditModal({{ json_encode($jsData) }})"
                                             class="p-2 text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                                             title="Edit">
@@ -146,23 +202,21 @@
                                                 </path>
                                             </svg>
                                         </button>
-
-                                        {{-- Delete Button --}}
                                         <button onclick="deleteCustomer({{ $customer->id }})"
                                             class="p-2 text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
                                             title="Delete">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                                 </path>
                                             </svg>
                                         </button>
-
-                                        {{-- View Details Button --}}
                                         <button onclick="showCustomerDetails({{ json_encode($jsData) }})"
                                             class="p-2 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
                                             title="View Details">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -173,11 +227,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr>
-                                <td colspan="4" class="p-8 text-center text-slate-500 text-sm">
-                                    No customers found in the database.
-                                </td>
-                            </tr>
+                            {{-- ... empty row remains same ... --}}
                         @endforelse
                     </tbody>
                 </table>
@@ -198,7 +248,7 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div
                     class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
-                    
+
                     {{-- Header --}}
                     <div class="bg-white px-6 py-6 border-b border-slate-100 flex justify-between items-center">
                         <h3 class="text-xl font-bold text-slate-800">Add New Customer</h3>
@@ -214,11 +264,14 @@
                     <form id="createCustomerForm" class="p-6 space-y-6">
                         @csrf
                         {{-- Messages --}}
-                        <div id="createErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4"></div>
-                        <div id="createSuccessMessage" class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
+                        <div id="createErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">
+                        </div>
+                        <div id="createSuccessMessage"
+                            class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
 
                         <div>
-                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Personal Information</h4>
+                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Personal
+                                Information</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">Full Name</label>
@@ -289,7 +342,7 @@
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div
                     class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
-                    
+
                     {{-- Header --}}
                     <div class="bg-white px-6 py-6 border-b border-slate-100 flex justify-between items-center">
                         <h3 class="text-xl font-bold text-slate-800">Edit Customer</h3>
@@ -307,11 +360,14 @@
                         {{-- Hidden ID for Update --}}
                         <input type="hidden" name="customer_id" id="edit_customer_id">
                         {{-- Messages --}}
-                        <div id="editErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4"></div>
-                        <div id="editSuccessMessage" class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
+                        <div id="editErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">
+                        </div>
+                        <div id="editSuccessMessage"
+                            class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
 
                         <div>
-                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Update Information</h4>
+                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Update
+                                Information</h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">Full Name</label>
@@ -448,11 +504,13 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // --- 1. GLOBAL VARIABLES & FUNCTIONS ---
-        const customerBaseUrl = "{{ route('customers.store') }}"; // Base Store URL
-        const customersUrl = "{{ url('customers') }}"; // Base for Updates/Deletes
+        // ==========================================
+        // 1. GLOBAL VARIABLES & CRUD OPERATIONS
+        // ==========================================
+        const customerBaseUrl = "{{ route('customers.store') }}"; 
+        const customersUrl = "{{ url('customers') }}"; 
 
-        // --- CREATE MODAL LOGIC ---
+        // --- CREATE MODAL ---
         function openCreateModal() {
             document.getElementById('createCustomerForm').reset();
             clearErrors('create');
@@ -463,16 +521,12 @@
             document.getElementById('create-customer-modal').classList.add('hidden');
         }
 
-        // --- EDIT MODAL LOGIC ---
+        // --- EDIT MODAL ---
         function openEditModal(data) {
-            // Fill Form
             document.getElementById('edit_customer_id').value = data.id;
             document.getElementById('edit_name').value = data.name;
             document.getElementById('edit_email').value = data.email;
-            
-            if (data.gender) {
-                document.getElementById('edit_gender').value = data.gender.toLowerCase();
-            }
+            if (data.gender) document.getElementById('edit_gender').value = data.gender.toLowerCase();
             document.getElementById('edit_dob').value = data.dob;
 
             clearErrors('edit');
@@ -506,10 +560,9 @@
             }
         }
 
-        // --- 2. EVENT LISTENERS ---
+        // --- FORM SUBMISSION LOGIC ---
         document.addEventListener("DOMContentLoaded", function() {
-
-            // === A. HANDLE CREATE SUBMIT ===
+            // Create Submit
             const createBtn = document.getElementById('createSubmitBtn');
             if(createBtn){
                 createBtn.addEventListener('click', function(e) {
@@ -518,7 +571,7 @@
                 });
             }
 
-            // === B. HANDLE EDIT SUBMIT ===
+            // Edit Submit
             const editBtn = document.getElementById('editSubmitBtn');
             if(editBtn){
                 editBtn.addEventListener('click', function(e) {
@@ -529,17 +582,13 @@
                 });
             }
 
-            // === COMMON SUBMIT FUNCTION ===
             function submitForm(type, url, method) {
                 let form = document.getElementById(`${type}CustomerForm`);
                 let formData = new FormData(form);
                 let btn = document.getElementById(`${type}SubmitBtn`);
                 let loader = document.getElementById(`${type}LoadingIcon`);
 
-                // Add Method Spoofing for PUT
-                if (method === 'PUT') {
-                    formData.append('_method', 'PUT');
-                }
+                if (method === 'PUT') formData.append('_method', 'PUT');
 
                 btn.disabled = true;
                 loader.classList.remove('hidden');
@@ -555,45 +604,42 @@
                 .catch(error => {
                     btn.disabled = false;
                     loader.classList.add('hidden');
-
                     if (error.response && error.response.status === 422) {
                         let errors = error.response.data.errors;
                         for (const [key, value] of Object.entries(errors)) {
-                            // Match input names with error class
-                            // Note: In Create form id is create_name, in Edit is edit_name, but validation key is 'name'
-                            // We look for error span inside the specific form
-                            let errorSpan = form.querySelector(`.name_error`); 
-                            // A simple hack to find specific error spans based on field name if classes are generic
-                            // or better, rely on the structure:
-                            let specificSpan = form.querySelector(`.${key}_error`);
+                            let specificSpan = form.querySelector(`.${key}_error`) || form.querySelector(`.name_error`); 
                             if (specificSpan) specificSpan.innerText = value[0];
                         }
                     } else {
-                        document.getElementById(`${type}ErrorMessage`).innerText = "Something went wrong. Please try again.";
+                        document.getElementById(`${type}ErrorMessage`).innerText = "Something went wrong.";
                         document.getElementById(`${type}ErrorMessage`).classList.remove('hidden');
                     }
                 });
             }
         });
     </script>
+
     <script>
-        // --- Mock Data Generator for History Tabs (Since these are dynamic lists not in user table) ---
+        // ==========================================
+        // 2. SEARCH, FILTERS & DRAWER LOGIC
+        // ==========================================
+        
+        // --- Mock History Generator ---
         const getMockHistory = (type) => {
             const statuses = ['In Progress', 'Delivered', 'Cancelled', 'Completed'];
             const items = [];
-            for (let i = 1; i <= 5; i++) { // Reduced count for cleaner look
+            for (let i = 1; i <= 5; i++) { 
                 const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
-                const dateStr = `2025-12-${day}`;
+                const dateStr = `2026-01-${day}`;
                 if (type === 'Transaction') {
                     const isCredit = Math.random() > 0.5;
                     items.push({
                         id: `TXN${10000+i}`,
-                        name: isCredit ? 'Wallet Top-up' : 'Order Payment',
-                        price: (Math.random() * 500).toFixed(2),
+                        name: isCredit ? 'Wallet Top-up' : 'Subscription Renewal',
+                        price: (Math.random() * 100).toFixed(2),
                         date: dateStr,
                         status: isCredit ? 'Credit' : 'Debit',
-                        image: isCredit ? 'https://via.placeholder.com/50/4f46e5/ffffff?text=IN' :
-                            'https://via.placeholder.com/50/ef4444/ffffff?text=OUT'
+                        image: ''
                     });
                 } else {
                     items.push({
@@ -609,64 +655,51 @@
             return items;
         };
 
-        let currentTabData = [];
-        const tabs = [{
-                id: 'personal',
-                label: 'Personal Info'
-            },
-            {
-                id: 'wallet',
-                label: 'Wallet'
-            },
-            {
-                id: 'orders',
-                label: 'Orders'
-            },
-            {
-                id: 'bookings',
-                label: 'Bookings'
-            },
-            {
-                id: 'services',
-                label: 'Service Requests'
-            },
-            {
-                id: 'providers',
-                label: 'Providers'
-            },
-            {
-                id: 'transactions',
-                label: 'History'
-            },
-            {
-                id: 'payments',
-                label: 'Payment Methods'
-            },
+        // --- Tabs Configuration (Added Subscription) ---
+        const tabs = [
+            { id: 'personal', label: 'Personal Info' },
+            { id: 'subscription', label: 'Subscription' }, // NEW TAB
+            { id: 'wallet', label: 'Wallet' },
+            { id: 'orders', label: 'Orders' },
+            { id: 'bookings', label: 'Bookings' },
+            { id: 'transactions', label: 'History' },
+            { id: 'payments', label: 'Payment Methods' },
         ];
+        
         let currentCustomer = null;
+        let currentTabData = [];
 
+        // --- FILTER LOGIC (UPDATED) ---
         document.addEventListener("DOMContentLoaded", function() {
             const searchInput = document.getElementById("customerSearchInput");
             const statusFilter = document.getElementById("statusFilter");
+            const subscriptionFilter = document.getElementById("subscriptionFilter"); // NEW
             const tableRows = document.querySelectorAll("#customerTable tbody tr");
             const noResults = document.getElementById("noResults");
 
             function filterMainTable() {
                 const query = searchInput.value.toLowerCase();
                 const status = statusFilter.value.toLowerCase();
+                const subStatus = subscriptionFilter ? subscriptionFilter.value.toLowerCase() : 'all'; // NEW
+
                 let hasVisibleRow = false;
 
                 tableRows.forEach(row => {
+                    // Data extraction
                     const name = row.querySelector(".search-name").innerText.toLowerCase();
                     const id = row.querySelector(".search-id").innerText.toLowerCase();
                     const email = row.querySelector(".search-email").innerText.toLowerCase();
+                    
+                    // Attribute extraction
                     const rowStatus = row.getAttribute("data-status");
+                    const rowSub = row.getAttribute("data-subscription"); // NEW
 
-                    const matchesSearch = name.includes(query) || id.includes(query) || email.includes(
-                        query);
+                    // Matching Logic
+                    const matchesSearch = name.includes(query) || id.includes(query) || email.includes(query);
                     const matchesStatus = status === "all" || rowStatus === status;
+                    const matchesSub = subStatus === "all" || rowSub === subStatus; // NEW
 
-                    if (matchesSearch && matchesStatus) {
+                    if (matchesSearch && matchesStatus && matchesSub) {
                         row.style.display = "";
                         hasVisibleRow = true;
                     } else {
@@ -675,12 +708,13 @@
                 });
                 if (noResults) noResults.style.display = hasVisibleRow ? "none" : "block";
             }
-            if (searchInput && statusFilter) {
-                searchInput.addEventListener("keyup", filterMainTable);
-                statusFilter.addEventListener("change", filterMainTable);
-            }
+
+            if (searchInput) searchInput.addEventListener("keyup", filterMainTable);
+            if (statusFilter) statusFilter.addEventListener("change", filterMainTable);
+            if (subscriptionFilter) subscriptionFilter.addEventListener("change", filterMainTable); // NEW
         });
 
+        // --- DRAWER FUNCTIONS ---
         function showCustomerDetails(customer) {
             currentCustomer = customer;
             document.getElementById('drawer-name').innerText = customer.name;
@@ -697,7 +731,11 @@
             const panel = document.getElementById('drawer-panel');
             drawer.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            switchTab('personal');
+            
+            // Open Subscription tab if they are a subscriber, else Personal
+            const initialTab = (customer.subscription && customer.subscription.has_plan) ? 'subscription' : 'personal';
+            switchTab(initialTab);
+
             setTimeout(() => {
                 backdrop.classList.remove('opacity-0');
                 panel.classList.remove('translate-x-full');
@@ -728,13 +766,84 @@
                 }
             });
             document.getElementById('drawer-content').innerHTML = renderContent(tabId);
-            if (['orders', 'bookings', 'services', 'providers', 'transactions'].includes(tabId)) {
+            if (['orders', 'bookings', 'transactions'].includes(tabId)) {
                 initHistoryTab(tabId);
             }
         }
 
+        // --- RENDER CONTENT (UPDATED WITH PRO SUBSCRIPTION UI) ---
         function renderContent(tabId) {
             const c = currentCustomer;
+            const sub = c.subscription; // Passed from PHP
+
+            // 1. SUBSCRIPTION TAB
+            if (tabId === 'subscription') {
+                if (!sub || !sub.has_plan) {
+                    // Empty State
+                    return `
+                    <div class="flex flex-col items-center justify-center p-8 bg-white border border-dashed border-slate-300 rounded-xl text-center h-64">
+                        <div class="h-14 w-14 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800">No Active Plan</h3>
+                        <p class="text-slate-500 text-sm mt-1 mb-4">This customer is currently on the Free Tier.</p>
+                        <button class="px-5 py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 shadow-md">Assign Subscription</button>
+                    </div>`;
+                }
+
+                // Pro State
+                return `
+                <div class="space-y-6 animate-fade-in-up">
+                    <div class="relative overflow-hidden bg-slate-900 p-6 rounded-2xl shadow-xl text-white">
+                        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-indigo-500 rounded-full opacity-20 blur-2xl"></div>
+                        <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-purple-500 rounded-full opacity-20 blur-2xl"></div>
+                        
+                        <div class="flex justify-between items-start relative z-10">
+                            <div>
+                                <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
+                                <h2 class="text-3xl font-extrabold text-white tracking-tight">${sub.plan_name}</h2>
+                            </div>
+                            <div class="bg-indigo-500/20 border border-indigo-400/30 p-2 rounded-lg">
+                                <svg class="w-6 h-6 text-indigo-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 space-y-3">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">Plan Usage</span>
+                                <span class="text-white font-medium">${sub.progress}% Remaining</span>
+                            </div>
+                            <div class="w-full bg-slate-700 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: ${sub.progress}%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs mt-1">
+                                <span class="text-slate-500">Auto-renews</span>
+                                <span class="text-yellow-400 font-medium">Expires: ${sub.expires_at}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">Included Benefits</h4>
+                        <ul class="space-y-3">
+                            <li class="flex items-center text-sm text-slate-600 font-medium">
+                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
+                                Priority 24/7 Support
+                            </li>
+                            <li class="flex items-center text-sm text-slate-600 font-medium">
+                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
+                                Advanced Analytics Dashboard
+                            </li>
+                            <li class="flex items-center text-sm text-slate-600 font-medium">
+                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
+                                Zero Transaction Fees
+                            </li>
+                        </ul>
+                    </div>
+                </div>`;
+            }
+
+            // 2. PERSONAL TAB
             if (tabId === 'personal') {
                 const addr = c.address || {};
                 return `
@@ -746,24 +855,22 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">Full Name</label><p class="text-slate-900 font-medium">${c.name}</p></div>
-                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Gender</label><p class="text-slate-900 font-medium">${c.gender}</p></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Gender</label><p class="text-slate-900 font-medium capitalize">${c.gender}</p></div>
                             <div><label class="text-xs font-semibold text-slate-400 uppercase">DOB</label><p class="text-slate-900 font-medium">${c.dob}</p></div>
-                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><p class="text-slate-900 font-medium">${c.email}</p></div>
-                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><p class="text-slate-900 font-medium">${c.phone}</p></div>
+                            <div><label class="text-xs font-semibold text-slate-400 uppercase">Email</label><p class="text-slate-900 font-medium break-all">${c.email}</p></div>
+                            <div class="md:col-span-2"><label class="text-xs font-semibold text-slate-400 uppercase">Phone</label><p class="text-slate-900 font-medium">${c.phone}</p></div>
                         </div>
                     </div>
                     <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 space-y-6">
                          <h3 class="text-lg font-bold text-slate-800 flex items-center">
                             <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a2 2 0 01-.586-1.414V15.5H5a2 2 0 01-2-2v-4a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2h-1.586a2 2 0 01-1.414.586z"></path></svg>
-                            Current Address
+                            Address
                         </h3>
                         <div class="p-4 bg-slate-50 rounded-lg border border-slate-200">
                              <div class="grid grid-cols-1 gap-4">
                                 <div><label class="text-xs font-semibold text-slate-400 uppercase">Street</label><p class="text-slate-900 font-medium">${addr.current}</p></div>
                                 <div class="grid grid-cols-2 gap-4">
                                      <div><label class="text-xs font-semibold text-slate-400 uppercase">City</label><p class="text-slate-900 font-medium">${addr.city}</p></div>
-                                     <div><label class="text-xs font-semibold text-slate-400 uppercase">State</label><p class="text-slate-900 font-medium">${addr.state}</p></div>
-                                     <div><label class="text-xs font-semibold text-slate-400 uppercase">Country</label><p class="text-slate-900 font-medium">${addr.country}</p></div>
                                      <div><label class="text-xs font-semibold text-slate-400 uppercase">Zip</label><p class="text-slate-900 font-medium">${addr.zip}</p></div>
                                 </div>
                              </div>
@@ -771,32 +878,31 @@
                     </div>
                 </div>`;
             }
+
+            // 3. WALLET TAB
             if (tabId === 'wallet') {
                 return `
                 <div class="space-y-6">
                     <div class="bg-gradient-to-r from-indigo-600 to-purple-700 p-6 rounded-2xl shadow-lg text-white">
                         <div class="flex justify-between items-start">
-                            <div><p class="text-indigo-100 text-sm font-medium mb-1">Total Balance</p><h2 class="text-4xl font-extrabold tracking-tight">$${parseFloat({{ $customer->wallet->balance }}).toFixed(2)}</h2></div>
+                            <div><p class="text-indigo-100 text-sm font-medium mb-1">Total Balance</p><h2 class="text-4xl font-extrabold tracking-tight">$${c.wallet_balance.toFixed(2)}</h2></div>
                             <div class="bg-white/20 p-2 rounded-lg backdrop-blur-sm"><svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg></div>
                         </div>
                         <div class="mt-6 flex items-center justify-between">
-                            <div class="flex items-center space-x-2"><span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center">${c.rewards} Points</span></div>
-                            <div class="text-indigo-100 text-xs">Last updated: Just now</div>
+                            <div class="flex items-center space-x-2"><span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full flex items-center">⭐ ${c.rewards} Points</span></div>
                         </div>
                     </div>
                 </div>`;
             }
+
+            // 4. PAYMENTS TAB
             if (tabId === 'payments') {
                 const methods = c.payment_methods || [];
-                return `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-lg font-bold text-slate-800 mb-4">Payment Methods</h3>${methods.length > 0 ? '' : '<p class="text-slate-500 italic">No saved payment methods (N/A).</p>'}</div>`;
+                return `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-lg font-bold text-slate-800 mb-4">Payment Methods</h3>${methods.length > 0 ? '' : '<p class="text-slate-500 italic text-sm">No saved payment methods (N/A).</p>'}</div>`;
             }
-            const typeMap = {
-                'orders': 'Order',
-                'bookings': 'Booking',
-                'services': 'Service Request',
-                'providers': 'Provider',
-                'transactions': 'Transaction'
-            };
+
+            // 5. HISTORY TABS (Orders, Bookings, Transactions)
+            const typeMap = { 'orders': 'Order', 'bookings': 'Booking', 'transactions': 'Transaction' };
             const title = typeMap[tabId];
             return `
                 <div class="space-y-4">
@@ -806,13 +912,7 @@
         }
 
         function initHistoryTab(tabId) {
-            const typeMap = {
-                'orders': 'Order',
-                'bookings': 'Booking',
-                'services': 'Service Request',
-                'providers': 'Provider',
-                'transactions': 'Transaction'
-            };
+            const typeMap = { 'orders': 'Order', 'bookings': 'Booking', 'transactions': 'Transaction' };
             currentTabData = getMockHistory(typeMap[tabId]);
             renderHistoryList(tabId, currentTabData);
         }
@@ -828,7 +928,7 @@
                     const isCredit = item.status === 'Credit';
                     return `<div class="bg-white p-3 rounded-lg border border-slate-100 flex items-center justify-between shadow-sm"><div class="flex items-center gap-3"><div class="h-10 w-10 rounded-full ${isCredit ? 'bg-green-100' : 'bg-red-100'} flex items-center justify-center"><span class="font-bold ${isCredit ? 'text-green-700' : 'text-red-700'}">${isCredit ? '↓' : '↑'}</span></div><div><p class="text-sm font-bold text-slate-900">${item.name}</p><p class="text-xs text-slate-500">${item.date} &bull; ${item.id}</p></div></div><div class="text-right"><p class="text-sm font-bold ${isCredit?'text-green-600':'text-slate-900'}">${isCredit?'+':'-'}$${item.price}</p><p class="text-xs text-slate-400 capitalize">${item.status}</p></div></div>`;
                 }
-                return `<div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="flex items-center gap-4"><img src="${item.image}" class="h-12 w-12 rounded-lg bg-slate-200 object-cover" alt="Item"><div><h4 class="text-sm font-bold text-slate-900">${item.name}</h4><p class="text-xs text-slate-500">ID: #${item.id} &bull; ${item.date}</p></div></div><div class="text-right flex items-center justify-between sm:block w-full sm:w-auto"><div><p class="text-sm font-bold text-slate-900">$${item.price}</p><span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-100 text-blue-800">${item.status}</span></div></div></div>`;
+                return `<div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex flex-col sm:flex-row sm:items-center justify-between gap-4"><div class="flex items-center gap-4"><div class="h-12 w-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 text-xs font-bold">IMG</div><div><h4 class="text-sm font-bold text-slate-900">${item.name}</h4><p class="text-xs text-slate-500">ID: #${item.id} &bull; ${item.date}</p></div></div><div class="text-right flex items-center justify-between sm:block w-full sm:w-auto"><div><p class="text-sm font-bold text-slate-900">$${item.price}</p><span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-blue-100 text-blue-800">${item.status}</span></div></div></div>`;
             }).join('');
         }
     </script>
