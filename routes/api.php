@@ -9,6 +9,8 @@ use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
 use App\Http\Controllers\MartVender\MartSubCategoryController;
 use App\Http\Controllers\MartVender\ProductController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\PromotionSlotController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
@@ -175,6 +177,8 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
 Route::middleware(['auth:api'])->prefix('admin')->group(function () {
     Route::apiResource('subscription-plans', SubscriptionPlanController::class);
     Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
+    Route::apiResource('promotions', PromotionController::class);
+    Route::apiResource('promotion-slots', PromotionSlotController::class);
 });
 Route::middleware('auth:api')->group(function () {
     Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);

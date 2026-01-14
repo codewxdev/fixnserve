@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 class Promotion extends Model
 {
     protected $fillable = [
+        'app_id',
         'name',
-        'boost_weight',
-        'promo_active',
-        'promo_expires_at',
+        'duration_hours',
+        'is_active',
     ];
+
+    public function slots()
+    {
+        return $this->hasMany(PromotionSlot::class);
+    }
 }
