@@ -8,12 +8,22 @@ class PromotionSlot extends Model
 {
     protected $fillable = [
         'promotion_id',
-        'total_slots',
+        'app_id',
+        'city_id',
+        'category_id',
+        'max_slots',
         'used_slots',
+        'visibility_weight',
+        'price',
     ];
 
     public function promotion()
     {
         return $this->belongsTo(Promotion::class);
+    }
+
+    public function hasAvailability(): bool
+    {
+        return $this->used_slots < $this->max_slots;
     }
 }

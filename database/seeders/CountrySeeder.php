@@ -74,7 +74,7 @@ class CountrySeeder extends Seeder
                 ['iso2' => strtolower($iso2)],
                 [
                     'name' => $country['name']['common'],
-                    'phone_code' => $phoneCode,
+                    'code' => $phoneCode,
                     'flag_url' => $country['flags']['png'] ?? null,
                     'phone_length' => $phoneLength,
 

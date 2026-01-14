@@ -8,7 +8,7 @@ class App extends Model
 {
     protected $fillable = [
         'name',
-        'app_id',
+        'app_key',
     ];
      
 

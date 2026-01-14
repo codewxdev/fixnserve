@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             NotificationTypeSeeder::class,
             CurrencySeeder::class,
             CountrySeeder::class,
+            AppSeeder::class,
         ]);
 
     }
