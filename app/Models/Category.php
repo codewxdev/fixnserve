@@ -14,4 +14,10 @@ class Category extends Model
     {
         return $this->hasMany(Subcategory::class);
     }
+
+    public function specialties()
+    {
+        return $this->hasMany(Subcategory::class);
+    }
+     
 }

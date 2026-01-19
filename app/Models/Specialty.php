@@ -8,13 +8,14 @@ class Specialty extends Model
 {
     protected $fillable = ['subcategory_id', 'name'];
 
-    public function subCategory()
+
+    public function sub_specialties()
     {
-        return $this->belongsTo(SubCategory::class);
+        return $this->hasMany(SubSpecialty::class, 'specialty_id');
     }
 
-    public function subSpecialties()
+    public function subcategory()
     {
-        return $this->hasMany(SubSpecialty::class);
+        return $this->belongsTo(Subcategory::class);
     }
 }

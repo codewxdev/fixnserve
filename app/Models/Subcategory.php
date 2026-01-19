@@ -17,4 +17,9 @@ class Subcategory extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function specialties()
+{
+    return $this->hasMany(Specialty::class);
+}
 }

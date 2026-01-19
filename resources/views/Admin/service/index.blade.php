@@ -7,14 +7,13 @@
             return {
                 allCategories: @json($categories),
                 currentModule: 'professionalExpert',
-                currentLevel: 'category',
+                currentLevel: 'category', // category, subcategory, specialty, subspecialty
                 breadcrumbs: [],
                 isModalOpen: false,
-                isEditing: false,
                 formData: {
                     name: '',
                     id: null,
-                    active: true // Default active
+                    active: true
                 },
 
                 modules: [{
@@ -32,27 +31,19 @@
                     {
                         id: 'martVender',
                         name: 'Mart Vendors'
-                    },
+                    }
                 ],
 
-                // Modal band karne ka function jo missing tha
-                closeModal() {
-                    this.isModalOpen = false;
-                    this.formData = {
-                        name: '',
-                        id: null,
-                        active: true
-                    };
+                // Dynamic Label mapping
+                levelLabels: {
+                    category: 'Main Category',
+                    subcategory: 'Sub Category',
+                    specialty: 'Specialty',
+                    subspecialty: 'Sub Specialty'
                 },
 
-                openModal() {
-                    this.isEditing = false;
-                    this.formData = {
-                        name: '',
-                        id: null,
-                        active: true
-                    };
-                    this.isModalOpen = true;
+                get currentLevelLabel() {
+                    return this.levelLabels[this.currentLevel];
                 },
 
                 get currentItems() {
@@ -60,36 +51,66 @@
                         return this.allCategories.filter(c => c.type === this.currentModule);
                     }
                     let lastCrumb = this.breadcrumbs[this.breadcrumbs.length - 1];
-                    // Ensure subcategories exist to avoid map errors
-                    return lastCrumb.item.subcategories || [];
+
+                    // Level ke mutabiq sahi children key uthayen
+                    if (this.currentLevel === 'subcategory') return lastCrumb.item.subcategories || [];
+                    if (this.currentLevel === 'specialty') return lastCrumb.item.specialties || [];
+                    if (this.currentLevel === 'subspecialty') return lastCrumb.item.sub_specialties || [];
+                    return [];
+                },
+
+                drillDown(item) {
+                    const levels = ['category', 'subcategory', 'specialty', 'subspecialty'];
+                    const currentIndex = levels.indexOf(this.currentLevel);
+
+                    if (currentIndex < levels.length - 1) {
+                        this.breadcrumbs.push({
+                            name: item.name,
+                            level: this.currentLevel,
+                            item: item
+                        });
+                        this.currentLevel = levels[currentIndex + 1];
+                    }
+                },
+
+                navigateToCrumb(index) {
+                    const levels = ['category', 'subcategory', 'specialty', 'subspecialty'];
+                    this.currentLevel = levels[index + 1];
+                    this.breadcrumbs = this.breadcrumbs.slice(0, index + 1);
+                },
+
+                resetToRoot() {
+                    this.breadcrumbs = [];
+                    this.currentLevel = 'category';
                 },
 
                 async saveItem() {
-                    const isCategory = this.currentLevel === 'category';
-                    const url = isCategory ? '{{ route('store.category') }}' : '{{ route('store.subcategory') }}';
-                    const token = '{{ csrf_token() }}';
-
+                    let url = '';
                     let payload = {
-                        name: this.formData.name,
-                        active: this.formData.active ? 1 : 0
+                        name: this.formData.name
                     };
+                    const parent = this.breadcrumbs.length > 0 ? this.breadcrumbs[this.breadcrumbs.length - 1].item :
+                        null;
 
-                    if (isCategory) {
+                    // Route aur Payload selection based on level
+                    if (this.currentLevel === 'category') {
+                        url = '{{ route('store.category') }}';
                         payload.type = this.currentModule;
-                    } else {
-                        // Ensure we pick the correct ID from the breadcrumb
-                        if (this.breadcrumbs.length > 0) {
-                            payload.category_id = this.breadcrumbs[this.breadcrumbs.length - 1].item.id;
-                        } else {
-                            alert("Please select a parent category first.");
-                            return;
-                        }
+                    } else if (this.currentLevel === 'subcategory') {
+                        url = '{{ route('store.subcategory') }}';
+                        payload.category_id = parent.id;
+                    } else if (this.currentLevel === 'specialty') {
+                        url = '{{ route('store.specialty') }}';
+                        payload.subcategory_id = parent.id;
+                    } else if (this.currentLevel === 'subspecialty') {
+                        url = '{{ route('store.subspecialty') }}';
+                        payload.specialty_id = parent.id;
                     }
 
+                    const token = '{{ csrf_token() }}';
                     try {
                         const response = await fetch(url, {
                             method: 'POST',
-                            credentials: 'same-origin',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'Accept': 'application/json',
@@ -98,52 +119,44 @@
                             body: JSON.stringify(payload)
                         });
 
-                        const result = await response.json();
-
                         if (response.ok) {
-                            this.closeModal(); // Ab yeh function exist karta hai
                             window.location.reload();
                         } else {
-                            // Agar 403 ya 422 error hai toh alert dikhayen
-                            alert(result.message || 'Error: ' + response.status);
-                            console.error("Server Error:", result);
+                            const res = await response.json();
+                            alert(res.message || "Error saving item");
                         }
-                    } catch (error) {
-                        console.error("Request failed:", error);
+                    } catch (e) {
+                        console.error(e);
                     }
                 },
 
-                // Baaki functions (switchModule, drillDown, etc.) waise hi rahenge...
-                switchModule(moduleId) {
-                    this.currentModule = moduleId;
-                    this.resetToRoot();
-                },
-                resetToRoot() {
-                    this.breadcrumbs = [];
-                    this.currentLevel = 'category';
-                },
-                drillDown(item) {
-                    if (this.currentLevel === 'category') {
-                        this.breadcrumbs.push({
-                            name: item.name,
-                            level: 'category',
-                            item: item
-                        });
-                        this.currentLevel = 'subcategory';
-                    }
-                },
-                navigateToCrumb(index) {
-                    this.breadcrumbs = this.breadcrumbs.slice(0, index + 1);
-                    this.currentLevel = 'subcategory';
-                },
                 getChildCount(item) {
-                    return item.subcategories ? item.subcategories.length : 0;
+                    if (this.currentLevel === 'category') return item.subcategories?.length || 0;
+                    if (this.currentLevel === 'subcategory') return item.specialties?.length || 0;
+                    if (this.currentLevel === 'specialty') return item.sub_specialties?.length || 0;
+                    return 0;
                 },
+
                 getNextLevelLabel() {
-                    return this.currentLevel === 'category' ? 'Sub Categories' : '';
+                    if (this.currentLevel === 'category') return 'Sub Categories';
+                    if (this.currentLevel === 'subcategory') return 'Specialties';
+                    if (this.currentLevel === 'specialty') return 'Sub Specialties';
+                    return '';
                 },
-                get currentLevelLabel() {
-                    return this.currentLevel === 'category' ? 'Main Category' : 'Sub Category';
+
+                closeModal() {
+                    this.isModalOpen = false;
+                    this.formData = {
+                        name: '',
+                        id: null
+                    };
+                },
+                openModal() {
+                    this.isModalOpen = true;
+                },
+                switchModule(id) {
+                    this.currentModule = id;
+                    this.resetToRoot();
                 }
             };
         }
@@ -275,7 +288,7 @@
                                         x-text="currentLevelLabel"> </span>
                                 </td>
 
-                                <td x-show="currentLevel !== 'subspeciality'" class="px-6 py-4 whitespace-nowrap">
+                                <td x-show="currentLevel !== 'subspecialty'" class="px-6 py-4 whitespace-nowrap">
                                     <button @click="drillDown(item)"
                                         class="flex items-center text-sm text-gray-600 hover:text-cyan-600 font-medium transition">
                                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor"
