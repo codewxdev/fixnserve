@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\App;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use Carbon\Carbon;
@@ -46,78 +47,39 @@ class SubscriptionService
     }
 
 
-    // Sare plans fetch karo app relation ke sath
-    public function getAllPlans()
+ 
+    public function createPlan(array $data)
     {
-        return SubscriptionPlan::with(['app', 'entitlements'])->latest()->get();
-    }
-
-
-    private function getColorByTier($tier)
-    {
-        return match (strtolower($tier)) {
-            'gold', 'premium' => 'yellow',
-            'platinum' => 'indigo',
-            'free', 'basic' => 'gray',
-            default => 'blue',
-        };
-    }
-
-
-   public function createPlan(array $data)
-    {
-        DB::beginTransaction();
-
-        try {
-            // 1. App ID nikalo 'vendor' ya 'rider' string se
-            $app = App::where('app_key', $data['module_type'])->firstOrFail();
-
-            // 2. Plan Save karo
+        // DB Transaction shuru karte hain taaky data consistent rahe
+        return DB::transaction(function () use ($data) {
+            
+            // 1. Plan Create karein
             $plan = SubscriptionPlan::create([
-                'app_id'        => $app->id,
-                'name'          => $data['name'],
-                'tagline'       => $data['tagline'] ?? null,
-                'tier'          => 'standard', // Default tier, logic badha sakty ho
-                'price'         => $data['price'],
-                'billing_cycle' => $data['interval'], // Form 'interval' bhej rha hai, DB 'billing_cycle' hai
-                'trial_days'    => $data['trial_days'] ?? 0,
+                'app_id'            => $data['app_id'],
+                'name'              => $data['name'],
+                'tier'              => $data['tier'], // e.g., Gold, Premium
+                'price'             => $data['price'],
+                'billing_cycle'     => $data['billing_cycle'],
+                'visibility_weight' => $data['visibility_weight'] ?? 0,
             ]);
 
-            // 3. Specific Features Save karo (Limits & Commission)
-            $entitlements = [];
-
-            if (isset($data['limit_items'])) {
-                $plan->entitlements()->create([
-                    'feature_key' => 'max_items',
-                    'feature_value' => $data['limit_items']
-                ]);
-            }
-
-            if (isset($data['commission_fee'])) {
-                $plan->entitlements()->create([
-                    'feature_key' => 'commission_percent',
-                    'feature_value' => $data['commission_fee']
-                ]);
-            }
-
-            // 4. Generic Display Features (Jo add more button se aaty hien)
+            // 2. Entitlements (Features) add karein
+            // Hum form se features array lenge jisme key aur value hogi
             if (!empty($data['features'])) {
-                foreach ($data['features'] as $featureText) {
-                    if($featureText) {
+                foreach ($data['features'] as $feature) {
+                    if(!empty($feature['key']) && !empty($feature['value'])) {
                         $plan->entitlements()->create([
-                            'feature_key' => 'display_feature', // Display purpose key
-                            'feature_value' => $featureText
+                            'feature_key'   => $feature['key'],
+                            'feature_value' => $feature['value'],
                         ]);
                     }
                 }
             }
 
-            DB::commit();
             return $plan;
-
-        } catch (Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        });
     }
+
+    
+   
 }
