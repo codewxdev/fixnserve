@@ -28,9 +28,11 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionEntitlementController;
 use App\Http\Controllers\SubscriptionPlanController;
+use App\Http\Controllers\SubSpecialtyController;
 use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +49,10 @@ Route::get('/skill/search', [SkillController::class, 'search']);
 Route::apiResource('notification-types', NotificationTypeController::class);
 Route::resource('mart-categories', MartCategoryController::class);
 Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
+// routes/api.php
+Route::apiResource('specialties', SpecialtyController::class);
+Route::apiResource('sub-specialties', SubSpecialtyController::class);
+
 Route::get('/countries', function () {
     return response()->json([
         'success' => true,
