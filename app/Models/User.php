@@ -277,7 +277,9 @@ class User extends Authenticatable implements JWTSubject
 
     public function wallet()
     {
-        return $this->hasOne(Wallet::class);
+        return $this->hasOne(Wallet::class)->withDefault([
+        'balance' => 0,
+    ]);
     }
 
     public function canSubscribeTo(int $appId): bool

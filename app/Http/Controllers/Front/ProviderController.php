@@ -41,6 +41,7 @@ class ProviderController extends Controller
     public function index(){
 
         $providers = User::role('Provider')->get();
+        
         return view('Admin.providers.index',compact('providers'));
 
     }

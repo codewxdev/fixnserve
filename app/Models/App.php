@@ -10,6 +10,7 @@ class App extends Model
         'name',
         'app_key',
     ];
+     
 
     public function plans()
     {
