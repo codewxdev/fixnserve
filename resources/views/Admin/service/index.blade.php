@@ -10,6 +10,7 @@
                 currentLevel: 'category', // category, subcategory, specialty, subspecialty
                 breadcrumbs: [],
                 isModalOpen: false,
+                isEditing: false,
                 formData: {
                     name: '',
                     id: null,
@@ -34,7 +35,6 @@
                     }
                 ],
 
-                // Dynamic Label mapping
                 levelLabels: {
                     category: 'Main Category',
                     subcategory: 'Sub Category',
@@ -51,13 +51,129 @@
                         return this.allCategories.filter(c => c.type === this.currentModule);
                     }
                     let lastCrumb = this.breadcrumbs[this.breadcrumbs.length - 1];
-
-                    // Level ke mutabiq sahi children key uthayen
                     if (this.currentLevel === 'subcategory') return lastCrumb.item.subcategories || [];
                     if (this.currentLevel === 'specialty') return lastCrumb.item.specialties || [];
                     if (this.currentLevel === 'subspecialty') return lastCrumb.item.sub_specialties || [];
                     return [];
                 },
+
+                // --- Core Functions ---
+
+                openModal() {
+                    this.isEditing = false;
+                    this.formData = {
+                        name: '',
+                        id: null,
+                        active: true
+                    };
+                    this.isModalOpen = true;
+                },
+
+                editItem(item) {
+                    this.isEditing = true;
+                    this.formData = {
+                        id: item.id,
+                        name: item.name,
+                        active: item.active !== undefined ? item.active : true
+                    };
+                    this.isModalOpen = true;
+                },
+
+                closeModal() {
+                    this.isModalOpen = false;
+                    this.isEditing = false;
+                    this.formData = {
+                        name: '',
+                        id: null,
+                        active: true
+                    };
+                },
+
+                async saveItem() {
+                    let url = '';
+                    const parent = this.breadcrumbs.length > 0 ? this.breadcrumbs[this.breadcrumbs.length - 1].item :
+                        null;
+
+                    // 1. Dynamic Route Selection
+                    if (this.isEditing) {
+                        // Update Routes
+                        if (this.currentLevel === 'category') url = `/categories/${this.formData.id}`;
+                        else if (this.currentLevel === 'subcategory') url = `/subcategories/${this.formData.id}`;
+                        else if (this.currentLevel === 'specialty') url = `/specialties/${this.formData.id}`;
+                        else if (this.currentLevel === 'subspecialty') url = `/sub-specialties/${this.formData.id}`;
+                    } else {
+                        // Store Routes
+                        if (this.currentLevel === 'category') url = '{{ route('store.category') }}';
+                        else if (this.currentLevel === 'subcategory') url = '{{ route('store.subcategory') }}';
+                        else if (this.currentLevel === 'specialty') url = '{{ route('store.specialty') }}';
+                        else if (this.currentLevel === 'subspecialty') url = '{{ route('store.subspecialty') }}';
+                    }
+
+                    // 2. Payload Building
+                    let payload = {
+                        name: this.formData.name,
+                        active: this.formData.active ? 1 : 0
+                    };
+
+                    if (!this.isEditing) {
+                        if (this.currentLevel === 'category') payload.type = this.currentModule;
+                        else if (this.currentLevel === 'subcategory') payload.category_id = parent.id;
+                        else if (this.currentLevel === 'specialty') payload.subcategory_id = parent.id;
+                        else if (this.currentLevel === 'subspecialty') payload.specialty_id = parent.id;
+                    }
+
+                    try {
+                        const response = await fetch(url, {
+                            method: this.isEditing ? 'PUT' : 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            const res = await response.json();
+                            alert(res.message || "Operation failed");
+                        }
+                    } catch (e) {
+                        console.error("Request Error:", e);
+                    }
+                },
+
+                async deleteItem(item) {
+                    if (!confirm(`Are you sure you want to delete "${item.name}"? This action cannot be undone.`))
+                        return;
+
+                    let url = '';
+                    if (this.currentLevel === 'category') url = `/categories/${item.id}`;
+                    else if (this.currentLevel === 'subcategory') url = `/subcategories/${item.id}`;
+                    else if (this.currentLevel === 'specialty') url = `/specialties/${item.id}`;
+                    else if (this.currentLevel === 'subspecialty') url = `/sub-specialties/${item.id}`;
+
+                    try {
+                        const response = await fetch(url, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            alert("Delete failed. Make sure there are no dependencies.");
+                        }
+                    } catch (e) {
+                        console.error("Delete Error:", e);
+                    }
+                },
+
+                // --- Navigation Functions ---
 
                 drillDown(item) {
                     const levels = ['category', 'subcategory', 'specialty', 'subspecialty'];
@@ -84,50 +200,9 @@
                     this.currentLevel = 'category';
                 },
 
-                async saveItem() {
-                    let url = '';
-                    let payload = {
-                        name: this.formData.name
-                    };
-                    const parent = this.breadcrumbs.length > 0 ? this.breadcrumbs[this.breadcrumbs.length - 1].item :
-                        null;
-
-                    // Route aur Payload selection based on level
-                    if (this.currentLevel === 'category') {
-                        url = '{{ route('store.category') }}';
-                        payload.type = this.currentModule;
-                    } else if (this.currentLevel === 'subcategory') {
-                        url = '{{ route('store.subcategory') }}';
-                        payload.category_id = parent.id;
-                    } else if (this.currentLevel === 'specialty') {
-                        url = '{{ route('store.specialty') }}';
-                        payload.subcategory_id = parent.id;
-                    } else if (this.currentLevel === 'subspecialty') {
-                        url = '{{ route('store.subspecialty') }}';
-                        payload.specialty_id = parent.id;
-                    }
-
-                    const token = '{{ csrf_token() }}';
-                    try {
-                        const response = await fetch(url, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': token
-                            },
-                            body: JSON.stringify(payload)
-                        });
-
-                        if (response.ok) {
-                            window.location.reload();
-                        } else {
-                            const res = await response.json();
-                            alert(res.message || "Error saving item");
-                        }
-                    } catch (e) {
-                        console.error(e);
-                    }
+                switchModule(id) {
+                    this.currentModule = id;
+                    this.resetToRoot();
                 },
 
                 getChildCount(item) {
@@ -142,21 +217,6 @@
                     if (this.currentLevel === 'subcategory') return 'Specialties';
                     if (this.currentLevel === 'specialty') return 'Sub Specialties';
                     return '';
-                },
-
-                closeModal() {
-                    this.isModalOpen = false;
-                    this.formData = {
-                        name: '',
-                        id: null
-                    };
-                },
-                openModal() {
-                    this.isModalOpen = true;
-                },
-                switchModule(id) {
-                    this.currentModule = id;
-                    this.resetToRoot();
                 }
             };
         }
@@ -319,7 +379,9 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button @click="editItem(item)"
                                         class="text-cyan-600 hover:text-cyan-900 mr-3">Edit</button>
-                                    <button class="text-red-400 hover:text-red-600">Delete</button>
+
+                                    <button @click="deleteItem(item)"
+                                        class="text-red-400 hover:text-red-600">Delete</button>
                                 </td>
                             </tr>
                         </template>
