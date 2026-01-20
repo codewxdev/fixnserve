@@ -4,10 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ApiResponse;
 use App\Models\PromotionSlot;
+use App\Services\PromotionSlotService;
 use Illuminate\Http\Request;
 
 class PromotionSlotController extends Controller
 {
+    protected $slotService;
+
+    public function __construct(PromotionSlotService $slotService)
+    {
+        $this->slotService = $slotService;
+    }
+
     public function index()
     {
         return ApiResponse::success(
@@ -24,20 +32,19 @@ class PromotionSlotController extends Controller
             'price' => 'required|numeric|min:0',
         ]);
 
-        $slot = PromotionSlot::create($data);
+        $slot = $this->slotService->create($data);
 
         return ApiResponse::success($slot, 'Promotion slot created', 201);
     }
 
     public function update(Request $request, PromotionSlot $promotionSlot)
     {
-        $promotionSlot->update($request->only([
-            'max_slots',
-            'visibility_weight',
-            'price',
-        ]));
+        $slot = $this->slotService->update(
+            $promotionSlot,
+            $request->only(['max_slots', 'visibility_weight', 'price'])
+        );
 
-        return ApiResponse::success($promotionSlot, 'Promotion slot updated');
+        return ApiResponse::success($slot, 'Promotion slot updated');
     }
 
     public function show($id)
@@ -54,7 +61,7 @@ class PromotionSlotController extends Controller
 
     public function destroy(PromotionSlot $promotionSlot)
     {
-        $promotionSlot->delete();
+        $this->slotService->delete($promotionSlot);
 
         return ApiResponse::success(null, 'Promotion slot deleted');
     }

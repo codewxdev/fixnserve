@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
-            
+
             Route::namespace('admin')->group(base_path('routes/admin/customer.php'));
             Route::namespace('admin')->group(base_path('routes/admin/provider.php'));
             Route::namespace('admin')->group(base_path('routes/admin/professional.php'));
@@ -47,4 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
+    })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        $schedule->command('promotions:expire')->everyMinute()->withoutOverlapping()->onOneServer();
     })->create();

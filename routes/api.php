@@ -10,6 +10,7 @@ use App\Http\Controllers\MartVender\MartCategoryController;
 use App\Http\Controllers\MartVender\MartSubCategoryController;
 use App\Http\Controllers\MartVender\ProductController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\PromotionPurchaseController;
 use App\Http\Controllers\PromotionSlotController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Role\PermissionController;
@@ -191,6 +192,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/unsubscribe', [SubscriptionController::class, 'cancel']);
     Route::get('/subscription/status', [SubscriptionController::class, 'status']);
     Route::get('/subscription/entitlements', [SubscriptionController::class, 'entitlements']);
+    Route::post('/promotion-purchases', [PromotionPurchaseController::class, 'store']);
+
 });
 // /////////////////////////////////////////extra code//////////////////////////////////////
 
