@@ -24,3 +24,10 @@ Route::delete('/categories/{id}', [ServiceController::class, 'destroyCategory'])
 Route::delete('/subcategories/{id}', [ServiceController::class, 'destroySubcategory'])->name('destroy.subcategory');
 Route::delete('/specialties/{id}', [ServiceController::class, 'destroySpecialty'])->name('destroy.specialty');
 Route::delete('/sub-specialties/{id}', [ServiceController::class, 'destroySubSpecialty'])->name('destroy.subspecialty');
+
+
+// Status Toggles
+Route::patch('/categories/{id}/toggle-status', [ServiceController::class, 'toggleCategoryStatus']);
+Route::patch('/subcategories/{id}/toggle-status', [ServiceController::class, 'toggleSubcategoryStatus']);
+Route::patch('/specialties/{id}/toggle-status', [ServiceController::class, 'toggleSpecialtyStatus']);
+Route::patch('/sub-specialties/{id}/toggle-status', [ServiceController::class, 'toggleSubSpecialtyStatus']);

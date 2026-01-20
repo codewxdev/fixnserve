@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::namespace('admin')->group(base_path('routes/admin/cooperation.php'));
             Route::namespace('admin')->group(base_path('routes/admin/codashboard.php'));
             Route::namespace('admin')->group(base_path('routes/admin/subscription.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/marketing.php'));
 
         }
     )

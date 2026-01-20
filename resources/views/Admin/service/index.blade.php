@@ -173,6 +173,38 @@
                     }
                 },
 
+                async toggleStatus(item) {
+                    // UI par foran change dikhany ke liye toggle karein
+                    const newStatus = !item.active;
+
+                    let url = '';
+                    if (this.currentLevel === 'category') url = `/categories/${item.id}/toggle-status`;
+                    else if (this.currentLevel === 'subcategory') url = `/subcategories/${item.id}/toggle-status`;
+                    else if (this.currentLevel === 'specialty') url = `/specialties/${item.id}/toggle-status`;
+                    else if (this.currentLevel === 'subspecialty') url = `/sub-specialties/${item.id}/toggle-status`;
+
+                    try {
+                        const response = await fetch(url, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                active: newStatus
+                            })
+                        });
+
+                        if (response.ok) {
+                            item.active = newStatus; // Success par state update karein
+                        } else {
+                            alert("Failed to update status");
+                        }
+                    } catch (e) {
+                        console.error("Status Update Error:", e);
+                    }
+                },
                 // --- Navigation Functions ---
 
                 drillDown(item) {
@@ -367,7 +399,7 @@
                                 </td>
 
                                 <td class="px-6 py-4 whitespace-nowrap">
-                                    <button @click="item.active = !item.active"
+                                    <button @click="toggleStatus(item)"
                                         class="relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
                                         :class="item.active ? 'bg-green-500' : 'bg-gray-200'">
                                         <span

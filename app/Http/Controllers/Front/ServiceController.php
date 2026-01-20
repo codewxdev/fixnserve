@@ -51,61 +51,87 @@ class ServiceController extends Controller
         return response()->json(['message' => 'Sub-Specialty added successfully']);
     }
 
-   // Update Main Category
-public function updateCategory(Request $request, $id) {
-    $item = Category::findOrFail($id);
-    $request->validate(['name' => 'required|string|max:255']);
-    $item->update(['name' => $request->name, 'active' => $request->active]);
-    return response()->json(['message' => 'Category updated successfully']);
-}
+    // Update Main Category
+    // --- Dynamic Update Methods ---
+    public function updateCategory(Request $request, $id)
+    {
+        $item = Category::findOrFail($id);
+        $item->update($request->only('name', 'active'));
+        return response()->json(['message' => 'Updated']);
+    }
 
-// Update Subcategory
-public function updateSubcategory(Request $request, $id) {
-    $item = Subcategory::findOrFail($id);
-    $request->validate(['name' => 'required|string|max:255']);
-    $item->update(['name' => $request->name, 'active' => $request->active]);
-    return response()->json(['message' => 'Subcategory updated successfully']);
-}
+    public function updateSubcategory(Request $request, $id)
+    {
+        $item = Subcategory::findOrFail($id);
+        $item->update($request->only('name', 'active'));
+        return response()->json(['message' => 'Updated']);
+    }
 
-// Update Specialty
-public function updateSpecialty(Request $request, $id) {
-    $item = Specialty::findOrFail($id);
-    $request->validate(['name' => 'required|string|max:255']);
-    $item->update(['name' => $request->name]); // Specialty table mein active column ho toh add kar lein
-    return response()->json(['message' => 'Specialty updated successfully']);
-}
+    public function updateSpecialty(Request $request, $id)
+    {
+        $item = Specialty::findOrFail($id);
+        $item->update($request->only('name', 'active'));
+        return response()->json(['message' => 'Updated']);
+    }
 
-// Update SubSpecialty
-public function updateSubSpecialty(Request $request, $id) {
-    $item = SubSpecialty::findOrFail($id);
-    $request->validate(['name' => 'required|string|max:255']);
-    $item->update(['name' => $request->name]);
-    return response()->json(['message' => 'Sub-Specialty updated successfully']);
-}
+    public function updateSubSpecialty(Request $request, $id)
+    {
+        $item = SubSpecialty::findOrFail($id);
+        $item->update($request->only('name', 'active'));
+        return response()->json(['message' => 'Updated']);
+    }
 
-// Delete Main Category
-public function destroyCategory($id) {
-    Category::findOrFail($id)->delete();
-    return response()->json(['message' => 'Category and its children deleted']);
-}
+    // --- Dynamic Toggle Status Methods (PATCH) ---
+    public function toggleCategoryStatus(Request $request, $id)
+    {
+        Category::where('id', $id)->update(['active' => $request->active]);
+        return response()->json(['status' => 'success']);
+    }
 
-// Delete Subcategory
-public function destroySubcategory($id) {
-    Subcategory::findOrFail($id)->delete();
-    return response()->json(['message' => 'Subcategory and its specialties deleted']);
-}
+    public function toggleSubcategoryStatus(Request $request, $id)
+    {
+        Subcategory::where('id', $id)->update(['active' => $request->active]);
+        return response()->json(['status' => 'success']);
+    }
 
-// Delete Specialty
-public function destroySpecialty($id) {
-    Specialty::findOrFail($id)->delete();
-    return response()->json(['message' => 'Specialty and its sub-specialties deleted']);
-}
+    public function toggleSpecialtyStatus(Request $request, $id)
+    {
+        Specialty::where('id', $id)->update(['active' => $request->active]);
+        return response()->json(['status' => 'success']);
+    }
 
-// Delete SubSpecialty
-public function destroySubSpecialty($id) {
-    SubSpecialty::findOrFail($id)->delete();
-    return response()->json(['message' => 'Sub-Specialty deleted']);
-}
+    public function toggleSubSpecialtyStatus(Request $request, $id)
+    {
+        SubSpecialty::where('id', $id)->update(['active' => $request->active]);
+        return response()->json(['status' => 'success']);
+    }
+    // Delete Main Category
+    public function destroyCategory($id)
+    {
+        Category::findOrFail($id)->delete();
+        return response()->json(['message' => 'Category and its children deleted']);
+    }
+
+    // Delete Subcategory
+    public function destroySubcategory($id)
+    {
+        Subcategory::findOrFail($id)->delete();
+        return response()->json(['message' => 'Subcategory and its specialties deleted']);
+    }
+
+    // Delete Specialty
+    public function destroySpecialty($id)
+    {
+        Specialty::findOrFail($id)->delete();
+        return response()->json(['message' => 'Specialty and its sub-specialties deleted']);
+    }
+
+    // Delete SubSpecialty
+    public function destroySubSpecialty($id)
+    {
+        SubSpecialty::findOrFail($id)->delete();
+        return response()->json(['message' => 'Sub-Specialty deleted']);
+    }
 
     public function index()
     {
