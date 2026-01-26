@@ -196,6 +196,61 @@
                 <span class="text-[10px] font-bold uppercase tracking-wider text-slate-600">Configuration</span>
             </li>
 
+            <li x-data="{ open: {{ request()->routeIs('marketing.*') ? 'true' : 'false' }} }">
+                <button @click="open = !open"
+                    class="w-full group flex items-center justify-between py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('marketing.*') ? 'bg-slate-800/50 text-white' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('marketing.*') ? 'text-blue-400' : 'text-slate-500 group-hover:text-pink-400' }}"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                        </svg>
+                        <span x-show="sidebarOpen"
+                            class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
+                            x-cloak>Marketing Engine</span>
+                    </div>
+                    <svg x-show="sidebarOpen" :class="open ? 'rotate-180' : ''"
+                        class="w-4 h-4 text-slate-500 transition-transform duration-200" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <ul x-show="open && sidebarOpen" x-collapse class="mt-1 space-y-1 px-2" x-cloak>
+                    <li>
+                        <a href="{{ route('marketing.coupons') }}"
+                            class="flex items-center py-2 px-3.5 rounded-lg text-sm transition-colors {{ request()->routeIs('marketing.coupons') ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('marketing.coupons') ? 'bg-blue-400' : 'bg-slate-600' }}"></span>
+                            Promo Codes
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('marketing.campaigns') }}"
+                            class="flex items-center py-2 px-3.5 rounded-lg text-sm transition-colors {{ request()->routeIs('marketing.campaigns') ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('marketing.campaigns') ? 'bg-blue-400' : 'bg-slate-600' }}"></span>
+                            Campaign Manager
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('marketing.loyalty') }}"
+                            class="flex items-center py-2 px-3.5 rounded-lg text-sm transition-colors {{ request()->routeIs('marketing.loyalty') ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('marketing.loyalty') ? 'bg-blue-400' : 'bg-slate-600' }}"></span>
+                            Loyalty & Rewards
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('marketing.featured') }}"
+                            class="flex items-center py-2 px-3.5 rounded-lg text-sm transition-colors {{ request()->routeIs('marketing.featured') ? 'bg-blue-600/20 text-blue-400' : 'text-slate-400 hover:text-white hover:bg-slate-800' }}">
+                            <span
+                                class="w-1.5 h-1.5 rounded-full mr-3 {{ request()->routeIs('marketing.featured') ? 'bg-blue-400' : 'bg-slate-600' }}"></span>
+                            Featured Requests
+                        </a>
+                    </li>
+                </ul>
+            </li>
             <li>
                 <a href="{{ route('cms.index') }}"
                     class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('cms.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
@@ -266,7 +321,7 @@
                         class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Mini
                         Dashboard</span>
                 </a>
-                 <a href="{{ route('subscription.index') }}"
+                <a href="{{ route('subscription.index') }}"
                     class="group flex items-center py-3 px-3.5 rounded-xl transition-all duration-200 ease-in-out {{ request()->routeIs('subscription.index') ? 'bg-blue-600/10 text-blue-400 shadow-inner' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-100' }}">
                     <svg class="w-5 h-5 flex-shrink-0 transition-colors {{ request()->routeIs('stats.index') ? 'text-blue-400' : 'text-slate-500 group-hover:text-slate-300' }}"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
@@ -276,9 +331,11 @@
                         <path d="M16 13V9m-4 4V7m-4 4v-2" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <span x-show="sidebarOpen"
-                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300" x-cloak>Subscription</span>
+                        class="ml-3 text-sm font-medium tracking-wide transition-opacity duration-300"
+                        x-cloak>Subscription</span>
                 </a>
             </li>
+
         </ul>
     </nav>
 </div>

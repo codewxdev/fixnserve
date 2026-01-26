@@ -1,83 +1,81 @@
 @extends('layouts.app')
 
 @section('content')
-   <div id="mart-vendor-module" 
-    x-data="{ 
-        openVendorId: null, 
-        isAddVendorModalOpen: false, 
+    <div id="mart-vendor-module" x-data="{
+        openVendorId: null,
+        isAddVendorModalOpen: false,
         currentTab: 'overview',
         searchTerm: '',
         categoryFilter: '',
         statusFilter: '',
         isSubmitting: false,
         vendors: {{ $vendors->toJson() }}, // Data yahan inject hoga
-
+    
         get filteredVendors() {
             return this.vendors.filter(v => {
                 const search = this.searchTerm.toLowerCase();
                 const nameMatch = v.name ? v.name.toLowerCase().includes(search) : false;
                 const ownerMatch = v.owner ? v.owner.toLowerCase().includes(search) : false;
-                
+    
                 const matchesSearch = nameMatch || ownerMatch;
                 const matchesCategory = this.categoryFilter === '' || v.category === this.categoryFilter;
                 const matchesStatus = this.statusFilter === '' || v.status === this.statusFilter;
-                                      
+    
                 return matchesSearch && matchesCategory && matchesStatus;
             });
         },
-
+    
         get activeVendor() {
             return this.vendors.find(v => v.id === this.openVendorId) || {};
         },
-
+    
         formatMoney(amount) {
-            if(!amount) return 'PKR 0';
+            if (!amount) return 'PKR 0';
             return 'PKR ' + Number(amount).toLocaleString();
         },
-
-        async submitForm(e) {
-    this.isSubmitting = true;
     
-    // Form data collect karna
-    const formData = new FormData(e.target);
-    const actionUrl = e.target.action;
-
-    try {
-        const response = await fetch(actionUrl, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        async submitForm(e) {
+            this.isSubmitting = true;
+    
+            // Form data collect karna
+            const formData = new FormData(e.target);
+            const actionUrl = e.target.action;
+    
+            try {
+                const response = await fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+    
+                const result = await response.json();
+    
+                if (response.ok) {
+                    // Success Case
+                    alert('Vendor Onboarded Successfully!');
+                    this.isAddVendorModalOpen = false;
+    
+                    // Data refresh karne ke liye reload ya live push
+                    location.reload();
+                } else {
+                    // Server-side validation errors (e.g. Email already exists)
+                    let errorMsg = result.message || 'Validation failed';
+                    if (result.errors) {
+                        errorMsg = Object.values(result.errors).flat().join('\n');
+                    }
+                    alert(errorMsg);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Server connection failed. Please try again.');
+            } finally {
+                this.isSubmitting = false;
             }
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Success Case
-            alert('Vendor Onboarded Successfully!');
-            this.isAddVendorModalOpen = false;
-            
-            // Data refresh karne ke liye reload ya live push
-            location.reload(); 
-        } else {
-            // Server-side validation errors (e.g. Email already exists)
-            let errorMsg = result.message || 'Validation failed';
-            if(result.errors) {
-                errorMsg = Object.values(result.errors).flat().join('\n');
-            }
-            alert(errorMsg);
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Server connection failed. Please try again.');
-    } finally {
-        this.isSubmitting = false;
-    }
-}
-    }" 
-    x-cloak class="p-4 md:p-8"> 
+    }" x-cloak class="p-4 md:p-8">
 
         {{-- HEADER SECTION --}}
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
@@ -191,6 +189,8 @@
                                 class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
                                 Operational Stats</th>
                             <th scope="col"
+                                class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Assigned Rider</th>
+                            <th scope="col"
                                 class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Wallet
                                 & Status</th>
                             <th scope="col"
@@ -220,6 +220,14 @@
                                         x-text="vendor.stats.orders + ' Orders'"></div>
                                     <div class="text-xs text-gray-500 mt-1">Inv: <span
                                             x-text="vendor.stats.products"></span> Items</div>
+                                </td>
+                                 <td class="px-6 py-4 whitespace-nowrap">
+                                     
+                                    <div class="mt-1">
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                            rider xyz
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-900 font-bold"
