@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = [
+     protected $fillable = [
         'user_id',
         'rider_id',
         'status',
@@ -16,13 +16,18 @@ class Order extends Model
         'drop_lng',
         'distance_km',
         'estimated_time',
+        'picked_up_at',
+        'transport_type_id',
+        'delivered_at',
     ];
 
-    public function customer()
+    // customer
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
 
+    // rider
     public function rider()
     {
         return $this->belongsTo(User::class, 'rider_id');

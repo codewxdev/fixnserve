@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('rider_id')
                 ->nullable()
                 ->constrained('users'); // rider (role=rider)
-            $table->string('status');
+            $table->enum('status',['pending','searching','assigned','picked_up','delivered','cancelled'])->default('pending');
             // pending | searching | assigned | picked_up | delivered | cancelled
             $table->decimal('pickup_lat', 10, 7);
             $table->decimal('pickup_lng', 10, 7);
