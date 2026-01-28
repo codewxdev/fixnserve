@@ -41,9 +41,6 @@ use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
-
-
-
 // Public Routes (No authentication required)
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
@@ -83,10 +80,12 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
     Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
     Route::post('/rate', [RatingController::class, 'rate']);
-    ////////////////////////////////////Rider Module//////////////////////////////////////////
+    // //////////////////////////////////Rider Module//////////////////////////////////////////
 
     Route::post('/rider/vehicles', [RiderVehicleController::class, 'store']);
     Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/{order}/accept', [OrderController::class, 'accept']);   // /////for rider request
+    Route::post('/rider/location', [OrderController::class, 'update']);
 
     // ///////////////////////////////mart vender routes//////////////////////////////////////
     Route::apiResource('products', ProductController::class);
@@ -197,7 +196,7 @@ Route::middleware(['auth:api'])->prefix('admin')->group(function () {
     Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
     Route::apiResource('promotions', PromotionController::class);
     Route::apiResource('promotion-slots', PromotionSlotController::class);
-    Route::post('/trasportation/type',[TransportTypeController::class, 'store']);
+    Route::post('/trasportation/type', [TransportTypeController::class, 'store']);
 });
 Route::middleware('auth:api')->group(function () {
 
@@ -208,7 +207,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/promotion-purchases', [PromotionPurchaseController::class, 'store']);
 
 });
-
 
 // /////////////////////////////////////////extra code//////////////////////////////////////
 
