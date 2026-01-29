@@ -36,7 +36,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                {{-- NEW: Subscription Filter --}}
+                {{-- Subscription Filter (Kept in main view as requested "nothing else") --}}
                 <select id="subscriptionFilter"
                     class="form-select block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white">
                     <option value="all">All Plans</option>
@@ -44,7 +44,7 @@
                     <option value="free">Free / None</option>
                 </select>
 
-                {{-- Existing Status Filter --}}
+                {{-- Status Filter --}}
                 <select id="statusFilter"
                     class="form-select block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white">
                     <option value="all">All Status</option>
@@ -63,7 +63,6 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Customer</th>
-                            {{-- NEW COLUMN --}}
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Current Plan</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -77,9 +76,7 @@
                     <tbody class="bg-white divide-y divide-slate-100">
                         @forelse ($users as $customer)
                             @php
-                                // --- MOCK SUBSCRIPTION DATA (Replace with real DB relation) ---
-                                // Example: $subscription = $customer->subscription;
-                                $hasSub = (bool) rand(0, 1); // Random for demo
+                                $hasSub = (bool) rand(0, 1);
                                 $planName = $hasSub ? (rand(0, 1) ? 'Gold Pro' : 'Silver Starter') : 'Free Tier';
                                 $subStatus = $hasSub ? 'subscribed' : 'free';
 
@@ -100,7 +97,7 @@
                                     'status' => $customer->status,
                                     'wallet_balance' => 0,
                                     'rewards' => 0,
-                                    // Passing Subscription Data to JS
+                                    // Subscription data kept for table logic, but won't be shown in sidebar
                                     'subscription' => [
                                         'has_plan' => $hasSub,
                                         'plan_name' => $planName,
@@ -118,7 +115,6 @@
                                 ];
                             @endphp
 
-                            {{-- Added data-subscription attribute for filtering --}}
                             <tr class="hover:bg-slate-50 transition-colors duration-200 customer-row"
                                 data-status="{{ strtolower($customer->status) }}" data-subscription="{{ $subStatus }}">
 
@@ -135,7 +131,6 @@
                                                 </div>
                                             @endif
 
-                                            {{-- CROWN ICON for Subscribers --}}
                                             @if ($hasSub)
                                                 <div class="absolute -top-1 -right-1 bg-yellow-400 text-white rounded-full p-0.5 border-2 border-white shadow-sm"
                                                     title="Premium Subscriber">
@@ -154,7 +149,6 @@
                                     </div>
                                 </td>
 
-                                {{-- NEW PLAN COLUMN --}}
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     @if ($hasSub)
                                         <span
@@ -227,7 +221,9 @@
                                 </td>
                             </tr>
                         @empty
-                            {{-- ... empty row remains same ... --}}
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-slate-500">No customers found.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -507,8 +503,8 @@
         // ==========================================
         // 1. GLOBAL VARIABLES & CRUD OPERATIONS
         // ==========================================
-        const customerBaseUrl = "{{ route('customers.store') }}"; 
-        const customersUrl = "{{ url('customers') }}"; 
+        const customerBaseUrl = "{{ route('customers.store') }}";
+        const customersUrl = "{{ url('customers') }}";
 
         // --- CREATE MODAL ---
         function openCreateModal() {
@@ -548,7 +544,11 @@
         function deleteCustomer(id) {
             if (confirm("Are you sure you want to delete this customer?")) {
                 let url = `${customersUrl}/${id}`;
-                axios.delete(url, { headers: { 'Accept': 'application/json' } })
+                axios.delete(url, {
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
                     .then(response => {
                         alert("Customer deleted successfully!");
                         window.location.reload();
@@ -564,7 +564,7 @@
         document.addEventListener("DOMContentLoaded", function() {
             // Create Submit
             const createBtn = document.getElementById('createSubmitBtn');
-            if(createBtn){
+            if (createBtn) {
                 createBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     submitForm('create', customerBaseUrl, 'POST');
@@ -573,7 +573,7 @@
 
             // Edit Submit
             const editBtn = document.getElementById('editSubmitBtn');
-            if(editBtn){
+            if (editBtn) {
                 editBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     let id = document.getElementById('edit_customer_id').value;
@@ -594,27 +594,34 @@
                 loader.classList.remove('hidden');
                 clearErrors(type);
 
-                axios.post(url, formData, { headers: { 'Accept': 'application/json' } })
-                .then(response => {
-                    document.getElementById(`${type}SuccessMessage`).innerText = response.data.message;
-                    document.getElementById(`${type}SuccessMessage`).classList.remove('hidden');
-                    form.reset();
-                    setTimeout(() => { window.location.reload(); }, 1000);
-                })
-                .catch(error => {
-                    btn.disabled = false;
-                    loader.classList.add('hidden');
-                    if (error.response && error.response.status === 422) {
-                        let errors = error.response.data.errors;
-                        for (const [key, value] of Object.entries(errors)) {
-                            let specificSpan = form.querySelector(`.${key}_error`) || form.querySelector(`.name_error`); 
-                            if (specificSpan) specificSpan.innerText = value[0];
+                axios.post(url, formData, {
+                        headers: {
+                            'Accept': 'application/json'
                         }
-                    } else {
-                        document.getElementById(`${type}ErrorMessage`).innerText = "Something went wrong.";
-                        document.getElementById(`${type}ErrorMessage`).classList.remove('hidden');
-                    }
-                });
+                    })
+                    .then(response => {
+                        document.getElementById(`${type}SuccessMessage`).innerText = response.data.message;
+                        document.getElementById(`${type}SuccessMessage`).classList.remove('hidden');
+                        form.reset();
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    })
+                    .catch(error => {
+                        btn.disabled = false;
+                        loader.classList.add('hidden');
+                        if (error.response && error.response.status === 422) {
+                            let errors = error.response.data.errors;
+                            for (const [key, value] of Object.entries(errors)) {
+                                let specificSpan = form.querySelector(`.${key}_error`) || form.querySelector(
+                                    `.name_error`);
+                                if (specificSpan) specificSpan.innerText = value[0];
+                            }
+                        } else {
+                            document.getElementById(`${type}ErrorMessage`).innerText = "Something went wrong.";
+                            document.getElementById(`${type}ErrorMessage`).classList.remove('hidden');
+                        }
+                    });
             }
         });
     </script>
@@ -623,12 +630,12 @@
         // ==========================================
         // 2. SEARCH, FILTERS & DRAWER LOGIC
         // ==========================================
-        
+
         // --- Mock History Generator ---
         const getMockHistory = (type) => {
             const statuses = ['In Progress', 'Delivered', 'Cancelled', 'Completed'];
             const items = [];
-            for (let i = 1; i <= 5; i++) { 
+            for (let i = 1; i <= 5; i++) {
                 const day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
                 const dateStr = `2026-01-${day}`;
                 if (type === 'Transaction') {
@@ -655,49 +662,62 @@
             return items;
         };
 
-        // --- Tabs Configuration (Added Subscription) ---
-        const tabs = [
-            { id: 'personal', label: 'Personal Info' },
-            { id: 'subscription', label: 'Subscription' }, // NEW TAB
-            { id: 'wallet', label: 'Wallet' },
-            { id: 'orders', label: 'Orders' },
-            { id: 'bookings', label: 'Bookings' },
-            { id: 'transactions', label: 'History' },
-            { id: 'payments', label: 'Payment Methods' },
+        // --- Tabs Configuration (REMOVED SUBSCRIPTION) ---
+        const tabs = [{
+                id: 'personal',
+                label: 'Personal Info'
+            },
+            {
+                id: 'wallet',
+                label: 'Wallet'
+            },
+            {
+                id: 'orders',
+                label: 'Orders'
+            },
+            {
+                id: 'bookings',
+                label: 'Bookings'
+            },
+            {
+                id: 'transactions',
+                label: 'History'
+            },
+            {
+                id: 'payments',
+                label: 'Payment Methods'
+            },
         ];
-        
+
         let currentCustomer = null;
         let currentTabData = [];
 
-        // --- FILTER LOGIC (UPDATED) ---
+        // --- FILTER LOGIC ---
         document.addEventListener("DOMContentLoaded", function() {
             const searchInput = document.getElementById("customerSearchInput");
             const statusFilter = document.getElementById("statusFilter");
-            const subscriptionFilter = document.getElementById("subscriptionFilter"); // NEW
+            const subscriptionFilter = document.getElementById("subscriptionFilter");
             const tableRows = document.querySelectorAll("#customerTable tbody tr");
             const noResults = document.getElementById("noResults");
 
             function filterMainTable() {
                 const query = searchInput.value.toLowerCase();
                 const status = statusFilter.value.toLowerCase();
-                const subStatus = subscriptionFilter ? subscriptionFilter.value.toLowerCase() : 'all'; // NEW
+                const subStatus = subscriptionFilter ? subscriptionFilter.value.toLowerCase() : 'all';
 
                 let hasVisibleRow = false;
 
                 tableRows.forEach(row => {
-                    // Data extraction
                     const name = row.querySelector(".search-name").innerText.toLowerCase();
                     const id = row.querySelector(".search-id").innerText.toLowerCase();
                     const email = row.querySelector(".search-email").innerText.toLowerCase();
-                    
-                    // Attribute extraction
                     const rowStatus = row.getAttribute("data-status");
-                    const rowSub = row.getAttribute("data-subscription"); // NEW
+                    const rowSub = row.getAttribute("data-subscription");
 
-                    // Matching Logic
-                    const matchesSearch = name.includes(query) || id.includes(query) || email.includes(query);
+                    const matchesSearch = name.includes(query) || id.includes(query) || email.includes(
+                        query);
                     const matchesStatus = status === "all" || rowStatus === status;
-                    const matchesSub = subStatus === "all" || rowSub === subStatus; // NEW
+                    const matchesSub = subStatus === "all" || rowSub === subStatus;
 
                     if (matchesSearch && matchesStatus && matchesSub) {
                         row.style.display = "";
@@ -711,7 +731,7 @@
 
             if (searchInput) searchInput.addEventListener("keyup", filterMainTable);
             if (statusFilter) statusFilter.addEventListener("change", filterMainTable);
-            if (subscriptionFilter) subscriptionFilter.addEventListener("change", filterMainTable); // NEW
+            if (subscriptionFilter) subscriptionFilter.addEventListener("change", filterMainTable);
         });
 
         // --- DRAWER FUNCTIONS ---
@@ -731,10 +751,9 @@
             const panel = document.getElementById('drawer-panel');
             drawer.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
-            
-            // Open Subscription tab if they are a subscriber, else Personal
-            const initialTab = (customer.subscription && customer.subscription.has_plan) ? 'subscription' : 'personal';
-            switchTab(initialTab);
+
+            // Always Default to Personal since Subscription is gone
+            switchTab('personal');
 
             setTimeout(() => {
                 backdrop.classList.remove('opacity-0');
@@ -771,79 +790,11 @@
             }
         }
 
-        // --- RENDER CONTENT (UPDATED WITH PRO SUBSCRIPTION UI) ---
+        // --- RENDER CONTENT (SUBSCRIPTION REMOVED) ---
         function renderContent(tabId) {
             const c = currentCustomer;
-            const sub = c.subscription; // Passed from PHP
 
-            // 1. SUBSCRIPTION TAB
-            if (tabId === 'subscription') {
-                if (!sub || !sub.has_plan) {
-                    // Empty State
-                    return `
-                    <div class="flex flex-col items-center justify-center p-8 bg-white border border-dashed border-slate-300 rounded-xl text-center h-64">
-                        <div class="h-14 w-14 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-400">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        </div>
-                        <h3 class="text-lg font-bold text-slate-800">No Active Plan</h3>
-                        <p class="text-slate-500 text-sm mt-1 mb-4">This customer is currently on the Free Tier.</p>
-                        <button class="px-5 py-2 bg-indigo-600 text-white font-medium text-sm rounded-lg hover:bg-indigo-700 shadow-md">Assign Subscription</button>
-                    </div>`;
-                }
-
-                // Pro State
-                return `
-                <div class="space-y-6 animate-fade-in-up">
-                    <div class="relative overflow-hidden bg-slate-900 p-6 rounded-2xl shadow-xl text-white">
-                        <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-indigo-500 rounded-full opacity-20 blur-2xl"></div>
-                        <div class="absolute bottom-0 left-0 -mb-4 -ml-4 w-24 h-24 bg-purple-500 rounded-full opacity-20 blur-2xl"></div>
-                        
-                        <div class="flex justify-between items-start relative z-10">
-                            <div>
-                                <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
-                                <h2 class="text-3xl font-extrabold text-white tracking-tight">${sub.plan_name}</h2>
-                            </div>
-                            <div class="bg-indigo-500/20 border border-indigo-400/30 p-2 rounded-lg">
-                                <svg class="w-6 h-6 text-indigo-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                            </div>
-                        </div>
-
-                        <div class="mt-8 space-y-3">
-                            <div class="flex justify-between text-sm">
-                                <span class="text-slate-400">Plan Usage</span>
-                                <span class="text-white font-medium">${sub.progress}% Remaining</span>
-                            </div>
-                            <div class="w-full bg-slate-700 rounded-full h-2">
-                                <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: ${sub.progress}%"></div>
-                            </div>
-                            <div class="flex justify-between text-xs mt-1">
-                                <span class="text-slate-500">Auto-renews</span>
-                                <span class="text-yellow-400 font-medium">Expires: ${sub.expires_at}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
-                        <h4 class="font-bold text-slate-800 mb-4 text-sm uppercase tracking-wide">Included Benefits</h4>
-                        <ul class="space-y-3">
-                            <li class="flex items-center text-sm text-slate-600 font-medium">
-                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
-                                Priority 24/7 Support
-                            </li>
-                            <li class="flex items-center text-sm text-slate-600 font-medium">
-                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
-                                Advanced Analytics Dashboard
-                            </li>
-                            <li class="flex items-center text-sm text-slate-600 font-medium">
-                                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-xs">✓</div>
-                                Zero Transaction Fees
-                            </li>
-                        </ul>
-                    </div>
-                </div>`;
-            }
-
-            // 2. PERSONAL TAB
+            // 1. PERSONAL TAB
             if (tabId === 'personal') {
                 const addr = c.address || {};
                 return `
@@ -879,7 +830,7 @@
                 </div>`;
             }
 
-            // 3. WALLET TAB
+            // 2. WALLET TAB
             if (tabId === 'wallet') {
                 return `
                 <div class="space-y-6">
@@ -895,14 +846,18 @@
                 </div>`;
             }
 
-            // 4. PAYMENTS TAB
+            // 3. PAYMENTS TAB
             if (tabId === 'payments') {
                 const methods = c.payment_methods || [];
                 return `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-lg font-bold text-slate-800 mb-4">Payment Methods</h3>${methods.length > 0 ? '' : '<p class="text-slate-500 italic text-sm">No saved payment methods (N/A).</p>'}</div>`;
             }
 
-            // 5. HISTORY TABS (Orders, Bookings, Transactions)
-            const typeMap = { 'orders': 'Order', 'bookings': 'Booking', 'transactions': 'Transaction' };
+            // 4. HISTORY TABS (Orders, Bookings, Transactions)
+            const typeMap = {
+                'orders': 'Order',
+                'bookings': 'Booking',
+                'transactions': 'Transaction'
+            };
             const title = typeMap[tabId];
             return `
                 <div class="space-y-4">
@@ -912,7 +867,11 @@
         }
 
         function initHistoryTab(tabId) {
-            const typeMap = { 'orders': 'Order', 'bookings': 'Booking', 'transactions': 'Transaction' };
+            const typeMap = {
+                'orders': 'Order',
+                'bookings': 'Booking',
+                'transactions': 'Transaction'
+            };
             currentTabData = getMockHistory(typeMap[tabId]);
             renderHistoryList(tabId, currentTabData);
         }

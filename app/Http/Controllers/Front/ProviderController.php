@@ -23,6 +23,7 @@ class ProviderController extends Controller
     public function store(StoreProviderRequest $request): JsonResponse
     {
 
+       
         try {
             $provider = $this->providerService->registerProvider($request->validated());
 

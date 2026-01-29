@@ -22,7 +22,15 @@ class StorePlanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            
+            'app_id'            => 'required|exists:apps,id',
+            'name'              => 'required|string|max:255',
+            'tier'              => 'required|string|max:255',
+            'price'             => 'required|numeric|min:0',
+            'billing_cycle'     => 'required|in:monthly,yearly',
+            'features'          => 'nullable|array',
+            // Features validation fixed
+            'features.*.key'    => 'required_with:features|string|max:255',
+            'features.*.value'  => 'required_with:features|string|max:255',
         ];
     }
 }

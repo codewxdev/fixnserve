@@ -4,7 +4,6 @@
     <section class="mb-10 pl-5 pr-5">
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-2xl font-bold text-slate-800">Key Performance Indicators</h3>
-            <button class="text-sm text-indigo-600 font-medium hover:underline">View Full Report</button>
         </div>
 
        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

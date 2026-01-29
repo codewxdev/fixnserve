@@ -10,20 +10,40 @@ use Spatie\Permission\Models\Role;
 
 class RolePermissionController extends Controller
 {
-    // Assign permissions to role
+
+
     public function assignPermission(Request $request)
     {
-        // dd($request);
         $request->validate([
             'role' => 'required|exists:roles,name',
-            'permissions' => 'required|array',
+            'permissions' => 'present|array', // 'present' allows sending empty array to clear all permissions
         ]);
 
+        // Find the role
         $role = Role::findByName($request->role, 'api');
+
+        // Sync the permissions (this handles both adding and removing)
         $role->syncPermissions($request->permissions);
 
-        return ApiResponse::success($role->permissions, 'Permissions assigned');
+        return ApiResponse::success(
+            $role->permissions->pluck('name'),
+            'Permissions synced successfully'
+        );
     }
+    // Assign permissions to role
+    // public function assignPermission(Request $request)
+    // {
+    //     // dd($request);
+    //     $request->validate([
+    //         'role' => 'required|exists:roles,name',
+    //         'permissions' => 'required|array',
+    //     ]);
+
+    //     $role = Role::findByName($request->role, 'api');
+    //     $role->syncPermissions($request->permissions);
+
+    //     return ApiResponse::success($role->permissions, 'Permissions assigned');
+    // }
 
     // Remove specific permissions
     public function removePermission(Request $request)

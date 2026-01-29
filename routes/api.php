@@ -251,3 +251,4 @@ Route::apiResource('roles', RoleController::class);
 Route::apiResource('permissions', PermissionController::class);
 Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
 Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
+Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
