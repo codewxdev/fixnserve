@@ -9,10 +9,12 @@ use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
 use App\Http\Controllers\MartVender\MartSubCategoryController;
 use App\Http\Controllers\MartVender\ProductController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PromotionPurchaseController;
 use App\Http\Controllers\PromotionSlotController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\RiderVehicleController;
 use App\Http\Controllers\Role\PermissionController;
 use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Role\RolePermissionController;
@@ -34,6 +36,7 @@ use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionEntitlementController;
 use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\SubSpecialtyController;
+use App\Http\Controllers\TransportTypeController;
 use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
@@ -77,6 +80,13 @@ Route::middleware(['auth:api', 'user.active'])->group(function () {
     Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
     Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
     Route::post('/rate', [RatingController::class, 'rate']);
+    // //////////////////////////////////Rider Module//////////////////////////////////////////
+
+    Route::post('/rider/vehicles', [RiderVehicleController::class, 'store']);
+    Route::post('/orders', [OrderController::class, 'store']);
+    Route::post('/orders/{order}/accept', [OrderController::class, 'accept']);   // /////for rider request
+    Route::post('/rider/location', [OrderController::class, 'update']);
+
     // ///////////////////////////////mart vender routes//////////////////////////////////////
     Route::apiResource('products', ProductController::class);
     Route::post('/products/{id}', [ProductController::class, 'update']);
@@ -186,8 +196,10 @@ Route::middleware(['auth:api'])->prefix('admin')->group(function () {
     Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
     Route::apiResource('promotions', PromotionController::class);
     Route::apiResource('promotion-slots', PromotionSlotController::class);
+    Route::post('/trasportation/type', [TransportTypeController::class, 'store']);
 });
 Route::middleware('auth:api')->group(function () {
+
     Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
     Route::post('/unsubscribe', [SubscriptionController::class, 'cancel']);
     Route::get('/subscription/status', [SubscriptionController::class, 'status']);
@@ -195,6 +207,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/promotion-purchases', [PromotionPurchaseController::class, 'store']);
 
 });
+
 // /////////////////////////////////////////extra code//////////////////////////////////////
 
 // Route::get('/roles/{role?}', [RoleController::class, 'index']);

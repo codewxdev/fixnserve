@@ -6,8 +6,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Exception;
 class CheckUserStatus
 {
     /**
@@ -17,24 +17,32 @@ class CheckUserStatus
      */
     public function handle(Request $request, Closure $next)
     {
-        $user = Auth::user();
-
-        // Check if user is authenticated
-        if (! $user) {
+        try {
+            $user = JWTAuth::parseToken()->authenticate();
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Unauthorized access.',
+                'message' => 'Invalid or missing token',
             ], 401);
         }
 
-        // Check if user is active
-        if ($user->status !== 'active') {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Your account is not active. Please contact support.',
+                'message' => 'Unauthorized',
+            ], 401);
+        }
+
+        if (strtolower(trim($user->status)) !== 'active') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is not active',
                 'user_status' => $user->status,
             ], 403);
         }
+
+        // Attach user to request (optional but useful)
+        auth()->setUser($user);
 
         return $next($request);
     }
