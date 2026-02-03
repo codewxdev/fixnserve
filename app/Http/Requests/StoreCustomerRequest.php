@@ -26,6 +26,7 @@ class StoreCustomerRequest extends FormRequest
             'email' => ['required', 'email', 'unique:users,email'],
             'dob'=>['required'],
             'gender' => ['required'],
+            'password' => 'required|string|min:6',
             
         ];
     }

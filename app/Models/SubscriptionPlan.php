@@ -18,6 +18,6 @@ class SubscriptionPlan extends Model
 
     public function entitlements()
     {
-        return $this->hasMany(SubscriptionEntitlement::class);
+        return $this->hasMany(SubscriptionEntitlement::class, 'subscription_plan_id');
     }
 }

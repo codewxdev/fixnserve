@@ -306,133 +306,115 @@
             </div>
         </div>
 
-        {{-- 4. Dispute Detail Slide-Over Panel (No icons were in this section, only the close button) --}}
-        <div x-show="openDisputeId !== null" x-transition:enter="ease-in-out duration-500"
-            x-transition:leave="ease-in-out duration-500" class="fixed inset-0 overflow-hidden z-40">
+        {{-- 4. Dispute Detail Slide-Over Panel --}}
+        <div x-show="openDisputeId !== null" class="fixed inset-0 overflow-hidden z-50" x-cloak>
 
             <div class="absolute inset-0 overflow-hidden">
                 {{-- Background overlay --}}
-                <div x-show="openDisputeId !== null" @click="openDisputeId = null"
-                    class="absolute inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+                <div x-show="openDisputeId !== null" x-transition:enter="transition-opacity ease-in-out duration-500"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition-opacity ease-in-out duration-500"
+                    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    @click="openDisputeId = null"
+                    class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity"></div>
 
                 <div class="fixed inset-y-0 right-0 max-w-full flex">
-                    {{-- Slide-over panel (Responsive width) --}}
+                    {{-- Slide-over panel --}}
                     <div x-show="openDisputeId !== null"
                         x-transition:enter="transform transition ease-in-out duration-500 sm:duration-700"
+                        x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                         x-transition:leave="transform transition ease-in-out duration-500 sm:duration-700"
-                        class="w-screen max-w-md md:max-w-xl lg:max-w-3xl">
+                        x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
+                        class="w-screen max-w-md md:max-w-xl lg:max-w-2xl">
 
-                        <div class="h-full flex flex-col bg-white shadow-xl overflow-y-scroll">
-                            <div class="p-4 sm:p-6 bg-yellow-600">
-                                {{-- Header and Close Button --}}
-                                <div class="flex items-start justify-between">
-                                    <h2 id="slide-over-title" class="text-lg sm:text-xl font-bold text-white">
-                                        Case Investigation (DIS-<span x-text="openDisputeId"></span>)
-                                    </h2>
-                                    <button type="button" class="rounded-md text-yellow-200 hover:text-white"
-                                        @click="openDisputeId = null">
-                                        {{-- Font Awesome Icon: Times/XMark (For Close) --}}
-                                        <i class="fa-solid fa-xmark h-6 w-6"></i>
+                        <div class="h-full flex flex-col bg-white shadow-2xl overflow-hidden">
+                            {{-- Header --}}
+                            <div class="p-6 bg-yellow-600 text-white shrink-0">
+                                <div class="flex items-center justify-between">
+                                    <h2 class="text-xl font-bold">Case Investigation (DIS-<span
+                                            x-text="openDisputeId"></span>)</h2>
+                                    <button @click="openDisputeId = null"
+                                        class="p-2 hover:bg-yellow-500 rounded-full transition">
+                                        <i class="fa-solid fa-xmark text-xl"></i>
                                     </button>
                                 </div>
-                                <p class="text-sm text-yellow-200 mt-1">Complaint: Item Not as Described</p>
+                                <p class="text-yellow-100 text-sm mt-1 opacity-90">Manage details, evidence and final
+                                    resolution.</p>
                             </div>
 
-                            {{-- Tabbed Navigation for Workflow --}}
-                            <nav x-data="{ detailTab: 'moderation' }"
-                                class="flex space-x-4 px-6 pt-4 border-b border-gray-200 sticky top-0 bg-white z-10 overflow-x-auto">
-                                @php
-                                    $tabs = ['Moderation', 'Evidence', 'Timeline', 'Final Decision'];
-                                @endphp
-                                @foreach ($tabs as $tab)
-                                    <button @click="detailTab = '{{ strtolower(str_replace(' ', '-', $tab)) }}'"
-                                        :class="{ 'border-yellow-500 text-yellow-600': detailTab === '{{ strtolower(str_replace(' ', '-', $tab)) }}', 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': detailTab !== '{{ strtolower(str_replace(' ', '-', $tab)) }}' }"
-                                        class="whitespace-nowrap pb-3 px-1 border-b-2 text-sm font-medium transition duration-150 ease-in-out">
-                                        {{ $tab }}
-                                    </button>
-                                @endforeach
-                            </nav>
+                            {{-- Navigation Tabs with Hidden Scrollbar --}}
+                            <div x-data="{ detailTab: 'moderation' }" class="flex flex-col h-full overflow-hidden">
+                                <nav
+                                    class="flex space-x-6 px-6 border-b border-gray-100 overflow-x-auto no-scrollbar scroll-smooth shrink-0 bg-white">
+                                    @foreach (['moderation' => 'Moderation', 'evidence' => 'Evidence', 'timeline' => 'Timeline', 'final' => 'Final Decision'] as $key => $label)
+                                        <button @click="detailTab = '{{ $key }}'"
+                                            :class="detailTab === '{{ $key }}' ? 'border-yellow-600 text-yellow-600' :
+                                                'border-transparent text-gray-400 hover:text-gray-600'"
+                                            class="whitespace-nowrap py-4 border-b-2 text-sm font-bold transition-all duration-300">
+                                            {{ $label }}
+                                        </button>
+                                    @endforeach
+                                </nav>
 
-                            <div class="p-6 flex-1 overflow-y-auto space-y-6">
+                                {{-- Content Area --}}
+                                <div class="flex-1 overflow-y-auto p-6 bg-gray-50/50">
 
-                                {{-- Moderation Tab Content --}}
-                                <div x-show="detailTab === 'moderation'" class="space-y-4">
-                                    <h3 class="font-semibold text-gray-900">Investigation Notes</h3>
-                                    <textarea rows="4"
-                                        class="w-full rounded-lg border-gray-300 text-sm focus:border-yellow-500 focus:ring-yellow-500"
-                                        placeholder="Add your moderation notes here..."></textarea>
-
-                                    <h3 class="font-semibold text-gray-900 mt-4">Provider Reply</h3>
-                                    <div class="p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700">
-                                        "We acknowledge the complaint. The item was a different color due to a temporary
-                                        stock issue. We offered a 10% coupon."
-                                    </div>
-                                    <button class="text-sm font-medium text-yellow-600 hover:underline mt-2">Request
-                                        Clarification</button>
-                                </div>
-
-                                {{-- Evidence Tab Content --}}
-                                <div x-show="detailTab === 'evidence'" class="space-y-4">
-                                    <h3 class="font-semibold text-gray-900">Evidence Uploads</h3>
-                                    <div class="space-y-3 p-3 border rounded-lg">
-                                        <p class="font-medium text-gray-700">Customer Evidence (3 files)</p>
-                                        <ul class="list-disc list-inside text-sm text-blue-600">
-                                            <li><a href="#" class="hover:underline">Photo_Damaged_Item.jpg</a></li>
-                                            <li><a href="#" class="hover:underline">Chat_Transcript.pdf</a></li>
-                                        </ul>
-                                    </div>
-                                    <div class="space-y-3 p-3 border rounded-lg">
-                                        <p class="font-medium text-gray-700">Provider Evidence (1 file)</p>
-                                    </div>
-                                    <button
-                                        class="mt-4 px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">Upload
-                                        Moderator Evidence</button>
-                                </div>
-
-                                {{-- Timeline Tab Content --}}
-                                <div x-show="detailTab === 'timeline'" class="space-y-4">
-                                    <h3 class="font-semibold text-gray-900">Case History / Escalation Path</h3>
-                                    <ol class="relative border-s border-gray-200 ml-3">
-                                        <li class="mb-4 ms-6">
-                                            <span
-                                                class="absolute flex items-center justify-center w-3 h-3 bg-gray-200 rounded-full -start-1.5 ring-4 ring-white"></span>
-                                            <h3 class="mb-1 text-sm font-semibold text-gray-900">Appeal Submitted</h3>
-                                            <time class="block mb-2 text-xs font-normal leading-none text-red-600">4 Hours
-                                                Ago (Urgent)</time>
-                                        </li>
-                                        <li class="mb-4 ms-6">
-                                            <span
-                                                class="absolute flex items-center justify-center w-3 h-3 bg-gray-200 rounded-full -start-1.5 ring-4 ring-white"></span>
-                                            <h3 class="mb-1 text-sm font-semibold text-gray-900">Provider Reply Submitted
-                                            </h3>
-                                            <time class="block mb-2 text-xs font-normal leading-none text-gray-400">1 Day
-                                                Ago</time>
-                                        </li>
-                                    </ol>
-                                </div>
-
-                                {{-- Final Decision Tab Content --}}
-                                <div x-show="detailTab === 'final-decision'" class="space-y-4">
-                                    <h3 class="font-semibold text-gray-900">Final Decision & Refund Workflow</h3>
-                                    <label class="block text-sm font-medium text-gray-700">Outcome</label>
-                                    <select
-                                        class="w-full rounded-lg border-gray-300 text-sm focus:border-yellow-500 focus:ring-yellow-500">
-                                        <option>Select Decision...</option>
-                                        <option>Full Refund Approved</option>
-                                        <option>Partial Refund Approved</option>
-                                        <option>Complaint Rejected</option>
-                                    </select>
-
-                                    <div class="p-3 bg-red-50 rounded-lg border border-red-200">
-                                        <label class="block text-sm font-medium text-gray-700">Refund Amount ($)</label>
-                                        <input type="number" placeholder="Enter amount..."
-                                            class="w-full rounded-lg border-gray-300 text-sm focus:border-yellow-500 focus:ring-yellow-500 mt-1">
+                                    {{-- Moderation Content --}}
+                                    <div x-show="detailTab === 'moderation'"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 scale-95" class="space-y-4">
+                                        <label class="block text-sm font-bold text-gray-700">Internal Moderation
+                                            Notes</label>
+                                        <textarea rows="5"
+                                            class="w-full rounded-xl border-gray-200 shadow-sm focus:ring-yellow-500 focus:border-yellow-500 p-4"
+                                            placeholder="Describe your findings..."></textarea>
                                     </div>
 
-                                    <button
-                                        class="mt-4 w-full py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-bold">
-                                        Finalize Decision & Process Refund
-                                    </button>
+                                    {{-- Evidence Content --}}
+                                    <div x-show="detailTab === 'evidence'"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 scale-95" class="space-y-4">
+                                        <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                                            <p class="text-sm font-bold text-gray-800 mb-3">Submitted Files</p>
+                                            <div class="flex items-center p-3 bg-blue-50 rounded-lg text-blue-700 text-sm">
+                                                <i class="fa-solid fa-file-pdf mr-3 text-lg"></i>
+                                                <span>customer_screenshot_01.pdf</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Timeline Content --}}
+                                    <div x-show="detailTab === 'timeline'"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 scale-95">
+                                        <div class="space-y-6 pl-4 border-l-2 border-yellow-100 ml-2">
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute -left-[25px] top-1 w-4 h-4 rounded-full bg-yellow-600 border-4 border-white">
+                                                </div>
+                                                <p class="text-sm font-bold">Investigation Started</p>
+                                                <p class="text-xs text-gray-400">Jan 25, 2026 - 10:00 AM</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Final Decision Content --}}
+                                    <div x-show="detailTab === 'final'"
+                                        x-transition:enter="transition ease-out duration-200"
+                                        x-transition:enter-start="opacity-0 scale-95" class="space-y-4">
+                                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                            <h4 class="font-bold text-gray-800 mb-4">Resolution Action</h4>
+                                            <div class="space-y-3">
+                                                <button
+                                                    class="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition">Approve
+                                                    Refund</button>
+                                                <button
+                                                    class="w-full py-3 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition">Reject
+                                                    Dispute</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -440,7 +422,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 @endsection
 
@@ -454,6 +435,24 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
+        [x-cloak] {
+            display: none !important;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        /* Ensure smooth transitions don't cause layout jumps */
         [x-cloak] {
             display: none !important;
         }

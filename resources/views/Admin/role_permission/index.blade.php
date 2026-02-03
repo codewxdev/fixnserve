@@ -781,27 +781,55 @@
         window.togglePermission = async function(checkbox) {
             const roleId = checkbox.dataset.roleId;
             const role = roles.find(r => r.id == roleId);
+
+            // Prevent modifying Super Admin
             if (role.name.toLowerCase() === 'super admin') {
                 checkbox.checked = true;
+                showToaster('Cannot modify Super Admin permissions', 'error');
                 return;
             }
 
-            const permName = permissions.find(p => p.id == checkbox.dataset.permId)?.name || checkbox.dataset
-                .permName;
-            const oldList = [...role.permissions_list];
-            if (checkbox.checked && !role.permissions_list.includes(permName)) role.permissions_list.push(permName);
-            else if (!checkbox.checked) role.permissions_list = role.permissions_list.filter(n => n !== permName);
+            // 1. Determine Permission Name
+            const permId = checkbox.dataset.permId;
+            // Find permission object by ID from global list, fallback to dataset name
+            const permObj = permissions.find(p => p.id == permId);
+            const permName = permObj ? permObj.name : checkbox.dataset.permName;
 
+            if (!permName) {
+                console.error("Permission name not found");
+                return;
+            }
+
+            // 2. Optimistic UI Update (Update local state immediately)
+            const oldList = [...role.permissions_list]; // Backup in case of error
+
+            if (checkbox.checked) {
+                if (!role.permissions_list.includes(permName)) {
+                    role.permissions_list.push(permName);
+                }
+            } else {
+                role.permissions_list = role.permissions_list.filter(n => n !== permName);
+            }
+
+            // 3. Send Sync Request
             try {
+                // We send the 'role' name and the WHOLE 'permissions' array to sync
                 await fetchData('/role-permission', 'POST', {
                     role: role.name,
                     permissions: role.permissions_list
                 });
+
                 showToaster(`Updated permissions for ${role.name}`);
+
+                // Optional: Update the card view numbers if user switches view
+                // renderCardView(); 
+
             } catch (e) {
+                // Revert UI on failure
                 role.permissions_list = oldList;
                 checkbox.checked = !checkbox.checked;
-                showToaster('Update failed', 'error');
+                showToaster(e.data?.message || 'Update failed', 'error');
+                console.error(e);
             }
         };
 

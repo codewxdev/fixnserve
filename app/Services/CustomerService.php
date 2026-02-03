@@ -18,7 +18,7 @@ class CustomerService{
                 'email' => $data['email'],
                 'gender'=>$data['gender'],
                 'dob' => $data['dob'] ?? null,
-                'password'=> Hash::make('javed123@'),
+                'password'=> Hash::make($data['password']),
      
             ]);
 

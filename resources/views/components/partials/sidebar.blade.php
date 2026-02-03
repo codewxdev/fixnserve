@@ -11,7 +11,7 @@
             </div>
             <span
                 class="text-xl font-bold tracking-wide bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
-                FixnServe
+                SahorOne
             </span>
         </div>
 

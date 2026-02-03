@@ -1,721 +1,831 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-gray-50/50 px-6 py-8 md:px-10 lg:px-12">
+<div class="min-h-screen bg-gray-50/50 p-6 space-y-8">
+    {{-- 1. HEADER --}}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Expert Management</h1>
+            <p class="text-sm text-gray-500">Manage professionals, validations, performance, and KYC.</p>
+        </div>
+        <button onclick="openCreateExpertModal()" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring focus:ring-indigo-200 active:bg-indigo-600 disabled:opacity-25 transition shadow-lg shadow-indigo-200">
+            <i class="fas fa-plus mr-2"></i> Add Professional
+        </button>
+    </div>
+
+    {{-- 2. STATS CARDS --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         
-        {{-- 1. HEADER --}}
-        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Expert Management</h1>
-                <p class="text-gray-500 mt-1">Manage KYC, validations, and platform performance.</p>
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-indigo-50/50 group-hover:bg-indigo-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Experts</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-indigo-600 transition-colors">{{ $professionals->count() }}</h3>
+                </div>
+                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-user-tie text-xl"></i>
+                </div>
             </div>
-            <div class="mt-4 md:mt-0">
-                <button onclick="openCreateExpertModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition-colors">
-                    + Add Professional
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-indigo-600 font-bold bg-indigo-50 px-1.5 py-0.5 rounded mr-2"><i class="fas fa-arrow-up"></i> New</span>
+                <span>Registrations</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-emerald-50/50 group-hover:bg-emerald-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Now</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-emerald-600 transition-colors">{{ $professionals->where('status', 'active')->count() }}</h3>
+                </div>
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded mr-2"><i class="fas fa-wifi"></i> Online</span>
+                <span>Ready for work</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-rose-50/50 group-hover:bg-rose-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Suspended</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-rose-600 transition-colors">{{ $professionals->where('status', 'suspend')->count() }}</h3>
+                </div>
+                <div class="p-3 bg-rose-50 text-rose-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-ban text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-rose-600 font-bold bg-rose-50 px-1.5 py-0.5 rounded mr-2"><i class="fas fa-exclamation-circle"></i> Flagged</span>
+                <span>Accounts</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 to-red-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-amber-50/50 group-hover:bg-amber-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending KYC</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-amber-600 transition-colors">{{ $professionals->where('kyc_status', 'pending')->count() }}</h3>
+                </div>
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fas fa-file-contract text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded mr-2"><i class="fas fa-clock"></i> Queue</span>
+                <span>Needs Verification</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+    </div>
+
+    {{-- 3. MAIN CONTENT (Filter & Table) --}}
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        {{-- Filter Bar --}}
+        <form id="filter-form" class="p-4 border-b border-gray-100 bg-gray-50 flex flex-wrap gap-4 items-center justify-between">
+            {{-- Search --}}
+            <div class="relative flex-1 max-w-md min-w-[200px]">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="filter-search" placeholder="Search by name, ID, email..." class="w-full pl-10 pr-4 py-2 text-sm border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+
+            {{-- Dropdowns --}}
+            <div class="flex flex-wrap gap-2">
+                <select id="filter-category" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
+                    <option value="">All Categories</option>
+                    <option value="legal">Legal</option>
+                    <option value="finance">Finance</option>
+                    <option value="architecture">Architecture</option>
+                    <option value="technology">Technology</option>
+                </select>
+                <select id="filter-region" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
+                    <option value="">All Regions</option>
+                    <option value="north america">North America</option>
+                    <option value="europe">Europe</option>
+                    <option value="asia">Asia</option>
+                </select>
+                <select id="filter-subscription" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
+                    <option value="all">All Plans</option>
+                    <option value="subscribed">Premium</option>
+                    <option value="free">Standard</option>
+                </select>
+                <select id="filter-kyc" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
+                    <option value="">KYC Status</option>
+                    <option value="verified">Verified</option>
+                    <option value="pending">Pending</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            
+            {{-- Reset & Count --}}
+            <div class="flex items-center gap-3">
+                <span id="result-count" class="text-xs font-semibold text-gray-500 uppercase hidden md:inline-block">Total: {{ $professionals->count() }}</span>
+                <button type="button" id="reset-filters" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Reset</button>
+            </div>
+        </form>
+
+        {{-- Table --}}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expert Profile</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category & Rate</th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200" id="experts-table-body">
+                    @forelse ($professionals as $expert)
+                        @php
+                            $hasSub = ($expert->id % 2 != 0); 
+                            $planName = $hasSub ? 'Diamond Expert' : 'Standard';
+                            $subStatus = $hasSub ? 'subscribed' : 'free';
+                            $category = $expert->specialization ?? 'General';
+                            $rate = $expert->hourly_rate ?? 0;
+                            
+                            $statusClasses = match($expert->status) {
+                                'active' => 'bg-green-100 text-green-800',
+                                'busy' => 'bg-yellow-100 text-yellow-800',
+                                'offline' => 'bg-gray-100 text-gray-800',
+                                'suspend' => 'bg-red-100 text-red-800',
+                                default => 'bg-gray-100 text-gray-800'
+                            };
+                            
+                            $image = $expert->image ? asset($expert->image) : 'https://ui-avatars.com/api/?name='.urlencode($expert->name).'&background=0D8ABC&color=fff';
+                            
+                            // JS Data Payload - UPDATED
+                            $jsData = [
+                                'id' => $expert->id,
+                                'name' => $expert->name,
+                                'image' => $image,
+                                'email' => $expert->email,
+                                'phone' => $expert->phone ?? '+1 234 567 8900',
+                                'status' => ucfirst($expert->status),
+                                'category' => $category,
+                                'rate' => $rate,
+                                'region' => $expert->city ?? 'Remote',
+                                'join_date' => $expert->created_at->format('M d, Y'),
+                                'description' => 'Experienced professional specialized in ' . $category . '.', 
+                                'kyc_status' => 'verified',
+                                'address' => [
+                                    'current' => $expert->current_address ?? '123 Tech Street, Suite 400',
+                                    'permanent' => $expert->permanent_address ?? '456 Home Avenue',
+                                    'city' => $expert->city ?? 'New York',
+                                    'state' => $expert->state ?? 'NY'
+                                ],
+                                'wallet' => [
+                                    'balance' => rand(500, 15000) . '.00',
+                                    'pending' => rand(0, 1000) . '.00',
+                                    'withdrawn' => rand(2000, 25000) . '.00',
+                                ],
+                                'orders' => [
+                                    [
+                                        'id' => '#EXP-' . rand(1000, 9999),
+                                        'client' => 'Acme Corp',
+                                        'task' => 'website development',
+                                        'date' => 'Oct 25, 2023',
+                                        'amount' => '150.00',
+                                        'status' => 'Completed'
+                                    ],
+                                    [
+                                        'id' => '#EXP-' . rand(1000, 9999),
+                                        'client' => 'John Smith',
+                                        'task' => 'App development',
+                                        'date' => 'Oct 20, 2023',
+                                        'amount' => '300.00',
+                                        'status' => 'Pending'
+                                    ],
+                                ],
+                                'payment_methods' => ['Visa **** 4242', 'Payoneer ID-445'],
+                                'documents' => [
+                                    ['name' => 'Govt ID Front', 'type' => 'PDF', 'status' => 'Approved'],
+                                    ['name' => 'Professional License', 'type' => 'Image', 'status' => 'Pending']
+                                ],
+                                'subscription' => [
+                                    'has_plan' => $hasSub,
+                                    'plan_name' => $planName,
+                                    'expires_at' => now()->addDays(30)->format('M d, Y'),
+                                    'progress' => 80
+                                ],
+                                // NEW SERVICES DATA
+                                'services' => [
+                                    [
+                                        'title' => 'Full Website Audit',
+                                        'price' => rand(100, 300),
+                                        'delivery' => '2 Days',
+                                        'status' => 'Active'
+                                    ],
+                                    [
+                                        'title' => '1-on-1 Consultation',
+                                        'price' => rand(50, 150),
+                                        'delivery' => '1 Hour',
+                                        'status' => 'Active'
+                                    ],
+                                    [
+                                        'title' => 'Custom Development',
+                                        'price' => rand(500, 1000),
+                                        'delivery' => '1 Week',
+                                        'status' => 'Inactive'
+                                    ]
+                                ]
+                            ];
+                        @endphp
+                        
+                        <tr class="expert-row hover:bg-indigo-50/30 transition duration-150 group" 
+                            data-name="{{ strtolower($expert->name) }}"
+                            data-id="{{ $expert->id }}"
+                            data-category="{{ strtolower($category) }}"
+                            data-rate="{{ $rate }}"
+                            data-status="{{ strtolower($expert->status) }}"
+                            data-kyc="verified"
+                            data-region="{{ strtolower($expert->city ?? '') }}"
+                            data-subscription="{{ $subStatus }}">
+                            
+                            {{-- Profile --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="relative">
+                                        <img class="h-10 w-10 rounded-full object-cover border border-gray-200" src="{{ $image }}">
+                                        @if ($hasSub)
+                                            <div class="absolute -top-1 -right-1 bg-indigo-600 text-white p-0.5 rounded-full border border-white" title="Diamond Expert">
+                                                <i class="fas fa-gem text-[8px]"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">{{ $expert->name }}</div>
+                                        <div class="text-xs text-gray-500">{{ $expert->email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            {{-- Category/Rate --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $hasSub ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800' }}">{{ $category }}</span>
+                                <div class="text-xs text-gray-500 mt-1 font-medium">${{ $rate }}/hr</div>
+                            </td>
+
+                            {{-- Status --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClasses }}">{{ ucfirst($expert->status) }}</span>
+                            </td>
+
+                            {{-- Performance --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
+                                4.9 <span class="text-yellow-400 text-xs"><i class="fas fa-star"></i></span>
+                            </td>
+
+                            {{-- Actions --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end items-center gap-2">
+                                    <button onclick="openExpertDetails({{ json_encode($jsData) }})" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded hover:bg-indigo-100 transition" title="View Details">
+                                        View Details
+                                    </button>
+                                    <div class="relative" x-data="{ open: false }">
+                                        <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div x-show="open" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
+                                            {{-- CHANGED: Only Suspend Account is shown here --}}
+                                            <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-ban mr-2"></i> Suspend Account</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="px-6 py-10 text-center text-gray-500">No professionals found.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="p-4 border-t border-gray-100">
+            @if ($professionals instanceof \Illuminate\Pagination\LengthAwarePaginator) {{ $professionals->links() }} @endif
+        </div>
+    </div>
+</div>
+
+{{-- 4. UNIFIED SLIDE-OVER --}}
+<div id="expert-slide-over" class="fixed inset-0 overflow-hidden z-50 hidden">
+    <div class="absolute inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeExpertDetails()"></div>
+    <div class="fixed inset-y-0 right-0 max-w-2xl w-full flex pointer-events-none">
+        <div class="w-full h-full bg-white shadow-2xl pointer-events-auto flex flex-col transform transition-transform duration-300 translate-x-full" id="so-panel">
+            
+            {{-- Slide Header --}}
+            <div class="bg-indigo-900 px-6 py-6 text-white shrink-0">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center space-x-4">
+                        <img id="so-image" src="" class="h-16 w-16 rounded-full border-2 border-white/50 object-cover">
+                        <div>
+                            <h2 class="text-xl font-bold" id="so-name"></h2>
+                            <p class="text-indigo-200 text-sm flex items-center gap-2">
+                                <span id="so-email"></span>
+                                <span class="w-1 h-1 bg-white rounded-full"></span>
+                                <span id="so-status-badge" class="uppercase text-xs font-bold bg-white/20 px-2 py-0.5 rounded"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="closeExpertDetails()" class="text-white hover:text-indigo-200 transition"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                {{-- Tabs --}}
+                <div class="flex space-x-6 mt-8 text-sm font-medium overflow-x-auto scrollbar-hide">
+                    <button onclick="switchTab('overview')" class="tab-btn border-b-2 border-white pb-3 text-white transition whitespace-nowrap" id="tab-overview">Overview</button>
+                    <button onclick="switchTab('orders')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-orders">Orders</button>
+                    <button onclick="switchTab('services')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-services">Services</button>
+                    <button onclick="switchTab('wallet')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-wallet">Wallet</button>
+                    <button onclick="switchTab('portfolio')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-portfolio">Portfolio</button>
+                    <button onclick="switchTab('payment-methods')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-payment-methods">Payment Methods</button>
+                    <button onclick="switchTab('documents')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-documents">Kyc Documents</button>
+                    <button onclick="switchTab('subscription')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-subscription">Subscription</button>
+                </div>
+            </div>
+
+            {{-- Slide Content --}}
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50 scroll-smooth">
+                
+                {{-- TAB: OVERVIEW --}}
+                <div id="content-overview" class="tab-content space-y-6">
+                    {{-- Basic Info --}}
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fas fa-id-card mr-2 text-indigo-500"></i> Professional Details</h3>
+                        <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                            <div><p class="text-gray-500 text-xs uppercase">Category</p><p class="font-medium text-gray-900" id="so-category"></p></div>
+                            <div><p class="text-gray-500 text-xs uppercase">Hourly Rate</p><p class="font-medium text-green-600" id="so-rate"></p></div>
+                            <div><p class="text-gray-500 text-xs uppercase">Location</p><p class="font-medium text-gray-900" id="so-region"></p></div>
+                            <div><p class="text-gray-500 text-xs uppercase">Joined</p><p class="font-medium text-gray-900" id="so-joined"></p></div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <p class="text-gray-500 text-xs uppercase mb-1">Contact</p>
+                            <p class="text-gray-900 font-medium text-sm" id="so-phone"></p>
+                        </div>
+                    </div>
+
+                    {{-- Address Section --}}
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fas fa-map-marker-alt mr-2 text-indigo-500"></i> Address Details</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="col-span-2">
+                                <p class="text-xs text-gray-500 uppercase">Current Address</p>
+                                <p class="font-medium text-gray-900 mt-1" id="so-addr-current"></p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-xs text-gray-500 uppercase">Permanent Address</p>
+                                <p class="font-medium text-gray-900 mt-1" id="so-addr-perm"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">City / State</p>
+                                <p class="font-medium text-gray-900 mt-1" id="so-addr-city"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: ORDERS --}}
+                <div id="content-orders" class="tab-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Order History</h3>
+                        <div id="so-orders-list" class="space-y-3">
+                            {{-- Populated by JS --}}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: SERVICES --}}
+                <div id="content-services" class="tab-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-900">Offered Services</h3>
+                            <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded font-medium">Gigs</span>
+                        </div>
+                        <div id="so-services-list" class="space-y-3">
+                            {{-- Populated by JS --}}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: WALLET --}}
+                <div id="content-wallet" class="tab-content hidden space-y-6">
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-emerald-100 text-xs font-bold uppercase tracking-wider">Total Balance</p>
+                                <h2 class="text-3xl font-bold mt-1" id="so-wallet-balance">$0.00</h2>
+                            </div>
+                            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <i class="fas fa-wallet text-2xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <div class="bg-black/10 rounded-lg p-3 flex-1">
+                                <p class="text-xs text-emerald-100 mb-1">Pending</p>
+                                <p class="font-semibold" id="so-wallet-pending">$0.00</p>
+                            </div>
+                            <div class="bg-black/10 rounded-lg p-3 flex-1">
+                                <p class="text-xs text-emerald-100 mb-1">Withdrawn</p>
+                                <p class="font-semibold" id="so-wallet-withdrawn">$0.00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Recent Transactions</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-3 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">
+                                        <i class="fas fa-arrow-down"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Job Completion</p>
+                                        <p class="text-xs text-gray-500">Service Fee Earned</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-green-600">+$120.00</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-3 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs">
+                                        <i class="fas fa-arrow-up"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Withdrawal</p>
+                                        <p class="text-xs text-gray-500">Bank Transfer</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-gray-900">-$500.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: PORTFOLIO --}}
+                <div id="content-portfolio" class="tab-content hidden h-full">
+                    <div class="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+                        <div class="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mb-3">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <p class="text-gray-500 text-sm font-medium">Portfolio Section</p>
+                        <p class="text-gray-400 text-xs mt-1">No portfolio items available.</p>
+                    </div>
+                </div>
+
+                {{-- TAB: PAYMENT METHODS --}}
+                <div id="content-payment-methods" class="tab-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Linked Payment Methods</h3>
+                        <div id="so-payment-methods-list" class="space-y-3">
+                            {{-- Populated by JS --}}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: DOCUMENTS --}}
+                <div id="content-documents" class="tab-content hidden space-y-4">
+                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-900">Submitted Compliance Docs</h3>
+                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">Verified</span>
+                        </div>
+                        <div id="so-doc-list" class="space-y-3">
+                            {{-- Populated via JS --}}
+                        </div>
+                        {{-- NEW: KYC Action Buttons inside Documents Tab --}}
+                        <div class="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                            <button class="flex-1 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition shadow-sm">
+                                <i class="fas fa-times-circle mr-2"></i> Reject KYC
+                            </button>
+                            <button class="flex-1 px-4 py-2.5 bg-green-600 text-white hover:bg-green-700 rounded-lg font-medium transition shadow-md">
+                                <i class="fas fa-check-circle mr-2"></i> Approve KYC
+                            </button>
+                        </div>
+                     </div>
+                </div>
+
+                {{-- TAB: SUBSCRIPTION --}}
+                <div id="content-subscription" class="tab-content hidden space-y-4">
+                    <div id="so-subscription-container">
+                        {{-- Populated via JS --}}
+                    </div>
+                </div>
+            </div>
+
+            {{-- Footer Actions REMOVED as requested --}}
+        </div>
+    </div>
+</div>
+
+{{-- 5. CREATE MODAL --}}
+<div id="create-expert-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeCreateExpertModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <div class="bg-white px-6 py-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-900">Add Professional</h3>
+                <button onclick="closeCreateExpertModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form id="createExpertForm" class="p-6 space-y-5">
+                @csrf
+                <div id="createErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm"></div>
+                <div id="createSuccessMessage" class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm"></div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                    <input type="text" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border" placeholder="e.g. Dr. John Doe">
+                    <span class="text-xs text-red-500 error-text name_error"></span>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" name="email" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border" placeholder="john@example.com">
+                    <span class="text-xs text-red-500 error-text email_error"></span>
+                </div>
+            </form>
+
+            <div class="p-6 border-t border-gray-100 flex justify-end bg-gray-50">
+                <button type="button" onclick="closeCreateExpertModal()" class="mr-3 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm font-medium">Cancel</button>
+                <button type="button" id="submitExpertBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md flex items-center transition font-medium">
+                    <span id="btnText">Add Professional</span>
                 </button>
             </div>
         </div>
-
-        {{-- 2. ANALYTICS CARDS (Unchanged) --}}
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-            @php
-                $stats = [
-                    [
-                        'label' => 'Total Experts',
-                        'value' => $professionals->count(),
-                        'icon_bg' => 'bg-indigo-100',
-                        'icon_text' => 'text-indigo-600',
-                        'icon_path' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M5 10a5.002 5.002 0 0110 0v-1h-10v1zm0 0l-2 10h14l-2-10H5zM17 4h3m-3 3h3M4 4h3m-3 3h3'
-                    ],
-                    [
-                        'label' => 'Active Now',
-                        'value' => $professionals->where('status', 'active')->count(),
-                        'icon_bg' => 'bg-green-100',
-                        'icon_text' => 'text-green-600',
-                        'icon_path' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'
-                    ],
-                    [
-                        'label' => 'Pending KYC',
-                        'value' => $professionals->where('kyc_status', 'pending')->count(), 
-                        'icon_bg' => 'bg-yellow-100',
-                        'icon_text' => 'text-yellow-600',
-                        'icon_path' => 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
-                    ],
-                    [
-                        'label' => 'Suspended',
-                        'value' => $professionals->where('status', 'suspend')->count(),
-                        'icon_bg' => 'bg-red-100',
-                        'icon_text' => 'text-red-600',
-                        'icon_path' => 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636'
-                    ],
-                ];
-            @endphp
-
-            @foreach($stats as $stat)
-                <div class="bg-white p-5 rounded-xl shadow-lg flex items-center justify-between transition duration-150 hover:shadow-xl hover:scale-[1.01]">
-                    <div>
-                        <p class="text-sm font-medium text-gray-500 truncate">{{ $stat['label'] }}</p>
-                        <p class="text-xl font-bold text-gray-900 mt-1">{{ number_format($stat['value']) }}</p>
-                    </div>
-                    <div class="p-3 rounded-full {{ $stat['icon_bg'] }} {{ $stat['icon_text'] }}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $stat['icon_path'] }}"></path>
-                        </svg>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-
-        {{-- 3. FILTER PANEL --}}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5 transition-all duration-300 mb-8">
-            <form id="filter-form">
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-                    
-                    {{-- Search --}}
-                    <div class="lg:col-span-4 relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </div>
-                        <input type="text" id="filter-search" class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-lg leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Search by name or ID...">
-                    </div>
-
-                    {{-- NEW: Subscription Filter --}}
-                    <div class="lg:col-span-2">
-                         <select id="filter-subscription" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-gray-600 sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="all">All Plans</option>
-                            <option value="subscribed">Premium (Subscribed)</option>
-                            <option value="free">Standard (Free)</option>
-                        </select>
-                    </div>
-
-                    <div class="lg:col-span-2">
-                        <select id="filter-category" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-gray-600 sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">All Categories</option>
-                            <option value="legal">Legal</option>
-                            <option value="finance">Finance</option>
-                            <option value="architecture">Architecture</option>
-                            <option value="technology">Technology</option>
-                        </select>
-                    </div>
-
-                    <div class="lg:col-span-2">
-                        <select id="filter-region" class="block w-full py-2.5 pl-3 pr-10 border border-gray-200 bg-white rounded-lg text-gray-600 sm:text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                            <option value="">All Regions</option>
-                            <option value="north america">North America</option>
-                            <option value="europe">Europe</option>
-                            <option value="asia">Asia Pacific</option>
-                        </select>
-                    </div>
-
-                    <div class="lg:col-span-2 flex justify-end gap-2">
-                        <button type="button" id="reset-filters" class="px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition w-full">
-                            Reset
-                        </button>
-                    </div>
-                </div>
-
-                <div class="mt-4 pt-4 border-t border-gray-100 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Availability</label>
-                        <div class="flex gap-2">
-                            <label class="cursor-pointer">
-                                <input type="radio" name="status" value="all" class="peer sr-only status-radio" checked>
-                                <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 peer-checked:bg-indigo-100 peer-checked:text-indigo-700 transition">All</span>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="status" value="active" class="peer sr-only status-radio">
-                                <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 peer-checked:bg-green-100 peer-checked:text-green-700 transition">Active</span>
-                            </label>
-                            <label class="cursor-pointer">
-                                <input type="radio" name="status" value="suspend" class="peer sr-only status-radio">
-                                <span class="px-3 py-1.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 peer-checked:bg-gray-200 peer-checked:text-gray-800 transition">Suspended</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Verification</label>
-                        <select id="filter-kyc" class="block w-full py-1.5 border-none bg-gray-50 rounded text-sm text-gray-600 focus:ring-0">
-                            <option value="">Any Status</option>
-                            <option value="verified">Verified Only</option>
-                            <option value="pending">Pending KYC</option>
-                            <option value="rejected">Rejected</option>
-                        </select>
-                    </div>
-
-                    <div class="lg:col-span-2">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide">Max Hourly Rate</label>
-                            <span class="text-xs text-indigo-600 font-bold">$<span id="rate-display">300</span>/hr</span>
-                        </div>
-                        <input type="range" id="filter-rate" min="25" max="1000" value="1000" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    </div>
-                </div>
-            </form>
-        </div>
-
-        {{-- 4. EXPERTS TABLE --}}
-        <div class="bg-white border border-gray-100 rounded-xl shadow-sm mt-8 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <h2 class="text-lg font-semibold text-gray-800">Expert Registry</h2>
-                <span id="result-count" class="text-xs font-medium text-gray-500 bg-white border border-gray-200 px-2 py-1 rounded">Total: {{ $professionals->count() }}</span>
-            </div>
-            
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expert Profile</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category & Rate</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
-                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="experts-table-body" class="bg-white divide-y divide-gray-200">
-                        @forelse($professionals as $expert)
-                            @php
-                                // --- SUBSCRIPTION LOGIC ---
-                                // Deterministic logic based on ID
-                                $hasSub = ($expert->id % 2 != 0); 
-                                $planName = $hasSub ? 'Diamond Expert' : 'Standard';
-                                $subStatus = $hasSub ? 'subscribed' : 'free';
-
-                                $category = $expert->specialization ?? 'General';
-                                $rate = $expert->hourly_rate ?? 0;
-                                // Map DB status to UI classes
-                                $statusClasses = match($expert->status) {
-                                    'active' => 'bg-green-50 text-green-700 ring-green-600/20',
-                                    'busy' => 'bg-yellow-50 text-yellow-800 ring-yellow-600/20',
-                                    'offline' => 'bg-gray-100 text-gray-600 ring-gray-600/20',
-                                    'suspend' => 'bg-red-50 text-red-700 ring-red-600/20',
-                                    default => 'bg-gray-50 text-gray-700 ring-gray-600/20'
-                                };
-                                $image = $expert->image ? asset($expert->image) : 'https://ui-avatars.com/api/?name='.urlencode($expert->name).'&background=0D8ABC&color=fff';
-                                
-                                // Mock Data for Slide Over
-                                $jsData = [
-                                    'id' => $expert->id,
-                                    'name' => $expert->name,
-                                    'image' => $image,
-                                    'category' => $category,
-                                    'rate' => $rate,
-                                    'join_date' => $expert->created_at->format('M Y'),
-                                    'kyc_status' => 'verified',
-                                    'region' => $expert->city ?? 'Remote',
-                                    'email' => $expert->email,
-                                    'phone' => $expert->phone ?? 'N/A',
-                                    // Subscription Data
-                                    'subscription' => [
-                                        'has_plan' => $hasSub,
-                                        'plan_name' => $planName,
-                                        'expires_at' => now()->addDays(30)->format('M d, Y'),
-                                        'progress' => 80
-                                    ],
-                                ];
-                            @endphp
-
-                            <tr class="expert-row hover:bg-gray-50 transition duration-150"
-                                data-name="{{ strtolower($expert->name) }}"
-                                data-id="{{ $expert->id }}"
-                                data-category="{{ strtolower($category) }}"
-                                data-rate="{{ $rate }}"
-                                data-status="{{ strtolower($expert->status) }}"
-                                data-kyc="verified" 
-                                data-region="{{ strtolower($expert->city ?? '') }}"
-                                data-subscription="{{ $subStatus }}"> {{-- Added data attribute --}}
-
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex items-center">
-                                        <div class="h-10 w-10 flex-shrink-0 relative">
-                                            <img class="h-10 w-10 rounded-full object-cover" src="{{ $image }}" alt="{{ $expert->name }}">
-                                            
-                                            {{-- STAR ICON for Subscribers --}}
-                                            @if($hasSub)
-                                            <div class="absolute -top-1 -right-1 h-4 w-4 bg-yellow-400 text-white rounded-full border-2 border-white shadow-sm flex items-center justify-center" title="Premium Expert">
-                                                <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                            </div>
-                                            @endif
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">{{ $expert->name }}</div>
-                                            <div class="text-xs text-gray-500">ID: EXP-{{ $expert->id }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">{{ $category }}</div>
-                                    <div class="text-xs text-gray-500">${{ $rate }}/hr</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ring-1 ring-inset {{ $statusClasses }}">
-                                        {{ ucfirst($expert->status) }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex flex-col gap-1">
-                                        <span class="inline-flex items-center gap-1 text-xs text-gray-600">
-                                            <svg class="w-3 h-3 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                            </svg>
-                                            Identity Verified
-                                        </span>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500">
-                                    <span class="font-bold text-gray-900">4.9 ★</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button onclick="openExpertDetails({{ json_encode($jsData) }})" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-md transition-colors">Details</button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">
-                                    No professionals found in the registry.
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="px-6 py-4 border-t border-gray-100 flex justify-center">
-                <span id="showing-text" class="text-sm text-gray-500">Showing {{ $professionals->count() }} results</span>
-            </div>
-        </div>
     </div>
-
-    {{-- 5. SLIDE OVER (Dynamic Content Injection) --}}
-    <div id="expert-details-slideover" class="relative z-50 hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
-        <div id="slideover-backdrop" class="fixed inset-0 bg-gray-900/60 opacity-0 transition-opacity ease-in-out duration-500 backdrop-blur-sm"></div>
-
-        <div class="fixed inset-0 overflow-hidden">
-            <div class="absolute inset-0 overflow-hidden">
-                <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
-                    <div id="slideover-panel" class="pointer-events-auto w-screen max-w-2xl transform translate-x-full transition-transform ease-in-out duration-500 sm:duration-500">
-                        <div class="flex h-full flex-col bg-white shadow-2xl">
-                            {{-- Header --}}
-                            <div class="bg-indigo-900 px-4 py-6 sm:px-6">
-                                <div class="flex items-center justify-between">
-                                    <h2 class="text-lg font-medium text-white" id="slide-over-title">Expert Profile</h2>
-                                    <div class="ml-3 flex h-7 items-center">
-                                        <button type="button" class="rounded-md bg-indigo-900 text-indigo-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white" onclick="closeExpertDetails()">
-                                            <span class="sr-only">Close panel</span>
-                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="mt-6 flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <img id="so-image" class="h-15 w-15 rounded-full object-cover" src="" alt="">
-                                    </div>
-                                    <div class="ml-4">
-                                        <h3 id="so-name" class="text-xl font-bold text-white"></h3>
-                                        <p id="so-meta" class="text-indigo-200 text-sm"></p>
-                                        <div class="mt-2 flex items-center gap-2">
-                                            <span class="inline-flex items-center rounded-md bg-green-400/10 px-2 py-1 text-xs font-medium text-green-400 ring-1 ring-inset ring-green-400/20">Verified Identity</span>
-                                            <span class="inline-flex items-center rounded-md bg-indigo-400/10 px-2 py-1 text-xs font-medium text-indigo-300 ring-1 ring-inset ring-indigo-400/20">Top Rated</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Actions Toolbar --}}
-                            <div class="border-b border-gray-200 bg-gray-50 px-4 py-3 flex gap-3 overflow-x-auto">
-                                <button class="flex-1 inline-flex justify-center items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                    <svg class="mr-1.5 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                        <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                                        <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
-                                    </svg>
-                                    Log in as User
-                                </button>
-                                <button class="flex-1 inline-flex justify-center items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
-                                    Approve KYC
-                                </button>
-                                <button class="flex-1 inline-flex justify-center items-center rounded-md bg-red-50 px-3 py-2 text-sm font-semibold text-red-600 shadow-sm ring-1 ring-inset ring-red-300 hover:bg-red-100">
-                                    Suspend
-                                </button>
-                            </div>
-
-                            {{-- Scrollable Content --}}
-                            <div class="flex-1 overflow-y-auto custom-scrollbar bg-white px-4 py-6 sm:px-6">
-                                <section class="mb-8">
-                                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">Professional Overview</h4>
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                            <p class="text-xs text-gray-500">Hourly Rate</p>
-                                            <p class="text-lg font-semibold text-gray-900">$<span id="so-rate"></span> <span class="text-xs font-normal text-gray-400">/hr</span></p>
-                                        </div>
-                                        <div class="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                            <p class="text-xs text-gray-500">Region</p>
-                                            <p id="so-region" class="text-lg font-semibold text-gray-900 capitalize"></p>
-                                        </div>
-                                        <div class="col-span-1 sm:col-span-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                            <p class="text-xs text-gray-500">Contact Info</p>
-                                            <div class="mt-1 text-sm text-gray-800">
-                                                <div id="so-email"></div>
-                                                <div id="so-phone"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {{-- Static Sections --}}
-                                <section class="mb-8">
-                                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">Verification Documents</h4>
-                                    <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-                                        <li class="flex items-center justify-between py-3 pl-3 pr-4 text-sm hover:bg-gray-50">
-                                            <div class="flex w-0 flex-1 items-center">
-                                                <svg class="h-5 w-5 flex-shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                                                </svg>
-                                                <span class="ml-2 w-0 flex-1 truncate">government_id_front.pdf</span>
-                                            </div>
-                                            <div class="ml-4 flex-shrink-0 flex gap-3">
-                                                <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500">View</a>
-                                                <span class="text-green-600 text-xs flex items-center font-bold">✓ Approved</span>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </section>
-
-                                <section>
-                                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">Financial Overview (YTD)</h4>
-                                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                                        <div class="px-4 py-5 sm:p-6 grid grid-cols-3 divide-x divide-gray-200 text-center">
-                                            <div>
-                                                <dt class="text-xs font-normal text-gray-500">Earnings</dt>
-                                                <dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">$0</dd>
-                                            </div>
-                                            <div>
-                                                <dt class="text-xs font-normal text-gray-500">Pending</dt>
-                                                <dd class="mt-1 text-xl font-semibold tracking-tight text-gray-900">$0</dd>
-                                            </div>
-                                            <div>
-                                                <dt class="text-xs font-normal text-gray-500">Refunds</dt>
-                                                <dd class="mt-1 text-xl font-semibold tracking-tight text-red-600">$0</dd>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {{-- SUBSCRIPTION SECTION (At Bottom) --}}
-                                <section class="mt-8 pt-6 border-t border-gray-100">
-                                    <h4 class="text-sm font-bold text-gray-500 uppercase tracking-wide mb-4">Subscription Status</h4>
-                                    <div id="so-subscription-container"></div>
-                                </section>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- 6. CREATE EXPERT MODAL (Unchanged) --}}
-    <div id="create-expert-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeCreateExpertModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-                <div class="bg-white px-6 py-6 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-900">Add Professional</h3>
-                    <button onclick="closeCreateExpertModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <form id="createExpertForm" class="p-6 space-y-5">
-                    @csrf
-                    <div id="createErrorMessage" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm"></div>
-                    <div id="createSuccessMessage" class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm"></div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input type="text" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
-                        <span class="text-xs text-red-500 error-text name_error"></span>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                        <input type="email" name="email" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
-                        <span class="text-xs text-red-500 error-text email_error"></span>
-                    </div>
-                </form>
-
-                <div class="p-6 border-t border-gray-100 flex justify-end bg-gray-50">
-                    <button type="button" onclick="closeCreateExpertModal()" class="mr-3 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm font-medium">Cancel</button>
-                    <button type="button" id="submitExpertBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md flex items-center transition font-medium">
-                        <svg id="expertLoadingIcon" class="hidden animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Add Professional
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+</div>
 @endsection
-
-@push('styles')
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 3px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #a0a0a0; }
-        
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            background: #4f46e5;
-            cursor: pointer;
-            margin-top: -6px; 
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            background: #e5e7eb;
-            border-radius: 2px;
-        }
-    </style>
-@endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         
-        /* -------------------------------------------------------------------------- */
-        /* 1. SLIDE OVER LOGIC                                                        */
-        /* -------------------------------------------------------------------------- */
-        const slideover = document.getElementById('expert-details-slideover');
-        const backdrop = document.getElementById('slideover-backdrop');
-        const panel = document.getElementById('slideover-panel');
-
-        // Populate Slide Over Data
+        // --- Slide Over Logic ---
         window.openExpertDetails = function(data) {
-            // Update Elements
+            document.getElementById('expert-slide-over').classList.remove('hidden');
+            document.getElementById('so-panel').classList.remove('translate-x-full');
+
+            // 1. Header
             document.getElementById('so-image').src = data.image;
             document.getElementById('so-name').innerText = data.name;
-            document.getElementById('so-meta').innerText = `${data.category} • Joined ${data.join_date}`;
-            document.getElementById('so-rate').innerText = data.rate;
-            document.getElementById('so-region').innerText = data.region;
             document.getElementById('so-email').innerText = data.email;
-            document.getElementById('so-phone').innerText = data.phone;
+            document.getElementById('so-status-badge').innerText = data.status;
 
-            // Generate Subscription Card
+            // 2. Overview Tab
+            document.getElementById('so-category').innerText = data.category;
+            document.getElementById('so-rate').innerText = `$${data.rate}/hr`;
+            document.getElementById('so-region').innerText = data.region;
+            document.getElementById('so-joined').innerText = data.join_date;
+            document.getElementById('so-phone').innerText = data.phone;
+            
+            // Address Fields
+            document.getElementById('so-addr-current').innerText = data.address.current;
+            document.getElementById('so-addr-perm').innerText = data.address.permanent;
+            document.getElementById('so-addr-city').innerText = `${data.address.city}, ${data.address.state}`;
+
+            // 3. Wallet Tab
+            document.getElementById('so-wallet-balance').innerText = `$${data.wallet.balance}`;
+            document.getElementById('so-wallet-pending').innerText = `$${data.wallet.pending}`;
+            document.getElementById('so-wallet-withdrawn').innerText = `$${data.wallet.withdrawn}`;
+
+            // 4. Payment Methods Tab
+            const payMethodList = document.getElementById('so-payment-methods-list');
+            if (data.payment_methods && data.payment_methods.length > 0) {
+                payMethodList.innerHTML = data.payment_methods.map(pm => `
+                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <div class="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mr-3">
+                         <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${pm}</p>
+                        <p class="text-xs text-gray-500">Verified</p>
+                    </div>
+                </div>
+                `).join('');
+            } else {
+                payMethodList.innerHTML = '<div class="text-center py-4 text-gray-500 italic">No payment methods linked.</div>';
+            }
+
+            // 5. Orders Tab
+            const ordersList = document.getElementById('so-orders-list');
+            if (data.orders && data.orders.length > 0) {
+                ordersList.innerHTML = data.orders.map(order => `
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center text-sm font-bold">
+                             <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-bold text-gray-900">${order.task}</p>
+                            <p class="text-xs text-gray-500">${order.id} • ${order.client}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-sm font-bold text-gray-900">$${order.amount}</p>
+                        <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded ${order.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${order.status}</span>
+                    </div>
+                </div>
+                `).join('');
+            } else {
+                ordersList.innerHTML = '<div class="text-center py-4 text-gray-500 italic">No work history available.</div>';
+            }
+
+            // 6. Documents Tab
+            const docList = document.getElementById('so-doc-list');
+            if(data.documents && data.documents.length > 0) {
+                docList.innerHTML = data.documents.map(doc => `
+                    <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-lg"><i class="fas fa-file-contract"></i></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">${doc.name}</p>
+                                <span class="text-[10px] text-gray-500 uppercase">${doc.type}</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-green-600 bg-green-50 px-2 py-1 rounded">${doc.status}</span>
+                    </div>
+                `).join('');
+            } else {
+                docList.innerHTML = '<p class="text-gray-500 italic text-center">No documents found.</p>';
+            }
+
+            // 7. Subscription Tab
             const subContainer = document.getElementById('so-subscription-container');
             if (data.subscription && data.subscription.has_plan) {
                 subContainer.innerHTML = `
                 <div class="relative overflow-hidden bg-gray-900 p-6 rounded-2xl shadow-xl text-white">
                     <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-indigo-500 rounded-full opacity-20 blur-2xl"></div>
-                    <div class="flex justify-between items-start relative z-10">
-                        <div>
-                            <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
-                            <h2 class="text-2xl font-extrabold text-white tracking-tight">${data.subscription.plan_name}</h2>
-                        </div>
-                        <div class="bg-indigo-500/20 border border-indigo-400/30 p-2 rounded-lg">
-                            <svg class="w-6 h-6 text-indigo-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                        </div>
-                    </div>
-                    <div class="mt-6 space-y-3">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-400">Validity</span>
-                            <span class="text-white font-medium">${data.subscription.progress}% Remaining</span>
-                        </div>
-                        <div class="w-full bg-gray-700 rounded-full h-2">
-                            <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full" style="width: ${data.subscription.progress}%"></div>
-                        </div>
-                        <div class="flex justify-between text-xs mt-1">
-                            <span class="text-gray-500">Auto-renews</span>
-                            <span class="text-indigo-300 font-medium">Expires: ${data.subscription.expires_at}</span>
+                    <div class="relative z-10">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
+                        <h2 class="text-2xl font-extrabold text-white tracking-tight">${data.subscription.plan_name}</h2>
+                        <div class="mt-6 space-y-3">
+                            <div class="flex justify-between text-sm"><span class="text-gray-400">Validity</span><span class="text-white font-medium">${data.subscription.progress}%</span></div>
+                            <div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full" style="width: ${data.subscription.progress}%"></div></div>
+                            <div class="flex justify-between text-xs mt-1"><span class="text-gray-500">Expires</span><span class="text-indigo-300 font-medium">${data.subscription.expires_at}</span></div>
                         </div>
                     </div>
                 </div>`;
             } else {
-                subContainer.innerHTML = `
-                <div class="flex flex-col items-center justify-center p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center">
-                    <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-gray-400">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                    </div>
-                    <h3 class="text-sm font-bold text-gray-800">No Active Plan</h3>
-                    <p class="text-gray-500 text-xs mt-1">On Free Tier.</p>
-                </div>`;
+                subContainer.innerHTML = '<div class="p-6 text-center border-dashed border-2 border-gray-300 rounded-xl text-gray-500">No active subscription (Standard Plan)</div>';
             }
 
-            // Show Panel
-            slideover.classList.remove('hidden');
-            setTimeout(() => {
-                backdrop.classList.remove('opacity-0');
-                backdrop.classList.add('opacity-100');
-                panel.classList.remove('translate-x-full');
-                panel.classList.add('translate-x-0');
-            }, 10);
+            // 8. Services Tab
+            const servicesList = document.getElementById('so-services-list');
+            if (data.services && data.services.length > 0) {
+                servicesList.innerHTML = data.services.map(service => {
+                    const statusColor = service.status === 'Active' ? 'text-green-600 bg-green-50' : 'text-gray-500 bg-gray-100';
+                    return `
+                    <div class="group flex flex-col md:flex-row md:items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-white">
+                        <div class="flex items-start gap-4">
+                            <div class="h-12 w-12 shrink-0 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-lg">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">${service.title}</h4>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> ${service.delivery}</span>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${statusColor}">${service.status}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 md:mt-0 text-right">
+                            <p class="text-lg font-bold text-gray-900">$${service.price}</p>
+                            <p class="text-xs text-gray-400">Starting at</p>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } else {
+                servicesList.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3">
+                            <i class="fas fa-box-open text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500 text-sm">No active services found for this professional.</p>
+                    </div>`;
+            }
+
+            switchTab('overview');
         };
 
         window.closeExpertDetails = function() {
-            backdrop.classList.remove('opacity-100');
-            backdrop.classList.add('opacity-0');
-            panel.classList.remove('translate-x-0');
-            panel.classList.add('translate-x-full');
-            setTimeout(() => {
-                slideover.classList.add('hidden');
-            }, 500); 
+            document.getElementById('so-panel').classList.add('translate-x-full');
+            setTimeout(() => { document.getElementById('expert-slide-over').classList.add('hidden'); }, 300);
         };
 
-        /* -------------------------------------------------------------------------- */
-        /* 2. FILTER SYSTEM LOGIC                     */
-        /* -------------------------------------------------------------------------- */
-        
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-white', 'text-white');
+                btn.classList.add('border-transparent', 'text-indigo-300');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+            document.getElementById('tab-' + tabName).classList.add('border-white', 'text-white');
+            document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-indigo-300');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+        };
+
+        // --- Filter Logic ---
         const searchInput = document.getElementById('filter-search');
         const categorySelect = document.getElementById('filter-category');
         const regionSelect = document.getElementById('filter-region');
         const kycSelect = document.getElementById('filter-kyc');
-        const subFilterSelect = document.getElementById('filter-subscription'); // NEW
-        const rateInput = document.getElementById('filter-rate');
-        const rateDisplay = document.getElementById('rate-display');
-        const statusRadios = document.querySelectorAll('.status-radio');
+        const subSelect = document.getElementById('filter-subscription');
         const resetButton = document.getElementById('reset-filters');
         
-        const tableRows = document.querySelectorAll('.expert-row');
-        const showingText = document.getElementById('showing-text');
-        const totalCountBadge = document.getElementById('result-count');
+        function filterTable() {
+            const search = searchInput.value.toLowerCase();
+            const cat = categorySelect.value.toLowerCase();
+            const reg = regionSelect.value.toLowerCase();
+            const kyc = kycSelect.value.toLowerCase();
+            const sub = subSelect.value.toLowerCase();
+            let count = 0;
 
-        function filterExperts() {
-            const searchValue = searchInput.value.toLowerCase();
-            const categoryValue = categorySelect.value.toLowerCase();
-            const regionValue = regionSelect.value.toLowerCase();
-            const kycValue = kycSelect.value.toLowerCase();
-            const subValue = subFilterSelect.value.toLowerCase(); // NEW
-            const maxRate = parseInt(rateInput.value);
-            
-            let statusValue = 'all';
-            document.querySelectorAll('input[name="status"]').forEach(radio => {
-                if(radio.checked) statusValue = radio.value;
-            });
+            document.querySelectorAll('.expert-row').forEach(row => {
+                const name = row.dataset.name;
+                const rCat = row.dataset.category;
+                const rReg = row.dataset.region;
+                const rKyc = row.dataset.kyc;
+                const rSub = row.dataset.subscription;
 
-            let visibleCount = 0;
+                const matchSearch = name.includes(search);
+                const matchCat = cat === '' || rCat === cat;
+                const matchReg = reg === '' || rReg === reg;
+                const matchKyc = kyc === '' || rKyc === kyc;
+                const matchSub = sub === 'all' || rSub === sub;
 
-            tableRows.forEach(row => {
-                const name = row.dataset.name.toLowerCase();
-                const id = row.dataset.id.toString().toLowerCase();
-                const category = row.dataset.category.toLowerCase();
-                const region = row.dataset.region ? row.dataset.region.toLowerCase() : '';
-                const kyc = row.dataset.kyc.toLowerCase();
-                const rowSub = row.dataset.subscription; // NEW
-                const rate = parseInt(row.dataset.rate);
-                const status = row.dataset.status.toLowerCase();
-
-                const matchesSearch = name.includes(searchValue) || id.includes(searchValue);
-                const matchesCategory = categoryValue === '' || category === categoryValue;
-                const matchesRegion = regionValue === '' || region === regionValue;
-                const matchesKyc = kycValue === '' || kyc === kycValue;
-                const matchesSub = subValue === 'all' || rowSub === subValue; // NEW
-                const matchesRate = rate <= maxRate;
-                const matchesStatus = statusValue === 'all' || status === statusValue;
-
-                if (matchesSearch && matchesCategory && matchesRegion && matchesKyc && matchesRate && matchesStatus && matchesSub) {
+                if (matchSearch && matchCat && matchReg && matchKyc && matchSub) {
                     row.classList.remove('hidden');
-                    visibleCount++;
+                    count++;
                 } else {
                     row.classList.add('hidden');
                 }
             });
-
-            if(showingText) showingText.innerText = `Showing ${visibleCount} results`;
-            if(totalCountBadge) totalCountBadge.innerText = `Total: ${visibleCount}`;
+            document.getElementById('result-count').innerText = `Total: ${count}`;
         }
 
-        searchInput.addEventListener('input', filterExperts);
-        rateInput.addEventListener('input', function() {
-            rateDisplay.innerText = this.value; 
-            filterExperts();
-        });
-
-        categorySelect.addEventListener('change', filterExperts);
-        regionSelect.addEventListener('change', filterExperts);
-        kycSelect.addEventListener('change', filterExperts);
-        subFilterSelect.addEventListener('change', filterExperts); // NEW listener
-        statusRadios.forEach(radio => radio.addEventListener('change', filterExperts));
-
+        [searchInput, categorySelect, regionSelect, kycSelect, subSelect].forEach(el => el.addEventListener('input', filterTable));
+        
         resetButton.addEventListener('click', () => {
             document.getElementById('filter-form').reset();
-            rateDisplay.innerText = "300";
-            filterExperts();
+            filterTable();
         });
 
-        filterExperts();
+        // --- Modal & AJAX Logic ---
+        window.openCreateExpertModal = function() {
+            document.getElementById('createExpertForm').reset();
+            document.getElementById('createErrorMessage').classList.add('hidden');
+            document.getElementById('createSuccessMessage').classList.add('hidden');
+            document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
+            document.getElementById('create-expert-modal').classList.remove('hidden');
+        };
 
-        /* -------------------------------------------------------------------------- */
-        /* 3. AJAX CREATE EXPERT LOGIC                */
-        /* -------------------------------------------------------------------------- */
+        window.closeCreateExpertModal = function() {
+            document.getElementById('create-expert-modal').classList.add('hidden');
+        };
+
         const submitBtn = document.getElementById('submitExpertBtn');
         const form = document.getElementById('createExpertForm');
-        const errorDiv = document.getElementById('createErrorMessage');
-        const successDiv = document.getElementById('createSuccessMessage');
-        const loader = document.getElementById('expertLoadingIcon');
 
         if(submitBtn) {
             submitBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-
                 submitBtn.disabled = true;
-                loader.classList.remove('hidden');
-                errorDiv.classList.add('hidden');
-                successDiv.classList.add('hidden');
-                document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
-
+                
                 let formData = new FormData(form);
-
-                axios.post("{{ route('store.professional') }}", formData, {
-                    headers: { 'Accept': 'application/json' }
-                })
+                axios.post("{{ route('store.professional') }}", formData)
                 .then(response => {
-                    successDiv.innerText = response.data.message || 'Expert invited successfully!';
-                    successDiv.classList.remove('hidden');
-                    form.reset();
-                    setTimeout(() => { window.location.reload(); }, 1000);
+                    document.getElementById('createSuccessMessage').classList.remove('hidden');
+                    document.getElementById('createSuccessMessage').innerText = "Expert added successfully!";
+                    setTimeout(() => { location.reload(); }, 1000);
                 })
                 .catch(error => {
                     submitBtn.disabled = false;
-                    loader.classList.add('hidden');
-                    if (error.response && error.response.status === 422) {
-                        let errors = error.response.data.errors;
-                        for (const [key, value] of Object.entries(errors)) {
-                            let errorSpan = document.querySelector(`.${key}_error`);
-                            if (errorSpan) errorSpan.innerText = value[0];
-                        }
+                    document.getElementById('createErrorMessage').classList.remove('hidden');
+                    if (error.response && error.response.data && error.response.data.errors) {
+                         let errors = error.response.data.errors;
+                         for (const [key, value] of Object.entries(errors)) {
+                             let errorSpan = document.querySelector(`.${key}_error`);
+                             if (errorSpan) errorSpan.innerText = value[0];
+                         }
                     } else {
-                        errorDiv.innerText = "Something went wrong. Please try again.";
-                        errorDiv.classList.remove('hidden');
+                        document.getElementById('createErrorMessage').innerText = "Error creating expert. Please try again.";
                     }
                 });
             });
         }
     });
-
-    // Modal Helpers
-    function openCreateExpertModal() {
-        document.getElementById('createExpertForm').reset();
-        document.getElementById('createErrorMessage').classList.add('hidden');
-        document.getElementById('createSuccessMessage').classList.add('hidden');
-        document.querySelectorAll('.error-text').forEach(el => el.innerText = '');
-        document.getElementById('create-expert-modal').classList.remove('hidden');
-    }
-
-    function closeCreateExpertModal() {
-        document.getElementById('create-expert-modal').classList.add('hidden');
-    }
 </script>
 @endpush

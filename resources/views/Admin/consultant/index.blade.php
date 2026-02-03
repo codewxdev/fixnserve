@@ -1,428 +1,528 @@
 @extends('layouts.app')
 
 @section('head')
-{{-- Font Awesome CDN Link for Icons --}}
+{{-- Font Awesome CDN Link --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 @endsection
 
 @section('content')
-<div class="space-y-6 px-4 sm:px-6 lg:px-8">
-    <header class="flex items-center justify-between pt-4">
-        <div class="flex flex-col">
-            <nav class="flex" aria-label="Breadcrumb">
-                <ol role="list" class="flex items-center space-x-2 text-sm text-gray-500">
-                    <li><a href="#" class="hover:text-gray-700 flex items-center"><i
-                                class="fa-solid fa-tachometer-alt w-4 h-4 mr-1"></i> Dashboard</a></li>
-                    <li class="text-gray-400">/</li>
-                    <li><span class="text-indigo-600 font-medium flex items-center"><i
-                                class="fa-solid fa-user-check w-4 h-4 mr-1"></i> Consultant Management</span></li>
-                </ol>
-            </nav>
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900 mt-2">Consultant Management</h1>
-            <p class="text-lg text-gray-500">Manage expert consultants, schedules, sessions, and recordings.</p>
-        </div>
-        <div>
-            {{-- Button with hover animation --}}
-            <button type="button" onclick="openAddModal()"
-                class="inline-flex items-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5">
-                <i class="fa-solid fa-user-plus w-4 h-4 mr-2"></i> Add Consultant
-            </button>
-        </div>
-    </header>
-
-    <section id="analytics-summary">
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4">
-            @php
-            // Static Analytics
-            $widgets = [
-                ['title' => 'Total Consultants', 'value' => $consultants->count(), 'icon' => 'users', 'color' => 'indigo'],
-                ['title' => 'Active Now', 'value' => 'NaN', 'icon' => 'user-check', 'color' => 'green'],
-                ['title' => "Today's Sessions", 'value' => 'NaN', 'icon' => 'calendar-check', 'color' => 'blue'],
-                ['title' => 'Completed (YTD)', 'value' => 'NaN', 'icon' => 'check-circle', 'color' => 'teal'],
-                ['title' => 'Billable Hours', 'value' => 'NaN', 'icon' => 'clock', 'color' => 'cyan'],
-                ['title' => 'Disputes/No-show', 'value' => 'NaN', 'icon' => 'exclamation-triangle', 'color' => 'orange'],
-                ['title' => 'Pending Refunds', 'value' => 'NaN', 'icon' => 'undo', 'color' => 'red'],
-                ['title' => 'Verified (KYC)', 'value' => 'NaN', 'icon' => 'shield-alt', 'color' => 'purple'],
-            ];
-            @endphp
-            @foreach ($widgets as $widget)
-            <div
-                class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-{{ $widget['color'] }}-500 transition duration-300 hover:shadow-xl transform hover:-translate-y-0.5">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-gray-500 truncate">{{ $widget['title'] }}</p>
-                    <i class="fa-solid fa-{{ $widget['icon'] }} w-5 h-5 text-{{ $widget['color'] }}-500"></i>
-                </div>
-                <div class="mt-1">
-                    <p class="text-2xl font-bold text-gray-900">{{ $widget['value'] }}</p>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </section>
-
-    <section id="sticky-filters" class="sticky top-0 z-10 bg-white pt-4 -mt-4 shadow-sm rounded-lg">
-        {{-- Functional Filter Bar --}}
-        <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
-            <div class="relative flex-grow">
-                <i class="fa-solid fa-search w-4 h-4 absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400"></i>
-                <input type="text" id="searchInput" placeholder="Search consultants..."
-                    class="pl-10 pr-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 text-sm">
-            </div>
-            
-            {{-- NEW: Subscription Filter --}}
-            <select id="subscriptionFilter"
-                class="rounded-lg px-3 py-2 border border-gray-300 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="all">All Plans</option>
-                <option value="subscribed">Premium (Subscribed)</option>
-                <option value="free">Standard (Free)</option>
-            </select>
-
-            <select id="statusFilter"
-                class="rounded-lg px-3 py-2 border border-gray-300 text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="suspend">Suspended</option>
-            </select>
-            
-            <button type="button" id="resetFilters"
-                class="flex items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition duration-150">
-                <i class="fa-solid fa-rotate-right w-4 h-4 mr-2"></i> Reset
-            </button>
-        </div>
-    </section>
-
-   <section id="consultant-list">
-        <div class="flow-root mt-6">
-            <div class="rounded-xl shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-                <div class="min-w-full">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50 sticky z-5">
-                            <tr>
-                                <th scope="col" class="py-3.5 pl-6 pr-3 text-left text-sm font-semibold text-gray-900">Basic Info</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Consultation Controls</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Performance</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Media/Recordings</th>
-                                <th scope="col" class="relative py-3.5 pl-3 pr-6 text-right"><span class="">Actions</span></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200 bg-white" id="consultants-table-body">
-                            @forelse ($consultants as $consultant)
-                            @php
-                                // --- SUBSCRIPTION LOGIC (Deterministic) ---
-                                $hasSub = ($consultant->id % 2 != 0); 
-                                $planName = $hasSub ? 'Executive Partner' : 'Standard';
-                                $subStatus = $hasSub ? 'subscribed' : 'free';
-
-                                // Data Preparation for JS SlideOver
-                                $jsData = [
-                                    'id' => $consultant->id,
-                                    'name' => $consultant->name,
-                                    'email' => $consultant->email,
-                                    'status' => $consultant->status,
-                                    // Missing fields in DB -> set to NaN/N/A
-                                    'expertise' => 'NaN', 
-                                    'rate' => 'NaN',
-                                    'rating' => 'NaN',
-                                    'sessions' => 'NaN',
-                                    'wallet' => 'NaN',
-                                    'recordings' => 0,
-                                    'phone' => $consultant->phone ?? 'N/A',
-                                    // Subscription Data
-                                    'subscription' => [
-                                        'has_plan' => $hasSub,
-                                        'plan_name' => $planName,
-                                        'expires_at' => now()->addDays(30)->format('M d, Y'),
-                                        'progress' => 75
-                                    ],
-                                ];
-                                
-                                // Status styling
-                                $statusClass = match($consultant->status) {
-                                    'active' => 'bg-green-100 text-green-800',
-                                    'suspend' => 'bg-red-100 text-red-800',
-                                    default => 'bg-gray-100 text-gray-800',
-                                };
-                            @endphp
-                            <tr class="consultant-row hover:bg-indigo-50/50 transition duration-150 group"
-                                data-name="{{ strtolower($consultant->name) }}"
-                                data-status="{{ strtolower($consultant->status) }}"
-                                data-subscription="{{ $subStatus }}"> {{-- Added Data Attribute --}}
-
-                                {{-- 1. Basic Info --}}
-                                <td class="whitespace-nowrap py-4 pl-6 pr-3 text-sm">
-                                    <div class="flex items-center">
-                                        <div class="h-10 w-10 flex-shrink-0 relative">
-                                            @if($consultant->image)
-                                                <img class="h-10 w-10 rounded-full object-cover border border-gray-200" src="{{ asset($consultant->image) }}" alt="">
-                                            @else
-                                                <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
-                                                    {{ substr($consultant->name, 0, 1) }}
-                                                </div>
-                                            @endif
-                                            
-                                            {{-- STAR ICON for Subscribers --}}
-                                            @if($hasSub)
-                                            <div class="absolute -top-1 -right-1 h-4 w-4 bg-yellow-400 text-white rounded-full border-2 border-white shadow-sm flex items-center justify-center" title="Premium Consultant">
-                                                <i class="fa-solid fa-star text-[8px]"></i>
-                                            </div>
-                                            @endif
-                                        </div>
-                                        <div class="ml-4">
-                                            <div class="font-medium text-gray-900 search-name">{{ $consultant->name }}</div>
-                                            <div class="text-gray-500 text-xs mt-1">Specialty:
-                                                <span class="font-semibold">NaN</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                {{-- 2. Consultation Controls --}}
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <div class="space-y-1">
-                                        <div class="font-medium text-gray-900 flex items-center">
-                                            <i class="fa-solid fa-calendar-days w-4 h-4 mr-1 text-indigo-500"></i>
-                                            Next: <strong class="ml-1">NaN</strong>
-                                        </div>
-                                        <div class="text-gray-500">Rate: <strong>$NaN/hr</strong></div>
-                                        <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium {{ $statusClass }}">
-                                            {{ ucfirst($consultant->status) }}
-                                        </span>
-                                    </div>
-                                </td>
-
-                                {{-- 3. Performance --}}
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <div class="space-y-1">
-                                        <div class="font-medium text-gray-900 flex items-center">
-                                            <i class="fa-solid fa-star w-4 h-4 mr-1 text-yellow-400"></i>
-                                            <strong class="ml-1">NaN</strong>
-                                            <span class="text-gray-400 font-normal ml-1">(NaN Reviews)</span>
-                                        </div>
-                                        <div>Total Sessions: <strong>NaN</strong></div>
-                                    </div>
-                                </td>
-
-                                {{-- 4. Media/Recordings --}}
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <div class="space-y-2">
-                                        <div class="flex items-center text-gray-700">
-                                            <i class="fa-solid fa-microphone-lines w-4 h-4 mr-2 text-gray-400"></i>
-                                            <span>Audio Logs: <strong>NaN</strong></span>
-                                        </div>
-                                        <div class="flex items-center text-gray-700">
-                                            <i class="fa-solid fa-video w-4 h-4 mr-2 text-gray-400"></i>
-                                            <span>Video Sessions: <strong>NaN</strong></span>
-                                        </div>
-                                    </div>
-                                </td>
-
-                                {{-- 5. Actions --}}
-                                <td class="relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium">
-                                    <div class="flex items-center justify-end space-x-3">
-                                        <button onclick="openSlideOver({{ json_encode($jsData) }})" class="text-indigo-600 hover:text-indigo-900 transition-colors bg-indigo-50 p-2 rounded-full" title="View Details">
-                                            <i class="fa-solid fa-eye text-lg"></i>
-                                        </button>
-                                        <button class="text-gray-400 hover:text-indigo-600 transition-colors" title="Edit">
-                                            <i class="fa-regular fa-pen-to-square text-lg"></i>
-                                        </button>
-                                        <button class="text-gray-400 hover:text-red-600 transition-colors" title="Delete">
-                                            <i class="fa-regular fa-trash-can text-lg"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            {{-- Empty State --}}
-                            <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-gray-500">
-                                    <div class="flex flex-col items-center justify-center">
-                                        <i class="fa-solid fa-magnifying-glass text-4xl text-gray-300 mb-3"></i>
-                                        <p class="text-lg font-medium text-gray-900">No consultants found</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            {{-- Count Display --}}
-            <div class="mt-4 text-sm text-gray-500 text-center">
-                 Showing <span id="showing-count">{{ $consultants->count() }}</span> consultants
-            </div>
-        </div>
-    </section>
-</div>
-
-{{-- ========================================== --}}
-{{-- DETAIL SLIDE-OVER (Dynamic Content) --}}
-{{-- ========================================== --}}
-<div id="consultant-detail-slideover" class="relative z-50 invisible" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+<div class="min-h-screen bg-gray-50/50 p-6 space-y-8">
     
-    {{-- Backdrop with fade transition --}}
-    <div id="slideover-backdrop" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-500 ease-in-out opacity-0 backdrop-blur-sm" onclick="closeSlideOver()"></div>
+    {{-- 1. HEADER --}}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Consultant Management</h1>
+            <p class="text-sm text-gray-500">Manage expert consultants, schedules, sessions, and recordings.</p>
+        </div>
+        <button onclick="openAddModal()" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring focus:ring-indigo-200 active:bg-indigo-600 disabled:opacity-25 transition shadow-lg shadow-indigo-200">
+            <i class="fa-solid fa-user-plus mr-2"></i> Add Consultant
+        </button>
+    </div>
 
-    <div class="fixed inset-0 overflow-hidden pointer-events-none">
-        <div class="absolute inset-0 overflow-hidden">
-            <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+    {{-- 2. ANALYTICS GRID --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {{-- Card 1 --}}
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-indigo-50/50 group-hover:bg-indigo-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Consultants</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-indigo-600 transition-colors">{{ $consultants->count() }}</h3>
+                </div>
+                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fa-solid fa-users text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-indigo-600 font-bold bg-indigo-50 px-1.5 py-0.5 rounded mr-2"><i class="fa-solid fa-arrow-up"></i> New</span>
+                <span>Onboarded this month</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-400 to-purple-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+        {{-- Card 2 --}}
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-emerald-50/50 group-hover:bg-emerald-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Now</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-emerald-600 transition-colors">NaN</h3>
+                </div>
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fa-solid fa-user-check text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-emerald-600 font-bold bg-emerald-50 px-1.5 py-0.5 rounded mr-2"><i class="fa-solid fa-signal"></i> Live</span>
+                <span>Available for calls</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+        {{-- Card 3 --}}
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-blue-50/50 group-hover:bg-blue-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Today's Sessions</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-blue-600 transition-colors">NaN</h3>
+                </div>
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fa-solid fa-calendar-check text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded mr-2"><i class="fa-solid fa-clock"></i> Upcoming</span>
+                <span>Scheduled Today</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+
+        {{-- Card 4 --}}
+        <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 rounded-full bg-amber-50/50 group-hover:bg-amber-100 transition-colors duration-300"></div>
+            <div class="relative flex justify-between items-start z-10">
+                <div>
+                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Pending KYC</p>
+                    <h3 class="text-3xl font-extrabold text-gray-900 mt-2 group-hover:text-amber-600 transition-colors">NaN</h3>
+                </div>
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl shadow-inner group-hover:scale-110 transition-transform duration-300">
+                    <i class="fa-solid fa-file-contract text-xl"></i>
+                </div>
+            </div>
+            <div class="mt-4 flex items-center text-xs text-gray-400">
+                <span class="text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded mr-2"><i class="fa-solid fa-hourglass-half"></i> Action</span>
+                <span>Documents Needed</span>
+            </div>
+            <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+        </div>
+    </div>
+
+    {{-- 3. MAIN CONTENT --}}
+    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        
+        {{-- Filter Bar --}}
+        <div class="p-4 border-b border-gray-100 bg-gray-50 flex flex-wrap gap-4 items-center justify-between">
+            <div class="relative flex-1 max-w-md min-w-[200px]">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="searchInput" placeholder="Search consultants..." class="w-full pl-10 pr-4 py-2 text-sm border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+            </div>
+            
+            <div class="flex flex-wrap gap-2">
+                <select id="subscriptionFilter" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
+                    <option value="all">All Plans</option>
+                    <option value="subscribed">Premium</option>
+                    <option value="free">Standard</option>
+                </select>
+
+                <select id="statusFilter" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="suspend">Suspended</option>
+                </select>
                 
-                {{-- Panel with Slide transition --}}
-                <div id="slideover-panel" class="pointer-events-auto w-screen max-w-2xl transform transition ease-in-out duration-500 translate-x-full">
-                    <div class="flex h-full flex-col overflow-y-scroll bg-white shadow-2xl">
+                <button type="button" id="resetFilters" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-2">
+                    Reset
+                </button>
+            </div>
+        </div>
 
-                        {{-- Header --}}
-                        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-6 z-10">
-                            <div class="flex items-start justify-between">
-                                <h2 class="text-2xl font-bold text-gray-900" id="slide-over-title">...</h2>
-                                <div class="ml-3 flex h-7 items-center">
-                                    <button type="button" class="rounded-md bg-white text-gray-400 hover:text-gray-500" onclick="closeSlideOver()">
-                                        <i class="fa-solid fa-times h-6 w-6"></i>
-                                    </button>
+        {{-- Table --}}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Basic Info</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Consultation Controls</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Media/Recordings</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white" id="consultants-table-body">
+                    @forelse ($consultants as $consultant)
+                    @php
+                        // Logic & Subscriptions
+                        $hasSub = ($consultant->id % 2 != 0); 
+                        $planName = $hasSub ? 'Executive Partner' : 'Standard';
+                        $subStatus = $hasSub ? 'subscribed' : 'free';
+                        $image = $consultant->image ? asset($consultant->image) : null;
+
+                        // Status styling
+                        $statusClass = match($consultant->status) {
+                            'active' => 'bg-green-100 text-green-800',
+                            'suspend' => 'bg-red-100 text-red-800',
+                            default => 'bg-gray-100 text-gray-800',
+                        };
+
+                        // Data Preparation for SlideOver
+                        $jsData = [
+                            'id' => $consultant->id,
+                            'name' => $consultant->name,
+                            'email' => $consultant->email,
+                            'image' => $image,
+                            'status' => ucfirst($consultant->status),
+                            'phone' => $consultant->phone ?? 'N/A',
+                            // Address Data
+                            'address' => [
+                                'current' => $consultant->current_address ?? '123 Consultant Way, Suite 100',
+                                'permanent' => $consultant->permanent_address ?? '456 Home Lane',
+                                'city' => $consultant->city ?? 'Los Angeles',
+                                'state' => $consultant->state ?? 'CA'
+                            ],
+                            // Wallet Data
+                            'wallet' => [
+                                'balance' => rand(1000, 20000) . '.00',
+                                'pending' => rand(0, 2000) . '.00',
+                                'withdrawn' => rand(5000, 50000) . '.00',
+                            ],
+                            // Payment Methods
+                            'payment_methods' => ['Visa **** 1234', 'Mastercard **** 5678'],
+                            // Media Data (NEW)
+                            'media' => [
+                                ['type' => 'video', 'title' => 'Consultation with John D.', 'date' => 'Oct 24, 2024', 'duration' => '45:00'],
+                                ['type' => 'audio', 'title' => 'Session #402 Audio Log', 'date' => 'Oct 20, 2024', 'duration' => '12:30'],
+                                ['type' => 'video', 'title' => 'Follow-up Call', 'date' => 'Oct 18, 2024', 'duration' => '30:00'],
+                            ],
+                            'documents' => [
+                                ['name' => 'National ID / Passport', 'type' => 'PDF', 'status' => 'Pending'],
+                                ['name' => 'Professional Certification', 'type' => 'IMG', 'status' => 'Verified']
+                            ],
+                            'subscription' => [
+                                'has_plan' => $hasSub,
+                                'plan_name' => $planName,
+                                'expires_at' => now()->addDays(30)->format('M d, Y'),
+                                'progress' => 75
+                            ],
+                        ];
+                    @endphp
+                    <tr class="consultant-row hover:bg-indigo-50/30 transition duration-150 group"
+                        data-name="{{ strtolower($consultant->name) }}"
+                        data-status="{{ strtolower($consultant->status) }}"
+                        data-subscription="{{ $subStatus }}">
+
+                        {{-- 1. Basic Info --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="relative flex-shrink-0 h-10 w-10">
+                                    @if($image)
+                                        <img class="h-10 w-10 rounded-full object-cover border border-gray-200" src="{{ $image }}" alt="">
+                                    @else
+                                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200">
+                                            {{ substr($consultant->name, 0, 1) }}
+                                        </div>
+                                    @endif
+                                    @if($hasSub)
+                                    <div class="absolute -top-1 -right-1 bg-indigo-600 text-white p-0.5 rounded-full border border-white" title="Premium">
+                                        <i class="fa-solid fa-crown text-[8px]"></i>
+                                    </div>
+                                    @endif
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">{{ $consultant->name }}</div>
+                                    <div class="text-xs text-gray-500">Spec: NaN</div>
                                 </div>
                             </div>
-                            <div class="mt-2 flex items-center space-x-2">
-                                <span class="inline-flex items-center rounded-full bg-green-100 px-3 py-0.5 text-sm font-medium text-green-800">
-                                    <i class="fa-solid fa-shield-alt w-4 h-4 mr-1"></i> <span id="slide-over-status">Verified Expert</span>
+                        </td>
+
+                        {{-- 2. Consultation Controls --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-xs text-gray-500 flex items-center"><i class="fa-solid fa-calendar-days mr-1 text-indigo-400"></i> Next: <strong class="ml-1 text-gray-700">NaN</strong></span>
+                                <span class="text-xs text-gray-500">Rate: <strong class="text-gray-900">$NaN/hr</strong></span>
+                                <span class="inline-flex w-fit items-center rounded-full px-2 py-0.5 text-xs font-semibold {{ $statusClass }}">
+                                    {{ ucfirst($consultant->status) }}
                                 </span>
-                                <span class="text-sm text-gray-500">ID: <span id="slide-over-id">...</span></span>
                             </div>
-                        </div>
+                        </td>
 
-                        {{-- Detailed Content --}}
-                        <div class="relative flex-1 px-6 py-6">
-                            <div class="space-y-8">
+                        {{-- 3. Performance --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 font-medium">NaN <span class="text-yellow-400 text-xs"><i class="fa-solid fa-star"></i></span></div>
+                            <div class="text-xs text-gray-500">NaN Sessions</div>
+                        </td>
 
-                                <section>
-                                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-4 flex items-center">
-                                        <i class="fa-solid fa-user w-5 h-5 mr-2 text-indigo-500"></i> Profile Overview
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mb-4">"No bio available (NaN)."</p>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-500">Email</div>
-                                            <div class="font-bold text-gray-900" id="slide-over-email">...</div>
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-medium text-gray-500">Rating</div>
-                                            <div class="font-bold text-gray-900 flex items-center">
-                                                <i class="fa-solid fa-star w-4 h-4 mr-1 text-yellow-400 fill-yellow-400"></i>
-                                                NaN
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-4 flex items-center">
-                                        <i class="fa-solid fa-calendar-alt w-5 h-5 mr-2 text-indigo-500"></i> Schedule Management
-                                    </h3>
-                                    <div class="bg-gray-50 p-4 rounded-lg">
-                                        <p class="text-sm font-medium text-gray-700 mb-2">Weekly Availability Calendar</p>
-                                        <p class="text-xs text-gray-500 italic">No schedule data available (NaN).</p>
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <h3 class="text-lg font-semibold text-gray-900 border-b pb-2 mb-4 flex items-center">
-                                        <i class="fa-solid fa-wallet w-5 h-5 mr-2 text-indigo-500"></i> Earnings & Wallet
-                                    </h3>
-                                    <div class="grid grid-cols-3 gap-4 text-center mb-4">
-                                        <div class="bg-indigo-50 p-3 rounded-lg">
-                                            <div class="text-xs text-gray-500">Revenue</div>
-                                            <div class="font-bold">$NaN</div>
-                                        </div>
-                                        <div class="bg-indigo-50 p-3 rounded-lg">
-                                            <div class="text-xs text-gray-500">Pending</div>
-                                            <div class="font-bold">$NaN</div>
-                                        </div>
-                                        <div class="bg-indigo-50 p-3 rounded-lg">
-                                            <div class="text-xs text-gray-500">Wallet</div>
-                                            <div class="font-bold">$NaN</div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {{-- SUBSCRIPTION SECTION (Bottom) --}}
-                                <section id="so-subscription-section" class="pt-6 border-t border-gray-100">
-                                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                                        <i class="fa-solid fa-crown w-5 h-5 mr-2 text-yellow-500"></i> Subscription Status
-                                    </h3>
-                                    <div id="so-subscription-container"></div>
-                                </section>
-
+                        {{-- 4. Media --}}
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex gap-2">
+                                <span class="inline-flex items-center px-2 py-1 rounded-md bg-gray-50 text-xs text-gray-600 border border-gray-200" title="Audio Logs">
+                                    <i class="fa-solid fa-microphone mr-1"></i> NaN
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-md bg-gray-50 text-xs text-gray-600 border border-gray-200" title="Video Sessions">
+                                    <i class="fa-solid fa-video mr-1"></i> NaN
+                                </span>
                             </div>
-                        </div>
+                        </td>
 
-                    </div>
-                </div>
-            </div>
+                        {{-- 5. Actions --}}
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div class="flex justify-end items-center gap-2">
+                                <button onclick="openSlideOver({{ json_encode($jsData) }})" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded hover:bg-indigo-100 transition" title="View Details">
+                                    View Details
+                                </button>
+                                
+                                <div class="relative" x-data="{ open: false }">
+                                    <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
+                                        <i class="fa-solid fa-ellipsis-v"></i>
+                                    </button>
+                                    <div x-show="open" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
+                                        {{-- CHANGED: Only Suspend Account --}}
+                                        <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
+                                            <i class="fa-solid fa-ban mr-2"></i> Suspend Account
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-gray-500 italic">No consultants found.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        
+        {{-- Footer --}}
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-center bg-gray-50">
+            <span class="text-xs font-medium text-gray-500">Showing <span id="showing-count">{{ $consultants->count() }}</span> consultants</span>
         </div>
     </div>
 </div>
 
-{{-- ========================================== --}}
-{{-- ADD CONSULTANT MODAL (Unchanged) --}}
-{{-- ========================================== --}}
-<div id="add-consultant-modal" class="relative z-50 invisible" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    {{-- Backdrop with Fade --}}
-    <div id="modal-backdrop" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity duration-300 ease-out opacity-0 backdrop-blur-sm" onclick="closeAddModal()"></div>
+{{-- 4. UNIFIED SLIDE-OVER --}}
+<div id="consultant-slide-over" class="fixed inset-0 overflow-hidden z-50 hidden">
+    <div class="absolute inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeSlideOver()"></div>
+    <div class="fixed inset-y-0 right-0 max-w-2xl w-full flex pointer-events-none">
+        <div class="w-full h-full bg-white shadow-2xl pointer-events-auto flex flex-col transform transition-transform duration-300 translate-x-full" id="so-panel">
+            
+            {{-- Header --}}
+            <div class="bg-indigo-900 px-6 py-6 text-white shrink-0">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center space-x-4">
+                        <img id="so-image" src="" class="h-16 w-16 rounded-full border-2 border-white/50 object-cover bg-indigo-800">
+                        <div>
+                            <h2 class="text-xl font-bold" id="so-name"></h2>
+                            <p class="text-indigo-200 text-sm flex items-center gap-2">
+                                <span id="so-email"></span>
+                                <span class="w-1 h-1 bg-white rounded-full"></span>
+                                <span id="so-status" class="uppercase text-xs font-bold bg-white/20 px-2 py-0.5 rounded"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="closeSlideOver()" class="text-white hover:text-indigo-200 transition"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
 
-    <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div id="modal-panel" class="relative transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all duration-300 ease-out scale-95 opacity-0 sm:my-8 sm:w-full sm:max-w-lg">
-                <div class="bg-indigo-600 px-4 py-4 sm:px-6 flex justify-between items-center">
-                    <h3 class="text-lg font-bold leading-6 text-white flex items-center" id="modal-title">
-                        <i class="fa-solid fa-user-plus mr-2"></i> Onboard Consultant
-                    </h3>
-                    <button onclick="closeAddModal()" class="text-indigo-100 hover:text-white transition">
-                        <i class="fa-solid fa-times text-lg"></i>
+                {{-- Tabs --}}
+                <div class="flex flex-nowrap space-x-6 mt-8 text-sm font-medium overflow-x-auto no-scrollbar">
+                    <button onclick="switchTab('overview')" class="tab-btn border-b-2 border-white pb-3 text-white transition whitespace-nowrap shrink-0" id="tab-overview">Overview</button>
+                    <button onclick="switchTab('media')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-media">Consultation history</button>
+                    <button onclick="switchTab('wallet')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-wallet">Wallet</button>
+                    <button onclick="switchTab('portfolio')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-portfolio">Portfolio</button>
+                    <button onclick="switchTab('payment-methods')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-payment-methods">Payment Methods</button>
+                    <button onclick="switchTab('documents')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-documents">KYC Documents</button>
+                    <button onclick="switchTab('subscription')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-subscription">Subscription</button>
+                </div>
+            </div>
+
+            {{-- Content --}}
+            <div class="flex-1 overflow-y-auto p-6 bg-gray-50 scroll-smooth">
+                
+                {{-- TAB: OVERVIEW --}}
+                <div id="content-overview" class="tab-content space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fa-solid fa-user-circle mr-2 text-indigo-500"></i> Profile Details</h3>
+                        <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
+                            <div><p class="text-gray-500 text-xs uppercase">Consultant ID</p><p class="font-medium text-gray-900" id="so-id"></p></div>
+                            <div><p class="text-gray-500 text-xs uppercase">Phone</p><p class="font-medium text-gray-900" id="so-phone"></p></div>
+                            <div class="col-span-2"><p class="text-gray-500 text-xs uppercase">Bio</p><p class="text-gray-600 italic mt-1">"No bio available (NaN)."</p></div>
+                        </div>
+                    </div>
+
+                    {{-- Address Section (New) --}}
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2 text-indigo-500"></i> Address Details</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="col-span-2">
+                                <p class="text-xs text-gray-500 uppercase">Current Address</p>
+                                <p class="font-medium text-gray-900 mt-1" id="so-addr-current"></p>
+                            </div>
+                            <div class="col-span-2">
+                                <p class="text-xs text-gray-500 uppercase">Permanent Address</p>
+                                <p class="font-medium text-gray-900 mt-1" id="so-addr-perm"></p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase">City / State</p>
+                                <p class="font-medium text-gray-900 mt-1" id="so-addr-city"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: MEDIA & RECORDINGS (NEW) --}}
+                <div id="content-media" class="tab-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Session Recordings & Media</h3>
+                        <div id="so-media-list" class="space-y-3">
+                            {{-- Populated by JS --}}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: WALLET (NEW) --}}
+                <div id="content-wallet" class="tab-content hidden space-y-6">
+                    {{-- Balance Card --}}
+                    <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-emerald-100 text-xs font-bold uppercase tracking-wider">Total Balance</p>
+                                <h2 class="text-3xl font-bold mt-1" id="so-wallet-balance">$0.00</h2>
+                            </div>
+                            <div class="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <i class="fa-solid fa-wallet text-2xl"></i>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <div class="bg-black/10 rounded-lg p-3 flex-1">
+                                <p class="text-xs text-emerald-100 mb-1">Pending</p>
+                                <p class="font-semibold" id="so-wallet-pending">$0.00</p>
+                            </div>
+                            <div class="bg-black/10 rounded-lg p-3 flex-1">
+                                <p class="text-xs text-emerald-100 mb-1">Withdrawn</p>
+                                <p class="font-semibold" id="so-wallet-withdrawn">$0.00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Transactions List (Dummy) --}}
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Recent Transactions</h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-3 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xs">
+                                        <i class="fa-solid fa-arrow-down"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Session Completed</p>
+                                        <p class="text-xs text-gray-500">Service Fee Earned</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-green-600">+$250.00</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-gray-50 pb-3 last:border-0">
+                                <div class="flex items-center gap-3">
+                                    <div class="h-8 w-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xs">
+                                        <i class="fa-solid fa-arrow-up"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900">Withdrawal</p>
+                                        <p class="text-xs text-gray-500">Bank Transfer</p>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-bold text-gray-900">-$1500.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: PORTFOLIO (NEW) --}}
+                <div id="content-portfolio" class="tab-content hidden h-full">
+                    <div class="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+                        <div class="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mb-3">
+                            <i class="fa-solid fa-images"></i>
+                        </div>
+                        <p class="text-gray-500 text-sm font-medium">Portfolio Section</p>
+                        <p class="text-gray-400 text-xs mt-1">No portfolio items available.</p>
+                    </div>
+                </div>
+
+                {{-- TAB: PAYMENT METHODS (NEW) --}}
+                <div id="content-payment-methods" class="tab-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="font-bold text-gray-900 mb-4">Linked Payment Methods</h3>
+                        <div id="so-payment-methods-list" class="space-y-3">
+                            {{-- Populated by JS --}}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: KYC DOCUMENTS --}}
+                <div id="content-documents" class="tab-content hidden space-y-4">
+                     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-bold text-gray-900">Submitted Compliance Docs</h3>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded">Review Needed</span>
+                        </div>
+                        <div id="so-doc-list" class="space-y-3">
+                            {{-- Populated via JS --}}
+                        </div>
+                        
+                        {{-- NEW: KYC Action Buttons inside Documents Tab --}}
+                        <div class="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                            <button class="flex-1 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition shadow-sm">
+                                <i class="fa-solid fa-ban mr-2"></i> Reject KYC
+                            </button>
+                            <button class="flex-1 px-4 py-2.5 bg-green-600 text-white hover:bg-green-700 rounded-lg font-medium transition shadow-md">
+                                <i class="fa-solid fa-check-circle mr-2"></i> Approve KYC
+                            </button>
+                        </div>
+                     </div>
+                </div>
+
+                {{-- TAB: SUBSCRIPTION --}}
+                <div id="content-subscription" class="tab-content hidden space-y-4">
+                    <div id="so-subscription-container"></div>
+                </div>
+            </div>
+
+            {{-- Footer REMOVED --}}
+        </div>
+    </div>
+</div>
+
+{{-- 5. ADD MODAL --}}
+<div id="add-consultant-modal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeAddModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+            <div class="bg-white px-6 py-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold text-gray-900"><i class="fa-solid fa-user-plus mr-2 text-indigo-500"></i> Onboard Consultant</h3>
+                <button onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fa-solid fa-times"></i></button>
+            </div>
+
+            <form id="createConsultantForm"> @csrf
+                <div class="p-6 space-y-5">
+                    <div id="successMessage" class="hidden mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm"></div>
+                    <div id="errorMessage" class="hidden mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm"></div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" name="name" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border" placeholder="e.g. Dr. Jane Doe">
+                        <span class="text-xs text-red-500 error-text name_error"></span>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" name="email" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border" placeholder="jane@consulting.com">
+                        <span class="text-xs text-red-500 error-text email_error"></span>
+                    </div>
+                </div>
+                
+                <div class="p-6 border-t border-gray-100 flex justify-end bg-gray-50">
+                    <button type="button" onclick="closeAddModal()" class="mr-3 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition shadow-sm font-medium">Cancel</button>
+                    <button type="button" id="submitBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md flex items-center transition font-medium">
+                        <i class="fa-solid fa-spinner fa-spin hidden mr-2" id="loadingIcon"></i> Save Consultant
                     </button>
                 </div>
-
-                <form id="createConsultantForm"> @csrf
-                    <div class="px-4 py-6 sm:p-6">
-                        <div id="successMessage" class="hidden mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded relative"></div>
-                        <div id="errorMessage" class="hidden mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative"></div>
-
-                        <div class="space-y-5">
-                            <div>
-                                <label for="name" class="block text-sm font-semibold leading-6 text-gray-900">Full Name</label>
-                                <div class="relative mt-2 rounded-md shadow-sm">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <i class="fa-solid fa-user text-gray-400"></i>
-                                    </div>
-                                    <input type="text" name="name" id="name" class="block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow" placeholder="e.g. Jacky Smith">
-                                </div>
-                                <span class="text-xs text-red-500 error-text name_error"></span>
-                            </div>
-                            <div>
-                                <label for="email" class="block text-sm font-semibold leading-6 text-gray-900">Email Address</label>
-                                <div class="relative mt-2 rounded-md shadow-sm">
-                                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                                        <i class="fa-solid fa-envelope text-gray-400"></i>
-                                    </div>
-                                    <input type="email" name="email" id="email" class="block w-full rounded-md border-0 py-2.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow" placeholder="jacky@example.com">
-                                </div>
-                                <span class="text-xs text-red-500 error-text email_error"></span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-4 py-4 sm:flex sm:flex-row-reverse sm:px-6 border-t border-gray-100">
-                        <button type="button" id="submitBtn" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 transition-colors sm:ml-3 sm:w-auto">
-                            <i class="fa-solid fa-spinner fa-spin hidden mr-2" id="loadingIcon"></i>
-                            Save Consultant
-                        </button>
-                        <button type="button" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 transition-colors sm:mt-0 sm:w-auto" onclick="closeAddModal()">Cancel</button>
-                    </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
@@ -430,15 +530,137 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         
-        // ==========================================
-        // 1. FILTER LOGIC
-        // ==========================================
+        // --- Slide Over Logic ---
+        window.openSlideOver = function(data) {
+            document.getElementById('consultant-slide-over').classList.remove('hidden');
+            document.getElementById('so-panel').classList.remove('translate-x-full');
+
+            // 1. Header
+            document.getElementById('so-name').innerText = data.name;
+            document.getElementById('so-email').innerText = data.email;
+            document.getElementById('so-status').innerText = data.status;
+            document.getElementById('so-image').src = data.image ? data.image : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=3730a3&color=fff`;
+
+            // 2. Details
+            document.getElementById('so-id').innerText = 'CNTR-' + data.id;
+            document.getElementById('so-phone').innerText = data.phone;
+            
+            // Address Fields (New)
+            document.getElementById('so-addr-current').innerText = data.address.current;
+            document.getElementById('so-addr-perm').innerText = data.address.permanent;
+            document.getElementById('so-addr-city').innerText = `${data.address.city}, ${data.address.state}`;
+
+            // 3. Media Tab (New)
+            const mediaList = document.getElementById('so-media-list');
+            if (data.media && data.media.length > 0) {
+                mediaList.innerHTML = data.media.map(item => `
+                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <div class="flex items-center gap-3">
+                        <div class="h-10 w-10 ${item.type == 'video' ? 'bg-indigo-100 text-indigo-600' : 'bg-orange-100 text-orange-600'} rounded-lg flex items-center justify-center">
+                             <i class="fa-solid ${item.type == 'video' ? 'fa-video' : 'fa-microphone'}"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${item.title}</p>
+                            <p class="text-xs text-gray-500">${item.date} • ${item.duration}</p>
+                        </div>
+                    </div>
+                    <button class="text-xs font-semibold text-indigo-600 hover:underline">Play</button>
+                </div>
+                `).join('');
+            } else {
+                mediaList.innerHTML = '<div class="text-center py-4 text-gray-500 italic">No recordings available.</div>';
+            }
+
+            // 4. Wallet Tab (New)
+            document.getElementById('so-wallet-balance').innerText = `$${data.wallet.balance}`;
+            document.getElementById('so-wallet-pending').innerText = `$${data.wallet.pending}`;
+            document.getElementById('so-wallet-withdrawn').innerText = `$${data.wallet.withdrawn}`;
+
+            // 5. Payment Methods Tab (New)
+            const payMethodList = document.getElementById('so-payment-methods-list');
+            if (data.payment_methods && data.payment_methods.length > 0) {
+                payMethodList.innerHTML = data.payment_methods.map(pm => `
+                <div class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition">
+                    <div class="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mr-3">
+                         <i class="fa-solid fa-credit-card"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${pm}</p>
+                        <p class="text-xs text-gray-500">Verified</p>
+                    </div>
+                </div>
+                `).join('');
+            } else {
+                payMethodList.innerHTML = '<div class="text-center py-4 text-gray-500 italic">No payment methods linked.</div>';
+            }
+
+            // 6. KYC Documents Tab
+            const docList = document.getElementById('so-doc-list');
+            if(data.documents && data.documents.length > 0) {
+                docList.innerHTML = data.documents.map(doc => `
+                    <div class="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition">
+                        <div class="flex items-center space-x-3">
+                            <div class="h-10 w-10 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-lg"><i class="fa-solid fa-file-contract"></i></div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800">${doc.name}</p>
+                                <span class="text-[10px] text-gray-500 uppercase">${doc.type}</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold ${doc.status === 'Verified' ? 'text-green-600 bg-green-50' : 'text-yellow-600 bg-yellow-50'} px-2 py-1 rounded">${doc.status}</span>
+                    </div>
+                `).join('');
+            } else {
+                docList.innerHTML = '<p class="text-gray-500 italic text-center">No documents found.</p>';
+            }
+
+            // 7. Subscription
+            const subContainer = document.getElementById('so-subscription-container');
+            if (data.subscription && data.subscription.has_plan) {
+                subContainer.innerHTML = `
+                <div class="relative overflow-hidden bg-gray-900 p-6 rounded-2xl shadow-xl text-white">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-indigo-500 rounded-full opacity-20 blur-2xl"></div>
+                    <div class="flex justify-between items-start relative z-10">
+                        <div>
+                            <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
+                            <h2 class="text-2xl font-extrabold text-white tracking-tight">${data.subscription.plan_name}</h2>
+                        </div>
+                        <div class="bg-indigo-500/20 border border-indigo-400/30 p-2 rounded-lg"><i class="fa-solid fa-crown text-indigo-300"></i></div>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <div class="flex justify-between text-sm"><span class="text-gray-400">Validity</span><span class="text-white font-medium">${data.subscription.progress}%</span></div>
+                        <div class="w-full bg-gray-700 rounded-full h-2"><div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full" style="width: ${data.subscription.progress}%"></div></div>
+                        <div class="flex justify-between text-xs mt-1"><span class="text-gray-500">Expires</span><span class="text-indigo-300 font-medium">${data.subscription.expires_at}</span></div>
+                    </div>
+                </div>`;
+            } else {
+                subContainer.innerHTML = '<div class="p-6 text-center border-dashed border-2 border-gray-300 rounded-xl text-gray-500"><h3 class="font-bold">No Active Plan</h3><p class="text-xs">Free Tier</p></div>';
+            }
+
+            switchTab('overview');
+        }
+
+        window.closeSlideOver = function() {
+            document.getElementById('so-panel').classList.add('translate-x-full');
+            setTimeout(() => { document.getElementById('consultant-slide-over').classList.add('hidden'); }, 300);
+        }
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-white', 'text-white');
+                btn.classList.add('border-transparent', 'text-indigo-300');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+            document.getElementById('tab-' + tabName).classList.add('border-white', 'text-white');
+            document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-indigo-300');
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+        }
+
+        // --- Filter Logic ---
         const searchInput = document.getElementById('searchInput');
         const subscriptionFilter = document.getElementById('subscriptionFilter');
         const statusFilter = document.getElementById('statusFilter');
         const resetBtn = document.getElementById('resetFilters');
-        const tableRows = document.querySelectorAll('.consultant-row');
-        const showingCount = document.getElementById('showing-count');
 
         function applyFilters() {
             const search = searchInput.value.toLowerCase();
@@ -446,187 +668,83 @@
             const status = statusFilter.value.toLowerCase();
             let visible = 0;
 
-            tableRows.forEach(row => {
-                const name = row.dataset.name.toLowerCase();
+            document.querySelectorAll('.consultant-row').forEach(row => {
+                const name = row.dataset.name;
                 const rowSub = row.dataset.subscription;
-                const rowStatus = row.dataset.status.toLowerCase();
+                const rowStatus = row.dataset.status;
 
-                const matchesSearch = name.includes(search);
-                const matchesSub = sub === 'all' || rowSub === sub;
-                const matchesStatus = status === 'all' || rowStatus === status;
-
-                if(matchesSearch && matchesSub && matchesStatus) {
+                if(name.includes(search) && (sub === 'all' || rowSub === sub) && (status === 'all' || rowStatus === status)) {
                     row.classList.remove('hidden');
                     visible++;
                 } else {
                     row.classList.add('hidden');
                 }
             });
-
-            if(showingCount) showingCount.innerText = visible;
+            document.getElementById('showing-count').innerText = visible;
         }
 
-        searchInput.addEventListener('input', applyFilters);
-        subscriptionFilter.addEventListener('change', applyFilters);
-        statusFilter.addEventListener('change', applyFilters);
-        
-        resetBtn.addEventListener('click', function() {
-            searchInput.value = '';
-            subscriptionFilter.value = 'all';
-            statusFilter.value = 'all';
-            applyFilters();
+        [searchInput, subscriptionFilter, statusFilter].forEach(el => el.addEventListener('input', applyFilters));
+        resetBtn.addEventListener('click', () => {
+            searchInput.value = ''; subscriptionFilter.value = 'all'; statusFilter.value = 'all'; applyFilters();
         });
-    });
 
-    // ==========================================
-    // 2. SLIDE OVER LOGIC (DYNAMIC DATA)
-    // ==========================================
-    const slideOver = document.getElementById('consultant-detail-slideover');
-    const slideOverBackdrop = document.getElementById('slideover-backdrop');
-    const slideOverPanel = document.getElementById('slideover-panel');
-    const slideOverTitle = document.getElementById('slide-over-title');
-    const slideOverStatus = document.getElementById('slide-over-status');
-    const slideOverId = document.getElementById('slide-over-id');
-    const slideOverEmail = document.getElementById('slide-over-email');
-    const subContainer = document.getElementById('so-subscription-container');
-
-    function openSlideOver(data) {
-        // Populate Basic Data
-        slideOverTitle.textContent = data.name;
-        slideOverStatus.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
-        slideOverId.textContent = 'CNTR-' + data.id;
-        slideOverEmail.textContent = data.email;
-
-        // Populate Subscription Card
-        if (data.subscription && data.subscription.has_plan) {
-            subContainer.innerHTML = `
-            <div class="relative overflow-hidden bg-gray-900 p-6 rounded-2xl shadow-xl text-white">
-                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 bg-indigo-500 rounded-full opacity-20 blur-2xl"></div>
-                <div class="flex justify-between items-start relative z-10">
-                    <div>
-                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Current Plan</p>
-                        <h2 class="text-2xl font-extrabold text-white tracking-tight">${data.subscription.plan_name}</h2>
-                    </div>
-                    <div class="bg-indigo-500/20 border border-indigo-400/30 p-2 rounded-lg">
-                        <i class="fa-solid fa-crown text-indigo-300 text-lg"></i>
-                    </div>
-                </div>
-                <div class="mt-6 space-y-3">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-400">Validity</span>
-                        <span class="text-white font-medium">${data.subscription.progress}% Remaining</span>
-                    </div>
-                    <div class="w-full bg-gray-700 rounded-full h-2">
-                        <div class="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full" style="width: ${data.subscription.progress}%"></div>
-                    </div>
-                    <div class="flex justify-between text-xs mt-1">
-                        <span class="text-gray-500">Auto-renews</span>
-                        <span class="text-indigo-300 font-medium">Expires: ${data.subscription.expires_at}</span>
-                    </div>
-                </div>
-            </div>`;
-        } else {
-            subContainer.innerHTML = `
-            <div class="flex flex-col items-center justify-center p-6 bg-gray-50 border border-dashed border-gray-300 rounded-xl text-center">
-                <div class="h-12 w-12 bg-white rounded-full flex items-center justify-center mb-3 shadow-sm text-gray-400">
-                    <i class="fa-solid fa-crown text-xl"></i>
-                </div>
-                <h3 class="text-sm font-bold text-gray-800">No Active Plan</h3>
-                <p class="text-gray-500 text-xs mt-1">On Free Tier.</p>
-            </div>`;
+        // --- Modal & AJAX ---
+        window.openAddModal = function() {
+            document.getElementById('add-consultant-modal').classList.remove('hidden');
+            document.getElementById('createConsultantForm').reset();
+            document.getElementById('successMessage').classList.add('hidden');
+            document.getElementById('errorMessage').classList.add('hidden');
         }
 
-        // Transitions
-        slideOver.classList.remove('invisible');
-        setTimeout(() => {
-            slideOverBackdrop.classList.remove('opacity-0');
-            slideOverBackdrop.classList.add('opacity-100');
-            slideOverPanel.classList.remove('translate-x-full');
-            slideOverPanel.classList.add('translate-x-0');
-        }, 10);
-    }
+        window.closeAddModal = function() {
+            document.getElementById('add-consultant-modal').classList.add('hidden');
+        }
 
-    function closeSlideOver() {
-        slideOverBackdrop.classList.remove('opacity-100');
-        slideOverBackdrop.classList.add('opacity-0');
-        slideOverPanel.classList.remove('translate-x-0');
-        slideOverPanel.classList.add('translate-x-full');
-        setTimeout(() => {
-            slideOver.classList.add('invisible');
-        }, 500);
-    }
-
-    // ==========================================
-    // 3. MODAL & AJAX LOGIC
-    // ==========================================
-    const addModal = document.getElementById('add-consultant-modal');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    const modalPanel = document.getElementById('modal-panel');
-    const submitBtn = document.getElementById('submitBtn');
-    const loadingIcon = document.getElementById('loadingIcon');
-    const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
-
-    function openAddModal() {
-        addModal.classList.remove('invisible');
-        document.getElementById('createConsultantForm').reset();
-        successMessage.classList.add('hidden');
-        errorMessage.classList.add('hidden');
-        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
-
-        setTimeout(() => {
-            modalBackdrop.classList.remove('opacity-0');
-            modalBackdrop.classList.add('opacity-100');
-            modalPanel.classList.remove('opacity-0', 'scale-95');
-            modalPanel.classList.add('opacity-100', 'scale-100');
-        }, 10);
-    }
-
-    function closeAddModal() {
-        modalBackdrop.classList.remove('opacity-100');
-        modalBackdrop.classList.add('opacity-0');
-        modalPanel.classList.remove('opacity-100', 'scale-100');
-        modalPanel.classList.add('opacity-0', 'scale-95');
-        setTimeout(() => {
-            addModal.classList.add('invisible');
-        }, 300);
-    }
-
-    submitBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        submitBtn.disabled = true;
-        loadingIcon.classList.remove('hidden');
-        successMessage.classList.add('hidden');
-        errorMessage.classList.add('hidden');
-        document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
-
-        const formData = new FormData(document.getElementById('createConsultantForm'));
-
-        axios.post("{{ route('store.consultant') }}", formData)
+        document.getElementById('submitBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            const btn = this;
+            btn.disabled = true;
+            document.getElementById('loadingIcon').classList.remove('hidden');
+            
+            const formData = new FormData(document.getElementById('createConsultantForm'));
+            axios.post("{{ route('store.consultant') }}", formData)
             .then(response => {
-                successMessage.textContent = response.data.message;
-                successMessage.classList.remove('hidden');
-                document.getElementById('createConsultantForm').reset();
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                document.getElementById('successMessage').textContent = response.data.message || 'Saved successfully';
+                document.getElementById('successMessage').classList.remove('hidden');
+                setTimeout(() => window.location.reload(), 1000);
             })
             .catch(error => {
-                submitBtn.disabled = false;
-                loadingIcon.classList.add('hidden');
-                
-                if (error.response && error.response.status === 422) {
-                    const errors = error.response.data.errors;
-                    Object.keys(errors).forEach(key => {
-                        const errorSpan = document.querySelector(`.${key}_error`);
-                        if(errorSpan) errorSpan.textContent = errors[key][0];
-                    });
-                } else {
-                    errorMessage.textContent = error.response?.data?.message || 'Something went wrong.';
-                    errorMessage.classList.remove('hidden');
-                }
+                btn.disabled = false;
+                document.getElementById('loadingIcon').classList.add('hidden');
+                document.getElementById('errorMessage').textContent = error.response?.data?.message || 'Error occurred';
+                document.getElementById('errorMessage').classList.remove('hidden');
             });
+        });
     });
 </script>
+@endpush
+
+@push('styles') {{-- Try changing to 'style' if this doesn't work --}}
+<style>
+    /* Hide scrollbar completely but allow scrolling */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none !important;  /* IE and Edge */
+        scrollbar-width: none !important;  /* Firefox */
+        -webkit-overflow-scrolling: touch; /* Smooth scroll for mobile */
+    }
+
+    /* Extra precaution for the tab container */
+    .tab-content {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 @endpush
