@@ -38,7 +38,7 @@ class OrderController extends Controller
                 'COUNT', 5
             );
         } catch (\Throwable $e) {
-            Log::error('Redis GEO failed', ['error' => $e->getMessage()]);
+            \Log::error('Redis GEO failed', ['error' => $e->getMessage()]);
             $nearbyRiders = [];
         }
 

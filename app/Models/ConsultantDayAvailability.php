@@ -14,8 +14,20 @@ class ConsultantDayAvailability extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function weekDay()
+    public function consultantWeekDay()
     {
-        return $this->belongsTo(ConsultantWeekDay::class);
+        return $this->belongsTo(
+            ConsultantWeekDay::class,
+            'consultant_week_day_id'
+        );
+    }
+
+    // (Optional) bookings relation
+    public function bookings()
+    {
+        return $this->hasMany(
+            ConsultantBooking::class,
+            'consultant_day_availability_id'
+        );
     }
 }

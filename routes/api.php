@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetCodeController;
 use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
+use App\Http\Controllers\ConsultantBookingController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
@@ -56,6 +57,9 @@ Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
 // routes/api.php
 Route::apiResource('specialties', SpecialtyController::class);
 Route::apiResource('sub-specialties', SubSpecialtyController::class);
+
+Route::get('getSlot', [ConsultantBookingController::class, 'getSlots']);
+Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
 
 Route::get('/countries', function () {
     return response()->json([
