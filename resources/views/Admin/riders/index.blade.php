@@ -47,6 +47,9 @@
         // Merging Dummy Data for UI Consistency
         return {
             ...r,
+            // --- ADDED: Assigned To Field Fallback ---
+            assigned_to: r.assigned_to || 'Central Pool (Unassigned)',
+            // -----------------------------------------
             address: r.address_details || { 
                 current: r.address || 'House #12, Street 4, Sector G-10/2', 
                 permanent: 'Village ABC, District XYZ', 
@@ -58,7 +61,7 @@
                 withdrawn: 85000 
             },
             payment_methods: r.payment_methods || ['JazzCash', 'EasyPaisa', 'Bank Alfalah'],
-            portfolio_items: [] // Riders usually don't have portfolios, but kept for consistency
+            portfolio_items: [] 
         };
     },
 
@@ -206,7 +209,7 @@
                 <input type="text" x-model="searchTerm" placeholder="Search Rider Name, Email..." class="w-full pl-10 pr-4 py-2 text-sm border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
             </div>
             
-            <div class="flex flex-wrap gap-2">
+            {{-- <div class="flex flex-wrap gap-2">
                 <select x-model="categoryFilter" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500 bg-white">
                     <option value="">All Categories</option>
                     <option value="Rider">Rider</option>
@@ -222,7 +225,7 @@
                 <button @click="searchTerm=''; categoryFilter=''; statusFilter=''" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium px-2">
                     Reset
                 </button>
-            </div>
+            </div> --}}
         </div>
 
         {{-- Table --}}
@@ -231,6 +234,8 @@
                 <thead class="bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rider Details</th>
+                        {{-- NEW COLUMN HEADER --}}
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assigned To</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Operational Stats</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet & Status</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Manage</th>
@@ -254,6 +259,14 @@
                                         <div class="text-xs text-gray-400 mt-0.5" x-text="rider.city"></div>
                                     </div>
                                 </div>
+                            </td>
+
+                            {{-- NEW COLUMN DATA: ASSIGNED TO --}}
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-blue-50 text-blue-700 border border-blue-100">
+                                    <i class="fa-solid fa-store mr-1.5 mt-0.5"></i> 
+                                    <span x-text="rider.assigned_to || 'General Pool'"></span>
+                                </span>
                             </td>
 
                             {{-- Operational Stats --}}
@@ -396,7 +409,17 @@
                                 <div><p class="text-gray-500 text-xs uppercase">Email</p><p class="font-medium text-gray-900" x-text="activeVendor.contact"></p></div>
                                 <div><p class="text-gray-500 text-xs uppercase">Phone</p><p class="font-medium text-gray-900" x-text="activeVendor.phone"></p></div>
                                 <div><p class="text-gray-500 text-xs uppercase">City</p><p class="font-medium text-gray-900" x-text="activeVendor.city"></p></div>
-                                <div><p class="text-gray-500 text-xs uppercase">Status</p><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800" x-text="activeVendor.status"></span></div>
+                                
+                                {{-- ADDED: Assigned Mart Info in Overview --}}
+                                <div>
+                                    <p class="text-gray-500 text-xs uppercase">Assigned Mart</p>
+                                    <p class="font-medium text-indigo-600 font-bold" x-text="activeVendor.assigned_to"></p>
+                                </div>
+                                
+                                <div class="col-span-2 border-t border-gray-50 pt-2 mt-2">
+                                    <p class="text-gray-500 text-xs uppercase mb-1">Status</p>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800" x-text="activeVendor.status"></span>
+                                </div>
                             </div>
                         </div>
 
@@ -476,17 +499,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- TAB: PORTFOLIO (NEW - Placeholder) --}}
-                    {{-- <div x-show="currentTab === 'portfolio'" class="h-full">
-                        <div class="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
-                            <div class="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mb-3">
-                                <i class="fa-solid fa-images"></i>
-                            </div>
-                            <p class="text-gray-500 text-sm font-medium">Rider Portfolio</p>
-                            <p class="text-gray-400 text-xs mt-1">No items uploaded.</p>
-                        </div>
-                    </div> --}}
 
                     {{-- TAB: PAYMENT METHODS (NEW) --}}
                     <div x-show="currentTab === 'payment-methods'" class="space-y-4">

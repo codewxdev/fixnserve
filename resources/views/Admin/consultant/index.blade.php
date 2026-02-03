@@ -268,11 +268,9 @@
                                         <i class="fa-solid fa-ellipsis-v"></i>
                                     </button>
                                     <div x-show="open" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
-                                        <button class="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50 flex items-center">
-                                            <i class="fa-solid fa-check-circle mr-2"></i> Approve
-                                        </button>
+                                        {{-- CHANGED: Only Suspend Account --}}
                                         <button class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
-                                            <i class="fa-solid fa-ban mr-2"></i> Reject
+                                            <i class="fa-solid fa-ban mr-2"></i> Suspend Account
                                         </button>
                                     </div>
                                 </div>
@@ -302,34 +300,34 @@
         <div class="w-full h-full bg-white shadow-2xl pointer-events-auto flex flex-col transform transition-transform duration-300 translate-x-full" id="so-panel">
             
             {{-- Header --}}
-{{-- Slide-Over Header with Fixed Tabs --}}
-<div class="bg-indigo-900 px-6 py-6 text-white shrink-0">
-    <div class="flex justify-between items-start">
-        <div class="flex items-center space-x-4">
-            <img id="so-image" src="" class="h-16 w-16 rounded-full border-2 border-white/50 object-cover bg-indigo-800">
-            <div>
-                <h2 class="text-xl font-bold" id="so-name"></h2>
-                <p class="text-indigo-200 text-sm flex items-center gap-2">
-                    <span id="so-email"></span>
-                    <span class="w-1 h-1 bg-white rounded-full"></span>
-                    <span id="so-status" class="uppercase text-xs font-bold bg-white/20 px-2 py-0.5 rounded"></span>
-                </p>
-            </div>
-        </div>
-        <button onclick="closeSlideOver()" class="text-white hover:text-indigo-200 transition"><i class="fa-solid fa-times text-xl"></i></button>
-    </div>
+            <div class="bg-indigo-900 px-6 py-6 text-white shrink-0">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center space-x-4">
+                        <img id="so-image" src="" class="h-16 w-16 rounded-full border-2 border-white/50 object-cover bg-indigo-800">
+                        <div>
+                            <h2 class="text-xl font-bold" id="so-name"></h2>
+                            <p class="text-indigo-200 text-sm flex items-center gap-2">
+                                <span id="so-email"></span>
+                                <span class="w-1 h-1 bg-white rounded-full"></span>
+                                <span id="so-status" class="uppercase text-xs font-bold bg-white/20 px-2 py-0.5 rounded"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="closeSlideOver()" class="text-white hover:text-indigo-200 transition"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
 
-    {{-- UPDATED: Added flex-nowrap and corrected class --}}
-    <div class="flex flex-nowrap space-x-6 mt-8 text-sm font-medium overflow-x-auto no-scrollbar">
-        <button onclick="switchTab('overview')" class="tab-btn border-b-2 border-white pb-3 text-white transition whitespace-nowrap shrink-0" id="tab-overview">Overview</button>
-        <button onclick="switchTab('media')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-media">Consultation history</button>
-        <button onclick="switchTab('wallet')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-wallet">Wallet</button>
-        <button onclick="switchTab('portfolio')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-portfolio">Portfolio</button>
-        <button onclick="switchTab('payment-methods')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-payment-methods">Payment Methods</button>
-        <button onclick="switchTab('documents')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-documents">KYC Documents</button>
-        <button onclick="switchTab('subscription')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-subscription">Subscription</button>
-    </div>
-</div>
+                {{-- Tabs --}}
+                <div class="flex flex-nowrap space-x-6 mt-8 text-sm font-medium overflow-x-auto no-scrollbar">
+                    <button onclick="switchTab('overview')" class="tab-btn border-b-2 border-white pb-3 text-white transition whitespace-nowrap shrink-0" id="tab-overview">Overview</button>
+                    <button onclick="switchTab('media')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-media">Consultation history</button>
+                    <button onclick="switchTab('wallet')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-wallet">Wallet</button>
+                    <button onclick="switchTab('portfolio')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-portfolio">Portfolio</button>
+                    <button onclick="switchTab('payment-methods')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-payment-methods">Payment Methods</button>
+                    <button onclick="switchTab('documents')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-documents">KYC Documents</button>
+                    <button onclick="switchTab('subscription')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap shrink-0" id="tab-subscription">Subscription</button>
+                </div>
+            </div>
+
             {{-- Content --}}
             <div class="flex-1 overflow-y-auto p-6 bg-gray-50 scroll-smooth">
                 
@@ -462,6 +460,16 @@
                         <div id="so-doc-list" class="space-y-3">
                             {{-- Populated via JS --}}
                         </div>
+                        
+                        {{-- NEW: KYC Action Buttons inside Documents Tab --}}
+                        <div class="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                            <button class="flex-1 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition shadow-sm">
+                                <i class="fa-solid fa-ban mr-2"></i> Reject KYC
+                            </button>
+                            <button class="flex-1 px-4 py-2.5 bg-green-600 text-white hover:bg-green-700 rounded-lg font-medium transition shadow-md">
+                                <i class="fa-solid fa-check-circle mr-2"></i> Approve KYC
+                            </button>
+                        </div>
                      </div>
                 </div>
 
@@ -471,11 +479,7 @@
                 </div>
             </div>
 
-            {{-- Footer --}}
-            <div class="p-4 bg-white border-t border-gray-200 flex justify-end gap-3 shrink-0">
-                <button class="px-5 py-2.5 rounded-lg border border-gray-300 text-red-600 font-medium hover:bg-red-50 transition">Reject</button>
-                <button class="px-5 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 shadow-md transition">Approve</button>
-            </div>
+            {{-- Footer REMOVED --}}
         </div>
     </div>
 </div>

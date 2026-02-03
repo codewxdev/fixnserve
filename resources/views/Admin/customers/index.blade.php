@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="min-h-screen bg-slate-50 p-4 md:p-8 font-sans">
+    <div class="min-h-screen bg-slate-50 p-4 md:p-8 font-sans" onclick="closeAllDropdowns(event)">
 
         {{-- Page Header --}}
         <header class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -36,25 +36,18 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-                {{-- Subscription Filter (Kept in main view as requested "nothing else") --}}
-                <select id="subscriptionFilter"
-                    class="form-select block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white">
-                    <option value="all">All Plans</option>
-                    <option value="subscribed">Has Subscription</option>
-                    <option value="free">Free / None</option>
-                </select>
-
                 {{-- Status Filter --}}
                 <select id="statusFilter"
                     class="form-select block w-full pl-3 pr-10 py-2.5 text-base border-slate-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg bg-white">
                     <option value="all">All Status</option>
                     <option value="active">Active</option>
                     <option value="suspend">Suspended</option>
-                    <option value="Ban">Banned</option>
-                    <option value="deactive">Deactive</option>
+                    {{-- <option value="Ban">Banned</option> --}}
+                    {{-- <option value="deactive">Deactive</option> --}}
                 </select>
             </div>
         </div>
+
         {{-- Main Table --}}
         <div class="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -63,8 +56,6 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Customer</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                Current Plan</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
                                 Contact & Status</th>
                             <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">
@@ -76,14 +67,9 @@
                     <tbody class="bg-white divide-y divide-slate-100">
                         @forelse ($users as $customer)
                             @php
-                                $hasSub = (bool) rand(0, 1);
-                                $planName = $hasSub ? (rand(0, 1) ? 'Gold Pro' : 'Silver Starter') : 'Free Tier';
-                                $subStatus = $hasSub ? 'subscribed' : 'free';
-
                                 $statusClass = match ($customer->status) {
                                     'active' => 'bg-green-100 text-green-800',
                                     'Ban', 'suspend' => 'bg-red-100 text-red-800',
-                                    'deactive' => 'bg-gray-100 text-gray-800',
                                     default => 'bg-yellow-100 text-yellow-800',
                                 };
 
@@ -97,13 +83,6 @@
                                     'status' => $customer->status,
                                     'wallet_balance' => 0,
                                     'rewards' => 0,
-                                    // Subscription data kept for table logic, but won't be shown in sidebar
-                                    'subscription' => [
-                                        'has_plan' => $hasSub,
-                                        'plan_name' => $planName,
-                                        'expires_at' => now()->addDays(rand(5, 30))->format('M d, Y'),
-                                        'progress' => rand(20, 90),
-                                    ],
                                     'address' => [
                                         'current' => $customer->current_address ?? ($customer->address ?? 'N/A'),
                                         'city' => $customer->city ?? 'N/A',
@@ -116,7 +95,7 @@
                             @endphp
 
                             <tr class="hover:bg-slate-50 transition-colors duration-200 customer-row"
-                                data-status="{{ strtolower($customer->status) }}" data-subscription="{{ $subStatus }}">
+                                data-status="{{ strtolower($customer->status) }}">
 
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
@@ -130,16 +109,6 @@
                                                     {{ substr($customer->name, 0, 1) }}
                                                 </div>
                                             @endif
-
-                                            @if ($hasSub)
-                                                <div class="absolute -top-1 -right-1 bg-yellow-400 text-white rounded-full p-0.5 border-2 border-white shadow-sm"
-                                                    title="Premium Subscriber">
-                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path
-                                                            d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                    </svg>
-                                                </div>
-                                            @endif
                                         </div>
                                         <div class="ml-4">
                                             <div class="text-sm font-semibold text-slate-900 search-name">
@@ -147,24 +116,6 @@
                                             <div class="text-xs text-slate-500 search-id">ID: #{{ $customer->id }}</div>
                                         </div>
                                     </div>
-                                </td>
-
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    @if ($hasSub)
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                            <svg class="mr-1.5 h-2 w-2 text-indigo-400" fill="currentColor"
-                                                viewBox="0 0 8 8">
-                                                <circle cx="4" cy="4" r="3" />
-                                            </svg>
-                                            {{ $planName }}
-                                        </span>
-                                    @else
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600">
-                                            Free Tier
-                                        </span>
-                                    @endif
                                 </td>
 
                                 <td class="px-6 py-4 whitespace-nowrap">
@@ -185,44 +136,88 @@
                                     </div>
                                 </td>
 
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <button onclick="openEditModal({{ json_encode($jsData) }})"
-                                            class="p-2 text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                                            title="Edit">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                        <button onclick="deleteCustomer({{ $customer->id }})"
-                                            class="p-2 text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-                                            title="Delete">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
-                                            </svg>
-                                        </button>
+                                <td class="px-6 py-4 whitespace-nowrap text-center relative">
+                                    <div class="flex justify-center items-center space-x-1">
+
+                                        {{-- 1. View Details Button (Moved Outside) --}}
                                         <button onclick="showCustomerDetails({{ json_encode($jsData) }})"
-                                            class="p-2 text-indigo-600 hover:text-indigo-900 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+                                            class="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-full transition-colors focus:outline-none"
                                             title="View Details">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                             </svg>
                                         </button>
+
+                                        {{-- 2. Dropdown Toggle Button --}}
+                                        <button onclick="toggleDropdown(event, {{ $customer->id }})"
+                                            class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors focus:outline-none">
+                                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path
+                                                    d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    {{-- Dropdown Menu --}}
+                                    <div id="dropdown-{{ $customer->id }}"
+                                        class="dropdown-menu hidden absolute right-10 top-8 z-50 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none text-left">
+                                        <div class="py-1">
+
+                                            {{-- View Details Removed from here --}}
+
+                                            <button onclick="openEditModal({{ json_encode($jsData) }})"
+                                                class="flex w-full items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                                <svg class="mr-3 h-4 w-4 text-slate-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                </svg>
+                                                Edit Profile
+                                            </button>
+
+                                            <div class="border-t border-slate-100 my-1"></div>
+
+                                            <button onclick="updateStatus({{ $customer->id }}, 'active')"
+                                                class="flex w-full items-center px-4 py-2 text-sm text-green-700 hover:bg-green-50">
+                                                <svg class="mr-3 h-4 w-4 text-green-500" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Activate
+                                            </button>
+
+                                            <button onclick="updateStatus({{ $customer->id }}, 'suspend')"
+                                                class="flex w-full items-center px-4 py-2 text-sm text-yellow-700 hover:bg-yellow-50">
+                                                <svg class="mr-3 h-4 w-4 text-yellow-500" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Suspend
+                                            </button>
+
+                                            <div class="border-t border-slate-100 my-1"></div>
+
+                                            <button onclick="deleteCustomer({{ $customer->id }})"
+                                                class="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                <svg class="mr-3 h-4 w-4 text-red-500" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                Delete
+                                            </button>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-10 text-center text-slate-500">No customers found.</td>
+                                <td colspan="4" class="px-6 py-10 text-center text-slate-500">No customers found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -266,8 +261,8 @@
                             class="hidden bg-green-50 text-green-600 p-3 rounded-lg text-sm mb-4"></div>
 
                         <div>
-                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Personal
-                                Information</h4>
+                            <h4 class="text-sm uppercase tracking-wide text-slate-500 font-semibold mb-3">Account Details
+                            </h4>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">Full Name</label>
@@ -286,6 +281,20 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium text-slate-700">Password</label>
+                                    <input type="password" name="password" id="create_password"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border"
+                                        placeholder="********">
+                                    <span class="text-xs text-red-500 error-text password_error"></span>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">Date of Birth</label>
+                                    <input type="date" name="dob" id="create_dob"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-slate-700">Gender</label>
                                     <select name="gender" id="create_gender"
                                         class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
@@ -293,12 +302,6 @@
                                         <option value="female">Female</option>
                                         <option value="other">Other</option>
                                     </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700">Date of Birth</label>
-                                    <input type="date" name="dob" id="create_dob"
-                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
                                 </div>
                             </div>
                         </div>
@@ -380,6 +383,12 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium text-slate-700">Date of Birth</label>
+                                    <input type="date" name="dob" id="edit_dob"
+                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-slate-700">Gender</label>
                                     <select name="gender" id="edit_gender"
                                         class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
@@ -387,12 +396,6 @@
                                         <option value="female">Female</option>
                                         <option value="other">Other</option>
                                     </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700">Date of Birth</label>
-                                    <input type="date" name="dob" id="edit_dob"
-                                        class="mt-1 block w-full border-slate-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm p-2.5 border">
                                 </div>
                             </div>
                         </div>
@@ -519,6 +522,10 @@
 
         // --- EDIT MODAL ---
         function openEditModal(data) {
+            // Close dropdown if open
+            const dropdown = document.getElementById(`dropdown-${data.id}`);
+            if (dropdown) dropdown.classList.add('hidden');
+
             document.getElementById('edit_customer_id').value = data.id;
             document.getElementById('edit_name').value = data.name;
             document.getElementById('edit_email').value = data.email;
@@ -538,6 +545,47 @@
             document.querySelectorAll(`#${prefix}CustomerForm .error-text`).forEach(el => el.innerText = '');
             document.getElementById(`${prefix}ErrorMessage`).classList.add('hidden');
             document.getElementById(`${prefix}SuccessMessage`).classList.add('hidden');
+        }
+
+        // --- TOGGLE DROPDOWN (3-DOT) ---
+        function toggleDropdown(event, id) {
+            event.stopPropagation();
+            // Close all other dropdowns
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== `dropdown-${id}`) menu.classList.add('hidden');
+            });
+            // Toggle current
+            const menu = document.getElementById(`dropdown-${id}`);
+            menu.classList.toggle('hidden');
+        }
+
+        function closeAllDropdowns(event) {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (!menu.classList.contains('hidden')) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        // --- UPDATE STATUS (Active, Suspend, Ban) ---
+        function updateStatus(id, status) {
+            if (confirm(`Are you sure you want to change status to ${status}?`)) {
+                // Mocking route, assume backend handles this
+                let url = `${customersUrl}/${id}/status`;
+
+                axios.post(url, {
+                        _method: 'PUT', // or PATCH
+                        status: status
+                    })
+                    .then(response => {
+                        alert("Status updated successfully!");
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("Failed to update status. (Ensure backend route exists)");
+                    });
+            }
         }
 
         // --- DELETE CUSTOMER ---
@@ -642,7 +690,7 @@
                     const isCredit = Math.random() > 0.5;
                     items.push({
                         id: `TXN${10000+i}`,
-                        name: isCredit ? 'Wallet Top-up' : 'Subscription Renewal',
+                        name: isCredit ? 'Wallet Top-up' : 'Service Payment',
                         price: (Math.random() * 100).toFixed(2),
                         date: dateStr,
                         status: isCredit ? 'Credit' : 'Debit',
@@ -662,7 +710,7 @@
             return items;
         };
 
-        // --- Tabs Configuration (REMOVED SUBSCRIPTION) ---
+        // --- Tabs Configuration ---
         const tabs = [{
                 id: 'personal',
                 label: 'Personal Info'
@@ -673,15 +721,29 @@
             },
             {
                 id: 'orders',
-                label: 'Orders'
+                label: 'Mart Orders'
             },
             {
                 id: 'bookings',
-                label: 'Bookings'
+                label: 'Bookings History'
             },
+            // Added History Sections
+            {
+                id: 'provider_history',
+                label: 'Provider History'
+            },
+            // {
+            //     id: 'rider_history',
+            //     label: 'Rider History'
+            // },
+            {
+                id: 'professional_history',
+                label: 'Professional History'
+            },
+            // Existing
             {
                 id: 'transactions',
-                label: 'History'
+                label: 'Transaction History'
             },
             {
                 id: 'payments',
@@ -696,14 +758,12 @@
         document.addEventListener("DOMContentLoaded", function() {
             const searchInput = document.getElementById("customerSearchInput");
             const statusFilter = document.getElementById("statusFilter");
-            const subscriptionFilter = document.getElementById("subscriptionFilter");
             const tableRows = document.querySelectorAll("#customerTable tbody tr");
             const noResults = document.getElementById("noResults");
 
             function filterMainTable() {
                 const query = searchInput.value.toLowerCase();
                 const status = statusFilter.value.toLowerCase();
-                const subStatus = subscriptionFilter ? subscriptionFilter.value.toLowerCase() : 'all';
 
                 let hasVisibleRow = false;
 
@@ -712,14 +772,12 @@
                     const id = row.querySelector(".search-id").innerText.toLowerCase();
                     const email = row.querySelector(".search-email").innerText.toLowerCase();
                     const rowStatus = row.getAttribute("data-status");
-                    const rowSub = row.getAttribute("data-subscription");
 
                     const matchesSearch = name.includes(query) || id.includes(query) || email.includes(
                         query);
                     const matchesStatus = status === "all" || rowStatus === status;
-                    const matchesSub = subStatus === "all" || rowSub === subStatus;
 
-                    if (matchesSearch && matchesStatus && matchesSub) {
+                    if (matchesSearch && matchesStatus) {
                         row.style.display = "";
                         hasVisibleRow = true;
                     } else {
@@ -731,11 +789,14 @@
 
             if (searchInput) searchInput.addEventListener("keyup", filterMainTable);
             if (statusFilter) statusFilter.addEventListener("change", filterMainTable);
-            if (subscriptionFilter) subscriptionFilter.addEventListener("change", filterMainTable);
         });
 
         // --- DRAWER FUNCTIONS ---
         function showCustomerDetails(customer) {
+            // Close dropdown if open
+            const dropdown = document.getElementById(`dropdown-${customer.id}`);
+            if (dropdown) dropdown.classList.add('hidden');
+
             currentCustomer = customer;
             document.getElementById('drawer-name').innerText = customer.name;
             document.getElementById('drawer-id').innerText = `ID: #${customer.id}`;
@@ -752,7 +813,6 @@
             drawer.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
 
-            // Always Default to Personal since Subscription is gone
             switchTab('personal');
 
             setTimeout(() => {
@@ -785,12 +845,15 @@
                 }
             });
             document.getElementById('drawer-content').innerHTML = renderContent(tabId);
-            if (['orders', 'bookings', 'transactions'].includes(tabId)) {
+
+            // Added new tabs to the initHistoryTab check
+            if (['orders', 'bookings', 'transactions', 'provider_history', 'rider_history', 'professional_history']
+                .includes(tabId)) {
                 initHistoryTab(tabId);
             }
         }
 
-        // --- RENDER CONTENT (SUBSCRIPTION REMOVED) ---
+        // --- RENDER CONTENT ---
         function renderContent(tabId) {
             const c = currentCustomer;
 
@@ -852,11 +915,14 @@
                 return `<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100"><h3 class="text-lg font-bold text-slate-800 mb-4">Payment Methods</h3>${methods.length > 0 ? '' : '<p class="text-slate-500 italic text-sm">No saved payment methods (N/A).</p>'}</div>`;
             }
 
-            // 4. HISTORY TABS (Orders, Bookings, Transactions)
+            // 4. HISTORY TABS (Orders, Bookings, Transactions, + New Tabs)
             const typeMap = {
                 'orders': 'Order',
                 'bookings': 'Booking',
-                'transactions': 'Transaction'
+                'transactions': 'Transaction',
+                'provider_history': 'Provider Service',
+                'rider_history': 'Ride',
+                'professional_history': 'Professional Service'
             };
             const title = typeMap[tabId];
             return `
@@ -870,7 +936,10 @@
             const typeMap = {
                 'orders': 'Order',
                 'bookings': 'Booking',
-                'transactions': 'Transaction'
+                'transactions': 'Transaction',
+                'provider_history': 'Provider Service',
+                'rider_history': 'Ride',
+                'professional_history': 'Professional Service'
             };
             currentTabData = getMockHistory(typeMap[tabId]);
             renderHistoryList(tabId, currentTabData);

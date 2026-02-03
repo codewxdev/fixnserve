@@ -143,7 +143,6 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expert Profile</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category & Rate</th>
                         <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Performance</th>
                         <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -181,20 +180,17 @@
                                 'join_date' => $expert->created_at->format('M d, Y'),
                                 'description' => 'Experienced professional specialized in ' . $category . '.', 
                                 'kyc_status' => 'verified',
-                                // New Address Data
                                 'address' => [
                                     'current' => $expert->current_address ?? '123 Tech Street, Suite 400',
                                     'permanent' => $expert->permanent_address ?? '456 Home Avenue',
                                     'city' => $expert->city ?? 'New York',
                                     'state' => $expert->state ?? 'NY'
                                 ],
-                                // New Wallet Data
                                 'wallet' => [
                                     'balance' => rand(500, 15000) . '.00',
                                     'pending' => rand(0, 1000) . '.00',
                                     'withdrawn' => rand(2000, 25000) . '.00',
                                 ],
-                                // New Orders Data (Order History)
                                 'orders' => [
                                     [
                                         'id' => '#EXP-' . rand(1000, 9999),
@@ -212,16 +208,7 @@
                                         'amount' => '300.00',
                                         'status' => 'Pending'
                                     ],
-                                    [
-                                        'id' => '#EXP-' . rand(1000, 9999),
-                                        'client' => 'TechStart Inc',
-                                        'task' => 'web design',
-                                        'date' => 'Oct 15, 2023',
-                                        'amount' => '500.00',
-                                        'status' => 'Completed'
-                                    ],
                                 ],
-                                // New Payment Methods
                                 'payment_methods' => ['Visa **** 4242', 'Payoneer ID-445'],
                                 'documents' => [
                                     ['name' => 'Govt ID Front', 'type' => 'PDF', 'status' => 'Approved'],
@@ -233,6 +220,27 @@
                                     'expires_at' => now()->addDays(30)->format('M d, Y'),
                                     'progress' => 80
                                 ],
+                                // NEW SERVICES DATA
+                                'services' => [
+                                    [
+                                        'title' => 'Full Website Audit',
+                                        'price' => rand(100, 300),
+                                        'delivery' => '2 Days',
+                                        'status' => 'Active'
+                                    ],
+                                    [
+                                        'title' => '1-on-1 Consultation',
+                                        'price' => rand(50, 150),
+                                        'delivery' => '1 Hour',
+                                        'status' => 'Active'
+                                    ],
+                                    [
+                                        'title' => 'Custom Development',
+                                        'price' => rand(500, 1000),
+                                        'delivery' => '1 Week',
+                                        'status' => 'Inactive'
+                                    ]
+                                ]
                             ];
                         @endphp
                         
@@ -275,14 +283,6 @@
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusClasses }}">{{ ucfirst($expert->status) }}</span>
                             </td>
 
-                            {{-- Compliance --}}
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex items-center gap-1.5">
-                                    <i class="fas fa-check-circle text-green-500 text-sm"></i>
-                                    <span class="text-xs text-gray-600">ID Verified</span>
-                                </div>
-                            </td>
-
                             {{-- Performance --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
                                 4.9 <span class="text-yellow-400 text-xs"><i class="fas fa-star"></i></span>
@@ -299,9 +299,8 @@
                                             <i class="fas fa-ellipsis-v"></i>
                                         </button>
                                         <div x-show="open" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100" style="display: none;">
-                                            <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-green-50"><i class="fas fa-check-circle mr-2"></i> Approve KYC</a>
-                                            <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-ban mr-2"></i> Suspend</a>
-                                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"><i class="fas fa-sign-in-alt mr-2"></i> Login as User</a>
+                                            {{-- CHANGED: Only Suspend Account is shown here --}}
+                                            <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fas fa-ban mr-2"></i> Suspend Account</a>
                                         </div>
                                     </div>
                                 </div>
@@ -345,10 +344,11 @@
                 <div class="flex space-x-6 mt-8 text-sm font-medium overflow-x-auto scrollbar-hide">
                     <button onclick="switchTab('overview')" class="tab-btn border-b-2 border-white pb-3 text-white transition whitespace-nowrap" id="tab-overview">Overview</button>
                     <button onclick="switchTab('orders')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-orders">Orders</button>
+                    <button onclick="switchTab('services')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-services">Services</button>
                     <button onclick="switchTab('wallet')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-wallet">Wallet</button>
                     <button onclick="switchTab('portfolio')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-portfolio">Portfolio</button>
                     <button onclick="switchTab('payment-methods')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-payment-methods">Payment Methods</button>
-                    <button onclick="switchTab('documents')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-documents">Documents</button>
+                    <button onclick="switchTab('documents')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-documents">Kyc Documents</button>
                     <button onclick="switchTab('subscription')" class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap" id="tab-subscription">Subscription</button>
                 </div>
             </div>
@@ -373,7 +373,7 @@
                         </div>
                     </div>
 
-                    {{-- Address Section (New) --}}
+                    {{-- Address Section --}}
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fas fa-map-marker-alt mr-2 text-indigo-500"></i> Address Details</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -393,7 +393,7 @@
                     </div>
                 </div>
 
-                {{-- TAB: ORDERS (NEW) --}}
+                {{-- TAB: ORDERS --}}
                 <div id="content-orders" class="tab-content hidden space-y-4">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="font-bold text-gray-900 mb-4">Order History</h3>
@@ -403,9 +403,21 @@
                     </div>
                 </div>
 
-                {{-- TAB: WALLET (NEW) --}}
+                {{-- TAB: SERVICES --}}
+                <div id="content-services" class="tab-content hidden space-y-4">
+                    <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-bold text-gray-900">Offered Services</h3>
+                            <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded font-medium">Gigs</span>
+                        </div>
+                        <div id="so-services-list" class="space-y-3">
+                            {{-- Populated by JS --}}
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB: WALLET --}}
                 <div id="content-wallet" class="tab-content hidden space-y-6">
-                    {{-- Balance Card --}}
                     <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
                         <div class="flex justify-between items-start">
                             <div>
@@ -428,7 +440,6 @@
                         </div>
                     </div>
 
-                    {{-- Transactions List (Dummy) --}}
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="font-bold text-gray-900 mb-4">Recent Transactions</h3>
                         <div class="space-y-4">
@@ -460,7 +471,7 @@
                     </div>
                 </div>
 
-                {{-- TAB: PORTFOLIO (NEW) --}}
+                {{-- TAB: PORTFOLIO --}}
                 <div id="content-portfolio" class="tab-content hidden h-full">
                     <div class="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
                         <div class="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mb-3">
@@ -471,7 +482,7 @@
                     </div>
                 </div>
 
-                {{-- TAB: PAYMENT METHODS (NEW) --}}
+                {{-- TAB: PAYMENT METHODS --}}
                 <div id="content-payment-methods" class="tab-content hidden space-y-4">
                     <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="font-bold text-gray-900 mb-4">Linked Payment Methods</h3>
@@ -491,6 +502,15 @@
                         <div id="so-doc-list" class="space-y-3">
                             {{-- Populated via JS --}}
                         </div>
+                        {{-- NEW: KYC Action Buttons inside Documents Tab --}}
+                        <div class="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                            <button class="flex-1 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition shadow-sm">
+                                <i class="fas fa-times-circle mr-2"></i> Reject KYC
+                            </button>
+                            <button class="flex-1 px-4 py-2.5 bg-green-600 text-white hover:bg-green-700 rounded-lg font-medium transition shadow-md">
+                                <i class="fas fa-check-circle mr-2"></i> Approve KYC
+                            </button>
+                        </div>
                      </div>
                 </div>
 
@@ -502,11 +522,7 @@
                 </div>
             </div>
 
-            {{-- Footer Actions --}}
-            <div class="p-4 bg-white border-t border-gray-200 flex justify-end gap-3 shrink-0">
-                <button class="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">Suspend Expert</button>
-                <button class="px-5 py-2.5 rounded-lg bg-green-600 text-white font-medium hover:bg-green-700 shadow-md transition">Approve KYC</button>
-            </div>
+            {{-- Footer Actions REMOVED as requested --}}
         </div>
     </div>
 </div>
@@ -574,17 +590,17 @@
             document.getElementById('so-joined').innerText = data.join_date;
             document.getElementById('so-phone').innerText = data.phone;
             
-            // Address Fields (New)
+            // Address Fields
             document.getElementById('so-addr-current').innerText = data.address.current;
             document.getElementById('so-addr-perm').innerText = data.address.permanent;
             document.getElementById('so-addr-city').innerText = `${data.address.city}, ${data.address.state}`;
 
-            // 3. Wallet Tab (New)
+            // 3. Wallet Tab
             document.getElementById('so-wallet-balance').innerText = `$${data.wallet.balance}`;
             document.getElementById('so-wallet-pending').innerText = `$${data.wallet.pending}`;
             document.getElementById('so-wallet-withdrawn').innerText = `$${data.wallet.withdrawn}`;
 
-            // 4. Payment Methods Tab (New)
+            // 4. Payment Methods Tab
             const payMethodList = document.getElementById('so-payment-methods-list');
             if (data.payment_methods && data.payment_methods.length > 0) {
                 payMethodList.innerHTML = data.payment_methods.map(pm => `
@@ -602,7 +618,7 @@
                 payMethodList.innerHTML = '<div class="text-center py-4 text-gray-500 italic">No payment methods linked.</div>';
             }
 
-            // 5. Orders Tab (New)
+            // 5. Orders Tab
             const ordersList = document.getElementById('so-orders-list');
             if (data.orders && data.orders.length > 0) {
                 ordersList.innerHTML = data.orders.map(order => `
@@ -663,6 +679,42 @@
                 </div>`;
             } else {
                 subContainer.innerHTML = '<div class="p-6 text-center border-dashed border-2 border-gray-300 rounded-xl text-gray-500">No active subscription (Standard Plan)</div>';
+            }
+
+            // 8. Services Tab
+            const servicesList = document.getElementById('so-services-list');
+            if (data.services && data.services.length > 0) {
+                servicesList.innerHTML = data.services.map(service => {
+                    const statusColor = service.status === 'Active' ? 'text-green-600 bg-green-50' : 'text-gray-500 bg-gray-100';
+                    return `
+                    <div class="group flex flex-col md:flex-row md:items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-md transition-all duration-200 bg-white">
+                        <div class="flex items-start gap-4">
+                            <div class="h-12 w-12 shrink-0 bg-indigo-50 text-indigo-600 rounded-lg flex items-center justify-center text-lg">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">${service.title}</h4>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <span class="text-xs text-gray-500"><i class="far fa-clock mr-1"></i> ${service.delivery}</span>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded ${statusColor}">${service.status}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 md:mt-0 text-right">
+                            <p class="text-lg font-bold text-gray-900">$${service.price}</p>
+                            <p class="text-xs text-gray-400">Starting at</p>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } else {
+                servicesList.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 mb-3">
+                            <i class="fas fa-box-open text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500 text-sm">No active services found for this professional.</p>
+                    </div>`;
             }
 
             switchTab('overview');

@@ -43,7 +43,7 @@
 
     get activeVendor() {
         const v = this.vendors.find(v => v.id === this.openVendorId) || {};
-        // Merging Dummy Data for UI Consistency (in case DB doesn't have these fields yet)
+        // Merging Dummy Data for UI Consistency
         return {
             ...v,
             address: v.address || { 
@@ -56,6 +56,14 @@
                 pending: 12500, 
                 withdrawn: 450000 
             },
+            // --- NEW: Dummy Products Data ---
+            products: v.products || [
+                { id: 101, name: 'Super Basmati Rice 5kg', category: 'Grains', price: 3450, stock: 45, sold: 1240, rating: 4.8, image: '🍚' },
+                { id: 102, name: 'Pure Organic Honey', category: 'Groceries', price: 1200, stock: 12, sold: 85, rating: 4.5, image: '🍯' },
+                { id: 103, name: 'Dairy Milk Chocolate', category: 'Snacks', price: 250, stock: 0, sold: 5000, rating: 4.9, image: '🍫' },
+                { id: 104, name: 'Shan Biryani Masala', category: 'Spices', price: 180, stock: 200, sold: 3200, rating: 4.7, image: '🌶️' },
+            ],
+            // --------------------------------
             payment_methods: v.payment_methods || ['Meezan Bank **** 1234', 'JazzCash Merchant'],
             portfolio_items: v.portfolio_items || []
         };
@@ -67,6 +75,7 @@
     },
 
     async submitForm(e) {
+        // ... (existing submit logic) ...
         this.isSubmitting = true;
         const formData = new FormData(e.target);
         const actionUrl = e.target.action;
@@ -102,7 +111,7 @@
     }
 }" x-cloak>
 
-    {{-- 1. HEADER --}}
+    {{-- 1. HEADER (Unchanged) --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Mart Vendors</h1>
@@ -118,7 +127,7 @@
         </div>
     </div>
 
-    {{-- 2. ANALYTICS GRID --}}
+    {{-- 2. ANALYTICS GRID (Unchanged) --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {{-- Card 1 --}}
         <div class="relative bg-white p-6 rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -197,7 +206,7 @@
         </div>
     </div>
 
-    {{-- 3. MAIN CONTENT --}}
+    {{-- 3. MAIN CONTENT (Unchanged) --}}
     <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         
         {{-- Filter Bar --}}
@@ -241,7 +250,7 @@
                 <tbody class="divide-y divide-gray-200 bg-white">
                     <template x-for="vendor in filteredVendors" :key="vendor.id">
                         <tr class="hover:bg-indigo-50/30 transition duration-150 group" >
-                            
+                            {{-- ... (same table rows) ... --}}
                             {{-- Vendor Info --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
@@ -257,20 +266,17 @@
                                     </div>
                                 </div>
                             </td>
-
                             {{-- Operational Stats --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 font-semibold" x-text="vendor.stats.orders + ' Orders'"></div>
                                 <div class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-box-open mr-1"></i> <span x-text="vendor.stats.products"></span> Items</div>
                             </td>
-
                             {{-- Assigned Rider --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-gray-50 text-gray-600 border border-gray-200">
                                     <i class="fa-solid fa-motorcycle mr-1"></i> rider xyz
                                 </span>
                             </td>
-
                             {{-- Wallet & Status --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm text-gray-900 font-bold" x-text="formatMoney(vendor.stats.revenue)"></div>
@@ -285,15 +291,12 @@
                                     </span>
                                 </div>
                             </td>
-
                             {{-- Actions --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <div class="flex justify-end items-center gap-2">
                                     <button @click="openVendorId = vendor.id" class="text-indigo-600 hover:text-indigo-900 bg-indigo-50 p-2 rounded hover:bg-indigo-100 transition" title="View Details">
                                         View Details
                                     </button>
-                                    
-                                    {{-- Dropdown (Alpine) --}}
                                     <div class="relative" x-data="{ open: false }">
                                         <button @click="open = !open" @click.away="open = false" class="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100">
                                             <i class="fa-solid fa-ellipsis-v"></i>
@@ -313,7 +316,6 @@
                     </template>
                 </tbody>
             </table>
-            
             {{-- Empty State --}}
             <div x-show="filteredVendors.length === 0" class="p-10 text-center text-gray-500">
                 <i class="fa-solid fa-store-slash text-4xl mb-3 text-gray-300"></i>
@@ -371,44 +373,86 @@
                         <button @click="openVendorId = null" class="text-white hover:text-indigo-200 transition"><i class="fa-solid fa-times text-xl"></i></button>
                     </div>
                     
-                    {{-- Tabs --}}
+                    {{-- Tabs (UPDATED) --}}
                     <div class="flex space-x-6 mt-8 text-sm font-medium overflow-x-auto scrollbar-hide">
                         <button @click="currentTab = 'overview'" 
                             :class="currentTab === 'overview' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
                             class="pb-3 border-b-2 transition whitespace-nowrap">Overview</button>
+                        
+                        {{-- NEW TAB: PRODUCTS --}}
+                        <button @click="currentTab = 'products'" 
+                            :class="currentTab === 'products' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
+                            class="pb-3 border-b-2 transition whitespace-nowrap">Products</button>
+                        
                         <button @click="currentTab = 'wallet'" 
                             :class="currentTab === 'wallet' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
                             class="pb-3 border-b-2 transition whitespace-nowrap">Wallet</button>
-                        <button @click="currentTab = 'portfolio'" 
-                            :class="currentTab === 'portfolio' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
-                            class="pb-3 border-b-2 transition whitespace-nowrap">Portfolio</button>
+                        
                         <button @click="currentTab = 'payment-methods'" 
                             :class="currentTab === 'payment-methods' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
                             class="pb-3 border-b-2 transition whitespace-nowrap">Payment Methods</button>
+                        
                         <button @click="currentTab = 'documents'" 
                             :class="currentTab === 'documents' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
                             class="pb-3 border-b-2 transition whitespace-nowrap">KYC Documents</button>
+                        
                         <button @click="currentTab = 'orders'" 
                             :class="currentTab === 'orders' ? 'border-white text-white' : 'border-transparent text-indigo-300 hover:text-white'"
-                            class="pb-3 border-b-2 transition whitespace-nowrap">Orders</button>
+                            class="pb-3 border-b-2 transition whitespace-nowrap">Order History</button>
                     </div>
                 </div>
 
                 {{-- Content --}}
                 <div class="flex-1 overflow-y-auto p-6 bg-gray-50 scroll-smooth">
                     
-                    {{-- TAB: OVERVIEW --}}
+                    {{-- TAB: OVERVIEW (Existing) --}}
                     <div x-show="currentTab === 'overview'" class="space-y-6">
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fa-solid fa-store mr-2 text-indigo-500"></i> Vendor Details</h3>
-                            <div class="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
-                                <div><p class="text-gray-500 text-xs uppercase">Owner Name</p><p class="font-medium text-gray-900" x-text="activeVendor.owner"></p></div>
-                                <div><p class="text-gray-500 text-xs uppercase">Contact</p><p class="font-medium text-gray-900" x-text="activeVendor.phone"></p></div>
-                                <div><p class="text-gray-500 text-xs uppercase">Category</p><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800" x-text="activeVendor.category"></span></div>
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold text-gray-900 mb-5 flex items-center border-b border-gray-50 pb-3">
+                                <i class="fa-solid fa-store mr-2 text-indigo-500"></i> Business Snapshot
+                            </h3>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4 text-sm">
+                                <div class="col-span-2 md:col-span-3">
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Mart / Store Name</p>
+                                    <p class="font-bold text-gray-900 text-lg mt-1" x-text="activeVendor.name"></p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Category</p>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-indigo-50 text-indigo-700 mt-1 border border-indigo-100" x-text="activeVendor.category"></span>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Total Products</p>
+                                    <div class="flex items-center mt-1">
+                                        <i class="fa-solid fa-cubes text-gray-300 mr-2 text-xs"></i>
+                                        <p class="font-semibold text-gray-900" x-text="(activeVendor.stats?.products || 0) + ' Items'"></p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Current Status</p>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold mt-1"
+                                        :class="{
+                                            'bg-green-100 text-green-800': activeVendor.status === 'Active',
+                                            'bg-red-100 text-red-800': activeVendor.status === 'Deactive' || activeVendor.status === 'Ban',
+                                            'bg-yellow-100 text-yellow-800': activeVendor.status === 'Suspend' || activeVendor.status === 'Pending'
+                                        }"
+                                        x-text="activeVendor.status">
+                                    </span>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Owner Name</p>
+                                    <p class="font-medium text-gray-900 mt-1" x-text="activeVendor.owner"></p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Contact Number</p>
+                                    <p class="font-medium text-gray-900 mt-1" x-text="activeVendor.phone"></p>
+                                </div>
+                                 <div>
+                                    <p class="text-gray-400 text-[10px] uppercase font-bold tracking-wider">Lifetime Orders</p>
+                                    <p class="font-medium text-gray-900 mt-1" x-text="(activeVendor.stats?.orders || 0) + ' Orders'"></p>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Address Section (New) --}}
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h3 class="font-bold text-gray-900 mb-4 flex items-center"><i class="fa-solid fa-map-marker-alt mr-2 text-indigo-500"></i> Address Details</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -428,10 +472,64 @@
                         </div>
                     </div>
 
-                    {{-- TAB: WALLET (NEW) --}}
+                    {{-- TAB: PRODUCTS (NEW) --}}
+                    <div x-show="currentTab === 'products'" class="space-y-4">
+                        <div class="flex justify-between items-center px-1">
+                            <h3 class="font-bold text-gray-900">Store Inventory</h3>
+                            <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-bold" x-text="activeVendor.products.length + ' Products Found'"></span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <template x-if="activeVendor.products.length === 0">
+                                <div class="text-center py-10 bg-white rounded-xl border border-gray-100 border-dashed">
+                                    <p class="text-gray-400 text-sm">No products uploaded yet.</p>
+                                </div>
+                            </template>
+                            
+                            <template x-for="product in activeVendor.products" :key="product.id">
+                                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center gap-4 hover:shadow-md transition duration-200">
+                                    {{-- Product Image & Name --}}
+                                    <div class="flex items-center gap-4 flex-1">
+                                        <div class="h-14 w-14 rounded-lg bg-gray-50 border border-gray-100 flex items-center justify-center text-3xl" x-text="product.image"></div>
+                                        <div>
+                                            <h4 class="text-sm font-bold text-gray-900" x-text="product.name"></h4>
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 mt-1" x-text="product.category"></span>
+                                        </div>
+                                    </div>
+
+                                    {{-- Product Stats --}}
+                                    <div class="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto mt-2 sm:mt-0 border-t sm:border-t-0 border-gray-50 pt-3 sm:pt-0">
+                                        <div class="text-center sm:text-right">
+                                            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Price</p>
+                                            <p class="text-sm font-bold text-gray-900" x-text="'PKR ' + product.price"></p>
+                                        </div>
+                                        
+                                        <div class="text-center sm:text-right">
+                                            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Sold</p>
+                                            <p class="text-sm font-semibold text-gray-700"><i class="fa-solid fa-arrow-trend-up text-green-500 mr-1 text-xs"></i><span x-text="product.sold"></span></p>
+                                        </div>
+
+                                        <div class="text-center sm:text-right">
+                                            <p class="text-[10px] text-gray-400 uppercase tracking-wider font-bold">Rating</p>
+                                            <div class="flex items-center justify-end text-sm font-bold text-amber-500">
+                                                <span x-text="product.rating"></span> <i class="fa-solid fa-star ml-1 text-xs"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="hidden sm:block">
+                                            <div x-show="product.stock > 0" class="h-2 w-2 rounded-full bg-green-500" title="In Stock"></div>
+                                            <div x-show="product.stock <= 0" class="h-2 w-2 rounded-full bg-red-500" title="Out of Stock"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    {{-- TAB: WALLET (Existing) --}}
                     <div x-show="currentTab === 'wallet'" class="space-y-6">
-                        {{-- Balance Card --}}
-                        <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
+                         {{-- Balance Card --}}
+                         <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
                             <div class="flex justify-between items-start">
                                 <div>
                                     <p class="text-emerald-100 text-xs font-bold uppercase tracking-wider">Total Balance</p>
@@ -485,18 +583,7 @@
                         </div>
                     </div>
 
-                    {{-- TAB: PORTFOLIO (NEW) --}}
-                    <div x-show="currentTab === 'portfolio'" class="h-full">
-                        <div class="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
-                            <div class="h-12 w-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-400 mb-3">
-                                <i class="fa-solid fa-images"></i>
-                            </div>
-                            <p class="text-gray-500 text-sm font-medium">Product Portfolio</p>
-                            <p class="text-gray-400 text-xs mt-1">No products/portfolio items uploaded.</p>
-                        </div>
-                    </div>
-
-                    {{-- TAB: PAYMENT METHODS (NEW) --}}
+                    {{-- TAB: PAYMENT METHODS (Existing) --}}
                     <div x-show="currentTab === 'payment-methods'" class="space-y-4">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h3 class="font-bold text-gray-900 mb-4">Linked Payment Methods</h3>
@@ -521,7 +608,7 @@
                         </div>
                     </div>
 
-                    {{-- TAB: KYC DOCUMENTS --}}
+                    {{-- TAB: KYC DOCUMENTS (Existing) --}}
                     <div x-show="currentTab === 'documents'" class="space-y-4">
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <div class="flex justify-between items-center mb-6">
@@ -555,7 +642,7 @@
                         </div>
                     </div>
 
-                    {{-- TAB: ORDERS --}}
+                    {{-- TAB: ORDERS (Existing) --}}
                     <div x-show="currentTab === 'orders'" class="space-y-4">
                          <div class="bg-white p-10 rounded-xl border border-gray-100 text-center">
                             <i class="fa-solid fa-receipt text-4xl text-gray-200 mb-3"></i>
@@ -574,7 +661,7 @@
         </div>
     </div>
 
-    {{-- 5. ADD VENDOR MODAL --}}
+    {{-- 5. ADD VENDOR MODAL (Unchanged) --}}
     <div x-show="isAddVendorModalOpen" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-sm" @click="!isSubmitting && (isAddVendorModalOpen = false)"></div>
         <div class="flex items-center justify-center min-h-screen p-4">

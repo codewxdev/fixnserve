@@ -143,6 +143,13 @@
                         class="w-full pl-10 pr-4 py-2 text-sm border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
                 </div>
                 <div class="flex gap-2">
+                    <select id="ratingFilter" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500">
+                        <option value="all">All Ratings</option>
+                        <option value="4.5">4.5+ Stars</option>
+                        <option value="4.0">4.0+ Stars</option>
+                        <option value="3.0">3.0+ Stars</option>
+                    </select>
+
                     <select id="subscriptionFilter" class="text-sm border-gray-300 rounded-lg focus:ring-indigo-500">
                         <option value="all">All Plans</option>
                         <option value="subscribed">Premium</option>
@@ -165,6 +172,10 @@
                                 Provider</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Service/Pricing</th>
+                            
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Performance</th>
+
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Status</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -190,8 +201,9 @@
                                     : 'https://ui-avatars.com/api/?name=' .
                                         urlencode($provider->name) .
                                         '&background=EBF4FF&color=7F9CF5';
+                                
+                                $rating = number_format(rand(35, 50) / 10, 1);
 
-                                // Full Data Object for JS
                                 $jsData = [
                                     'id' => $provider->id,
                                     'name' => $provider->name ?? 'N/A',
@@ -201,6 +213,7 @@
                                     'gender' => $provider->gender ?? 'N/A',
                                     'dob' => $provider->dob ?? 'N/A',
                                     'status' => $provider->status,
+                                    'rating' => $rating,
                                     'join_date' => $provider->created_at
                                         ? $provider->created_at->format('M d, Y')
                                         : 'N/A',
@@ -214,7 +227,6 @@
                                         'pending' => rand(0, 500) . '.00',
                                         'withdrawn' => rand(1000, 10000) . '.00',
                                     ],
-                                    // Dummy Order History Data
                                     'orders' => [
                                         [
                                             'id' => '#ORD-' . rand(1000, 9999),
@@ -264,7 +276,9 @@
                                 ];
                             @endphp
                             <tr class="hover:bg-indigo-50/30 transition duration-150 group provider-row"
-                                data-subscription="{{ $subStatus }}" data-status="{{ $provider->status }}"
+                                data-subscription="{{ $subStatus }}" 
+                                data-status="{{ $provider->status }}"
+                                data-rating="{{ $rating }}"
                                 data-search="{{ strtolower(($provider->name ?? '') . ' ' . ($provider->email ?? '') . ' ' . ($provider->phone ?? '')) }}">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center">
@@ -290,6 +304,25 @@
                                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $hasSub ? 'bg-indigo-100 text-indigo-800' : 'bg-gray-100 text-gray-800' }}">{{ $planName }}</span>
                                     <div class="text-xs text-gray-500 mt-1">$NaN/hr</div>
                                 </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-bold text-gray-900 mr-2">{{ $rating }}</span>
+                                        <div class="flex text-yellow-400 text-xs">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                @if ($i <= $rating)
+                                                    <i class="fas fa-star"></i>
+                                                @elseif ($i - 0.5 <= $rating)
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                @else
+                                                    <i class="far fa-star text-gray-300"></i>
+                                                @endif
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    <div class="text-[10px] text-gray-400 mt-0.5">24 Reviews</div>
+                                </td>
+
                                 <td class="px-6 py-4 whitespace-nowrap text-center">
                                     <span
                                         class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $statusColor }}">{{ ucfirst($provider->status) }}</span>
@@ -313,12 +346,10 @@
                                             <div x-show="open"
                                                 class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-100"
                                                 style="display: none;">
-                                                <a href="#"
-                                                    class="block px-4 py-2 text-sm text-green-600 hover:bg-green-50"><i
-                                                        class="fas fa-check-circle mr-2"></i> Approve KYC</a>
+                                                {{-- CHANGED: Only Suspend/Ban here --}}
                                                 <a href="#"
                                                     class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i
-                                                        class="fas fa-ban mr-2"></i> Suspend</a>
+                                                        class="fas fa-ban mr-2"></i> Suspend Account</a>
                                             </div>
                                         </div>
                                     </div>
@@ -326,7 +357,7 @@
                             </tr>
                         @empty
                             <tr id="no-providers-row">
-                                <td colspan="5" class="px-6 py-10 text-center text-gray-500">No providers found.</td>
+                                <td colspan="6" class="px-6 py-10 text-center text-gray-500">No providers found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -386,7 +417,7 @@
                             id="tab-payment-methods">Payment Methods</button>
                         <button onclick="switchTab('documents')"
                             class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap"
-                            id="tab-documents">Documents</button>
+                            id="tab-documents">Kyc Documents</button>
                         <button onclick="switchTab('subscription')"
                             class="tab-btn border-b-2 border-transparent pb-3 text-indigo-300 hover:text-white transition whitespace-nowrap"
                             id="tab-subscription">Subscription</button>
@@ -465,17 +496,15 @@
                         </div>
                     </div>
 
-                    {{-- TAB: ORDERS (NEW) --}}
+                    {{-- TAB: ORDERS --}}
                     <div id="content-orders" class="tab-content hidden space-y-4">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h3 class="font-bold text-gray-900 mb-4">Work History</h3>
-                            <div id="so-orders-list" class="space-y-3">
-                                {{-- Populated by JS --}}
-                            </div>
+                            <div id="so-orders-list" class="space-y-3"></div>
                         </div>
                     </div>
 
-                    {{-- TAB: WALLET (NEW) --}}
+                    {{-- TAB: WALLET --}}
                     <div id="content-wallet" class="tab-content hidden space-y-6">
                         {{-- Balance Card --}}
                         <div class="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-6 text-white shadow-lg">
@@ -501,11 +530,10 @@
                             </div>
                         </div>
 
-                        {{-- Transactions List (Dummy) --}}
+                        {{-- Transactions List --}}
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h3 class="font-bold text-gray-900 mb-4">Recent Transactions</h3>
                             <div class="space-y-4">
-                                {{-- Fake Transactions --}}
                                 <div class="flex justify-between items-center border-b border-gray-50 pb-3 last:border-0">
                                     <div class="flex items-center gap-3">
                                         <div
@@ -536,7 +564,7 @@
                         </div>
                     </div>
 
-                    {{-- TAB: PORTFOLIO (NEW - BLANK) --}}
+                    {{-- TAB: PORTFOLIO --}}
                     <div id="content-portfolio" class="tab-content hidden h-full">
                         <div
                             class="flex flex-col items-center justify-center h-64 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
@@ -548,17 +576,15 @@
                         </div>
                     </div>
 
-                    {{-- TAB: PAYMENT METHODS (NEW) --}}
+                    {{-- TAB: PAYMENT METHODS --}}
                     <div id="content-payment-methods" class="tab-content hidden space-y-4">
                         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
                             <h3 class="font-bold text-gray-900 mb-4">Linked Payment Methods</h3>
-                            <div id="so-payment-methods-list" class="space-y-3">
-                                {{-- Populated by JS --}}
-                            </div>
+                            <div id="so-payment-methods-list" class="space-y-3"></div>
                         </div>
                     </div>
 
-                    {{-- TAB: KYC --}}
+                    {{-- TAB: DOCUMENTS (UPDATED) --}}
                     <div id="content-documents" class="tab-content hidden space-y-4">
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <div class="flex justify-between items-center mb-6">
@@ -567,6 +593,18 @@
                                     Review</span>
                             </div>
                             <div id="so-kyc-list" class="space-y-3"></div>
+
+                            {{-- NEW: KYC Action Buttons inside Documents Tab --}}
+                            <div class="mt-8 pt-6 border-t border-gray-100 flex gap-3">
+                                <button
+                                    class="flex-1 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 border border-red-200 rounded-lg font-medium transition shadow-sm">
+                                    <i class="fas fa-times-circle mr-2"></i> Reject KYC
+                                </button>
+                                <button
+                                    class="flex-1 px-4 py-2.5 bg-green-600 text-white hover:bg-green-700 rounded-lg font-medium transition shadow-md">
+                                    <i class="fas fa-check-circle mr-2"></i> Approve KYC
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -576,15 +614,7 @@
                     </div>
                 </div>
 
-                {{-- Footer Actions --}}
-                <div class="p-4 bg-white border-t border-gray-200 flex justify-end gap-3 shrink-0">
-                    <button
-                        class="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition">Suspend
-                        Provider</button>
-                    <button
-                        class="px-5 py-2.5 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 shadow-md transition">Approve
-                        Provider</button>
-                </div>
+                {{-- Footer Actions REMOVED as requested --}}
             </div>
         </div>
     </div>
@@ -607,7 +637,6 @@
                         class="text-gray-400 hover:text-gray-600 focus:outline-none"><i class="fas fa-times"></i></button>
                 </div>
 
-                {{-- NOTICE: onsubmit="submitProvider(event)" is added here --}}
                 <form id="providerForm" action="{{ route('store.provider') }}" method="POST"
                     enctype="multipart/form-data" onsubmit="submitProvider(event)">
                     @csrf
@@ -893,23 +922,31 @@
             const searchInput = document.getElementById('searchInput');
             const subFilter = document.getElementById('subscriptionFilter');
             const kycFilter = document.getElementById('kycFilter');
+            const ratingFilter = document.getElementById('ratingFilter');
             const tableRows = document.querySelectorAll('.provider-row');
 
             function filterProviders() {
                 const searchValue = searchInput.value.toLowerCase();
                 const subValue = subFilter.value;
                 const kycValue = kycFilter.value;
+                const ratingValue = ratingFilter.value;
 
                 tableRows.forEach(row => {
                     const searchData = row.getAttribute('data-search') || '';
                     const rowSub = row.getAttribute('data-subscription');
                     const rowStatus = row.getAttribute('data-status');
+                    const rowRating = parseFloat(row.getAttribute('data-rating'));
 
                     const matchesSearch = searchData.includes(searchValue);
                     const matchesSub = (subValue === 'all') || (subValue === rowSub);
                     const matchesKyc = (kycValue === '') || (rowStatus === kycValue);
+                    
+                    let matchesRating = true;
+                    if (ratingValue !== 'all') {
+                        matchesRating = rowRating >= parseFloat(ratingValue);
+                    }
 
-                    if (matchesSearch && matchesSub && matchesKyc) {
+                    if (matchesSearch && matchesSub && matchesKyc && matchesRating) {
                         row.style.display = '';
                     } else {
                         row.style.display = 'none';
@@ -920,6 +957,7 @@
             searchInput.addEventListener('keyup', filterProviders);
             subFilter.addEventListener('change', filterProviders);
             kycFilter.addEventListener('change', filterProviders);
+            ratingFilter.addEventListener('change', filterProviders);
         });
     </script>
 @endpush
