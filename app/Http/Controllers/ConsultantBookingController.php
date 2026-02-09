@@ -33,6 +33,9 @@ class ConsultantBookingController extends Controller
             'booking_date' => 'required|date',
             'start_time' => 'required',
             'duration' => 'required|in:15,30,45,60',
+            'consultant_id' => 'required|exists:users,id',
+            'category_id' => 'required|exists:categories,id',
+            'sub_category_id' => 'required|exists:sub_categories,id',
         ]);
 
         return DB::transaction(function () use ($request) {
@@ -43,9 +46,16 @@ class ConsultantBookingController extends Controller
 
             $consultantId = $availability->consultantWeekDay->user_id;
 
-            $profile = ConsultancyProfile::where('user_id', $consultantId)->firstOrFail();
+            $profile = ConsultancyProfile::where('user_id', $consultantId)->first();
 
-            // Fee calculation
+            if (! $profile) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Consultant profile not found',
+                ], 404);
+            }
+
+            // 🔹 Fee calculation
             $fee = match ($request->duration) {
                 15 => $profile->fee_15,
                 30 => $profile->fee_30,
@@ -54,36 +64,41 @@ class ConsultantBookingController extends Controller
             };
 
             if (! $fee) {
-                abort(422, 'Selected duration not available');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Selected duration not available',
+                ], 422);
             }
 
             $start = Carbon::createFromFormat('H:i', $request->start_time);
             $end = $start->copy()->addMinutes($request->duration);
 
-            // ❌ Check overlapping bookings
+            // 🔒 Overlap check (correct logic)
             $overlap = ConsultantBooking::where(
                 'consultant_day_availability_id',
                 $availability->id
             )
                 ->where('booking_date', $request->booking_date)
                 ->where(function ($q) use ($start, $end) {
-                    $q->whereBetween('start_time', [$start, $end])
-                        ->orWhereBetween('end_time', [$start, $end])
-                        ->orWhere(function ($q2) use ($start, $end) {
-                            $q2->where('start_time', '<=', $start)
-                                ->where('end_time', '>=', $end);
-                        });
+                    $q->where('start_time', '<', $end)
+                        ->where('end_time', '>', $start);
                 })
                 ->exists();
 
             if ($overlap) {
-                abort(409, 'This slot is already booked');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'This slot is already booked',
+                ], 409);
             }
 
             // ✅ Create booking
             $booking = ConsultantBooking::create([
                 'user_id' => auth()->id(),
                 'consultant_day_availability_id' => $availability->id,
+                'consultant_id' => $request->consultant_id,
+                'category_id' => $request->category_id,
+                'sub_category_id' => $request->sub_category_id,
                 'booking_date' => $request->booking_date,
                 'start_time' => $start->format('H:i'),
                 'end_time' => $end->format('H:i'),
@@ -96,7 +111,9 @@ class ConsultantBookingController extends Controller
                 'success' => true,
                 'message' => 'Slot booked successfully',
                 'booking' => $booking,
-            ]);
+            ], 201);
         });
     }
+
+    public function getBookSlot() {}
 }
