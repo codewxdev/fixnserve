@@ -68,7 +68,7 @@ class CustomerController extends Controller
     public function index()
     {
         $users = User::doesntHave('roles')->with('wallet')->get();
-        // dd($users);
+         
         return view('Admin.customers.index', compact('users'));
     }
 
