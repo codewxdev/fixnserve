@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             CountrySeeder::class,
             AppSeeder::class,
             TransportTypeSeeder::class,
+            CategorySubcategorySeeder::class,
         ]);
 
     }

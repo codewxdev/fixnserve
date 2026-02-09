@@ -14,9 +14,9 @@ class ServiceProviderController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user->hasRole('service provider')) {
-            return ApiResponse::error('Only service providers can save categories and subcategories.', 403);
-        }
+        // if (! $user->hasRole('service provider')) {
+        //     return ApiResponse::error('Only service providers can save categories and subcategories.', 403);
+        // }
 
         $request->validate([
             'categories' => 'required|array|max:5',
