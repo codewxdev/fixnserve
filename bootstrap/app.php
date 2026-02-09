@@ -13,28 +13,28 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function (): void {
 
-            Route::namespace('admin')->group(base_path('routes/Admin/customer.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/provider.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/professional.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/role_permission.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/consultant.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/mart.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/rider.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/service.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/finance.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/car.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/report.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/cms.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/notification.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/cooperation.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/codashboard.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/subscription.php'));
-            Route::namespace('admin')->group(base_path('routes/Admin/marketing.php'));
-            Route::namespace('user')->group(base_path('routes/User/provider.php'));
-            Route::namespace('user')->group(base_path('routes/User/professional.php'));
-            Route::namespace('user')->group(base_path('routes/User/consultant.php'));
-            Route::namespace('user')->group(base_path('routes/User/rider.php'));
-            Route::namespace('user')->group(base_path('routes/User/vendor.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/customer.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/provider.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/professional.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/role_permission.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/consultant.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/mart.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/rider.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/service.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/finance.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/car.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/report.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/cms.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/notification.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/cooperation.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/codashboard.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/subscription.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/marketing.php'));
+            Route::namespace('user')->group(base_path('routes/user/provider.php'));
+            Route::namespace('user')->group(base_path('routes/user/professional.php'));
+            Route::namespace('user')->group(base_path('routes/user/consultant.php'));
+            Route::namespace('user')->group(base_path('routes/user/rider.php'));
+            Route::namespace('user')->group(base_path('routes/user/vendor.php'));
 
         }
     )
