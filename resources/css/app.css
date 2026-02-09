@@ -40,6 +40,7 @@
 
     *,
     ::after,
+
     ::before,
     ::backdrop,
     ::file-selector-button {
