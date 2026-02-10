@@ -4,30 +4,31 @@ use App\Http\Controllers\Front\ServiceController;
 use Illuminate\Support\Facades\Route;
  
 
-//Service Module Routes
-Route::get('/service/managment',[ServiceController::class, 'index'])->name('service.index');
+// ====================================================
+// SERVICE MANAGEMENT (Categories, Specialties, etc.)
+// ====================================================
+Route::get('/services/management', [ServiceController::class, 'index'])->name('service.index');
 
-Route::post('/service/categories', [ServiceController::class, 'storeCategory'])->name('store.category');
-Route::post('/service/subcategories', [ServiceController::class, 'storeSubcategory'])->name('store.subcategory');
-Route::post('/specialties', [ServiceController::class, 'storeSpecialty'])->name('store.specialty');
-Route::post('/sub-specialties', [ServiceController::class, 'storeSubSpecialty'])->name('store.subspecialty');
+// Create
+Route::post('/services/categories', [ServiceController::class, 'storeCategory'])->name('store.category');
+Route::post('/services/sub-categories', [ServiceController::class, 'storeSubcategory'])->name('store.subcategory');
+Route::post('/services/specialties', [ServiceController::class, 'storeSpecialty'])->name('store.specialty');
+Route::post('/services/sub-specialties', [ServiceController::class, 'storeSubSpecialty'])->name('store.subspecialty');
 
+// Update (Added prefix for standard hierarchy)
+Route::put('/services/categories/{id}', [ServiceController::class, 'updateCategory'])->name('update.category');
+Route::put('/services/sub-categories/{id}', [ServiceController::class, 'updateSubcategory'])->name('update.subcategory');
+Route::put('/services/specialties/{id}', [ServiceController::class, 'updateSpecialty'])->name('update.specialty');
+Route::put('/services/sub-specialties/{id}', [ServiceController::class, 'updateSubSpecialty'])->name('update.subspecialty');
 
-// Edit/Update Routes
-Route::put('/categories/{id}', [ServiceController::class, 'updateCategory'])->name('update.category');
-Route::put('/subcategories/{id}', [ServiceController::class, 'updateSubcategory'])->name('update.subcategory');
-Route::put('/specialties/{id}', [ServiceController::class, 'updateSpecialty'])->name('update.specialty');
-Route::put('/sub-specialties/{id}', [ServiceController::class, 'updateSubSpecialty'])->name('update.subspecialty');
+// Delete (Added prefix for standard hierarchy)
+Route::delete('/services/categories/{id}', [ServiceController::class, 'destroyCategory'])->name('destroy.category');
+Route::delete('/services/sub-categories/{id}', [ServiceController::class, 'destroySubcategory'])->name('destroy.subcategory');
+Route::delete('/services/specialties/{id}', [ServiceController::class, 'destroySpecialty'])->name('destroy.specialty');
+Route::delete('/services/sub-specialties/{id}', [ServiceController::class, 'destroySubSpecialty'])->name('destroy.subspecialty');
 
-// Delete Routes
-Route::delete('/categories/{id}', [ServiceController::class, 'destroyCategory'])->name('destroy.category');
-Route::delete('/subcategories/{id}', [ServiceController::class, 'destroySubcategory'])->name('destroy.subcategory');
-Route::delete('/specialties/{id}', [ServiceController::class, 'destroySpecialty'])->name('destroy.specialty');
-Route::delete('/sub-specialties/{id}', [ServiceController::class, 'destroySubSpecialty'])->name('destroy.subspecialty');
-
-
-// Status Toggles
-Route::patch('/categories/{id}/toggle-status', [ServiceController::class, 'toggleCategoryStatus']);
-Route::patch('/subcategories/{id}/toggle-status', [ServiceController::class, 'toggleSubcategoryStatus']);
-Route::patch('/specialties/{id}/toggle-status', [ServiceController::class, 'toggleSpecialtyStatus']);
-Route::patch('/sub-specialties/{id}/toggle-status', [ServiceController::class, 'toggleSubSpecialtyStatus']);
+// Status Toggles (Using concise 'status' endpoint)
+Route::patch('/services/categories/{id}/status', [ServiceController::class, 'toggleCategoryStatus']);
+Route::patch('/services/sub-categories/{id}/status', [ServiceController::class, 'toggleSubcategoryStatus']);
+Route::patch('/services/specialties/{id}/status', [ServiceController::class, 'toggleSpecialtyStatus']);
+Route::patch('/services/sub-specialties/{id}/status', [ServiceController::class, 'toggleSubSpecialtyStatus']);

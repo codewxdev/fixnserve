@@ -5,5 +5,7 @@ use App\Http\Controllers\Front\ReportController;
 use Illuminate\Support\Facades\Route;
  
 
-//Customer Module Routes
-Route::get('/reports/analytics',[ReportController::class, 'index'])->name('report.index');
+// ====================================================
+// REPORTS & ANALYTICS
+// ====================================================
+Route::get('/reports/analytics', [ReportController::class, 'index'])->name('report.index');
