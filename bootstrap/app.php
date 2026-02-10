@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\CalculateApiMetrics;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -46,6 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'health_api' => \App\Http\Middleware\ApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Http\Middleware\CheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -62,4 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('promotions:expire')->everyMinute()->withoutOverlapping()->onOneServer();
-    })->create();
+        $schedule->job(new CalculateApiMetrics)->everyMinute();
+
+    })
+    ->create();
