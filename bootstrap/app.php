@@ -41,6 +41,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Correct way to register middleware aliases in Laravel 11/12
         $middleware->alias([
+            'health_api' => \App\Http\Middleware\ApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Http\Middleware\CheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -56,4 +57,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('promotions:expire')->everyMinute()->withoutOverlapping()->onOneServer();
-    })->create();
+        $schedule->job(new \App\Jobs\CalculateApiMetrics)->everyMinute();
+
+    })
+    ->create();
