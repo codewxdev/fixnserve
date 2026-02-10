@@ -188,20 +188,21 @@
                 .then(res => res.json())
                 .then(data => {
                     localStorage.setItem('api_token', data
-                    .access_token);
-                      
-                     // Assuming 'response.token' holds the value
+                        .access_token);
+
+                    // Assuming 'response.token' holds the value
                     if (data.status === '2fa_required') {
+
                         // Admin/Super Admin needs to verify 2FA before login
                         tempAccessToken = data
-                        .access_token; // Keep token for potential future use or re-login flow
+                            .access_token; // Keep token for potential future use or re-login flow
                         showTwoFAModal('2FA Verification Required', currentAuthEmail, false);
                         document.getElementById('twoFactorForm').setAttribute('data-mode', 'verify');
 
                     } else if (data.status === 'enable_2fa') {
                         // Admin/Super Admin needs to SET UP 2FA
                         tempAccessToken = data
-                        .access_token; // Use this token to authenticate the enable2FA API call
+                            .access_token; // Use this token to authenticate the enable2FA API call
                         return enable2FA(data.access_token);
 
                     } else if (data.access_token && data.token_type === 'bearer') {
@@ -210,6 +211,7 @@
                         // The backend should return user data here if needed, but the current respondWithToken does not.
                         // Let's assume you'll update the backend response for non-2fa users to be consistent or
                         // rely on a separate API call post-login. For now, redirect.
+                        document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
                         window.location.href = "/";
 
                     } else if (data.error) {
@@ -250,8 +252,8 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                 
-                  
+
+
                     if (data.status === 'setup_initiated' && data.qrcode_url) {
                         showTwoFAModal(
                             'Setup Two-Factor Authentication',
@@ -306,16 +308,19 @@
                 })
                 .then(res => res.json())
                 .then(data => {
-                    console.log(data);
 
                     if (data.status === 'success' && data.token) {
-
-                        // Successful final authentication (either setup verification or standard 2FA)
                         localStorage.setItem('token', data.token);
-                        // The user object is returned by your verify2FA controller, which is good.
+
+                        // --- ADD THIS BLOCK ---
+                        // Set a cookie so the browser sends the token on reload/redirect
+                        document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
+                        // ----------------------
+
                         if (data.user) {
                             localStorage.setItem("user", JSON.stringify(data.user));
                         }
+
                         window.location.href = "/";
                     } else if (data.error) {
                         // Failed verification (e.g., Invalid OTP)

@@ -41,6 +41,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         // Correct way to register middleware aliases in Laravel 11/12
+        $middleware->encryptCookies(except: [
+            'token', 
+        ]);
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Http\Middleware\CheckSuperAdmin::class,
@@ -49,6 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'user.active' => \App\Http\Middleware\CheckUserStatus::class,
             'service.provider' => \App\Http\Middleware\CheckServiceProviderRole::class,
+            // 'javed' => \App\Http\Middleware\Admin\AuthMiddleware::class,
 
         ]);
     })
