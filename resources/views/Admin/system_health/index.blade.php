@@ -290,7 +290,8 @@
     INTERACTIVITY & POLLING (VANILLA JS)
     ==========================================================================
 --}}
-<script>
+ @push('scripts')
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
         
         // 1. Initialize Chart.js
@@ -383,5 +384,6 @@
             alert(`Command sent: ${action} ${queueName}`);
         }
     }
-</script>
+</script> 
+ @endpush
 @endsection
