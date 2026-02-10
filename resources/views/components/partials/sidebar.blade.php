@@ -86,7 +86,7 @@ sidebar
                         <span x-show="sidebarOpen"
                             class="ml-3 text-sm font-medium tracking-wide nav-text transition-opacity duration-300"
                             x-cloak>
-                            Command centre
+                            Command centre of Javed
                         </span>
                     </div>
                     <svg x-show="sidebarOpen" :class="activeDropdown === 'command_centre' ? 'rotate-180' : ''"
