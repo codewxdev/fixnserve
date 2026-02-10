@@ -14,9 +14,9 @@ class PortfolioController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user->hasRole('service provider')) {
-            return ApiResponse::error('Only service providers can see portfolio.', 403);
-        }
+        // if (! $user->hasRole('service provider')) {
+        //     return ApiResponse::error('Only service providers can see portfolio.', 403);
+        // }
 
         $portfolios = Portfolio::where('user_id', $user->id)->latest()->get();
 
@@ -73,9 +73,9 @@ class PortfolioController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user->hasRole('service provider')) {
-            return ApiResponse::error('Only service providers can update portfolio.', 403);
-        }
+        // if (! $user->hasRole('service provider')) {
+        //     return ApiResponse::error('Only service providers can update portfolio.', 403);
+        // }
 
         $portfolio = Portfolio::findOrFail($id);
 
@@ -113,9 +113,9 @@ class PortfolioController extends Controller
     {
         $user = auth()->user();
 
-        if (! $user->hasRole('service provider')) {
-            return ApiResponse::error('Only service providers can delete portfolio.', 403);
-        }
+        // if (! $user->hasRole('service provider')) {
+        //     return ApiResponse::error('Only service providers can delete portfolio.', 403);
+        // }
 
         if ($portfolio->image) {
             Storage::disk('public')->delete($portfolio->image);
