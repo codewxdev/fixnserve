@@ -50,22 +50,11 @@
             transform: translateY(-2px);
         }
 
-        .sidebar {
-            transition: width 0.3s ease-in-out;
-            background-color: #1e293b;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-active {
-            background-color: #334155;
-            border-left: 4px solid #3b82f6;
-        }
-
-        #dashboard-chart {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        /* Sidebar Transition Logic */
+        .fn-main-content-area {
+            transition-property: margin-left;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 300ms;
         }
     </style>
     @stack('styles')
@@ -74,15 +63,16 @@
 <body class="antialiased fn-body">
 
     <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }" class="fn-app-wrapper">
+        
         <x-partials.sidebar class="fn-sidebar-component" />
 
-        <div x-bind:class="{ 'ml-64': sidebarOpen, 'ml-20': !sidebarOpen }"
-            class="transition-all duration-300 fn-main-content-area">
+        <div x-bind:class="{ 'ml-72': sidebarOpen, 'ml-20': !sidebarOpen }"
+            class="fn-main-content-area min-h-screen flex flex-col">
 
             <header
                 class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20 fn-header-top-nav">
 
-                <div class="flex items-center fn-header-left-group pl-5">
+                <div class="flex items-center fn-header-left-group">
                     <button @click="sidebarOpen = !sidebarOpen"
                         class="text-slate-600 hover:text-blue-500 transition-colors mr-4 focus:outline-none fn-btn-sidebar-toggle">
                         <svg x-show="sidebarOpen" class="w-6 h-6 fn-icon-menu-open" fill="none" stroke="currentColor"
@@ -193,7 +183,7 @@
                 </div>
             </header>
 
-            <main class="p-6 lg:p-8 fn-main-page-content">
+            <main class="p-6 lg:p-8 fn-main-page-content flex-1">
                 @yield('content')
             </main>
         </div>
@@ -208,15 +198,12 @@
             const logoutBtn = event.target;
             logoutBtn.disabled = true;
             logoutBtn.innerText = "Logging out...";
-
             const token = localStorage.getItem("token");
-
             if (!token) {
                 localStorage.clear();
                 window.location.href = "/auth/login";
                 return;
             }
-
             fetch("http://127.0.0.1:8000/api/auth/logout", {
                     method: "POST",
                     headers: {
@@ -238,6 +225,5 @@
                 });
         }
     </script>
-
 </body>
 </html>
