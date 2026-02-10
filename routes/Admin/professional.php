@@ -3,7 +3,8 @@
 use App\Http\Controllers\Front\ProfessionalController;
 use Illuminate\Support\Facades\Route;
  
-//professional Module Routes
-Route::get('/professional/experts',[ProfessionalController::class, 'index'])->name('professional.index');
-Route::post('/professional/store',[ProfessionalController::class, 'store'])->name('store.professional');
- 
+// ====================================================
+// PROFESSIONAL MODULE
+// ====================================================
+Route::get('/professionals', [ProfessionalController::class, 'index'])->name('professional.index');
+Route::post('/professionals', [ProfessionalController::class, 'store'])->name('store.professional');

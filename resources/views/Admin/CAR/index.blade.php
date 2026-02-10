@@ -202,7 +202,7 @@
                                 </th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-100">
+                        <tbody class="bg-white dividhe-y divide-gray-100">
 
                             {{-- Dynamic Complaint Rows --}}
                             <template x-for="complaint in filteredComplaints()" :key="complaint.id">

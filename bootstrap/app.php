@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\CalculateApiMetrics;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -30,6 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::namespace('admin')->group(base_path('routes/admin/codashboard.php'));
             Route::namespace('admin')->group(base_path('routes/admin/subscription.php'));
             Route::namespace('admin')->group(base_path('routes/admin/marketing.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/system_health.php'));
             Route::namespace('user')->group(base_path('routes/user/provider.php'));
             Route::namespace('user')->group(base_path('routes/user/professional.php'));
             Route::namespace('user')->group(base_path('routes/user/consultant.php'));
@@ -57,7 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('promotions:expire')->everyMinute()->withoutOverlapping()->onOneServer();
-        $schedule->job(new \App\Jobs\CalculateApiMetrics)->everyMinute();
+        $schedule->job(new CalculateApiMetrics)->everyMinute();
 
     })
     ->create();

@@ -6,15 +6,17 @@ use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
 use App\Http\Controllers\FavouriteController;
-use App\Http\Controllers\HealthController;
+use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
 use App\Http\Controllers\MartVender\MartSubCategoryController;
 use App\Http\Controllers\MartVender\ProductController;
+use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PromotionPurchaseController;
 use App\Http\Controllers\PromotionSlotController;
+use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RiderVehicleController;
 use App\Http\Controllers\Role\PermissionController;
@@ -44,8 +46,15 @@ use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api')->group(function () {
-    Route::get('/admin/health', [HealthController::class, 'index']);
+    Route::prefix('metrics')->group(function () {
+        Route::get('/summary', [MetricsController::class, 'summary']);
+        Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
+        Route::get('/endpoints', [MetricsController::class, 'endpoints']);
+        Route::get('/dependencies', [MetricsController::class, 'dependencies']);
+    });
 
+    Route::get('/incidents', [IncidentController::class, 'index']);
+    Route::get('/queues/health', [QueueController::class, 'health']);
     // Public Routes (No authentication required)
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');

@@ -3,37 +3,58 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
 class ApiHealthMetrics
 {
-    public function handle($request, Closure $next)
+    private const SAMPLE_LIMIT = 400;   // sliding window samples
+
+    private const RAW_TTL = 120;        // 2 min only
+
+    public function handle(Request $request, Closure $next)
     {
         $start = microtime(true);
 
         $response = $next($request);
 
-        $duration = (microtime(true) - $start) * 1000; // ms
-        $endpoint = $request->path(); // e.g., "api/users"
+        $latency = round((microtime(true) - $start) * 1000, 2);
 
-        // Store durations in Redis list for this endpoint
-        $key = "metrics:summary:$endpoint";
-        Redis::rpush($key.':latencies', $duration);
+        $endpoint = $this->normalizeEndpoint($request);
+        $minute = now()->format('YmdHi');
 
-        // Keep last 1000 requests only
-        Redis::ltrim($key.':latencies', -1000, -1);
+        $latKey = "metrics:raw:$endpoint:latencies";
+        $reqKey = "metrics:raw:$endpoint:requests:$minute";
+        $errKey = "metrics:raw:$endpoint:errors:$minute";
+        $rpsKey = "metrics:raw:global:rps:$minute";
 
-        // Increment total requests for RPS calculation
-        $rpsKey = 'metrics:rps:'.now()->format('YmdHi'); // YYYYMMDDHHMM
-        Redis::incr($rpsKey);
-        Redis::expire($rpsKey, 120); // auto-expire after 2 mins
+        Redis::pipeline(function ($pipe) use ($latKey, $reqKey, $errKey, $rpsKey, $latency, $response) {
 
-        // Increment errors if response status >= 400
-        if ($response->getStatusCode() >= 400) {
-            $errorKey = "metrics:errors:$endpoint";
-            Redis::incr($errorKey);
-        }
+            // latency samples
+            $pipe->rpush($latKey, $latency);
+            $pipe->ltrim($latKey, -self::SAMPLE_LIMIT, -1);
+            $pipe->expire($latKey, self::RAW_TTL);
+
+            // request count
+            $pipe->incr($reqKey);
+            $pipe->expire($reqKey, self::RAW_TTL);
+
+            // errors
+            if ($response->getStatusCode() >= 500) {
+                $pipe->incr($errKey);
+                $pipe->expire($errKey, self::RAW_TTL);
+            }
+
+            // global rps
+            $pipe->incr($rpsKey);
+            $pipe->expire($rpsKey, self::RAW_TTL);
+        });
 
         return $response;
+    }
+
+    private function normalizeEndpoint(Request $request): string
+    {
+        return str_replace('/', ':', trim($request->route()?->uri() ?? $request->path(), '/'));
     }
 }
