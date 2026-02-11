@@ -7,6 +7,7 @@ use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
 use App\Http\Controllers\MartVender\MartSubCategoryController;
@@ -68,12 +69,10 @@ Route::middleware('health_api', 'check_country')->group(function () {
     Route::apiResource('notification-types', NotificationTypeController::class);
     Route::resource('mart-categories', MartCategoryController::class);
     Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
-    // routes/api.php
     Route::apiResource('specialties', SpecialtyController::class);
     Route::apiResource('sub-specialties', SubSpecialtyController::class);
-    // ////////////////////////////////////consultant route
+    // ////////////////////////////////////consultant route/////////////////////
     Route::get('getSlot', [ConsultantBookingController::class, 'getSlots']);
-    Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
 
     Route::get('/countries', function () {
         return response()->json([
@@ -86,21 +85,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
         return Country::all();
     });
 
-    Route::patch('/countries/{id}', function (Request $request, $id) {
-        $request->validate([
-            'status' => 'required|in:enabled,soft_disabled,hard_disabled',
-        ]);
-        $country = Country::findorfail($id);
-        $res = $country->update([
-            'status' => $request->status,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'response' => $res,
-        ]);
-    });
-
     Route::get('/currences', function () {
         return response()->json([
             'success' => true,
@@ -109,6 +93,12 @@ Route::middleware('health_api', 'check_country')->group(function () {
     });
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active'])->group(function () {
+        // /////////middleware for blocking order for soft_disable country/////////
+        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders'])->group(function () {
+            // //////////////////////////book slot for consultant////////////
+            Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
+
+        });
         // Auth Routes
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -227,6 +217,24 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::apiResource('subcategories', SubcategoryController::class);
             Route::apiResource('skills', SkillController::class);
             Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
+            // //////////disable country status////////////////
+            Route::patch('/countries/{id}', function (Request $request, $id) {
+                $request->validate([
+                    'status' => 'required|in:enabled,soft_disabled,hard_disabled',
+                ]);
+                $country = Country::findorfail($id);
+                $res = $country->update([
+                    'status' => $request->status,
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'response' => $res,
+                ]);
+            });
+            // /////////////////maintance route/////////////////
+            Route::post('/maintenance', [MaintenanceController::class, 'store']);
+            Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
         });
     });
     Route::middleware(['auth:api'])->prefix('admin')->group(function () {
@@ -245,6 +253,8 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::post('/promotion-purchases', [PromotionPurchaseController::class, 'store']);
 
     });
+    Route::post('/maintenance', [MaintenanceController::class, 'store']);
+    Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
 });
 // /////////////////////////////////////////extra code//////////////////////////////////////
 
