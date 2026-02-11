@@ -86,7 +86,7 @@ sidebar
                         <span x-show="sidebarOpen"
                             class="ml-3 text-sm font-medium tracking-wide nav-text transition-opacity duration-300"
                             x-cloak>
-                            Command centre of Javed
+                            Command centre
                         </span>
                     </div>
                     <svg x-show="sidebarOpen" :class="activeDropdown === 'command_centre' ? 'rotate-180' : ''"
@@ -101,7 +101,7 @@ sidebar
                             style="color: rgb(var(--text-muted));">Platform Overview</a></li>
                     <li><a href="{{ route('system_health.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">System Health</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{route('regional_controle.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Regional controle</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Maintainace & Emergency</a></li>

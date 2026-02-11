@@ -1,6 +1,15 @@
  
-*{
-    font-family: 'Poppins';
+body {
+    font-family: var(--font-heading);
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+.pro-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    /* ... rest of code */
 }
 
 :root {
@@ -13,6 +22,49 @@
   
 }
 
+/* public/assets/css/style.css */
+
+:root {
+    /* Brand Colors */
+    --primary-color: #3b82f6;       /* Blue */
+    --primary-hover: #2563eb;
+    --bg-main: #f8fafc;            /* Light gray/white bg */
+    --bg-dark-module: #111827;      /* Dark theme bg (for system health) */
+    
+    /* Card & Element Colors */
+    --card-bg: #ffffff;
+    --card-bg-dark: #1f2937;
+    --card-border: #e2e8f0;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+
+    /* Text Colors */
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --text-white: #ffffff;
+
+    /* Typography */
+    --font-main: 'Inter', sans-serif;
+    --font-heading: 'Poppins', sans-serif;
+}
+
+:root {
+    /* Main Theme Colors */
+    --brand-primary: #3b82f6;
+    --brand-success: #22c55e;
+    --brand-warning: #eab308;
+    --brand-danger: #ef4444;
+    --brand-info: #a855f7; /* Purple */
+
+    /* System Health Dark Theme Variables */
+    --health-bg: #111827;          /* Page background */
+    --health-card-bg: #1f2937;     /* Card background */
+    --health-card-border: #374151; /* Border color */
+    --health-text-main: #f9fafb;   /* Primary text */
+    --health-text-muted: #9ca3af;  /* Muted/Secondary text */
+    
+    /* Global Fonts */
+    --font-family-base: 'Inter', sans-serif;
+}
 
 .login-card-shadow {
     /* A modern, professional box shadow */

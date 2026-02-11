@@ -14,6 +14,7 @@
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" class="fn-link-fontawesome" />
     <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}" class="fn-link-responsive">
+    <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
     <style class="fn-style-custom">
