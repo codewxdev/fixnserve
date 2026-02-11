@@ -43,9 +43,10 @@ use App\Http\Controllers\SubSpecialtyController;
 use App\Http\Controllers\TransportTypeController;
 use App\Models\Country;
 use App\Models\Currency;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api')->group(function () {
+Route::middleware('health_api', 'check_country')->group(function () {
     Route::prefix('metrics')->group(function () {
         Route::get('/summary', [MetricsController::class, 'summary']);
         Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
@@ -70,7 +71,7 @@ Route::middleware('health_api')->group(function () {
     // routes/api.php
     Route::apiResource('specialties', SpecialtyController::class);
     Route::apiResource('sub-specialties', SubSpecialtyController::class);
-
+    // ////////////////////////////////////consultant route
     Route::get('getSlot', [ConsultantBookingController::class, 'getSlots']);
     Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
 
@@ -80,6 +81,26 @@ Route::middleware('health_api')->group(function () {
             'data' => Country::orderBy('name')->get(),
         ]);
     });
+
+    Route::get('/countries', function () {
+        return Country::all();
+    });
+
+    Route::patch('/countries/{id}', function (Request $request, $id) {
+        $request->validate([
+            'status' => 'required|in:enabled,soft_disabled,hard_disabled',
+        ]);
+        $country = Country::findorfail($id);
+        $res = $country->update([
+            'status' => $request->status,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'response' => $res,
+        ]);
+    });
+
     Route::get('/currences', function () {
         return response()->json([
             'success' => true,
