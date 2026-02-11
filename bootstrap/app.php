@@ -44,10 +44,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Correct way to register middleware aliases in Laravel 11/12
         $middleware->encryptCookies(except: [
-            'token', 
+            'token',
         ]);
 
         $middleware->alias([
+            'check_maintenance' => \App\Http\Middleware\CheckMaintenance::class,
             'health_api' => \App\Http\Middleware\ApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Http\Middleware\CheckSuperAdmin::class,
@@ -56,6 +57,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'user.active' => \App\Http\Middleware\CheckUserStatus::class,
             'service.provider' => \App\Http\Middleware\CheckServiceProviderRole::class,
+            'check_country' => \App\Http\Middleware\CheckCountryStatus::class,
+            'block_soft_country_orders' => \App\Http\Middleware\BlockOrdersForSoftDisabledCountry::class,
             // 'javed' => \App\Http\Middleware\Admin\AuthMiddleware::class,
 
         ]);
@@ -66,6 +69,17 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         $schedule->command('promotions:expire')->everyMinute()->withoutOverlapping()->onOneServer();
         $schedule->job(new CalculateApiMetrics)->everyMinute();
-
+        $schedule->call(function () {
+            // Activate scheduled maintenances
+            \App\Models\Maintenance::where('status', 'scheduled')
+                ->where('starts_at', '<=', now())
+                ->update(['status' => 'active']);
+            // Auto-expire finished maintenances
+            \App\Models\Maintenance::where('status', 'active')
+                ->whereNotNull('ends_at')
+                ->where('ends_at', '<=', now())
+                ->update(['status' => 'cancelled']);
+            cache()->forget('maintenance:active');
+        })->everyMinute();
     })
     ->create();

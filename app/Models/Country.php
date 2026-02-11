@@ -12,6 +12,7 @@ class Country extends Model
         'phone_code',
         'flag_url',
         'phone_length',
+        'status',
 
     ];
 

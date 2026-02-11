@@ -50,7 +50,7 @@ class User extends Authenticatable implements JWTSubject
         'rating',        // Added
         'favourite', // Add UUID to fillable
         'dob',
-        'gender'
+        'gender',
     ];
 
     /**
@@ -80,6 +80,11 @@ class User extends Authenticatable implements JWTSubject
 
         ];
     }
+
+    // public function country()
+    // {
+    //     return $this->belongsTo(Country::class);
+    // }
 
     /**
      * Get columns that should receive UUIDs
@@ -278,8 +283,8 @@ class User extends Authenticatable implements JWTSubject
     public function wallet()
     {
         return $this->hasOne(Wallet::class)->withDefault([
-        'balance' => 0,
-    ]);
+            'balance' => 0,
+        ]);
     }
 
     public function canSubscribeTo(int $appId): bool
