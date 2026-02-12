@@ -1,37 +1,3 @@
-sidebar
-<style>
-    :root {
-        /* BRAND COLORS */
-        --brand-primary: 59, 130, 246;
-        --brand-secondary: 37, 99, 235;
-        --sidebar-bg: 15, 23, 42;
-        --sidebar-border: 30, 41, 59;
-        --text-main: 255, 255, 255;
-        --text-muted: 148, 163, 184;
-        --item-active-bg: 30, 41, 59;
-    }
-
-    /* Single line enforcement */
-    .nav-text {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: rgb(var(--sidebar-border));
-        border-radius: 20px;
-    }
-</style>
-
 <div x-data="{
     activeDropdown: null,
     toggle(key) {
@@ -41,7 +7,7 @@ sidebar
     class="sidebar fixed top-0 left-0 h-full z-30 flex flex-col transition-all duration-300 ease-in-out shadow-2xl custom-scrollbar"
     style="background-color: rgb(var(--sidebar-bg)); border-right: 1px solid rgb(var(--sidebar-border)); color: rgb(var(--text-main));">
 
-    <div class="flex items-center pl-6 h-20 shrink-0 border-b border-slate-800">
+    <div class="flex items-center pl-6 h-20 shrink-0 border-b sidebar" style="border-color: rgb(var(--sidebar-border));">
         <div x-show="sidebarOpen" class="flex items-center gap-3 transition-opacity duration-300" x-cloak>
             <div class="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
                 style="background: linear-gradient(135deg, rgb(var(--brand-primary)), rgb(var(--brand-secondary)));">
@@ -50,7 +16,7 @@ sidebar
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
             </div>
-            <span class="text-xl font-bold tracking-wide text-white nav-text">
+            <span class="text-xl font-bold tracking-wide nav-text" style="color: rgb(var(--text-main));">
                 SahorOne
             </span>
         </div>
@@ -63,7 +29,7 @@ sidebar
         </div>
     </div>
 
-    <nav class="flex-1 overflow-y-auto py-6 custom-scrollbar px-3">
+    <nav class="flex-1 overflow-y-auto py-6 custom-scrollbar px-3 sidebar">
         <ul class="space-y-1">
 
             <li x-show="sidebarOpen" class="px-3 mt-2 mb-2" x-cloak>
@@ -73,9 +39,9 @@ sidebar
 
             <li>
                 <button @click="toggle('command_centre')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'command_centre' ?
-                        'background-color: rgb(var(--item-active-bg)); color: white;' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'command_centre' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -97,7 +63,7 @@ sidebar
                 </button>
                 <ul x-show="activeDropdown === 'command_centre' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"
                     x-cloak>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{route('platform_overview.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Platform Overview</a></li>
                     <li><a href="{{ route('system_health.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">System Health</a></li>
@@ -110,8 +76,8 @@ sidebar
 
             <li>
                 <button @click="toggle('security')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'security' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'security' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -151,8 +117,8 @@ sidebar
 
             <li>
                 <button @click="toggle('rbac')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'rbac' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'rbac' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -187,8 +153,8 @@ sidebar
 
             <li>
                 <button @click="toggle('audit')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'audit' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'audit' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -231,8 +197,8 @@ sidebar
 
             <li>
                 <button @click="toggle('settings')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'settings' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'settings' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -285,8 +251,8 @@ sidebar
 
             <li>
                 <button @click="toggle('accounts')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'accounts' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'accounts' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -328,8 +294,8 @@ sidebar
 
             <li>
                 <button @click="toggle('kyc')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'kyc' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'kyc' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -371,8 +337,8 @@ sidebar
 
             <li>
                 <button @click="toggle('catalog')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'catalog' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'catalog' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -410,9 +376,9 @@ sidebar
 
             <li>
                 <button @click="toggle('subscriptions')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'subscriptions' ?
-                        'background-color: rgb(var(--item-active-bg)); color: white;' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'subscriptions' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -449,8 +415,8 @@ sidebar
 
             <li>
                 <button @click="toggle('monetization')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'monetization' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'monetization' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -495,8 +461,8 @@ sidebar
 
             <li>
                 <button @click="toggle('orders')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'orders' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'orders' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -532,8 +498,8 @@ sidebar
 
             <li>
                 <button @click="toggle('logistics')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'logistics' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'logistics' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -573,8 +539,8 @@ sidebar
 
             <li>
                 <button @click="toggle('finance')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'finance' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'finance' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -614,9 +580,9 @@ sidebar
 
             <li>
                 <button @click="toggle('payment_gateways')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'payment_gateways' ?
-                        'background-color: rgb(var(--item-active-bg)); color: white;' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'payment_gateways' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -658,8 +624,8 @@ sidebar
 
             <li>
                 <button @click="toggle('fraud')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'fraud' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'fraud' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -700,8 +666,8 @@ sidebar
 
             <li>
                 <button @click="toggle('disputes')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'disputes' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'disputes' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -750,8 +716,8 @@ sidebar
 
             <li>
                 <button @click="toggle('analytics')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'analytics' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'analytics' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -800,8 +766,8 @@ sidebar
 
             <li>
                 <button @click="toggle('marketing')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'marketing' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'marketing' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -842,8 +808,8 @@ sidebar
 
             <li>
                 <button @click="toggle('cms')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'cms' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'cms' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -888,9 +854,9 @@ sidebar
 
             <li>
                 <button @click="toggle('notifications')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'notifications' ?
-                        'background-color: rgb(var(--item-active-bg)); color: white;' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'notifications' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -940,8 +906,8 @@ sidebar
 
             <li>
                 <button @click="toggle('support')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'support' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'support' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -992,8 +958,8 @@ sidebar
 
             <li>
                 <button @click="toggle('ai')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'ai' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'ai' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -1044,8 +1010,8 @@ sidebar
 
             <li>
                 <button @click="toggle('integrations')"
-                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-slate-800 hover:text-white"
-                    :style="activeDropdown === 'integrations' ? 'background-color: rgb(var(--item-active-bg)); color: white;' :
+                    class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
+                    :style="activeDropdown === 'integrations' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"

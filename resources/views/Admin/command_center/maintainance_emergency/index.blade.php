@@ -3,16 +3,11 @@
 @section('content')
     {{-- 
     ==========================================================================
-    MODULE 1.4: MAINTENANCE & EMERGENCY OPS (Robust Fix)
+    MODULE 1.4: MAINTENANCE & EMERGENCY OPS
     ==========================================================================
     --}}
 
-    {{-- 
-        CRITICAL FIX: 
-        1. Added parentheses () to emergencySystem()
-        2. Removed x-init (handled automatically by the script now)
-    --}}
-    <div class="min-h-screen bg-gray-900 text-gray-100 p-6 font-sans relative overflow-hidden" 
+    <div class="min-h-screen theme-bg-body theme-text-main p-6 font-sans relative overflow-hidden" 
          x-data="emergencySystem()">
 
         {{-- GLOBAL LOADING OVERLAY --}}
@@ -21,7 +16,7 @@
              class="fixed inset-0 bg-black/80 z-[60] flex flex-col items-center justify-center backdrop-blur-sm"
              style="display: none;">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-500 mb-4"></div>
-            <div class="text-xs text-gray-400 font-mono animate-pulse" x-text="loadingMessage">Processing...</div>
+            <div class="text-xs theme-text-muted font-mono animate-pulse" x-text="loadingMessage">Processing...</div>
         </div>
 
         {{-- EMERGENCY OVERRIDE VISUAL ALERT --}}
@@ -41,24 +36,24 @@
              x-transition:leave="transition ease-in duration-200"
              x-transition:leave-start="opacity-100 translate-x-0"
              x-transition:leave-end="opacity-0 translate-x-8"
-             class="fixed top-6 right-6 z-[70] bg-gray-800 border-l-4 p-4 rounded shadow-2xl flex items-center gap-3 min-w-[300px]"
+             class="fixed top-6 right-6 z-[70] theme-bg-card border-l-4 p-4 rounded shadow-2xl flex items-center gap-3 min-w-[300px]"
              :class="toast.type === 'success' ? 'border-green-500' : (toast.type === 'danger' ? 'border-red-500' : 'border-blue-500')"
              style="display: none;">
-            <div x-text="toast.message" class="text-sm font-semibold text-white"></div>
+            <div x-text="toast.message" class="text-sm font-semibold theme-text-main"></div>
         </div>
 
         {{-- HEADER --}}
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b border-gray-800 pb-6">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 border-b theme-border pb-6">
             <div>
-                <h1 class="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-                    <div class="p-2 bg-red-900/30 rounded-lg text-red-500 border border-red-500/30">
+                <h1 class="text-3xl font-bold tracking-tight theme-text-main flex items-center gap-3">
+                    <div class="p-2 bg-red-500/10 rounded-lg text-red-500 border border-red-500/30">
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                         </svg>
                     </div>
                     <span>System Governance</span>
                 </h1>
-                <p class="text-gray-400 text-sm mt-2 ml-14">
+                <p class="theme-text-muted text-sm mt-2 ml-14">
                     Maintenance Controls & Emergency Kill Switches
                 </p>
             </div>
@@ -71,7 +66,7 @@
                 </div>
 
                 <button @click="toggleOverride()"
-                    :class="override.active ? 'bg-red-600 hover:bg-red-700 animate-pulse border-red-500 shadow-red-900/50' : 'bg-gray-800 border-gray-600 hover:bg-gray-700'"
+                    :class="override.active ? 'bg-red-600 hover:bg-red-700 animate-pulse border-red-500 shadow-red-900/50' : 'theme-bg-card theme-border hover:bg-white/5'"
                     class="group border px-5 py-3 rounded-lg transition-all flex items-center gap-3 shadow-lg">
                     <div :class="override.active ? 'bg-white text-red-600' : 'bg-gray-700 text-gray-400'"
                         class="p-1.5 rounded-md transition-colors">
@@ -80,9 +75,9 @@
                         </svg>
                     </div>
                     <div class="text-left">
-                        <div class="text-xs font-bold uppercase tracking-wide"
+                        <div class="text-xs font-bold uppercase tracking-wide theme-text-main"
                             x-text="override.active ? 'TERMINATE SESSION' : 'EMERGENCY OVERRIDE'"></div>
-                        <div class="text-[10px] opacity-70"
+                        <div class="text-[10px] opacity-70 theme-text-muted"
                             x-text="override.active ? 'Root Access Granted' : 'Requires MFA'"></div>
                     </div>
                 </button>
@@ -93,9 +88,9 @@
 
             {{-- COLUMN 1: MAINTENANCE CONFIGURATION --}}
             <div class="xl:col-span-1 space-y-6">
-                <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden">
-                    <div class="p-5 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
-                        <h3 class="font-bold text-white flex items-center gap-2">
+                <div class="theme-bg-card rounded-xl border theme-border shadow-lg overflow-hidden">
+                    <div class="p-5 border-b theme-border flex justify-between items-center" style="background-color: rgba(var(--bg-body), 0.5);">
+                        <h3 class="font-bold theme-text-main flex items-center gap-2">
                             <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -114,8 +109,8 @@
                     <div class="p-6 space-y-5">
                         {{-- Scope Tabs --}}
                         <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Scope</label>
-                            <div class="grid grid-cols-3 gap-2 bg-gray-900 p-1 rounded-lg">
+                            <label class="block text-xs font-semibold theme-text-muted uppercase mb-2">Scope</label>
+                            <div class="grid grid-cols-3 gap-2 theme-bg-body p-1 rounded-lg">
                                 <button @click="maintenance.scope = 'global'"
                                     :class="maintenance.scope === 'global' ? 'bg-gray-700 text-white shadow' : 'text-gray-500 hover:text-gray-300'"
                                     class="py-1.5 text-xs font-medium rounded transition">Global</button>
@@ -130,9 +125,9 @@
 
                         {{-- Dynamic Selects --}}
                         <div x-show="maintenance.scope === 'module'" x-transition style="display: none;">
-                            <label class="block text-xs text-gray-500 mb-1">Target Module</label>
+                            <label class="block text-xs theme-text-muted mb-1">Target Module</label>
                             <select x-model="maintenance.target"
-                                class="w-full bg-gray-900 border border-gray-600 rounded-lg text-sm px-3 py-2 text-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                class="w-full theme-bg-body border theme-border rounded-lg text-sm px-3 py-2 theme-text-main focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                                 <option value="" disabled selected>Select Module</option>
                                 <template x-for="mod in mockData.modules" :key="mod.id">
                                     <option :value="mod.id" x-text="mod.name"></option>
@@ -141,9 +136,9 @@
                         </div>
 
                         <div x-show="maintenance.scope === 'region'" x-transition style="display: none;">
-                            <label class="block text-xs text-gray-500 mb-1">Target Region</label>
+                            <label class="block text-xs theme-text-muted mb-1">Target Region</label>
                             <select x-model="maintenance.target"
-                                class="w-full bg-gray-900 border border-gray-600 rounded-lg text-sm px-3 py-2 text-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                                class="w-full theme-bg-body border theme-border rounded-lg text-sm px-3 py-2 theme-text-main focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                                 <option value="" disabled selected>Select Region</option>
                                 <template x-for="reg in mockData.regions" :key="reg.id">
                                     <option :value="reg.id" x-text="reg.name"></option>
@@ -153,9 +148,9 @@
 
                         {{-- Reason --}}
                         <div>
-                            <label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Reason Code</label>
+                            <label class="block text-xs font-semibold theme-text-muted uppercase mb-2">Reason Code</label>
                             <select x-model="maintenance.reason"
-                                class="w-full bg-gray-900 border border-gray-600 rounded-lg text-sm px-3 py-2 mb-3 text-gray-300 focus:border-blue-500">
+                                class="w-full theme-bg-body border theme-border rounded-lg text-sm px-3 py-2 mb-3 theme-text-main focus:border-blue-500">
                                 <option value="scheduled">Scheduled Maintenance (Standard)</option>
                                 <option value="emergency">Emergency Patch (Critical)</option>
                                 <option value="performance">Database Optimization</option>
@@ -173,7 +168,7 @@
                         {{-- Actions --}}
                         <div class="grid grid-cols-2 gap-3 pt-2">
                             <button
-                                class="px-4 py-2 text-xs font-bold text-gray-300 bg-gray-700 hover:bg-gray-600 rounded-lg border border-gray-600 transition">
+                                class="px-4 py-2 text-xs font-bold theme-text-muted hover:bg-white/5 rounded-lg border theme-border transition">
                                 Schedule Later
                             </button>
                             <button @click="toggleMaintenance()"
@@ -186,9 +181,9 @@
                 </div>
 
                 {{-- LIVE AUDIT LOG --}}
-                <div class="bg-gray-800 rounded-xl border border-gray-700 shadow-lg overflow-hidden flex flex-col h-64">
-                    <div class="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-800/50">
-                        <h3 class="font-bold text-white text-sm">Live Audit Trail</h3>
+                <div class="theme-bg-card rounded-xl border theme-border shadow-lg overflow-hidden flex flex-col h-64">
+                    <div class="p-4 border-b theme-border flex justify-between items-center" style="background-color: rgba(var(--bg-body), 0.5);">
+                        <h3 class="font-bold theme-text-main text-sm">Live Audit Trail</h3>
                         <div class="flex items-center gap-2">
                             <span class="relative flex h-2 w-2">
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
@@ -199,18 +194,18 @@
                     </div>
                     <div class="flex-1 overflow-y-auto custom-scrollbar p-2" id="logs-container">
                         <table class="w-full text-left text-[10px]">
-                            <tbody class="divide-y divide-gray-700">
+                            <tbody class="divide-y" style="border-color: rgba(var(--border-color), 0.5);">
                                 <template x-for="log in logs" :key="log.id">
-                                    <tr class="hover:bg-gray-700/50 transition">
+                                    <tr class="hover:bg-white/5 transition">
                                         <td class="p-2 text-gray-400 font-mono whitespace-nowrap" x-text="log.time"></td>
-                                        <td class="p-2 text-white font-bold" x-text="log.admin"></td>
+                                        <td class="p-2 theme-text-main font-bold" x-text="log.admin"></td>
                                         <td class="p-2">
                                             <span class="px-1.5 py-0.5 rounded border inline-block w-full text-center"
                                                 :class="{
-                                                    'bg-red-900/20 border-red-500/30 text-red-400': log.type === 'danger',
-                                                    'bg-yellow-900/20 border-yellow-500/30 text-yellow-400': log.type === 'warning',
-                                                    'bg-blue-900/20 border-blue-500/30 text-blue-400': log.type === 'info',
-                                                    'bg-green-900/20 border-green-500/30 text-green-400': log.type === 'success'
+                                                    'bg-red-500/10 border-red-500/30 text-red-400': log.type === 'danger',
+                                                    'bg-yellow-500/10 border-yellow-500/30 text-yellow-400': log.type === 'warning',
+                                                    'bg-blue-500/10 border-blue-500/30 text-blue-400': log.type === 'info',
+                                                    'bg-green-500/10 border-green-500/30 text-green-400': log.type === 'success'
                                                 }"
                                                 x-text="log.action"></span>
                                         </td>
@@ -224,17 +219,17 @@
 
             {{-- COLUMN 2 & 3: KILL SWITCHES --}}
             <div class="xl:col-span-2">
-                <div class="bg-gray-800/80 rounded-xl border border-gray-700 shadow-lg overflow-hidden h-full flex flex-col">
-                    <div class="p-5 border-b border-gray-700 bg-gray-800/50 flex justify-between items-center">
+                <div class="theme-bg-card rounded-xl border theme-border shadow-lg overflow-hidden h-full flex flex-col">
+                    <div class="p-5 border-b theme-border flex justify-between items-center" style="background-color: rgba(var(--bg-body), 0.5);">
                         <div>
-                            <h3 class="font-bold text-white flex items-center gap-2 text-lg">
+                            <h3 class="font-bold theme-text-main flex items-center gap-2 text-lg">
                                 <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path>
                                 </svg>
                                 Service Kill Switches
                             </h3>
-                            <p class="text-xs text-gray-400 mt-1">
-                                Status: <span class="text-white font-mono" x-text="services.filter(s => s.status === 'operational').length"></span>/<span x-text="services.length"></span> Operational
+                            <p class="text-xs theme-text-muted mt-1">
+                                Status: <span class="theme-text-main font-mono" x-text="services.filter(s => s.status === 'operational').length"></span>/<span x-text="services.length"></span> Operational
                             </p>
                         </div>
                         
@@ -254,7 +249,7 @@
 
                             {{-- Dynamic Service Cards --}}
                             <template x-for="service in services" :key="service.id">
-                                <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 relative overflow-hidden group hover:border-gray-600 transition-all">
+                                <div class="theme-bg-body border theme-border rounded-lg p-4 relative overflow-hidden group hover:border-gray-500 transition-all">
                                     {{-- Status Indicator Strip --}}
                                     <div class="absolute left-0 top-0 bottom-0 w-1 transition-colors duration-500"
                                         :class="{
@@ -266,7 +261,7 @@
 
                                     <div class="flex justify-between items-start pl-3 mb-4">
                                         <div>
-                                            <h4 class="font-bold text-gray-200" x-text="service.name"></h4>
+                                            <h4 class="font-bold theme-text-main" x-text="service.name"></h4>
                                             <div class="flex items-center gap-2 mt-1">
                                                 <span class="h-1.5 w-1.5 rounded-full"
                                                     :class="{
@@ -285,7 +280,7 @@
                                         </div>
                                         <div class="text-right">
                                             <div class="text-[10px] text-gray-500 font-mono" x-text="'PID: ' + (2000 + service.id)"></div>
-                                            <div class="text-[10px] text-gray-600" x-text="service.latency + 'ms'"></div>
+                                            <div class="text-[10px] theme-text-muted" x-text="service.latency + 'ms'"></div>
                                         </div>
                                     </div>
 
@@ -296,8 +291,8 @@
                                             :disabled="service.status === 'soft' || !override.active"
                                             class="py-2 px-3 rounded text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed border"
                                             :class="service.status === 'soft' ?
-                                                'bg-yellow-900/10 text-yellow-500 border-yellow-500/30' :
-                                                'bg-yellow-900/20 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500 hover:text-gray-900'">
+                                                'bg-yellow-500/10 text-yellow-500 border-yellow-500/30' :
+                                                'bg-yellow-500/20 text-yellow-500 border-yellow-500/30 hover:bg-yellow-500 hover:text-gray-900'">
                                             <span x-text="service.status === 'soft' ? 'Graceful Shutdown' : 'Soft Kill'"></span>
                                         </button>
 
@@ -306,15 +301,15 @@
                                             :disabled="service.status === 'hard' || !override.active"
                                             class="py-2 px-3 rounded text-xs font-bold transition disabled:opacity-40 disabled:cursor-not-allowed border"
                                             :class="service.status === 'hard' ? 
-                                                'bg-red-900/10 text-red-500 border-red-500/30' :
-                                                'bg-red-900/20 text-red-500 border-red-500/30 hover:bg-red-600 hover:text-white'">
+                                                'bg-red-500/10 text-red-500 border-red-500/30' :
+                                                'bg-red-500/20 text-red-500 border-red-500/30 hover:bg-red-600 hover:text-white'">
                                             <span x-text="service.status === 'hard' ? 'Process Killed' : 'Hard Kill'"></span>
                                         </button>
                                     </div>
                                     
                                     {{-- Lock Hint --}}
                                     <div x-show="!override.active" class="absolute inset-0 bg-gray-900/60 flex items-center justify-center backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <div class="bg-gray-800 text-xs text-red-400 px-3 py-1 rounded border border-red-500/30 flex items-center gap-2">
+                                        <div class="theme-bg-card text-xs text-red-400 px-3 py-1 rounded border border-red-500/30 flex items-center gap-2">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                                             Engage Override First
                                         </div>
@@ -329,12 +324,12 @@
         </div>
         
         {{-- BACKEND DEVELOPER PREVIEW AREA --}}
-        <div class="mt-8 relative z-10 bg-black/50 border border-gray-800 rounded-xl p-4 font-mono text-xs">
+        <div class="mt-8 relative z-10 bg-black/50 border theme-border rounded-xl p-4 font-mono text-xs">
             <div class="flex justify-between items-center mb-2">
                 <h4 class="text-gray-400 uppercase font-bold">Backend Payload Preview (Last Action)</h4>
                 <button @click="copyPayload()" class="text-blue-400 hover:text-white transition">Copy JSON</button>
             </div>
-            <div class="bg-gray-900 p-4 rounded border border-gray-800 overflow-x-auto text-green-400">
+            <div class="theme-bg-body p-4 rounded border theme-border overflow-x-auto text-green-400">
                 <pre x-text="JSON.stringify(lastPayload, null, 2)"></pre>
             </div>
         </div>
@@ -350,7 +345,7 @@
             x-transition:leave-end="opacity-0"
             style="display: none;">
 
-            <div class="bg-gray-800 w-full max-w-2xl rounded-2xl border border-red-500/50 shadow-2xl relative overflow-hidden"
+            <div class="theme-bg-card w-full max-w-2xl rounded-2xl border border-red-500/50 shadow-2xl relative overflow-hidden"
                 @click.away="killModal.open = false">
 
                 <div class="h-2 w-full bg-stripes-red"></div>
@@ -363,14 +358,14 @@
                             </svg>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold text-white">Confirm <span x-text="killModal.type"></span> Kill</h2>
-                            <p class="text-gray-400 text-sm mt-1">Target: <strong class="text-white" x-text="killModal.serviceName"></strong></p>
+                            <h2 class="text-2xl font-bold theme-text-main">Confirm <span x-text="killModal.type"></span> Kill</h2>
+                            <p class="theme-text-muted text-sm mt-1">Target: <strong class="text-white" x-text="killModal.serviceName"></strong></p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         {{-- AI Blast Radius --}}
-                        <div class="col-span-2 bg-gray-900 rounded-lg border border-gray-700 p-4 relative overflow-hidden">
+                        <div class="col-span-2 theme-bg-body rounded-lg border theme-border p-4 relative overflow-hidden">
                              {{-- AI SCAN LINE ANIMATION --}}
                             <div x-show="!killModal.aiLoaded" class="absolute top-0 left-0 w-full h-[2px] bg-purple-500 shadow-[0_0_15px_#a855f7] animate-scan"></div>
                             
@@ -390,11 +385,11 @@
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 style="display: none;">
                                 <div>
-                                    <div class="text-2xl font-mono font-bold text-white" x-text="killModal.ai.impactUsers"></div>
+                                    <div class="text-2xl font-mono font-bold theme-text-main" x-text="killModal.ai.impactUsers"></div>
                                     <div class="text-[10px] text-gray-500 uppercase">Impacted Users</div>
                                 </div>
                                 <div>
-                                    <div class="text-2xl font-mono font-bold text-white" x-text="killModal.ai.revenueLoss"></div>
+                                    <div class="text-2xl font-mono font-bold theme-text-main" x-text="killModal.ai.revenueLoss"></div>
                                     <div class="text-[10px] text-gray-500 uppercase">Est. Revenue Loss</div>
                                 </div>
                                 <div>
@@ -407,20 +402,20 @@
                         </div>
 
                         <div class="col-span-2">
-                            <label class="block text-xs text-gray-400 mb-1">Mandatory Justification</label>
+                            <label class="block text-xs theme-text-muted mb-1">Mandatory Justification</label>
                             <textarea x-model="killModal.justification" placeholder="Reason for intervention..."
-                                class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 text-white h-20 resize-none"></textarea>
+                                class="w-full theme-bg-body border theme-border rounded-lg p-3 text-sm focus:border-red-500 focus:ring-1 focus:ring-red-500 theme-text-main h-20 resize-none"></textarea>
                         </div>
 
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Admin 2 Approval</label>
+                            <label class="block text-xs theme-text-muted mb-1">Admin 2 Approval</label>
                             <input type="password" x-model="killModal.admin2Pass" placeholder="Enter 'root'"
-                                class="w-full bg-gray-900 border border-red-500/50 rounded-lg p-2 text-sm text-white focus:ring-1 focus:ring-red-500">
+                                class="w-full theme-bg-body border border-red-500/50 rounded-lg p-2 text-sm theme-text-main focus:ring-1 focus:ring-red-500">
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-3 pt-4 border-t border-gray-700">
-                        <button @click="killModal.open = false" class="px-5 py-2 text-sm text-gray-300 hover:text-white transition">Cancel</button>
+                    <div class="flex justify-end gap-3 pt-4 border-t theme-border">
+                        <button @click="killModal.open = false" class="px-5 py-2 text-sm theme-text-muted hover:text-white transition">Cancel</button>
                         <button @click="executeKill()"
                             :disabled="!killModal.admin2Pass || !killModal.justification || !killModal.aiLoaded"
                             class="px-6 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-700 disabled:text-gray-500 text-white font-bold rounded-lg shadow-lg transition flex items-center gap-2">
@@ -435,10 +430,8 @@
     </div>
 
     <style>
+        /* Specific styles for this module not covered by global theme */
         .bg-stripes-red { background-image: linear-gradient(45deg, #ef4444 25%, #7f1d1d 25%, #7f1d1d 50%, #ef4444 50%, #ef4444 75%, #7f1d1d 75%, #7f1d1d 100%); background-size: 20px 20px; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
         @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
         .animate-scan { animation: scan 1.5s linear infinite; }
     </style>
@@ -691,4 +684,4 @@
         };
     }
 </script>
-@endpush
+@endpushz
