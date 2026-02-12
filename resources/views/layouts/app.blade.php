@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <style class="fn-style-custom">
+    {{-- <style class="fn-style-custom">
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -33,11 +33,6 @@
 
         ::-webkit-scrollbar-thumb:hover {
             background: #64748b;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f8fafc;
         }
 
         .pro-card {
@@ -57,11 +52,11 @@
             transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
             transition-duration: 300ms;
         }
-    </style>
+    </style> --}}
     @stack('styles')
 </head>
 
-<body class="antialiased fn-body">
+<body class="antialiased fn-body theme-bg-body">
 
     <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }" class="fn-app-wrapper">
         
@@ -190,7 +185,6 @@
         </div>
     </div>
 
-    @stack('scripts')
 
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" class="fn-script-apexcharts"></script>
 
@@ -226,5 +220,7 @@
                 });
         }
     </script>
+
+    @stack('scripts')
 </body>
 </html>

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class SystemHealthController extends Controller
+class PlatformOverviewController extends Controller
 {
     public function index(){
-        return view('Admin.command_center.system_health.index');
+        return view('Admin.command_center.platform_overview.index');
     }
 }
