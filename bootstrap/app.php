@@ -36,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::namespace('admin')->group(base_path('routes/admin/marketing.php'));
             Route::namespace('admin')->group(base_path('routes/admin/system_health.php'));
             Route::namespace('admin')->group(base_path('routes/admin/regional_controle.php'));
+            Route::namespace('admin')->group(base_path('routes/admin/maintainance.php'));
             Route::namespace('user')->group(base_path('routes/user/provider.php'));
             Route::namespace('user')->group(base_path('routes/user/professional.php'));
             Route::namespace('user')->group(base_path('routes/user/consultant.php'));

@@ -103,7 +103,7 @@ sidebar
                             style="color: rgb(var(--text-muted));">System Health</a></li>
                     <li><a href="{{route('regional_controle.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Regional controle</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{route('maintainance.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Maintainace & Emergency</a></li>
                 </ul>
             </li>
