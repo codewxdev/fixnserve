@@ -8,6 +8,13 @@ use Illuminate\Validation\Rule;
 
 class MaintenanceController extends Controller
 {
+    public function index()
+    {
+        $data = Maintenance::get();
+
+        return response()->json(['data' => $data, 'message' => 'data fetch successfuly']);
+    }
+
     public function store(Request $request)
     {
         $data = $request->validate([
