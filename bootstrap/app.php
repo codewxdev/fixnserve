@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Middleware\EmergencyOverrideMiddleware;
 use App\Jobs\CalculateApiMetrics;
+use App\Models\KillSwitch;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -48,6 +51,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'emergency' => EmergencyOverrideMiddleware::class,
+            'kill' => \App\Http\Middleware\KillSwitch::class,
             'check_maintenance' => \App\Http\Middleware\CheckMaintenance::class,
             'health_api' => \App\Http\Middleware\ApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
@@ -81,5 +86,25 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->update(['status' => 'cancelled']);
             cache()->forget('maintenance:active');
         })->everyMinute();
-    })
-    ->create();
+        $schedule->call(function () {
+            // 🔥 Push active kill switches to Redis
+            KillSwitch::where('status', 'active')->get()->each(function ($kill) {
+                // ⏰ Auto-expire check
+                if ($kill->expires_at && $kill->expires_at->isPast()) {
+                    $kill->update(['status' => 'expired']);
+                    Redis::del("kill_switch:{$kill->scope}");
+
+                    return;
+                }
+                Redis::set(
+                    "kill_switch:{$kill->scope}",
+                    json_encode([
+                        'id' => $kill->id,
+                        'type' => $kill->type,
+                        'expires_at' => $kill->expires_at,
+                    ])
+                );
+            });
+
+        })->everyMinute();
+    })->create();

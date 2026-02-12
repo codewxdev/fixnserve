@@ -7,6 +7,7 @@ use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\KillSwitchController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
@@ -94,11 +95,13 @@ Route::middleware('health_api', 'check_country')->group(function () {
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active'])->group(function () {
         // /////////middleware for blocking order for soft_disable country/////////
-        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders'])->group(function () {
+        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders'])->group(function () {
             // //////////////////////////book slot for consultant////////////
             Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
 
         });
+        // ////////////////middleware for payment routes////////////////
+        Route::middleware('kill:payments')->group(function () {});
         // Auth Routes
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -109,12 +112,10 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
         Route::post('/rate', [RatingController::class, 'rate']);
         // //////////////////////////////////Rider Module//////////////////////////////////////////
-
         Route::post('/rider/vehicles', [RiderVehicleController::class, 'store']);
         Route::post('/orders', [OrderController::class, 'store']);
         Route::post('/orders/{order}/accept', [OrderController::class, 'accept']);   // /////for rider request
         Route::post('/rider/location', [OrderController::class, 'update']);
-
         // ///////////////////////////////mart vender routes//////////////////////////////////////
         Route::apiResource('products', ProductController::class);
         Route::post('/products/{id}', [ProductController::class, 'update']);
@@ -200,7 +201,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::delete('/{id}', [UserExperienceController::class, 'destroy']);
         });
         // Super Admin Routes (with additional checks)
-        Route::middleware(['role:Super Admin', '2fa'])->group(function () {
+        Route::middleware(['role:Super Admin', '2fa', 'emergency'])->group(function () {
             // Route::apiResource('roles', RoleController::class);
             // Route::apiResource('permissions', PermissionController::class);
             // Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
@@ -234,7 +235,13 @@ Route::middleware('health_api', 'check_country')->group(function () {
             });
             // /////////////////maintance route/////////////////
             Route::post('/maintenance', [MaintenanceController::class, 'store']);
+            Route::get('/maintenance', [MaintenanceController::class, 'index']);
             Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
+            // //////////////////switchkill route////////////////
+            Route::post('/kill/switch', [KillSwitchController::class, 'store']);
+            Route::get('/kill/switch', [KillSwitchController::class, 'index']);
+            Route::post('kill/switch/cancel/{id}', [KillSwitchController::class, 'cancel']);
+
         });
     });
     Route::middleware(['auth:api'])->prefix('admin')->group(function () {
@@ -244,7 +251,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::apiResource('promotion-slots', PromotionSlotController::class);
         Route::post('/trasportation/type', [TransportTypeController::class, 'store']);
     });
-    Route::middleware('auth:api')->group(function () {
+    Route::middleware('auth:api', 'kill:subscriptions')->group(function () {
 
         Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::post('/unsubscribe', [SubscriptionController::class, 'cancel']);
