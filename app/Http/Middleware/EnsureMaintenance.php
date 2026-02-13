@@ -6,7 +6,7 @@ use App\Services\MaintenanceService;
 use Closure;
 use Illuminate\Http\Request;
 
-class CheckMaintenance
+class EnsureMaintenance
 {
     /**
      * Handle an incoming request.

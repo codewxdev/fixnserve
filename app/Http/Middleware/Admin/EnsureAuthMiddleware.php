@@ -4,11 +4,11 @@ namespace App\Http\Middleware\Admin;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Auth;
 
-class AuthMiddleware
+class EnsureAuthMiddleware
 {
     /**
      * Handle an incoming request.
@@ -18,7 +18,7 @@ class AuthMiddleware
         // 1. Try to get the token from the 'token' cookie
         $token = $request->cookie('token');
 
-        if (!$token) {
+        if (! $token) {
             // No token found -> Redirect to login
             return redirect()->route('login.index');
         }
@@ -28,7 +28,7 @@ class AuthMiddleware
             JWTAuth::setToken($token);
 
             // 3. Authenticate the user based on the token
-            if (!$user = JWTAuth::authenticate()) {
+            if (! $user = JWTAuth::authenticate()) {
                 return redirect()->route('login.index')->withErrors(['error' => 'User not found']);
             }
 

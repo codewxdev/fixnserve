@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlacklistedToken;
 use App\Models\User;
 use App\Models\UserSession;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SessionController extends Controller
 {
@@ -19,7 +21,7 @@ class SessionController extends Controller
             ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
             ->when($request->role, fn ($q) => $q->where('role', $request->role))
             ->when($request->region, fn ($q) => $q->where('region', $request->region))
-            ->latest('last_activity')
+            ->latest('last_activity_at')
             ->get();
 
         return response()->json($sessions);
@@ -43,7 +45,6 @@ class SessionController extends Controller
     public function revoke($id)
     {
         $session = UserSession::findOrFail($id);
-
         $this->revokeSession($session);
 
         return response()->json([
@@ -61,9 +62,8 @@ class SessionController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        UserSession::where('user_id', $request->user_id)
-            ->whereNull('logout_at')
-            ->each(fn ($session) => $this->revokeSession($session));
+        $user = UserSession::where('user_id', $request->user_id)
+            ->whereNull('logout_at')->each(fn ($session) => $this->revokeSession($session));
 
         return response()->json([
             'message' => 'All user sessions revoked',
@@ -80,9 +80,18 @@ class SessionController extends Controller
             'role' => 'required|string',
         ]);
 
-        UserSession::where('role', $request->role)
+        UserSession::with('user') // load related user
             ->whereNull('logout_at')
-            ->each(fn ($session) => $this->revokeSession($session));
+            ->get()
+            ->each(function ($session) use ($request) {
+                // Check role
+                if ($session->user && $session->user->role === $request->role) {
+                    // Skip Super Admin (optional)
+                    if ($session->user->role !== 'Super Admin') {
+                        $this->revokeSession($session);
+                    }
+                }
+            });
 
         return response()->json([
             'message' => "All {$request->role} sessions revoked",
@@ -112,16 +121,21 @@ class SessionController extends Controller
      * 7️⃣ Flag Session (Risk)
      * POST /api/sessions/{id}/flag
      */
-    public function flag($id)
+    public function flag(Request $request, $id)
     {
+        $request->validate([
+            'risk_score' => 'required|integer|min:0|max:100',
+        ]);
+
         $session = UserSession::findOrFail($id);
 
         $session->update([
-            'risk_score' => 'high',
+            'risk_score' => $request->risk_score,
         ]);
 
         return response()->json([
-            'message' => 'Session flagged as high risk',
+            'message' => 'Session risk score updated',
+            'risk_score' => $request->risk_score,
         ]);
     }
 
@@ -130,16 +144,27 @@ class SessionController extends Controller
      */
     private function revokeSession(UserSession $session)
     {
+        // Super Admin session ko skip karna
+        if ($session->user->role === 'Super Admin') {
+            return; // kuch bhi revoke nahi
+        }
+
+        // Get token expiry from JWT
+        $payload = JWTAuth::setToken($session->token)->getPayload();
+        $expiresAt = now()->setTimestamp($payload->get('exp'));
+
+        // Store in DB blacklist
+        BlacklistedToken::updateOrCreate(
+            ['jwt_id' => $session->jwt_id],
+            [
+                'expires_at' => $expiresAt,
+            ]
+        );
+
+        // Update session
         $session->update([
             'is_revoked' => true,
             'logout_at' => now(),
         ]);
-
-        // Optional: Add to blacklist (Redis / DB)
-        cache()->put(
-            "jwt_blacklist:{$session->jwt_id}",
-            true,
-            now()->addSeconds(config('jwt.ttl') * 60)
-        );
     }
 }

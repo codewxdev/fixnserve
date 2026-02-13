@@ -38,6 +38,7 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
+use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionEntitlementController;
@@ -99,7 +100,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders'])->group(function () {
             // //////////////////////////book slot for consultant////////////
             Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
-
         });
         // ////////////////middleware for payment routes////////////////
         Route::middleware('kill:payments')->group(function () {});
@@ -247,6 +247,18 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::post('emergency-override/terminate', [EmergencyOverrideController::class, 'terminate']);
             Route::get('emergency-override/logs', [EmergencyOverrideController::class, 'logs']);
             Route::post('/critical-action', [EmergencyOverrideController::class, 'criticalAction'])->middleware('emergency');
+            // /////////////////////session managment//////////////////////////
+            Route::prefix('sessions')->group(function () {
+                Route::get('/', [SessionController::class, 'index']);
+                Route::get('{id}', [SessionController::class, 'show']);
+
+                Route::post('{id}/revoke', [SessionController::class, 'revoke']);
+                Route::post('{id}/flag', [SessionController::class, 'flag']);
+
+                Route::post('revoke-all', [SessionController::class, 'revokeAll']);
+                Route::post('revoke-role', [SessionController::class, 'revokeByRole']);
+                // Route::post('revoke-region', [SessionController::class, 'revokeByRegion']);
+            });
 
         });
 

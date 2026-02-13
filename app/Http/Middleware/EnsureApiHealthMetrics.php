@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
-class ApiHealthMetrics
+class EnsureApiHealthMetrics
 {
     private const SAMPLE_LIMIT = 400;   // sliding window samples
 

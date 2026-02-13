@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
-class EmergencyOverrideMiddleware
+class EnsureEmergencyOverrideMiddleware
 {
     public function handle(Request $request, Closure $next)
     {

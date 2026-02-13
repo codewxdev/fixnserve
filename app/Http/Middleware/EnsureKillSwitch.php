@@ -6,7 +6,7 @@ use App\Services\KillSwitchService;
 use Closure;
 use Illuminate\Http\Request;
 
-class KillSwitch
+class EnsureKillSwitch
 {
     /**
      * Handle an incoming request.

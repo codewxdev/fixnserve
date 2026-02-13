@@ -8,7 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class CheckServiceProviderRole
+class EnsureServiceProviderRole
 {
     /**
      * Handle an incoming request.
