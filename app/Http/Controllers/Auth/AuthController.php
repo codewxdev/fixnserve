@@ -5,21 +5,19 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\LoginHistory;
+use App\Models\Session;
 use App\Models\User;
+use App\Models\UserSession;
 use App\Models\Wallet;
+use BaconQrCode\Renderer\Image\GdImageBackend;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Jenssegers\Agent\Agent;
 use PragmaRX\Google2FA\Google2FA;
 use Twilio\Rest\Client;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use BaconQrCode\Renderer\Image\GdImageBackend; // Or GdImageBackEnd if Imagick is not installed
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
-
-
-use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth; // Or GdImageBackEnd if Imagick is not installed
 
 class AuthController extends Controller
 {
@@ -34,9 +32,10 @@ class AuthController extends Controller
                 'string',
                 'min:6',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{6,}$/',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&]).+$/',
             ],
         ]);
+
         DB::transaction(function () use ($request, &$user, &$token) {
 
             $user = User::create([
@@ -44,14 +43,31 @@ class AuthController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
+
             Wallet::create([
                 'user_id' => $user->id,
                 'balance' => 0,
                 'currency' => 'PKR',
             ]);
 
-            // ===== Generate JWT Token =====
+            // JWT generate
             $token = JWTAuth::fromUser($user);
+
+            // Token payload (jti)
+            $payload = JWTAuth::setToken($token)->getPayload();
+
+            // 🔥 SESSION STORE
+
+            UserSession::create([
+                'user_id' => $user->id,
+                'jwt_id' => $payload->get('jti'),
+                'token' => hash('sha256', $token),
+                'device' => $request->header('User-Agent'),
+                'ip_address' => $request->ip(),
+                'location' => null,
+                'risk_score' => 0,
+                'last_activity_at' => now(),
+            ]);
         });
 
         return response()->json([
@@ -78,40 +94,58 @@ class AuthController extends Controller
             $fieldType => $login,
             'password' => $request->password,
         ];
-        // $credentials = $request->only('email', 'password', 'phone');
 
-        if (! $token = JWTAuth::attempt($credentials)) {
+        // 🔐 Generate unique JWT ID (jti)
+        $jwtId = (string) Str::uuid();
+
+        // Attempt login with custom jti
+        if (! $token = JWTAuth::claims(['jti' => $jwtId])->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
         $user = auth()->user();
-        $agent = $request->header('User-Agent');
-        $device = 'Unknown';
-        $platform = 'Unknown';
-        $browser = 'Unknown';
 
-        if ($agent) {
-            $agentParser = new \Jenssegers\Agent\Agent;
-            $agentParser->setUserAgent($agent);
-            $device = $agentParser->device();
-            $platform = $agentParser->platform();
-            $browser = $agentParser->browser();
-        }
+        /* ------------------------------
+           Device / Agent Detection
+        --------------------------------*/
+        $agent = new Agent;
+        $agent->setUserAgent($request->userAgent());
 
-        // Save login history
-        LoginHistory::create([
+        $device = $agent->device() ?: 'Unknown';
+        $platform = $agent->platform() ?: 'Unknown';
+        $browser = $agent->browser() ?: 'Unknown';
+
+        /* ------------------------------
+           Login History (AUDIT LOG ONLY)
+        --------------------------------*/
+        // LoginHistory::create([
+        //     'user_id' => $user->id,
+        //     'ip_address' => $request->ip(),
+        //     'user_agent' => $request->userAgent(),
+        //     'device' => $device,
+        //     'platform' => $platform,
+        //     'browser' => $browser,
+        //     'login_at' => now(),
+        // ]);
+
+        /* ------------------------------
+           ACTIVE SESSION TRACKING
+           (REAL SECURITY CONTROL)
+        --------------------------------*/
+        UserSession::create([
             'user_id' => $user->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $agent,
+            'jwt_id' => $jwtId,
+            'token' => hash('sha256', $token), // 🔥 NEVER store raw JWT
             'device' => $device,
-            'platform' => $platform,
-            'browser' => $browser,
-            'token' => $token,
-            'login_at' => now(),
+            'ip_address' => $request->ip(),
+            'location' => null, // GeoIP later
+            'risk_score' => 0,
+            'last_activity_at' => now(),
         ]);
 
-        // Get user roles and permissions
-
+        /* ------------------------------
+           Admin / Super Admin – 2FA FLOW
+        --------------------------------*/
         if ($user->hasRole(['Admin', 'Super Admin'])) {
 
             if ($user->is_2fa_enabled) {
@@ -119,11 +153,11 @@ class AuthController extends Controller
                     'status' => '2fa_required',
                     'email' => $user->email,
                     'access_token' => $token,
-                    'message' => 'Admin 2FA verification required.',
+                    'token_type' => 'bearer',
+                    'expires_in' => auth()->factory()->getTTL() * 60,
                 ]);
             }
 
-            // If admin 2FA is NOT enabled → force enable
             return response()->json([
                 'status' => 'enable_2fa',
                 'message' => 'Admin account must enable 2FA.',
@@ -141,17 +175,52 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $user = auth()->user();
         $token = $request->bearerToken();
 
-        // Update logout_at
-        LoginHistory::where('user_id', $user->id)
-            ->where('token', $token)
-            ->latest()
-            ->update(['logout_at' => now()]);
-        auth()->logout();
+        if (! $token) {
+            return response()->json(['message' => 'Token not provided'], 400);
+        }
 
-        return response()->json(['message' => 'Logged out']);
+        try {
+            // Get JWT payload
+            $payload = JWTAuth::setToken($token)->getPayload();
+            $jti = $payload->get('jti');
+
+            // Revoke the token in UserSession
+            if ($jti) {
+                UserSession::where('jwt_id', $jti)
+                    ->whereNull('logout_at')
+                    ->update([
+                        'logout_at' => now(),
+                        'is_revoked' => true,
+                    ]);
+            }
+
+            // Update the latest login history
+            // $user = auth()->user();
+            // if ($user) {
+            //     $lastLogin = LoginHistory::where('user_id', $user->id)
+            //         ->where('token', $token)
+            //         ->latest()
+            //         ->first();
+
+            //     if ($lastLogin) {
+            //         $lastLogin->update(['logout_at' => now()]);
+            //     }
+            // }
+
+            // Log out the user from auth
+            auth()->logout();
+
+            return response()->json(['message' => 'Logged out successfully']);
+
+        } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['message' => 'Token has expired'], 401);
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['message' => 'Invalid token'], 401);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Logout failed', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function refresh()
@@ -178,12 +247,11 @@ class AuthController extends Controller
         );
 
         return response()->json([
-            'status'=>'setup_initiated',
+            'status' => 'setup_initiated',
             'secret' => $secret,
             'qrcode_url' => $qrCodeUrl,
         ]);
     }
-
 
     public function verify2FA(Request $request)
     {
@@ -286,13 +354,13 @@ class AuthController extends Controller
         if ($request->hasFile('image')) {
 
             // Delete old image if exists
-            if ($user->image && \Storage::exists('public/profile_images/' . $user->image)) {
-                \Storage::delete('public/profile_images/' . $user->image);
+            if ($user->image && \Storage::exists('public/profile_images/'.$user->image)) {
+                \Storage::delete('public/profile_images/'.$user->image);
             }
 
             // Save new image
             $file = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
 
             $file->storeAs('public/profile_images/', $filename);
 
@@ -313,7 +381,7 @@ class AuthController extends Controller
             'data' => [
                 'user' => $user,
                 'profile_image_url' => $user->image
-                    ? asset('storage/profile_images/' . $user->image)
+                    ? asset('storage/profile_images/'.$user->image)
                     : null,
             ],
         ]);
