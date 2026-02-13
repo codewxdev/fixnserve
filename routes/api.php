@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\PasswordResetCodeController;
 use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
+use App\Http\Controllers\EmergencyOverrideController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\KillSwitchController;
@@ -93,7 +94,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         ]);
     });
     // Main Authenticated Routes Group with User Status Check
-    Route::middleware(['auth:api', 'user.active'])->group(function () {
+    Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
         // /////////middleware for blocking order for soft_disable country/////////
         Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders'])->group(function () {
             // //////////////////////////book slot for consultant////////////
@@ -201,7 +202,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::delete('/{id}', [UserExperienceController::class, 'destroy']);
         });
         // Super Admin Routes (with additional checks)
-        Route::middleware(['role:Super Admin', '2fa', 'emergency'])->group(function () {
+        Route::middleware(['role:Super Admin', '2fa'])->group(function () {
             // Route::apiResource('roles', RoleController::class);
             // Route::apiResource('permissions', PermissionController::class);
             // Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
@@ -241,17 +242,23 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::post('/kill/switch', [KillSwitchController::class, 'store']);
             Route::get('/kill/switch', [KillSwitchController::class, 'index']);
             Route::post('kill/switch/cancel/{id}', [KillSwitchController::class, 'cancel']);
+            // ///////////////////emergency override route///////////////////
+            Route::post('emergency-override/activate', [EmergencyOverrideController::class, 'activate']);
+            Route::post('emergency-override/terminate', [EmergencyOverrideController::class, 'terminate']);
+            Route::get('emergency-override/logs', [EmergencyOverrideController::class, 'logs']);
+            Route::post('/critical-action', [EmergencyOverrideController::class, 'criticalAction'])->middleware('emergency');
 
         });
+
     });
-    Route::middleware(['auth:api'])->prefix('admin')->group(function () {
+    Route::middleware(['auth:api', 'active.session'])->prefix('admin')->group(function () {
         Route::apiResource('subscription-plans', SubscriptionPlanController::class);
         Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
         Route::apiResource('promotions', PromotionController::class);
         Route::apiResource('promotion-slots', PromotionSlotController::class);
         Route::post('/trasportation/type', [TransportTypeController::class, 'store']);
     });
-    Route::middleware('auth:api', 'kill:subscriptions')->group(function () {
+    Route::middleware('auth:api', 'kill:subscriptions', 'active.session')->group(function () {
 
         Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::post('/unsubscribe', [SubscriptionController::class, 'cancel']);
@@ -260,8 +267,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::post('/promotion-purchases', [PromotionPurchaseController::class, 'store']);
 
     });
-    Route::post('/maintenance', [MaintenanceController::class, 'store']);
-    Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
+
 });
 // /////////////////////////////////////////extra code//////////////////////////////////////
 

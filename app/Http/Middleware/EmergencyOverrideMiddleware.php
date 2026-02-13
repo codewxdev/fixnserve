@@ -2,20 +2,24 @@
 
 namespace App\Http\Middleware;
 
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
 class EmergencyOverrideMiddleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        $key = 'emergency_override:admin:'.auth()->id();
+        // STEP 1 — Admin must be authenticated
+        $admin = auth('Super Admin')->user();
+
+        if (! $admin) {
+            return $next($request);
+        }
+
+        // STEP 2 — Fetch override session
+        $key = 'emergency_override:admin:'.$admin->id;
         $data = Redis::get($key);
 
         if (! $data) {
@@ -24,15 +28,18 @@ class EmergencyOverrideMiddleware
 
         $override = json_decode($data, true);
 
-        // STEP 5.1 — AUTO EXPIRY
-        if (now()->greaterThan($override['expires_at'])) {
+        // STEP 3 — Auto expiry
+        if (
+            empty($override['expires_at']) ||
+            Carbon::now()->greaterThan(Carbon::parse($override['expires_at']))
+        ) {
             Redis::del($key);
 
             return $next($request);
         }
 
-        // STEP 5.2 — MARK REQUEST
-        $request->merge(['emergency_override' => true]);
+        // STEP 4 — Mark request
+        $request->attributes->set('emergency_override', true);
 
         return $next($request);
     }

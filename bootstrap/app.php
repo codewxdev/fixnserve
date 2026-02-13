@@ -50,6 +50,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'active.session' => \App\Http\Middleware\CheckActiveSession::class,
             'emergency' => EmergencyOverrideMiddleware::class,
             'kill' => \App\Http\Middleware\KillSwitch::class,
             'check_maintenance' => \App\Http\Middleware\CheckMaintenance::class,
