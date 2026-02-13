@@ -1,30 +1,225 @@
-:root {
-    /* --- GLOBAL COLOR PALETTE (RGB Values) --- */
-    /* Sirf yahan change krny se poory dashboard ka color change hojayega */
-    
-    /* Brand Colors */
-    --brand-primary: 59, 130, 246;    /* Blue */
-    --brand-secondary: 37, 99, 235;   /* Darker Blue */
+/* :root {
+     
+    --brand-primary: 59, 130, 246;     
+    --brand-secondary: 37, 99, 235;    
 
-    /* Backgrounds */
-    --bg-body: 15, 23, 42;            /* Main Dark Background */
-    --bg-card: 30, 41, 59;            /* Card/Panel Background */
+    
+    --bg-body: 15, 23, 42;            
+    --bg-card: 30, 41, 59;             
     --sidebar-bg: 15, 23, 42;
     
-    /* Borders */
-    --border-color: 51, 65, 85;       /* General Borders */
-    --sidebar-border: 30, 41, 59;     /* Sidebar specific border */
+     
+    --border-color: 51, 65, 85;        
+    --sidebar-border: 30, 41, 59;     
 
-    /* Text */
-    --text-main: 248, 250, 252;       /* Bright White text */
-    --text-muted: 148, 163, 184;      /* Grayish text */
+     
+    --text-main: 248, 250, 252;        
+    --text-muted: 148, 163, 184;       
     
-    /* States */
-    --item-active-bg: 51, 65, 85;     /* Active menu item */
-    --status-success: 34, 197, 94;    /* Green */
-    --status-danger: 239, 68, 68;     /* Red */
-    --status-warning: 234, 179, 8;    /* Yellow */
+    
+    --item-active-bg: 51, 65, 85;     
+    --status-success: 34, 197, 94;   
+    --status-danger: 239, 68, 68;      
+    --status-warning: 234, 179, 8;    
+} */
+
+/* --- DEFAULT THEME (Standard Dark) --- */
+:root {
+    --brand-primary: 59, 130, 246;
+    --brand-secondary: 37, 99, 235;
+    --bg-body: 15, 23, 42;
+    --bg-card: 30, 41, 59;
+    --bg-sidebar: 15, 23, 42;
+    --border-color: 51, 65, 85;
+    --sidebar-border: 30, 41, 59;
+    --text-main: 248, 250, 252;
+    --text-muted: 148, 163, 184;
+    --item-active-bg: 51, 65, 85;
 }
+
+/* --- THEME: CLEAN SAAS (Light) --- */
+body.theme-saas {
+    --brand-primary: 79, 70, 229;
+    --brand-secondary: 67, 56, 202;
+    --bg-body: 243, 244, 246;
+    --bg-card: 255, 255, 255;
+    --bg-sidebar: 255, 255, 255;
+    --border-color: 229, 231, 235;
+    --sidebar-border: 229, 231, 235;
+    --text-main: 17, 24, 39;
+    --text-muted: 107, 114, 128;
+    --item-active-bg: 243, 244, 246;
+}
+
+/* --- THEME: CYBERPUNK (Deep Dark) --- */
+body.theme-cyberpunk {
+    --brand-primary: 192, 38, 211;
+    --brand-secondary: 147, 51, 234;
+    --bg-body: 9, 9, 11;
+    --bg-card: 24, 24, 27;
+    --bg-sidebar: 9, 9, 11;
+    --border-color: 39, 39, 42;
+    --sidebar-border: 39, 39, 42;
+    --text-main: 250, 250, 250;
+    --text-muted: 161, 161, 170;
+    --item-active-bg: 39, 39, 42;
+}
+
+/* --- THEME: FINTECH EMERALD (Pro Dark) --- */
+body.theme-fintech {
+    --brand-primary: 16, 185, 129;
+    --brand-secondary: 5, 150, 105;
+    --bg-body: 23, 23, 23;
+    --bg-card: 38, 38, 38;
+    --bg-sidebar: 23, 23, 23;
+    --border-color: 64, 64, 64;
+    --sidebar-border: 64, 64, 64;
+    --text-main: 245, 245, 245;
+    --text-muted: 163, 163, 163;
+    --item-active-bg: 64, 64, 64;
+}
+
+
+/* --- THEME: MIDNIGHT PRO (Executive Blue) --- */
+body.theme-midnight {
+    --brand-primary: 56, 189, 248;
+    /* Sky 400 */
+    --brand-secondary: 2, 132, 199;
+    /* Sky 600 */
+    --bg-body: 2, 6, 23;
+    /* Slate 950 */
+    --bg-card: 15, 23, 42;
+    /* Slate 900 */
+    --bg-sidebar: 2, 6, 23;
+    /* Darker Sidebar */
+    --border-color: 30, 41, 59;
+    /* Slate 800 */
+    --sidebar-border: 30, 41, 59;
+    --text-main: 241, 245, 249;
+    /* Slate 100 */
+    --text-muted: 148, 163, 184;
+    /* Slate 400 */
+    --item-active-bg: 30, 41, 59;
+}
+
+/* --- THEME: CRIMSON OPS (Security Red) --- */
+body.theme-crimson {
+    --brand-primary: 220, 38, 38;
+    /* Red 600 */
+    --brand-secondary: 153, 27, 27;
+    /* Red 800 */
+    --bg-body: 24, 24, 27;
+    /* Zinc 900 */
+    --bg-card: 39, 39, 42;
+    /* Zinc 800 */
+    --bg-sidebar: 24, 24, 27;
+    --border-color: 63, 63, 70;
+    /* Zinc 700 */
+    --sidebar-border: 63, 63, 70;
+    --text-main: 250, 250, 250;
+    --text-muted: 161, 161, 170;
+    --item-active-bg: 63, 63, 70;
+}
+
+/* --- THEME: SOLAR LIGHT (Warm/Sepia) --- */
+body.theme-solar {
+    --brand-primary: 217, 119, 6;
+    /* Amber 600 */
+    --brand-secondary: 180, 83, 9;
+    /* Amber 700 */
+    --bg-body: 255, 251, 235;
+    /* Amber 50 (Cream) */
+    --bg-card: 255, 255, 255;
+    /* White */
+    --bg-sidebar: 255, 251, 235;
+    --border-color: 231, 229, 228;
+    /* Stone 200 */
+    --sidebar-border: 231, 229, 228;
+    --text-main: 28, 25, 23;
+    /* Stone 900 */
+    --text-muted: 120, 113, 108;
+    /* Stone 500 */
+    --item-active-bg: 254, 243, 199;
+    /* Amber 100 */
+}
+
+/* :root {
+     
+    --brand-primary: 79, 70, 229; 
+    --brand-secondary: 67, 56, 202;    
+
+    
+    --bg-body: 243, 244, 246; 
+    --bg-card: 255, 255, 255;        
+    --bg-sidebar: 255, 255, 255;       
+    
+    
+    --border-color: 229, 231, 235;     
+    --sidebar-border: 229, 231, 235;   
+
+    
+    --text-main: 17, 24, 39;         
+    --text-muted: 107, 114, 128;       
+    
+ 
+    --item-active-bg: 243, 244, 246;   
+    --status-success: 22, 163, 74;     
+    --status-danger: 220, 38, 38;      
+    --status-warning: 202, 138, 4;    
+} */
+
+/* 
+:root {
+    
+    --brand-primary: 192, 38, 211; 
+    --brand-secondary: 147, 51, 234;  
+
+ 
+    --bg-body: 9, 9, 11;               
+    --bg-card: 24, 24, 27;             
+    --bg-sidebar: 9, 9, 11;            
+    
+   
+    --border-color: 39, 39, 42;        
+    --sidebar-border: 39, 39, 42;     
+
+    
+    --text-main: 250, 250, 250;        
+    --text-muted: 161, 161, 170;       
+    
+   
+    --item-active-bg: 39, 39, 42;      
+    --status-success: 45, 212, 191;    
+    --status-danger: 244, 63, 94;     
+    --status-warning: 250, 204, 21; 
+} */
+
+/* 
+:root {
+  
+    --brand-primary: 16, 185, 129;     
+    --brand-secondary: 5, 150, 105;  
+
+     
+    --bg-body: 23, 23, 23;            
+    --bg-card: 38, 38, 38;           
+    --bg-sidebar: 23, 23, 23;         
+    
+     
+    --border-color: 64, 64, 64;       
+    --sidebar-border: 64, 64, 64;     
+
+ 
+    --text-main: 245, 245, 245;       
+    --text-muted: 163, 163, 163; 
+    
+    
+    --item-active-bg: 64, 64, 64;     
+    --status-success: 34, 197, 94;    
+    --status-danger: 239, 68, 68;     
+    --status-warning: 234, 179, 8;    
+} */
+
 
 /* --- UTILITY CLASSES (Use these in HTML) --- */
 
@@ -42,12 +237,22 @@
 }
 
 /* Headings */
-.theme-text-main { color: rgb(var(--text-main)); }
-.theme-text-muted { color: rgb(var(--text-muted)); }
-.theme-text-brand { color: rgb(var(--brand-primary)); }
+.theme-text-main {
+    color: rgb(var(--text-main));
+}
+
+.theme-text-muted {
+    color: rgb(var(--text-muted));
+}
+
+.theme-text-brand {
+    color: rgb(var(--brand-primary));
+}
 
 /* Borders */
-.theme-border { border-color: rgb(var(--border-color)); }
+.theme-border {
+    border-color: rgb(var(--border-color));
+}
 
 /* --- COMPONENT STYLES --- */
 
@@ -98,6 +303,3 @@
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 300ms;
 }
-
-
- 

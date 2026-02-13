@@ -212,7 +212,7 @@
                         // Let's assume you'll update the backend response for non-2fa users to be consistent or
                         // rely on a separate API call post-login. For now, redirect.
                         document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-                        window.location.href = "/";
+                        window.location.href = "/platform-overview";
 
                     } else if (data.error) {
                         // Failed login (e.g., Invalid credentials - 401 response from backend)
@@ -321,7 +321,7 @@
                             localStorage.setItem("user", JSON.stringify(data.user));
                         }
 
-                        window.location.href = "/";
+                        window.location.href = "/platform-overview";
                     } else if (data.error) {
                         // Failed verification (e.g., Invalid OTP)
                         errorMessage.innerText = data.error;
