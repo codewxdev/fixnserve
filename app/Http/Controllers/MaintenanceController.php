@@ -42,7 +42,7 @@ class MaintenanceController extends Controller
         return response()->json($maintenance, 201);
     }
 
-    public function cancel(Maintenance $maintenance)
+    public function updateStatus(Maintenance $maintenance)
     {
         $maintenance->update(['status' => 'cancelled']);
         cache()->forget('maintenance:active');
