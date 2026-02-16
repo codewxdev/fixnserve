@@ -1,9 +1,11 @@
 <?php
 
 use App\Domains\Command\Controllers\Api\EmergencyOverrideController;
+use App\Domains\Command\Controllers\Api\IncidentController;
 use App\Domains\Command\Controllers\Api\KillSwitchController;
 use App\Domains\Command\Controllers\Api\MaintenanceController;
 use App\Domains\Command\Controllers\Api\MetricsController;
+use App\Domains\Command\Controllers\Api\QueueController;
 use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +17,8 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::get('/endpoints', [MetricsController::class, 'endpoints']);
         Route::get('/dependencies', [MetricsController::class, 'dependencies']);
     });
+    Route::get('/incidents', [IncidentController::class, 'index']);
+    Route::get('/queues/health', [QueueController::class, 'health']);
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
 

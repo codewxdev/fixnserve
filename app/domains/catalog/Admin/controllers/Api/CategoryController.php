@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Domains\Catalog\Admin\Controllers\Api;
+
+use App\Domains\Catalog\Admin\Models\Category;
+use App\Helpers\ApiResponse;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class CategoryController extends Controller
+{
+    public function index()
+    {
+        $categories = Category::all();
+
+        return ApiResponse::success($categories, 'Categories fetched successfully');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
+        ]);
+
+        $category = Category::create([
+            'name' => $request->name,
+            'type' => $request->type,
+        ]);
+
+        return ApiResponse::success($category, 'Category created successfully', 201);
+    }
+
+    public function show($id)
+    {
+        $category = Category::findOrFail($id);
+
+        return ApiResponse::success($category, 'Category fetched successfully');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
+
+        ]);
+
+        $category->update([
+            'name' => $request->name,
+            'type' => $request->type,
+
+        ]);
+
+        return ApiResponse::success($category, 'Category updated successfully');
+    }
+
+    public function destroy($id)
+    {
+        $category = Category::findOrFail($id);
+        $category->delete();
+
+        return ApiResponse::success(null, 'Category deleted successfully');
+    }
+}
