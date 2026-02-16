@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Front;
+namespace App\Domains\Accounts\Controllers\Front;
 
+use App\Domains\Accounts\Requests\StoreConsultantRequest;
+use App\Domains\Accounts\Services\ConsultantService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreConsultantRequest;
 use App\Models\User;
-use App\Services\ConsultantService;
+ 
 use Illuminate\Http\Request;
 
 class ConsultantController extends Controller
@@ -39,7 +40,7 @@ class ConsultantController extends Controller
    public function index()
     { 
          
-        $consultants = User::role('Consultant')->get();
+        $consultants = User::get();
         return view('Admin.consultant.index',compact('consultants'));
     }
 }

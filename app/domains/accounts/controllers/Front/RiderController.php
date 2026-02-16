@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Front;
+namespace App\Domains\Accounts\Controllers\Front;
 
+use App\Domains\Accounts\Requests\StoreRiderRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreRiderRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,7 +19,7 @@ class RiderController extends Controller
         // 2. Fetch Riders (Users) and Map to the Table Structure
         // We filter by a role or just fetch all users depending on your logic. 
         // Here I fetch all, assuming this table is for riders.
-        $riders = User::role('Rider')->get()->map(function ($user) {
+        $riders = User::get()->map(function ($user) {
             return [
                 'id'       => $user->id,
                 'name'     => $user->name,

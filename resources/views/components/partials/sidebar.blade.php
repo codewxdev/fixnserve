@@ -281,11 +281,11 @@
                             style="color: rgb(var(--text-muted));">Service Providers</a></li>
                     <li><a href="{{ route('professional.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Professional Experts</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('consultant.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Consultants</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('mart.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Mart Vendors</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('rider.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Riders</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Future Verticals</a></li>

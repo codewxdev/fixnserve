@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Front;
+namespace App\Domains\Accounts\Controllers\Front;
 
+use App\Domains\Accounts\Requests\StoreMartRequest;
+use App\Domains\Accounts\Services\MartOnboardingService;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreMartRequest;
+ 
 use App\Models\MartCategory;
 use App\Models\User;
-use App\Services\MartOnboardingService;
 use Illuminate\Http\Request;
 
 class MartController extends Controller

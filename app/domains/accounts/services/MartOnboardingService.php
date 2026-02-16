@@ -1,5 +1,5 @@
 <?php
-namespace App\Services;
+namespace App\Domains\Accounts\Services;
 
 use App\Models\User;
 use App\Models\BusinessDoc; // Make sure Model exists for business_docs table

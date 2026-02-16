@@ -2,8 +2,8 @@
 
 namespace App\Domains\Accounts\Controllers\Front;
 
+use App\Domains\Accounts\Requests\StoreProfessionalRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProfessionalRequest;
 use App\Models\User;
 use App\Services\ProfessionalService;
 use Illuminate\Http\Request;

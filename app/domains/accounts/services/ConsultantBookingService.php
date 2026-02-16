@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Domains\Accounts\Services;
 
 use App\Models\ConsultancyProfile;
 use App\Models\ConsultantBooking;
