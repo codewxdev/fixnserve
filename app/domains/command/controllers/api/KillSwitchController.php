@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Command\Controllers\Api;
 
-use App\Models\KillSwitch;
+use App\Domains\Command\Models\KillSwitch;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Command\Controllers\Api;
 
 use Illuminate\Support\Facades\Redis;
 
-class HealthController extends Controller
+class HealthController extends \App\Http\Controllers\Controller
 {
     public function index()
     {

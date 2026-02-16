@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Command\Controllers\Api;
 
-use App\Models\Maintenance;
+use App\Domains\Command\Models\Maintenance;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 

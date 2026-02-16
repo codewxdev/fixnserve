@@ -5,11 +5,8 @@ use App\Http\Controllers\Auth\PasswordResetCodeController;
 use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
-use App\Http\Controllers\EmergencyOverrideController;
 use App\Http\Controllers\FavouriteController;
 use App\Http\Controllers\IncidentController;
-use App\Http\Controllers\KillSwitchController;
-use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\MartVender\BusinessDocController;
 use App\Http\Controllers\MartVender\MartCategoryController;
 use App\Http\Controllers\MartVender\MartSubCategoryController;
@@ -51,13 +48,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country')->group(function () {
-    Route::prefix('metrics')->group(function () {
-        Route::get('/summary', [MetricsController::class, 'summary']);
-        Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
-        Route::get('/endpoints', [MetricsController::class, 'endpoints']);
-        Route::get('/dependencies', [MetricsController::class, 'dependencies']);
-    });
-
+    // Route::prefix('metrics')->group(function () {
+    //     Route::get('/summary', [MetricsController::class, 'summary']);
+    //     Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
+    //     Route::get('/endpoints', [MetricsController::class, 'endpoints']);
+    //     Route::get('/dependencies', [MetricsController::class, 'dependencies']);
+    // });
     Route::get('/incidents', [IncidentController::class, 'index']);
     Route::get('/queues/health', [QueueController::class, 'health']);
     // Public Routes (No authentication required)
@@ -76,7 +72,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
     Route::apiResource('sub-specialties', SubSpecialtyController::class);
     // ////////////////////////////////////consultant route/////////////////////
     Route::get('getSlot', [ConsultantBookingController::class, 'getSlots']);
-
     Route::get('/countries', function () {
         return response()->json([
             'success' => true,
@@ -235,18 +230,18 @@ Route::middleware('health_api', 'check_country')->group(function () {
                 ]);
             });
             // /////////////////maintance route/////////////////
-            Route::post('/maintenance', [MaintenanceController::class, 'store']);
-            Route::get('/maintenance', [MaintenanceController::class, 'index']);
-            Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
-            // //////////////////switchkill route////////////////
-            Route::post('/kill/switch', [KillSwitchController::class, 'store']);
-            Route::get('/kill/switch', [KillSwitchController::class, 'index']);
-            Route::post('kill/switch/cancel/{id}', [KillSwitchController::class, 'cancel']);
-            // ///////////////////emergency override route///////////////////
-            Route::post('emergency-override/activate', [EmergencyOverrideController::class, 'activate']);
-            Route::post('emergency-override/terminate', [EmergencyOverrideController::class, 'terminate']);
-            Route::get('emergency-override/logs', [EmergencyOverrideController::class, 'logs']);
-            Route::post('/critical-action', [EmergencyOverrideController::class, 'criticalAction'])->middleware('emergency');
+            // Route::post('/maintenance', [MaintenanceController::class, 'store']);
+            // Route::get('/maintenance', [MaintenanceController::class, 'index']);
+            // Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
+            // // //////////////////switchkill route////////////////
+            // Route::post('/kill/switch', [KillSwitchController::class, 'store']);
+            // Route::get('/kill/switch', [KillSwitchController::class, 'index']);
+            // Route::post('kill/switch/cancel/{id}', [KillSwitchController::class, 'cancel']);
+            // // ///////////////////emergency override route///////////////////
+            // Route::post('emergency-override/activate', [EmergencyOverrideController::class, 'activate']);
+            // Route::post('emergency-override/terminate', [EmergencyOverrideController::class, 'terminate']);
+            // Route::get('emergency-override/logs', [EmergencyOverrideController::class, 'logs']);
+            // Route::post('/critical-action', [EmergencyOverrideController::class, 'criticalAction'])->middleware('emergency');
             // /////////////////////session managment//////////////////////////
             Route::prefix('sessions')->group(function () {
                 Route::get('/', [SessionController::class, 'index']);

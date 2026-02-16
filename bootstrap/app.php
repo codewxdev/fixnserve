@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Middleware\EnsureEmergencyOverrideMiddleware;
-use App\Http\Middleware\EnsureKillSwitch;
+use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
+use App\Domains\Command\Middlewares\EnsureKillSwitch;
+use App\Domains\Command\Models\KillSwitch;
+use App\Http\Middleware\EnsureServiceProviderRole;
 use App\Jobs\CalculateApiMetrics;
-use App\Models\KillSwitch;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -57,17 +58,17 @@ return Application::configure(basePath: dirname(__DIR__))
             'active.session' => \App\Http\Middleware\EnsureActiveSession::class,
             'emergency' => EnsureEmergencyOverrideMiddleware::class,
             'kill' => EnsureKillSwitch::class,
-            'check_maintenance' => \App\Http\Middleware\EnsureMaintenance::class,
-            'health_api' => \App\Http\Middleware\EnsureApiHealthMetrics::class,
+            'check_maintenance' => App\Domains\Command\Middlewares\EnsureMaintenance::class,
+            'health_api' => App\Domains\Command\Middlewares\EnsureApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Http\Middleware\EnsureCheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             '2fa' => \App\Http\Middleware\Ensure2FAEnabled::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'user.active' => \App\Http\Middleware\EnsureCheckUserStatus::class,
-            'service.provider' => \App\Http\Middleware\EnsureServiceProviderRole::class,
-            'check_country' => \App\Http\Middleware\EnsureCountryStatus::class,
-            'block_soft_country_orders' => \App\Http\Middleware\EnsureBlockOrdersForSoftDisabledCountry::class,
+            'service.provider' => EnsureServiceProviderRole::class,
+            'check_country' => App\Domains\Command\Middlewares\EnsureCountryStatus::class,
+            'block_soft_country_orders' => App\Domains\Command\Middlewares\EnsureBlockOrdersForSoftDisabledCountry::class,
             // 'javed' => \App\Http\Middleware\Admin\AuthMiddleware::class,
 
         ]);
@@ -80,11 +81,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->job(new CalculateApiMetrics)->everyMinute();
         $schedule->call(function () {
             // Activate scheduled maintenances
-            \App\Models\Maintenance::where('status', 'scheduled')
+            App\Domains\Command\Models\Maintenance::where('status', 'scheduled')
                 ->where('starts_at', '<=', now())
                 ->update(['status' => 'active']);
             // Auto-expire finished maintenances
-            \App\Models\Maintenance::where('status', 'active')
+            App\Domains\Command\Models\Maintenance::where('status', 'active')
                 ->whereNotNull('ends_at')
                 ->where('ends_at', '<=', now())
                 ->update(['status' => 'cancelled']);
