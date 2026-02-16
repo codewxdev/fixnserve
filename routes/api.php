@@ -48,12 +48,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country')->group(function () {
-    Route::prefix('metrics')->group(function () {
-        Route::get('/summary', [MetricsController::class, 'summary']);
-        Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
-        Route::get('/endpoints', [MetricsController::class, 'endpoints']);
-        Route::get('/dependencies', [MetricsController::class, 'dependencies']);
-    });
+    // Route::prefix('metrics')->group(function () {
+    //     Route::get('/summary', [MetricsController::class, 'summary']);
+    //     Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
+    //     Route::get('/endpoints', [MetricsController::class, 'endpoints']);
+    //     Route::get('/dependencies', [MetricsController::class, 'dependencies']);
+    // });
     Route::get('/incidents', [IncidentController::class, 'index']);
     Route::get('/queues/health', [QueueController::class, 'health']);
     // Public Routes (No authentication required)

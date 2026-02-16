@@ -1,12 +1,12 @@
 <?php
 
+use App\Domains\Command\Controllers\Api\EmergencyOverrideController;
+use App\Domains\Command\Controllers\Api\KillSwitchController;
+use App\Domains\Command\Controllers\Api\MaintenanceController;
+use App\Domains\Command\Controllers\Api\MetricsController;
+use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MetricsController;
-use App\Http\Controllers\KillSwitchController;
-use App\Http\Controllers\MaintenanceController;
-use App\Http\Controllers\EmergencyOverrideController;
-
 
 Route::middleware('health_api', 'check_country')->group(function () {
     Route::prefix('metrics')->group(function () {
@@ -15,14 +15,12 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::get('/endpoints', [MetricsController::class, 'endpoints']);
         Route::get('/dependencies', [MetricsController::class, 'dependencies']);
     });
-
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
-       
+
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {
-            
-            Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
+
             // //////////disable country status////////////////
             Route::patch('/countries/{id}', function (Request $request, $id) {
                 $request->validate([
@@ -51,10 +49,8 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::post('emergency-override/terminate', [EmergencyOverrideController::class, 'terminate']);
             Route::get('emergency-override/logs', [EmergencyOverrideController::class, 'logs']);
             Route::post('/critical-action', [EmergencyOverrideController::class, 'criticalAction'])->middleware('emergency');
-           
+
+        });
     });
-    
-   
-  
 
 });

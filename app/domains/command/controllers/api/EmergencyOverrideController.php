@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Command\Controllers\Api;
 
-use App\Models\EmergencyOverride;
-use App\Models\EmergencyOverrideLog;
+use App\Domains\Command\Models\EmergencyOverride;
+use App\Domains\Command\Models\EmergencyOverrideLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
-class EmergencyOverrideController extends Controller
+class EmergencyOverrideController extends \App\Http\Controllers\Controller
 {
     /**
      * ACTIVATE emergency override

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Domains\Command\Middlewares;
 
 use App\Services\MaintenanceService;
 use Closure;
