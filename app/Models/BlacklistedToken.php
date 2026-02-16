@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class BlacklistedToken extends Model
 {
-    //
+    protected $fillable = ['jwt_id', 'expires_at'];
 }

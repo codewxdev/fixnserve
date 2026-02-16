@@ -4,11 +4,11 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Support\Facades\Auth; // Import Auth
+use Tymon\JWTAuth\Facades\JWTAuth; // Import Auth
 
-class CheckSuperAdmin
+class EnsureCheckSuperAdmin
 {
     public function handle(Request $request, Closure $next): Response
     {
@@ -20,6 +20,7 @@ class CheckSuperAdmin
             if ($request->acceptsHtml()) {
                 return redirect()->route('login.index');
             }
+
             return response()->json(['error' => 'Token not provided'], 401);
         }
 
@@ -42,6 +43,7 @@ class CheckSuperAdmin
                 if ($request->acceptsHtml()) {
                     abort(403, 'Super Admin access required');
                 }
+
                 return response()->json(['error' => 'Super Admin access required'], 403);
             }
 
@@ -50,6 +52,7 @@ class CheckSuperAdmin
             if ($request->acceptsHtml()) {
                 return redirect()->route('login.index')->withErrors('Session expired, please login again.');
             }
+
             return response()->json(['error' => 'Invalid token'], 401);
         }
 

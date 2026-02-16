@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Middleware\EmergencyOverrideMiddleware;
+use App\Http\Middleware\EnsureEmergencyOverrideMiddleware;
+use App\Http\Middleware\EnsureKillSwitch;
 use App\Jobs\CalculateApiMetrics;
 use App\Models\KillSwitch;
 use Illuminate\Foundation\Application;
@@ -53,20 +54,20 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'active.session' => \App\Http\Middleware\CheckActiveSession::class,
-            'emergency' => EmergencyOverrideMiddleware::class,
-            'kill' => \App\Http\Middleware\KillSwitch::class,
-            'check_maintenance' => \App\Http\Middleware\CheckMaintenance::class,
-            'health_api' => \App\Http\Middleware\ApiHealthMetrics::class,
+            'active.session' => \App\Http\Middleware\EnsureActiveSession::class,
+            'emergency' => EnsureEmergencyOverrideMiddleware::class,
+            'kill' => EnsureKillSwitch::class,
+            'check_maintenance' => \App\Http\Middleware\EnsureMaintenance::class,
+            'health_api' => \App\Http\Middleware\EnsureApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'super.admin' => \App\Http\Middleware\CheckSuperAdmin::class,
+            'super.admin' => \App\Http\Middleware\EnsureCheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             '2fa' => \App\Http\Middleware\Ensure2FAEnabled::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'user.active' => \App\Http\Middleware\CheckUserStatus::class,
-            'service.provider' => \App\Http\Middleware\CheckServiceProviderRole::class,
-            'check_country' => \App\Http\Middleware\CheckCountryStatus::class,
-            'block_soft_country_orders' => \App\Http\Middleware\BlockOrdersForSoftDisabledCountry::class,
+            'user.active' => \App\Http\Middleware\EnsureCheckUserStatus::class,
+            'service.provider' => \App\Http\Middleware\EnsureServiceProviderRole::class,
+            'check_country' => \App\Http\Middleware\EnsureCountryStatus::class,
+            'block_soft_country_orders' => \App\Http\Middleware\EnsureBlockOrdersForSoftDisabledCountry::class,
             // 'javed' => \App\Http\Middleware\Admin\AuthMiddleware::class,
 
         ]);
