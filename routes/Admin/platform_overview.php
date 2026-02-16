@@ -8,4 +8,4 @@ use Illuminate\Support\Facades\Route;
 // ====================================================
 // Platform Overview MODULE
 // ====================================================
-Route::get('/platform-overview', [PlatformOverviewController::class, 'index'])->name('platform_overview.index');
+// Route::get('/platform-overview', [PlatformOverviewController::class, 'index'])->name('platform_overview.index');
