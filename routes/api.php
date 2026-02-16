@@ -6,70 +6,44 @@ use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
 use App\Http\Controllers\FavouriteController;
-use App\Http\Controllers\IncidentController;
 use App\Http\Controllers\MartVender\BusinessDocController;
-use App\Http\Controllers\MartVender\MartCategoryController;
-use App\Http\Controllers\MartVender\MartSubCategoryController;
 use App\Http\Controllers\MartVender\ProductController;
-use App\Http\Controllers\MetricsController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\PromotionPurchaseController;
 use App\Http\Controllers\PromotionSlotController;
-use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\RiderVehicleController;
-use App\Http\Controllers\Role\PermissionController;
-use App\Http\Controllers\Role\RoleController;
-use App\Http\Controllers\Role\RolePermissionController;
-use App\Http\Controllers\Role\UserRoleController;
-use App\Http\Controllers\ServiceProvider\CategoryController;
 use App\Http\Controllers\ServiceProvider\NotificationTypeController;
 use App\Http\Controllers\ServiceProvider\PortfolioController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
 use App\Http\Controllers\ServiceProvider\ServiceProviderController;
 use App\Http\Controllers\ServiceProvider\SkillController;
-use App\Http\Controllers\ServiceProvider\SubcategoryController;
 use App\Http\Controllers\ServiceProvider\UserEducationController;
 use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
 use App\Http\Controllers\SessionController;
-use App\Http\Controllers\SpecialtyController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionEntitlementController;
 use App\Http\Controllers\SubscriptionPlanController;
-use App\Http\Controllers\SubSpecialtyController;
 use App\Http\Controllers\TransportTypeController;
 use App\Models\Country;
 use App\Models\Currency;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country')->group(function () {
-    // Route::prefix('metrics')->group(function () {
-    //     Route::get('/summary', [MetricsController::class, 'summary']);
-    //     Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);
-    //     Route::get('/endpoints', [MetricsController::class, 'endpoints']);
-    //     Route::get('/dependencies', [MetricsController::class, 'dependencies']);
-    // });
-    Route::get('/incidents', [IncidentController::class, 'index']);
-    Route::get('/queues/health', [QueueController::class, 'health']);
-    // Public Routes (No authentication required)
+
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
     Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
     Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
     Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
     Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
-    Route::get('/skill/suggested', [SkillController::class, 'suggested']);
-    Route::get('/skill/search', [SkillController::class, 'search']);
+
     Route::apiResource('notification-types', NotificationTypeController::class);
-    Route::resource('mart-categories', MartCategoryController::class);
-    Route::apiResource('mart-sub-categories', MartSubCategoryController::class);
-    Route::apiResource('specialties', SpecialtyController::class);
-    Route::apiResource('sub-specialties', SubSpecialtyController::class);
+
     // ////////////////////////////////////consultant route/////////////////////
     Route::get('getSlot', [ConsultantBookingController::class, 'getSlots']);
     Route::get('/countries', function () {
@@ -145,9 +119,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::post('/update/mode', [ServiceProviderController::class, 'updateMode']);
         });
         // Skills Routes
-        Route::prefix('skills')->group(function () {
-            Route::post('/add', [SkillController::class, 'addSkills']);
-        });
+
         // Portfolio Routes
         Route::prefix('portfolios')->group(function () {
             Route::apiResource('portfolios', PortfolioController::class);
@@ -198,50 +170,11 @@ Route::middleware('health_api', 'check_country')->group(function () {
         });
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {
-            // Route::apiResource('roles', RoleController::class);
-            // Route::apiResource('permissions', PermissionController::class);
-            // Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
-            Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
-            Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
-            Route::prefix('users')->group(function () {
-                // Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
-                // Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
-                Route::get('/{id}/roles', [UserRoleController::class, 'getUserRoles']);
-                Route::get('/{id}/permissions', [UserRoleController::class, 'getUserPermissions']);
-            });
-            Route::get('/login-history', [AuthController::class, 'loginHistory']);
-            Route::apiResource('categories', CategoryController::class);
-            Route::apiResource('subcategories', SubcategoryController::class);
-            Route::apiResource('skills', SkillController::class);
-            Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
-            // //////////disable country status////////////////
-            Route::patch('/countries/{id}', function (Request $request, $id) {
-                $request->validate([
-                    'status' => 'required|in:enabled,soft_disabled,hard_disabled',
-                ]);
-                $country = Country::findorfail($id);
-                $res = $country->update([
-                    'status' => $request->status,
-                ]);
 
-                return response()->json([
-                    'success' => true,
-                    'response' => $res,
-                ]);
-            });
-            // /////////////////maintance route/////////////////
-            // Route::post('/maintenance', [MaintenanceController::class, 'store']);
-            // Route::get('/maintenance', [MaintenanceController::class, 'index']);
-            // Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
-            // // //////////////////switchkill route////////////////
-            // Route::post('/kill/switch', [KillSwitchController::class, 'store']);
-            // Route::get('/kill/switch', [KillSwitchController::class, 'index']);
-            // Route::post('kill/switch/cancel/{id}', [KillSwitchController::class, 'cancel']);
-            // // ///////////////////emergency override route///////////////////
-            // Route::post('emergency-override/activate', [EmergencyOverrideController::class, 'activate']);
-            // Route::post('emergency-override/terminate', [EmergencyOverrideController::class, 'terminate']);
-            // Route::get('emergency-override/logs', [EmergencyOverrideController::class, 'logs']);
-            // Route::post('/critical-action', [EmergencyOverrideController::class, 'criticalAction'])->middleware('emergency');
+            Route::get('/login-history', [AuthController::class, 'loginHistory']);
+
+            Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
+
             // /////////////////////session managment//////////////////////////
             Route::prefix('sessions')->group(function () {
                 Route::get('/', [SessionController::class, 'index']);
@@ -276,60 +209,3 @@ Route::middleware('health_api', 'check_country')->group(function () {
     });
 
 });
-// /////////////////////////////////////////extra code//////////////////////////////////////
-
-// Route::get('/roles/{role?}', [RoleController::class, 'index']);
-// Route::post('/roles', [RoleController::class, 'store']);
-// Route::post('/roles/{role}', [RoleController::class, 'update']);
-// Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
-// Permissions CRUD
-// Route::get('/permissions/{permission?}', [PermissionController::class, 'index']);
-// Route::post('/permissions', [PermissionController::class, 'store']);
-// Route::post('/permissions/{permission}', [PermissionController::class, 'update']);
-// Route::delete('/permissions/{permission}', [PermissionController::class, 'destroy']);
-
-// -------------------------
-// CATEGORY CRUD
-// -------------------------
-// Route::get('/categories', [CategoryController::class, 'index']);
-// Route::post('/categories', [CategoryController::class, 'store']);
-// Route::get('/categories/{id}', [CategoryController::class, 'show']);
-// Route::put('/categories/{id}', [CategoryController::class, 'update']);
-// Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
-
-// -------------------------
-// SUBCATEGORY CRUD
-// -------------------------
-// Route::get('/subcategories', [SubcategoryController::class, 'index']);
-// Route::post('/subcategories', [SubcategoryController::class, 'store']);
-// Route::get('/subcategories/{id}', [SubcategoryController::class, 'show']);
-// Route::post('/subcategories/{id}', [SubcategoryController::class, 'update']);
-// Route::delete('/subcategories/{id}', [SubcategoryController::class, 'destroy']);
-
-// -------------------------
-// SKILL CRUD
-// -------------------------
-// Route::get('/skills', [SkillController::class, 'index']);
-// Route::post('/skills', [SkillController::class, 'store']);
-// Route::get('/skills/{id}', [SkillController::class, 'show']);
-// Route::put('/skills/{id}', [SkillController::class, 'update']);
-// Route::delete('/skills/{id}', [SkillController::class, 'destroy']);
-// SERVICE CRUD
-// -------------------------
-
-// Route::get('/services', [ServiceController::class, 'index']);
-// Route::post('/services', [ServiceController::class, 'store']);
-// Route::get('/services/{id}', [ServiceController::class, 'show']);
-// Route::put('/services/{id}', [ServiceController::class, 'update']);
-// Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
-// Route::get('', [PortfolioController::class, 'index']);
-// Route::post('', [PortfolioController::class, 'store']);
-// Route::get('/{id}', [PortfolioController::class, 'show']);
-// Route::post('/{id}', [PortfolioController::class, 'update']);
-// Route::delete('/{portfolio}', [PortfolioController::class, 'destroy']);
-
-Route::apiResource('roles', RoleController::class);
-Route::apiResource('permissions', PermissionController::class);
-Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
-Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
-Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);

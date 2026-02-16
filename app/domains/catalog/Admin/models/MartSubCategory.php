@@ -1,28 +1,25 @@
 <?php
 
-namespace App\Models;
+namespace App\Domains\Catalog\Admin\Models;
 
-use App\Domains\Catalog\Admin\Models\Skill;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Portfolio extends Model
+class MartSubCategory extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'project_title',
-        'role',
+        'mart_category_id',
+        'name',
         'description',
-        'image',
         'status',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function skills()
+    public function category()
     {
-        return $this->belongsToMany(Skill::class, 'portfolio_skills');
+        return $this->belongsTo(MartCategory::class, 'mart_category_id');
     }
 }
