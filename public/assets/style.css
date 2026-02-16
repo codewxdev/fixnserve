@@ -143,6 +143,71 @@ body.theme-solar {
     /* Amber 100 */
 }
 
+/* --- THEME: OBSIDIAN GOLD (Luxury/VIP) --- */
+body.theme-obsidian {
+    --brand-primary: 234, 179, 8;
+    /* Gold (Yellow 500) */
+    --brand-secondary: 202, 138, 4;
+    /* Dark Gold */
+    --bg-body: 0, 0, 0;
+    /* Pure Black */
+    --bg-card: 23, 23, 23;
+    /* Neutral 900 */
+    --bg-sidebar: 0, 0, 0;
+    /* Pure Black */
+    --border-color: 64, 64, 64;
+    /* Neutral 700 */
+    --sidebar-border: 64, 64, 64;
+    --text-main: 255, 255, 255;
+    /* White */
+    --text-muted: 163, 163, 163;
+    /* Neutral 400 */
+    --item-active-bg: 38, 38, 38;
+    /* Neutral 800 */
+}
+
+/* --- THEME: ROYAL TWILIGHT (Creative Purple) --- */
+body.theme-royal {
+    --brand-primary: 139, 92, 246;
+    /* Violet 500 */
+    --brand-secondary: 124, 58, 237;
+    /* Violet 600 */
+    --bg-body: 10, 10, 28;
+    /* Very Dark Violet */
+    --bg-card: 22, 18, 45;
+    /* Deep Purple Card */
+    --bg-sidebar: 10, 10, 28;
+    --border-color: 46, 36, 80;
+    /* Purple Border */
+    --sidebar-border: 46, 36, 80;
+    --text-main: 237, 233, 254;
+    /* Violet 50 */
+    --text-muted: 167, 139, 250;
+    /* Violet 400 (Muted) */
+    --item-active-bg: 46, 36, 80;
+}
+
+/* --- THEME: DEEP FOREST (Nature/Growth) --- */
+body.theme-forest {
+    --brand-primary: 52, 211, 153;
+    /* Emerald 400 */
+    --brand-secondary: 16, 185, 129;
+    /* Emerald 500 */
+    --bg-body: 2, 20, 15;
+    /* Deep Jungle Green */
+    --bg-card: 6, 35, 25;
+    /* Dark Moss */
+    --bg-sidebar: 2, 20, 15;
+    --border-color: 20, 60, 45;
+    /* Green Border */
+    --sidebar-border: 20, 60, 45;
+    --text-main: 236, 253, 245;
+    /* Emerald 50 */
+    --text-muted: 110, 231, 183;
+    /* Emerald 300 */
+    --item-active-bg: 20, 60, 45;
+}
+
 /* :root {
      
     --brand-primary: 79, 70, 229; 
