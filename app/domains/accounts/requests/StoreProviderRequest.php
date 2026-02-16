@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Domains\Accounts\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Hash;
 
-class StoreProfessionalRequest extends FormRequest
+class StoreProviderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +25,6 @@ class StoreProfessionalRequest extends FormRequest
         return [
             'name'=>['required','max:255'],
             'email'=>['required','email','unique:users,email'],
-            
         ];
     }
 }

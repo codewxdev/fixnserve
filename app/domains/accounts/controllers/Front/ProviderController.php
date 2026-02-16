@@ -2,10 +2,10 @@
 
 namespace App\Domains\Accounts\Controllers\Front;
 
+use App\Domains\Accounts\Requests\StoreProviderRequest;
+use App\Domains\Accounts\Services\ServiceProvider;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreProviderRequest;
 use App\Models\User;
-use App\Services\ServiceProvider;
 use Illuminate\Http\Request;
 use Spatie\Permission\Commands\AssignRole;
 use Symfony\Component\HttpFoundation\JsonResponse;

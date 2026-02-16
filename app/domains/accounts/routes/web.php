@@ -3,6 +3,10 @@
 use App\Domains\Accounts\Controllers\Front\CustomerController;
 use App\Domains\Accounts\Controllers\Front\ProfessionalController;
 use App\Domains\Accounts\Controllers\Front\ProviderController;
+use App\Domains\Accounts\Controllers\Front\ConsultantController;
+use App\Domains\Accounts\Controllers\Front\MartController;
+use App\Domains\Accounts\Controllers\Front\RiderController;
+ 
 use Illuminate\Support\Facades\Route;
 
 // ====================================================
@@ -17,7 +21,6 @@ Route::delete('/customers/{id}', [CustomerController::class, 'destroy'])->name('
 // ====================================================
 // Service Providers Routes 
 // ====================================================
-
 Route::get('/providers', [ProviderController::class, 'index'])->name('provider.index');
 Route::post('/providers', [ProviderController::class, 'store'])->name('store.provider');
 
@@ -27,3 +30,24 @@ Route::post('/providers', [ProviderController::class, 'store'])->name('store.pro
 // ====================================================
 Route::get('/professionals', [ProfessionalController::class, 'index'])->name('professional.index');
 Route::post('/professionals', [ProfessionalController::class, 'store'])->name('store.professional');
+
+
+// ====================================================
+// Consultant Routes
+// ====================================================
+Route::get('/consultants', [ConsultantController::class, 'index'])->name('consultant.index');
+Route::post('/consultants', [ConsultantController::class, 'store'])->name('store.consultant');
+
+
+// ====================================================
+// Mart Vendors Routes
+// ==================================================== 
+Route::get('/mart/vendors', [MartController::class, 'index'])->name('mart.index');
+Route::post('/mart/vendors', [MartController::class, 'store'])->name('store.mart');
+
+
+// ===================================================
+//  Rider Routes 
+// ===================================================
+Route::get('/riders', [RiderController::class, 'index'])->name('rider.index');
+Route::post('/riders', [RiderController::class, 'store'])->name('store.rider');

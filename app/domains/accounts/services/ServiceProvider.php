@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Domains\Accounts\Services;
 
 use App\Models\User; // Ya Provider Model
 use Illuminate\Support\Facades\DB;
