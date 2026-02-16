@@ -321,7 +321,7 @@
                             localStorage.setItem("user", JSON.stringify(data.user));
                         }
 
-                        window.location.href = "/platform-overview";
+                        window.location.href = "{{ route('platform_overview.index') }}";
                     } else if (data.error) {
                         // Failed verification (e.g., Invalid OTP)
                         errorMessage.innerText = data.error;

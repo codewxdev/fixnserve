@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Front;
+namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProviderRequest;
@@ -22,7 +22,6 @@ class ProviderController extends Controller
 
     public function store(StoreProviderRequest $request): JsonResponse
     {
-
        
         try {
             $provider = $this->providerService->registerProvider($request->validated());
@@ -37,11 +36,11 @@ class ProviderController extends Controller
                 'message' => 'Something went wrong: ' . $e->getMessage()
             ], 500);
         }
-    }
+    } 
 
     public function index(){
 
-        $providers = User::role('Provider')->get();
+        $providers = User::get();
         
         return view('Admin.providers.index',compact('providers'));
 
