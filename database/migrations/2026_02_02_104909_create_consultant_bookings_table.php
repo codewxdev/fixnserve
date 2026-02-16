@@ -25,7 +25,7 @@ return new class extends Migration
             // 2️⃣ Add foreign keys separately
             $table->foreign('consultant_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('category_id')->references('id')->on('categories')->cascadeOnDelete();
-            $table->foreign('sub_category_id')->references('id')->on('sub_categories')->cascadeOnDelete();
+            $table->foreign('sub_category_id')->references('id')->on('subcategories')->cascadeOnDelete();
 
             $table->date('booking_date');
 
@@ -34,7 +34,7 @@ return new class extends Migration
 
             $table->enum('duration', [15, 30, 45, 60]);
             $table->decimal('fee', 10, 2);
-            $table->enum('status', ['confirmed', 'expired'])->default('confirmed')->after('fee');
+            $table->enum('status', ['confirmed', 'expired'])->default('confirmed');
 
             $table->timestamps();
 

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class CarController extends Controller
+class RegionalController extends Controller
 {
     public function index(){
-        return view('Admin.car.index');
+        return view('Admin.command_center.regional_controle.index');
     }
 }

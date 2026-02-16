@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class SystemHealthController extends Controller
 {
     public function index(){
-        return view('Admin.system_health.index');
+        return view('Admin.command_center.system_health.index');
     }
 }
