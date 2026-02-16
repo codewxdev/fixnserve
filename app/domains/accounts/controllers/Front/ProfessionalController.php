@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Front;
+namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreProfessionalRequest;
@@ -38,7 +38,7 @@ class ProfessionalController extends Controller
 
     public function index(){
 
-        $professionals = User::role('Professional')->get();
+        $professionals = User::get();
         return view('Admin.professionals.index',compact('professionals'));
     }
 }

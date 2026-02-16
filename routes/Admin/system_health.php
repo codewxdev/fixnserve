@@ -7,4 +7,4 @@ use Illuminate\Support\Facades\Route;
 // ====================================================
 // SUBSCRIPTION MODULE
 // ====================================================
-Route::get('/system-health', [SystemHealthController::class, 'index'])->name('system_health.index');
+// Route::get('/system-health', [SystemHealthController::class, 'index'])->name('system_health.index');

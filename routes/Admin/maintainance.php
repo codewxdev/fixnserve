@@ -8,4 +8,4 @@ use Illuminate\Support\Facades\Route;
 // ====================================================
 // Miantainance & Emergency MODULE
 // ====================================================
-Route::get('/maintainance/emergency', [MaintainanceController::class, 'index'])->name('maintainance.index');
+// Route::get('/maintainance/emergency', [MaintainanceController::class, 'index'])->name('maintainance.index');
