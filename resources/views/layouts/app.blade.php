@@ -70,7 +70,10 @@
         'theme-fintech': currentTheme === 'fintech',
         'theme-midnight': currentTheme === 'midnight',
         'theme-crimson': currentTheme === 'crimson',
-        'theme-solar': currentTheme === 'solar'
+        'theme-solar': currentTheme === 'solar',
+        'theme-obsidian': currentTheme === 'obsidian',
+        'theme-royal': currentTheme === 'royal',
+        'theme-forest': currentTheme === 'forest'
     }">
 
     <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }" class="fn-app-wrapper">
@@ -162,6 +165,24 @@
                                 class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
                                 <span>Solar Light (Warm)</span>
                                 <span x-show="currentTheme === 'solar'" class="text-blue-500 font-bold">✓</span>
+                            </button>
+
+                            <button @click="setTheme('obsidian'); showThemeMenu = false"
+                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
+                                <span>Obsidian Gold (Luxury)</span>
+                                <span x-show="currentTheme === 'obsidian'" class="text-blue-500 font-bold">✓</span>
+                            </button>
+
+                            <button @click="setTheme('royal'); showThemeMenu = false"
+                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
+                                <span>Royal Twilight</span>
+                                <span x-show="currentTheme === 'royal'" class="text-blue-500 font-bold">✓</span>
+                            </button>
+
+                            <button @click="setTheme('forest'); showThemeMenu = false"
+                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
+                                <span>Deep Forest</span>
+                                <span x-show="currentTheme === 'forest'" class="text-blue-500 font-bold">✓</span>
                             </button>
                         </div>
                     </div>
