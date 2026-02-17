@@ -83,8 +83,6 @@ class AuthController extends Controller
         ]);
 
         $login = $request->login;
-
-        // Detect email or phone
         $fieldType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
         $credentials = [
@@ -92,62 +90,18 @@ class AuthController extends Controller
             'password' => $request->password,
         ];
 
-        // 🔐 Generate unique JWT ID (jti)
         $jwtId = (string) Str::uuid();
 
-        // Attempt login with custom jti
         if (! $token = JWTAuth::claims(['jti' => $jwtId])->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
 
         $user = auth()->user();
-        // dd($user->hasRole('Super Admin'));
 
-        /* ------------------------------
-           Device / Agent Detection
-        --------------------------------*/
-        $agent = new Agent;
-        $agent->setUserAgent($request->userAgent());
-
-        $device = $agent->device() ?: 'Unknown';
-        $platform = $agent->platform() ?: 'Unknown';
-        $browser = $agent->browser() ?: 'Unknown';
-
-        /* ------------------------------
-           Login History (AUDIT LOG ONLY)
-        --------------------------------*/
-        // LoginHistory::create([
-        //     'user_id' => $user->id,
-        //     'ip_address' => $request->ip(),
-        //     'user_agent' => $request->userAgent(),
-        //     'device' => $device,
-        //     'platform' => $platform,
-        //     'browser' => $browser,
-        //     'login_at' => now(),
-        // ]);
-
-        /* ------------------------------
-           ACTIVE SESSION TRACKING
-           (REAL SECURITY CONTROL)
-        --------------------------------*/
-        UserSession::create([
-            'user_id' => $user->id,
-            'jwt_id' => $jwtId,
-            'token' => hash('sha256', $token), // 🔥 NEVER store raw JWT
-            'device' => $device,
-            'ip_address' => $request->ip(),
-            'location' => null, // GeoIP later
-            'risk_score' => 0,
-            'last_activity_at' => now(),
-        ]);
-
-        // dd($user->hasRole('Super Admin'));
-        /* ------------------------------
-           Admin / Super Admin – 2FA FLOW
-        --------------------------------*/
+        // For Admin / Super Admin – 2FA
         if ($user->hasRole(['Admin', 'Super Admin'])) {
-
             if ($user->is_2fa_enabled) {
+                // Return 2FA required response; do NOT create session yet
                 return response()->json([
                     'status' => '2fa_required',
                     'email' => $user->email,
@@ -157,12 +111,16 @@ class AuthController extends Controller
                 ]);
             }
 
+            // Admin without 2FA enabled
             return response()->json([
                 'status' => 'enable_2fa',
                 'message' => 'Admin account must enable 2FA.',
                 'access_token' => $token,
             ]);
         }
+
+        // Normal user – create session immediately
+        $this->createSession($user, $token, $jwtId, $request);
 
         return $this->respondWithToken($token);
     }
@@ -234,15 +192,14 @@ class AuthController extends Controller
 
         $secret = $google2fa->generateSecretKey();
 
-        // Save to DB
         $user = $request->user();
         $user->google2fa_secret = $secret;
-        $user->is_2fa_enabled = false; // OTP verify hone ke baad 1
-        $user->save(); // important!
+        $user->is_2fa_enabled = false; // will be set true after OTP verify
+        $user->save();
 
         $qrCodeUrl = $google2fa->getQRCodeUrl(
             'FixnServe',
-            $request->user()->email,
+            $user->email,
             $secret
         );
 
@@ -266,26 +223,48 @@ class AuthController extends Controller
         }
 
         $google2fa = new Google2FA;
-
         $valid = $google2fa->verifyKey($user->google2fa_secret, $request->otp);
 
         if (! $valid) {
             return response()->json(['error' => 'Invalid OTP'], 401);
         }
 
-        // ✅ OTP valid → enable 2FA for future logins
+        // Enable 2FA after first successful verification
         if (! $user->is_2fa_enabled) {
             $user->is_2fa_enabled = 1;
             $user->save();
         }
 
-        // OTP valid → JWT generate
-        $token = auth()->login($user);
+        $jwtId = (string) Str::uuid();
+        $token = JWTAuth::claims(['jti' => $jwtId])->fromUser($user);
+
+        // Create user session after successful 2FA
+        $this->createSession($user, $token, $jwtId, $request);
 
         return response()->json([
             'status' => 'success',
             'token' => $token,
             'user' => $user,
+        ]);
+    }
+
+    /**
+     * Helper: Create User Session
+     */
+    protected function createSession(User $user, $token, $jwtId, Request $request)
+    {
+        $agent = new Agent;
+        $agent->setUserAgent($request->userAgent());
+
+        UserSession::create([
+            'user_id' => $user->id,
+            'jwt_id' => $jwtId,
+            'token' => hash('sha256', $token),
+            'device' => $agent->device() ?: 'Unknown',
+            'ip_address' => $request->ip(),
+            'location' => null,
+            'risk_score' => 0,
+            'last_activity_at' => now(),
         ]);
     }
 
@@ -298,13 +277,13 @@ class AuthController extends Controller
         ]);
     }
 
-    public function loginHistory(Request $request)
-    {
-        $user = auth()->user();
-        $history = $user->loginHistories()->orderBy('login_at', 'desc')->get();
+    // public function loginHistory(Request $request)
+    // {
+    //     $user = auth()->user();
+    //     $history = $user->loginHistories()->orderBy('login_at', 'desc')->get();
 
-        return response()->json($history);
-    }
+    //     return response()->json($history);
+    // }
 
     public function updateProfile(Request $request)
     {
