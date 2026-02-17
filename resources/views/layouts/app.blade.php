@@ -304,6 +304,7 @@
             logoutBtn.disabled = true;
             logoutBtn.innerText = "Logging out...";
             const token = localStorage.getItem("token");
+            console.log("Attempting to logout with token:", token);
             if (!token) {
                 localStorage.clear();
                 window.location.href = "/auth/login";
@@ -316,17 +317,19 @@
                         "Content-Type": "application/json"
                     }
                 })
+                 
                 .then(response => response.json())
                 .then(data => {
+                     
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
-                    window.location.href = "/auth/login";
+                    // window.location.href = "/auth/login";
                 })
                 .catch(error => {
                     console.error("Logout Error:", error);
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
-                    window.location.href = "/auth/login";
+                    // window.location.href = "/auth/login";
                 });
         }
     </script>

@@ -15,7 +15,7 @@
         <form action="" method="POST" id="loginForm" class="space-y-6">
 
             <div>
-                <label for="email" class="block text-sm font-medium mb-2" style="color: #021056;">Email
+                <zabel for="email" class="block text-sm font-medium mb-2" style="color: #021056;">Email
                     Address</label>
                 <input type="email" name="email" id="email" placeholder="you@example.com" required
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
