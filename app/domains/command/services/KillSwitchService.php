@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Services;
+namespace App\Domains\Command\Services;
 
-use App\Models\KillSwitche;
+use App\Domains\Command\Models\KillSwitch;
 
 class KillSwitchService
 {
     public function active($scope)
     {
         return cache()->remember(
-            "kill_switch:$scope", 10, fn () => KillSwitche::where('scope', $scope)
+            "kill_switch:$scope", 10, fn () => KillSwitch::where('scope', $scope)
                 ->where('status', 'active')
                 ->first()
         );
