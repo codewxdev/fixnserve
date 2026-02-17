@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\security\controllers\api;
+namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Security\Models\User;
 use App\Domains\Security\Models\UserSession;
@@ -101,7 +101,7 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
-        dd($user->hasRole('Super Admin'));
+        // dd($user->hasRole('Super Admin'));
 
         /* ------------------------------
            Device / Agent Detection

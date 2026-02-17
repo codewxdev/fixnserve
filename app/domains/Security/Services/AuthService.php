@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Domains\Security\Services;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Domains\Security\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class AuthService
@@ -22,7 +21,7 @@ class AuthService
         return [
             'status' => true,
             'token' => $token,
-            'user'  => $user
+            'user' => $user,
         ];
     }
 }

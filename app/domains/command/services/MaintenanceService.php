@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Services;
+namespace App\Domains\Command\Services;
 
-use App\Models\Maintenance;
+use App\Domains\Command\Models\Maintenance;
 
 class MaintenanceService
 {
