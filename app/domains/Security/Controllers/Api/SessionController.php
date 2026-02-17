@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Security\Models\UserSession;
+use App\Http\Controllers\Controller;
 use App\Models\BlacklistedToken;
-use App\Models\User;
-use App\Models\UserSession;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
 

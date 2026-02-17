@@ -1,8 +1,23 @@
 <?php
 
-namespace App\Models;
+namespace App\Domains\Security\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Domains\Catalog\Admin\Models\Skill;
+use App\Models\Country;
+use App\Models\Favourite;
+use App\Models\LoginHistory;
+use App\Models\NotificationType;
+use App\Models\Rating;
+use App\Models\Service;
+use App\Models\UserCertificate;
+use App\Models\UserEducation;
+use App\Models\UserExperience;
+use App\Models\UserLanguage;
+use App\Models\UserNotification;
+use App\Models\UserPayment;
+use App\Models\UserTransportation;
+use App\Models\Wallet;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;

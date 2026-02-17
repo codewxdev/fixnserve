@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domains\Catalog\Admin\Models\Subcategory;
+use App\Domains\Security\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model

@@ -1,10 +1,12 @@
 <?php
 
+use App\Domains\Command\Jobs\CalculateApiMetrics;
 use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
 use App\Domains\Command\Models\KillSwitch;
+use App\Domains\Security\Middlewares\Ensure2FAEnabled;
+use App\Domains\Security\Middlewares\EnsureActiveSession;
 use App\Http\Middleware\EnsureServiceProviderRole;
-use App\Jobs\CalculateApiMetrics;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -55,7 +57,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'active.session' => \App\Http\Middleware\EnsureActiveSession::class,
+            'active.session' => EnsureActiveSession::class,
             'emergency' => EnsureEmergencyOverrideMiddleware::class,
             'kill' => EnsureKillSwitch::class,
             'check_maintenance' => App\Domains\Command\Middlewares\EnsureMaintenance::class,
@@ -63,7 +65,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Http\Middleware\EnsureCheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
-            '2fa' => \App\Http\Middleware\Ensure2FAEnabled::class,
+            '2fa' => Ensure2FAEnabled::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'user.active' => \App\Http\Middleware\EnsureCheckUserStatus::class,
             'service.provider' => EnsureServiceProviderRole::class,
