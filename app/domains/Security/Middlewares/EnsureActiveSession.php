@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Domains\Security\Middlewares;
 
+use App\Domains\Security\Models\UserSession;
 use App\Models\BlacklistedToken;
-use App\Models\UserSession;
 use Closure;
 use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;

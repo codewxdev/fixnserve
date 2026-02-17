@@ -4,7 +4,7 @@ namespace App\Domains\RBAC\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Domains\Security\Models\User;
 use Illuminate\Http\Request;
 
 class UserRoleController extends Controller

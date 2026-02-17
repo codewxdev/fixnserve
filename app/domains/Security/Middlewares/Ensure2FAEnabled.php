@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Domains\Security\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ class Ensure2FAEnabled
         $user = Auth::user();
 
         if (! $user || ! $user->is_2fa_enabled) {
-            
+
             // If browser request, redirect to login (or a specific 2FA setup page)
             if ($request->acceptsHtml()) {
                 return redirect()->route('login.index')->withErrors('2FA Verification Required.');

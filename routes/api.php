@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\PasswordResetCodeController;
 use App\Http\Controllers\Consultancy\ConsultancyProfileController;
 use App\Http\Controllers\Consultancy\ConsultantWeekDayController;
 use App\Http\Controllers\ConsultantBookingController;
@@ -18,7 +16,6 @@ use App\Http\Controllers\ServiceProvider\NotificationTypeController;
 use App\Http\Controllers\ServiceProvider\PortfolioController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
 use App\Http\Controllers\ServiceProvider\ServiceProviderController;
-use App\Http\Controllers\ServiceProvider\SkillController;
 use App\Http\Controllers\ServiceProvider\UserEducationController;
 use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
@@ -34,13 +31,6 @@ use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country')->group(function () {
-
-    Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
-    Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
-    Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
-    Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
-    Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 
     Route::apiResource('notification-types', NotificationTypeController::class);
 
@@ -72,12 +62,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         });
         // ////////////////middleware for payment routes////////////////
         Route::middleware('kill:payments')->group(function () {});
-        // Auth Routes
-        Route::get('/auth/me', [AuthController::class, 'me']);
-        Route::post('/auth/logout', [AuthController::class, 'logout']);
-        Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-        Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
-        Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
+
         Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
         Route::post('/rate', [RatingController::class, 'rate']);
@@ -110,7 +95,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::delete('/consultant/week-days/{id}', [ConsultantWeekDayController::class, 'destroy']);
         // Route::middleware(['service.provider'])->group(function () {
         Route::post('/language', [PortfolioController::class, 'addLanguage']);
-        Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
         // Service Provider Routes
         Route::prefix('service-provider')->group(function () {
             Route::apiResource('services', ServiceController::class);
@@ -170,23 +154,9 @@ Route::middleware('health_api', 'check_country')->group(function () {
         });
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {
-
-            Route::get('/login-history', [AuthController::class, 'loginHistory']);
-
             Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
-
             // /////////////////////session managment//////////////////////////
-            Route::prefix('sessions')->group(function () {
-                Route::get('/', [SessionController::class, 'index']);
-                Route::get('{id}', [SessionController::class, 'show']);
 
-                Route::post('{id}/revoke', [SessionController::class, 'revoke']);
-                Route::post('{id}/flag', [SessionController::class, 'flag']);
-
-                Route::post('revoke-all', [SessionController::class, 'revokeAll']);
-                Route::post('revoke-role', [SessionController::class, 'revokeByRole']);
-                // Route::post('revoke-region', [SessionController::class, 'revokeByRegion']);
-            });
 
         });
 

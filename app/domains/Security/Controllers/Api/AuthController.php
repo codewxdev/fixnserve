@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Domains\security\controllers\api;
 
+use App\Domains\Security\Models\User;
+use App\Domains\Security\Models\UserSession;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
-use App\Models\LoginHistory;
-use App\Models\Session;
-use App\Models\User;
-use App\Models\UserSession;
 use App\Models\Wallet;
-use BaconQrCode\Renderer\Image\GdImageBackend;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -104,6 +101,7 @@ class AuthController extends Controller
         }
 
         $user = auth()->user();
+        dd($user->hasRole('Super Admin'));
 
         /* ------------------------------
            Device / Agent Detection
@@ -143,6 +141,7 @@ class AuthController extends Controller
             'last_activity_at' => now(),
         ]);
 
+        // dd($user->hasRole('Super Admin'));
         /* ------------------------------
            Admin / Super Admin – 2FA FLOW
         --------------------------------*/
@@ -175,6 +174,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+
         $token = $request->bearerToken();
 
         if (! $token) {

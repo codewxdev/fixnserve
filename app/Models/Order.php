@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Domains\Security\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-     protected $fillable = [
+    protected $fillable = [
         'user_id',
         'rider_id',
         'status',

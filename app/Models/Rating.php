@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\Security\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Rating extends Model

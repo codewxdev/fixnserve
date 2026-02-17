@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Security\Models\User;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Mail\ResetPasswordCodeMail;
 use App\Models\PasswordResetCode;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;

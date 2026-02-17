@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Domains\Catalog\Admin\Models\MartCategory;
+use App\Domains\Catalog\Admin\Models\MartSubCategory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
