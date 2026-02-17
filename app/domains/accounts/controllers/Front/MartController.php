@@ -4,10 +4,9 @@ namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Domains\Accounts\Requests\StoreMartRequest;
 use App\Domains\Accounts\Services\MartOnboardingService;
+use App\Domains\Catalog\Admin\Models\MartCategory;
 use App\Http\Controllers\Controller;
- 
-use App\Models\MartCategory;
-use App\Models\User;
+use App\Domains\Security\Models\User;
 use Illuminate\Http\Request;
 
 class MartController extends Controller
@@ -73,7 +72,7 @@ class MartController extends Controller
     public function index()
     {
         // 1. Categories fetch karein (Dropdown ke liye)
-        $categories = \App\Models\MartCategory::where('status', 1)->get();
+        $categories = MartCategory::where('status', 1)->get();
 
         // 2. Vendors fetch karein (Table listing ke liye)
         // Hum business_docs table se data le rahe hain

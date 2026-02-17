@@ -4,8 +4,8 @@ namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Domains\Accounts\Requests\StoreCustomerRequest;
 use App\Domains\Accounts\Services\CustomerService;
+use App\Domains\Security\Models\User;
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;

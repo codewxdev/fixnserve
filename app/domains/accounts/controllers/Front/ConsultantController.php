@@ -5,7 +5,7 @@ namespace App\Domains\Accounts\Controllers\Front;
 use App\Domains\Accounts\Requests\StoreConsultantRequest;
 use App\Domains\Accounts\Services\ConsultantService;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Domains\Security\Models\User;
  
 use Illuminate\Http\Request;
 
