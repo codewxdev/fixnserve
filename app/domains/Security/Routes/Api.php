@@ -14,6 +14,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
     Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
     Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
     Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
+    Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
 
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
@@ -22,7 +23,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-        Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
         Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
 
         // Route::middleware(['service.provider'])->group(function () {
