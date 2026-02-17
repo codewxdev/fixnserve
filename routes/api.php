@@ -21,7 +21,6 @@ use App\Http\Controllers\ServiceProvider\UserExperienceController;
 use App\Http\Controllers\ServiceProvider\UserNotificationController;
 use App\Http\Controllers\ServiceProvider\UserPaymentController;
 use App\Http\Controllers\ServiceProvider\UserTransportationController;
-use App\Http\Controllers\SessionController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\SubscriptionEntitlementController;
 use App\Http\Controllers\SubscriptionPlanController;
@@ -156,7 +155,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {
             Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
             // /////////////////////session managment//////////////////////////
-
 
         });
 

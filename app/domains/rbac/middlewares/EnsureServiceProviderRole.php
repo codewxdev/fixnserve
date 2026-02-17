@@ -2,7 +2,7 @@
 
 // app/Http/Middleware/CheckServiceProviderRole.php
 
-namespace App\Http\Middleware;
+namespace App\Domains\RBAC\Middlewares;
 
 use Closure;
 use Illuminate\Http\Request;

@@ -4,9 +4,10 @@ use App\Domains\Command\Jobs\CalculateApiMetrics;
 use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
 use App\Domains\Command\Models\KillSwitch;
+use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
 use App\Domains\Security\Middlewares\Ensure2FAEnabled;
 use App\Domains\Security\Middlewares\EnsureActiveSession;
-use App\Http\Middleware\EnsureServiceProviderRole;
+use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -63,11 +64,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'check_maintenance' => App\Domains\Command\Middlewares\EnsureMaintenance::class,
             'health_api' => App\Domains\Command\Middlewares\EnsureApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            'super.admin' => \App\Http\Middleware\EnsureCheckSuperAdmin::class,
+            'super.admin' => \App\Domains\RBAC\Middlewares\EnsureCheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             '2fa' => Ensure2FAEnabled::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
-            'user.active' => \App\Http\Middleware\EnsureCheckUserStatus::class,
+            'user.active' => EnsureCheckUserStatus::class,
             'service.provider' => EnsureServiceProviderRole::class,
             'check_country' => App\Domains\Command\Middlewares\EnsureCountryStatus::class,
             'block_soft_country_orders' => App\Domains\Command\Middlewares\EnsureBlockOrdersForSoftDisabledCountry::class,
