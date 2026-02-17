@@ -323,13 +323,13 @@
                      
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
-                    // window.location.href = "/auth/login";
+                    window.location.href = "/auth/login";
                 })
                 .catch(error => {
                     console.error("Logout Error:", error);
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
-                    // window.location.href = "/auth/login";
+                    window.location.href = "/auth/login";
                 });
         }
     </script>

@@ -3,8 +3,9 @@
 namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Domains\Accounts\Requests\StoreRiderRequest;
+use App\Domains\Catalog\Admin\Models\MartCategory;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Domains\Security\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Commands\AssignRole;
@@ -14,7 +15,7 @@ class RiderController extends Controller
       public function index()
     {
         // 1. Fetch Categories (Kept as per your previous code, though maybe less relevant for riders)
-        $categories = \App\Models\MartCategory::where('status', 1)->get();
+        $categories = MartCategory::where('status', 1)->get();
 
         // 2. Fetch Riders (Users) and Map to the Table Structure
         // We filter by a role or just fetch all users depending on your logic. 

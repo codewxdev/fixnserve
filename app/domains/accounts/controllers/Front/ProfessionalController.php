@@ -4,7 +4,7 @@ namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Domains\Accounts\Requests\StoreProfessionalRequest;
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Domains\Security\Models\User;
 use App\Services\ProfessionalService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
