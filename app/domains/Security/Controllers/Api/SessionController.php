@@ -14,14 +14,26 @@ class SessionController extends Controller
      * 1️⃣ List Active Sessions
      * GET /api/sessions
      */
-    public function index(Request $request)
+    // public function index(Request $request)
+    // {
+    //     $sessions = UserSession::with('user')
+    //         ->whereNull('logout_at')
+    //         ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
+    //         ->when($request->role, fn ($q) => $q->where('role', $request->role))
+    //         ->when($request->region, fn ($q) => $q->where('region', $request->region))
+    //         ->latest('last_activity_at')
+    //         ->get();
+
+    //     return response()->json($sessions);
+    // }
+    // 1. Fetch ONLY Active Sessions
+    public function index()
     {
-        $sessions = UserSession::with('user')
-            ->whereNull('logout_at')
-            ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
-            ->when($request->role, fn ($q) => $q->where('role', $request->role))
-            ->when($request->region, fn ($q) => $q->where('region', $request->region))
-            ->latest('last_activity_at')
+        // Hum sirf wo sessions layengy jo abhi tak logout nahi huye (Active hain)
+        $sessions = UserSession::with('user') // User data bhi sath layen
+            ->whereNull('logout_at')          // Jo logout nahi huye
+            ->where('is_revoked', false)      // Jo zabardasti revoke nahi huye
+            ->orderBy('last_activity_at', 'desc') // Latest pehly
             ->get();
 
         return response()->json($sessions);
@@ -56,20 +68,37 @@ class SessionController extends Controller
      * 4️⃣ Revoke All Sessions for a User
      * POST /api/sessions/revoke-all
      */
+    // public function revokeAll(Request $request)
+    // {
+    //     $request->validate([
+    //         'user_id' => 'required|exists:users,id',
+    //     ]);
+
+    //     $user = UserSession::where('user_id', $request->user_id)
+    //         ->whereNull('logout_at')->each(fn ($session) => $this->revokeSession($session));
+
+    //     return response()->json([
+    //         'message' => 'All user sessions revoked',
+    //     ]);
+    // }
+
+    // 2. Revoke ALL Sessions (System-wide Logout / Panic Button)
     public function revokeAll(Request $request)
     {
-        $request->validate([
-            'user_id' => 'required|exists:users,id',
-        ]);
-
-        $user = UserSession::where('user_id', $request->user_id)
-            ->whereNull('logout_at')->each(fn ($session) => $this->revokeSession($session));
+        // Validation hata di hai kyunke hamein kisi specific user ki ID nahi chahiye.
+        // Hum SEEDHA database mein update query chalayengy.
+        
+        $affected = UserSession::whereNull('logout_at')
+            ->where('is_revoked', false)
+            ->update([
+                'is_revoked' => true,
+                'logout_at' => now(),
+            ]);
 
         return response()->json([
-            'message' => 'All user sessions revoked',
+            'message' => "Success! Total {$affected} active sessions have been terminated.",
         ]);
     }
-
     /**
      * 5️⃣ Force Logout by Role
      * POST /api/sessions/revoke-role

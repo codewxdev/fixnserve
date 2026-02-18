@@ -4,40 +4,42 @@
 
 @section('content')
     <div class="min-h-screen theme-bg-body theme-text-main max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
+
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
             <div>
                 <h1 class="text-2xl font-bold theme-text-main">Active Sessions</h1>
                 <p class="theme-text-muted mt-1">Monitor and control user access in real-time.</p>
             </div>
-            
+
             <div class="flex gap-3">
-                <button onclick="openRevokeRoleModal()" 
+                <button onclick="openRevokeRoleModal()"
                     class="flex items-center gap-2 px-4 py-2 theme-bg-card border theme-border rounded-lg text-sm font-medium hover:bg-white/5 theme-text-main transition-colors shadow-sm">
-                    <i data-lucide="users" class="w-4 h-4 theme-text-muted"></i> 
+                    <i data-lucide="users" class="w-4 h-4 theme-text-muted"></i>
                     <span>Revoke by Role</span>
                 </button>
-                <button onclick="revokeAllSessions()" 
+                <button onclick="revokeAllSessions()"
                     class="flex items-center gap-2 px-4 py-2 text-white rounded-lg text-sm font-medium shadow-sm transition-colors hover:opacity-90"
                     style="background-color: #ef4444;"> {{-- Red for Danger --}}
-                    <i data-lucide="skull" class="w-4 h-4"></i> 
+                    <i data-lucide="skull" class="w-4 h-4"></i>
                     <span>Revoke All Sessions</span>
                 </button>
             </div>
         </div>
 
-        <div class="theme-bg-card p-4 rounded-xl border theme-border shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
+        <div
+            class="theme-bg-card p-4 rounded-xl border theme-border shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
             <div class="flex gap-4 flex-1">
                 <div class="relative w-full max-w-sm">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-text-muted"></i>
-                    <input type="text" id="search-input" placeholder="Search user, IP, or Device..." 
+                    <input type="text" id="search-input" placeholder="Search user, IP, or Device..."
                         class="pl-10 w-full theme-bg-body border theme-border rounded-lg text-sm theme-text-main focus:ring-2 focus:ring-blue-500 placeholder-gray-500">
                 </div>
-                <select id="risk-filter" class="theme-bg-body border theme-border theme-text-main rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
+                <select id="risk-filter"
+                    class="theme-bg-body border theme-border theme-text-main rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
                     <option value="all">All Risk Levels</option>
                     <option value="high">High Risk (>50)</option>
                     <option value="medium">Medium Risk (10-50)</option>
-                    <option value="low">Low Risk (<10)</option>
+                    <option value="low">Low Risk (<10)< /option>
                 </select>
             </div>
             <div class="text-sm theme-text-muted">
@@ -48,7 +50,8 @@
         <div class="theme-bg-card rounded-xl shadow-sm border theme-border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm theme-text-muted">
-                    <thead class="theme-text-main font-semibold uppercase text-xs border-b theme-border" style="background-color: rgba(var(--bg-body), 0.5);">
+                    <thead class="theme-text-main font-semibold uppercase text-xs border-b theme-border"
+                        style="background-color: rgba(var(--bg-body), 0.5);">
                         <tr>
                             <th class="px-6 py-4">User Details</th>
                             <th class="px-6 py-4">Device / IP</th>
@@ -58,7 +61,8 @@
                             <th class="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="sessions-table-body" class="divide-y theme-border" style="border-color: rgb(var(--border-color));">
+                    <tbody id="sessions-table-body" class="divide-y theme-border"
+                        style="border-color: rgb(var(--border-color));">
                         <tr>
                             <td colspan="6" class="px-6 py-12 text-center theme-text-muted">
                                 <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 opacity-50"></i>
@@ -73,21 +77,24 @@
     </div>
 
     {{-- ROLE REVOKE MODAL --}}
-    <div id="role-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div id="role-modal"
+        class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="theme-bg-card rounded-xl shadow-2xl max-w-md w-full p-6 border theme-border">
             <h3 class="text-lg font-bold theme-text-main mb-2">Force Logout by Role</h3>
-            <p class="text-sm theme-text-muted mb-4">This will immediately terminate sessions for all users with the selected role.</p>
-            
-            <select id="role-select" class="w-full mb-6 theme-bg-body border theme-border theme-text-main rounded-lg focus:ring-2 focus:ring-red-500">
+            <p class="text-sm theme-text-muted mb-4">This will immediately terminate sessions for all users with the
+                selected role.</p>
+
+            <select id="role-select"
+                class="w-full mb-6 theme-bg-body border theme-border theme-text-main rounded-lg focus:ring-2 focus:ring-red-500">
                 <option value="admin">Administrators</option>
                 <option value="moderator">Moderators</option>
                 <option value="user">Standard Users</option>
             </select>
 
             <div class="flex justify-end gap-3">
-                <button onclick="document.getElementById('role-modal').classList.add('hidden')" 
+                <button onclick="document.getElementById('role-modal').classList.add('hidden')"
                     class="px-4 py-2 theme-text-muted hover:bg-white/5 rounded-lg border theme-border transition">Cancel</button>
-                <button onclick="revokeByRole()" 
+                <button onclick="revokeByRole()"
                     class="px-4 py-2 text-white rounded-lg font-medium shadow-sm transition hover:opacity-90"
                     style="background-color: #ef4444;">Confirm Logout</button>
             </div>
@@ -97,16 +104,16 @@
 
 @push('scripts')
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <script>
         // ==============================
         // 1. CONFIGURATION & STATE
         // ==============================
         const API_BASE = "{{ url('/api') }}";
-        
+
         // Headers with Auth Token (Local Storage se utha raha hun)
         function getHeaders() {
-            const token = localStorage.getItem('access_token');
+            const token = localStorage.getItem('token');
             return {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token,
@@ -128,42 +135,31 @@
         // A. Fetch All Sessions
         async function fetchSessions() {
             const tbody = document.getElementById('sessions-table-body');
-            
-            // Show Loading State
-            tbody.innerHTML = `
-                <tr><td colspan="6" class="px-6 py-12 text-center theme-text-muted">
-                    <i data-lucide="loader-2" class="w-8 h-8 animate-spin mx-auto mb-2 opacity-50"></i>
-                    Fetching latest sessions...
-                </td></tr>
-            `;
+            tbody.innerHTML =
+                `<tr><td colspan="6" class="text-center py-8"><i data-lucide="loader-2" class="animate-spin w-6 h-6 mx-auto"></i></td></tr>`;
             lucide.createIcons();
 
             try {
-                const response = await fetch(`${API_BASE}/sessions`, { headers: getHeaders() });
-                
-                if (!response.ok) throw new Error("Unauthorized or Failed");
+                const response = await fetch(`${API_BASE}/sessions`, {
+                    headers: getHeaders()
+                });
+                const data = await response.json();
 
-                let data = await response.json();
-                
-                // Handle Response Format (Direct array or {data: []})
+                // Data handling (Direct array or paginated)
                 const sessions = Array.isArray(data) ? data : (data.data || []);
-                
-                renderTable(sessions);
 
-            } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `
-                    <tr><td colspan="6" class="text-center py-4 text-red-500 font-bold">
-                        Failed to load sessions. Please check if you are logged in.
-                        <br><button onclick="fetchSessions()" class="mt-2 underline text-sm">Retry</button>
-                    </td></tr>
-                `;
+                renderTable(sessions); // Render function wahi purana use karein
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML =
+                    `<tr><td colspan="6" class="text-center text-red-500 py-4">Error loading sessions</td></tr>`;
             }
         }
 
         // B. Revoke Single Session (Kill)
         async function revokeSession(id) {
-            if(!confirm('Are you sure you want to kill this session? The user will be logged out immediately.')) return;
+            if (!confirm('Are you sure you want to kill this session? The user will be logged out immediately.'))
+        return;
 
             try {
                 const response = await fetch(`${API_BASE}/sessions/${id}/revoke`, {
@@ -171,7 +167,7 @@
                     headers: getHeaders()
                 });
 
-                if(response.ok) {
+                if (response.ok) {
                     showToast("Success", "Session terminated successfully.");
                     fetchSessions(); // Refresh Table
                 } else {
@@ -185,8 +181,8 @@
 
         // C. Revoke All Sessions (Panic Button)
         async function revokeAllSessions() {
-            if(!confirm('DANGER: This will log out EVERYONE (Active Users). Are you sure?')) return;
-            
+            if (!confirm('DANGER: This will log out EVERYONE (Active Users). Are you sure?')) return;
+
             try {
                 const response = await fetch(`${API_BASE}/sessions/revoke-all`, {
                     method: 'POST',
@@ -209,7 +205,7 @@
         async function revokeByRole() {
             const role = document.getElementById('role-select').value;
             const btn = document.querySelector('#role-modal button.bg-red-500'); // Button selector
-            
+
             // Disable button
             btn.innerText = "Processing...";
             btn.disabled = true;
@@ -218,12 +214,14 @@
                 const response = await fetch(`${API_BASE}/sessions/revoke-role`, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ role: role }) // Sending Role in Body
+                    body: JSON.stringify({
+                        role: role
+                    }) // Sending Role in Body
                 });
 
                 const result = await response.json();
                 alert(result.message || `Sessions for ${role} revoked.`);
-                
+
                 document.getElementById('role-modal').classList.add('hidden');
                 fetchSessions();
             } catch (error) {
@@ -238,17 +236,19 @@
         async function flagSession(id) {
             // API Error showed "risk_score field is required", so we ask for it
             const score = prompt("Enter new Risk Score (0-100) for this session:", "99");
-            
+
             if (score === null) return; // Cancelled
 
             try {
                 const response = await fetch(`${API_BASE}/sessions/${id}/flag`, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ risk_score: score })
+                    body: JSON.stringify({
+                        risk_score: score
+                    })
                 });
 
-                if(response.ok) {
+                if (response.ok) {
                     showToast("Alert", "Session flagged as High Risk.");
                     fetchSessions();
                 } else {
@@ -268,27 +268,28 @@
             const tbody = document.getElementById('sessions-table-body');
             const searchInput = document.getElementById('search-input').value.toLowerCase();
             const riskFilter = document.getElementById('risk-filter').value;
-            
+
             tbody.innerHTML = '';
 
             // Client Side Filtering (Optional, for smoother UX)
             const filtered = sessions.filter(s => {
-                const matchSearch = (s.user.name.toLowerCase().includes(searchInput) || 
-                                     s.user.email.toLowerCase().includes(searchInput) ||
-                                     (s.ip_address && s.ip_address.includes(searchInput)));
-                
+                const matchSearch = (s.user.name.toLowerCase().includes(searchInput) ||
+                    s.user.email.toLowerCase().includes(searchInput) ||
+                    (s.ip_address && s.ip_address.includes(searchInput)));
+
                 let matchRisk = true;
-                if(riskFilter === 'high') matchRisk = s.risk_score > 50;
-                if(riskFilter === 'medium') matchRisk = s.risk_score >= 10 && s.risk_score <= 50;
-                if(riskFilter === 'low') matchRisk = s.risk_score < 10;
+                if (riskFilter === 'high') matchRisk = s.risk_score > 50;
+                if (riskFilter === 'medium') matchRisk = s.risk_score >= 10 && s.risk_score <= 50;
+                if (riskFilter === 'low') matchRisk = s.risk_score < 10;
 
                 return matchSearch && matchRisk;
             });
 
             document.getElementById('session-count').innerText = filtered.length;
 
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center theme-text-muted">No active sessions found.</td></tr>`;
+            if (filtered.length === 0) {
+                tbody.innerHTML =
+                    `<tr><td colspan="6" class="px-6 py-8 text-center theme-text-muted">No active sessions found.</td></tr>`;
                 return;
             }
 
@@ -296,11 +297,11 @@
                 // Formatting Logic
                 let badgeColor = 'bg-green-500/10 text-green-500 border border-green-500/20';
                 let riskLabel = 'Low';
-                
-                if(session.risk_score > 50) {
+
+                if (session.risk_score > 50) {
                     badgeColor = 'bg-red-500/10 text-red-500 border border-red-500/20';
                     riskLabel = 'High';
-                } else if(session.risk_score > 10) {
+                } else if (session.risk_score > 10) {
                     badgeColor = 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20';
                     riskLabel = 'Medium';
                 }
@@ -309,7 +310,8 @@
                 const userName = session.user ? session.user.name : 'Unknown';
                 const userEmail = session.user ? session.user.email : 'No Email';
                 const userInitial = userName.charAt(0);
-                const lastActive = session.last_activity_at ? new Date(session.last_activity_at).toLocaleTimeString() : 'N/A';
+                const lastActive = session.last_activity_at ? new Date(session.last_activity_at)
+                .toLocaleTimeString() : 'N/A';
                 const location = session.location || 'Unknown Location';
                 const device = session.device || 'Unknown Device';
 
@@ -380,6 +382,5 @@
             // alert(`${title}: ${message}`); 
             console.log(title, message);
         }
-
     </script>
 @endpush
