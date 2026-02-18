@@ -7,6 +7,8 @@ use App\Domains\Command\Models\KillSwitch;
 use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
 use App\Domains\Security\Middlewares\Ensure2FAEnabled;
 use App\Domains\Security\Middlewares\EnsureActiveSession;
+use App\Domains\Security\Middlewares\LoginMethodPolicyMiddleware;
+use App\Domains\Security\Middlewares\MFAPolicyMiddleware;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -58,6 +60,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'login.policy' => LoginMethodPolicyMiddleware::class,
+            'mfa.policy' => MFAPolicyMiddleware::class,
             'active.session' => EnsureActiveSession::class,
             'emergency' => EnsureEmergencyOverrideMiddleware::class,
             'kill' => EnsureKillSwitch::class,
@@ -80,7 +84,8 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
-        $schedule->command('promotions:expire')->everyMinute()->withoutOverlapping()->onOneServer();
+        $schedule->command('promotions:expire')->everyMinute();
+        $schedule->command('security:password-rotation')->daily();
         $schedule->job(new CalculateApiMetrics)->everyMinute();
         $schedule->call(function () {
             // Activate scheduled maintenances
@@ -115,4 +120,5 @@ return Application::configure(basePath: dirname(__DIR__))
             });
 
         })->everyMinute();
+
     })->create();
