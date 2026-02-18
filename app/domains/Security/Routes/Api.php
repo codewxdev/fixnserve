@@ -1,6 +1,7 @@
 <?php
 
 use App\Domains\Security\Controllers\Api\AuthController;
+use App\Domains\Security\Controllers\Api\AuthGovernanceController;
 use App\Domains\Security\Controllers\Api\PasswordResetCodeController;
 use App\Domains\Security\Controllers\Api\SessionController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('health_api', 'check_country')->group(function () {
 
     Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:login');
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:login', 'login.policy']);
     Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
     Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
     Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
@@ -46,6 +47,20 @@ Route::middleware('health_api', 'check_country')->group(function () {
                 Route::post('revoke-all', [SessionController::class, 'revokeAll']);
                 Route::post('revoke-role', [SessionController::class, 'revokeByRole']);
                 // Route::post('revoke-region', [SessionController::class, 'revokeByRegion']);
+            });
+
+            // ///////////////////////auth governance route//////////////////////
+            Route::prefix('auth/governance')->group(function () {
+
+                Route::get('/', [AuthGovernanceController::class, 'index']);
+
+                Route::post('/login-methods', [AuthGovernanceController::class, 'updateLoginMethods']);
+
+                Route::post('/mfa', [AuthGovernanceController::class, 'updateMFA']);
+
+                Route::post('/password-rules', [AuthGovernanceController::class, 'updatePasswordRules']);
+
+                Route::post('/force-reset', [AuthGovernanceController::class, 'forcePasswordReset']);
             });
 
         });

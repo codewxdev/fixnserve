@@ -2,6 +2,8 @@
 
 namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Security\Models\AuthPolicy;
+use App\Domains\Security\Models\MFAPolicy;
 use App\Domains\Security\Models\User;
 use App\Domains\Security\Models\UserSession;
 use App\Http\Controllers\Controller;
@@ -98,10 +100,88 @@ class AuthController extends Controller
 
         $user = auth()->user();
 
-        // For Admin / Super Admin – 2FA
-        if ($user->hasRole(['Admin', 'Super Admin'])) {
+        /* =======================
+         | AUTH GOVERNANCE CHECKS
+         ======================= */
+
+        $authPolicy = AuthPolicy::current();
+
+        /**
+         * 1️⃣ Account status
+         */
+        if ($user->status !== 'active') {
+            return response()->json(['error' => 'Account inactive'], 403);
+        }
+
+        /**
+         * 2️⃣ LOGIN RULES (JSON BASED – ROLE + TIME)
+         */
+        $rules = $authPolicy->login_rules ?? [];
+        $role = $user->role;
+        $now = now()->format('H:i');
+
+        // Role specific rule
+        if (isset($rules['roles'][$role])) {
+
+            $roleRule = $rules['roles'][$role];
+
+            // Role blocked
+            if (($roleRule['allowed'] ?? true) === false) {
+                return response()->json(['error' => 'Login not allowed for this role'], 403);
+            }
+
+            // Role time window
+            if (isset($roleRule['time'])) {
+                if (
+                    $now < $roleRule['time']['from'] ||
+                    $now > $roleRule['time']['to']
+                ) {
+                    return response()->json(['error' => 'Login not allowed at this time'], 403);
+                }
+            }
+
+        }
+        // Default rule
+        elseif (isset($rules['default']['time'])) {
+
+            if (
+                $now < $rules['default']['time']['from'] ||
+                $now > $rules['default']['time']['to']
+            ) {
+                return response()->json(['error' => 'Login not allowed at this time'], 403);
+            }
+        }
+
+        /**
+         * 3️⃣ Force password reset
+         */
+        if ($user->force_password_reset) {
+            return response()->json([
+                'status' => 'password_reset_required',
+                'message' => 'Password reset required by security policy',
+            ], 403);
+        }
+
+        /**
+         * 4️⃣ MFA POLICY (CONFIG DRIVEN)
+         */
+        $mfaPolicy = MFAPolicy::current();
+        $mfaRequired = false;
+
+        if ($mfaPolicy->enforcement_policy === 'all_users') {
+            $mfaRequired = true;
+        }
+
+        if (
+            $mfaPolicy->enforcement_policy === 'admins_only' &&
+            $user->hasRole(['Admin', 'Super Admin'])
+        ) {
+            $mfaRequired = true;
+        }
+
+        if ($mfaRequired) {
+
             if ($user->is_2fa_enabled) {
-                // Return 2FA required response; do NOT create session yet
                 return response()->json([
                     'status' => '2fa_required',
                     'email' => $user->email,
@@ -111,15 +191,16 @@ class AuthController extends Controller
                 ]);
             }
 
-            // Admin without 2FA enabled
             return response()->json([
                 'status' => 'enable_2fa',
-                'message' => 'Admin account must enable 2FA.',
+                'message' => 'Two-factor authentication is required.',
                 'access_token' => $token,
             ]);
         }
 
-        // Normal user – create session immediately
+        /**
+         * 5️⃣ Create session (NORMAL USERS)
+         */
         $this->createSession($user, $token, $jwtId, $request);
 
         return $this->respondWithToken($token);

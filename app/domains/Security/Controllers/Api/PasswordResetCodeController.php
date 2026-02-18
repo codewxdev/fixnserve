@@ -84,7 +84,12 @@ class PasswordResetCodeController extends Controller
 
         $user = User::where('email', $request->email)->first();
 
-        $user->update(['password' => Hash::make($request->password)]);
+        // $user->update(['password' => Hash::make($request->password)]);
+        $user->update([
+            'password' => Hash::make($request->password),
+            'last_password_changed_at' => now(),
+            'force_password_reset' => false,
+        ]);
 
         $record->update(['is_used' => true]);
 
