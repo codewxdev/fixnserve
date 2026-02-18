@@ -72,7 +72,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'service.provider' => EnsureServiceProviderRole::class,
             'check_country' => App\Domains\Command\Middlewares\EnsureCountryStatus::class,
             'block_soft_country_orders' => App\Domains\Command\Middlewares\EnsureBlockOrdersForSoftDisabledCountry::class,
-            // 'javed' => \App\Http\Middleware\Admin\AuthMiddleware::class,
 
         ]);
     })

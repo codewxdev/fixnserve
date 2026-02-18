@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 
 // Super Admin Routes (with additional checks)
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/', function () {
         return view('Admin.dashboard.index');
     })->name('dashboard.index');
