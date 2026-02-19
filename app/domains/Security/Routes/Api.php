@@ -14,11 +14,12 @@ Route::middleware('health_api', 'check_country')->group(function () {
     Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
     Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
     Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
+
     Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
 
     // Main Authenticated Routes Group with User Status Check
-    Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
+    Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'device.bind', 'token.role'])->group(function () {
 
         // Auth Routes
         Route::get('/auth/me', [AuthController::class, 'me']);
@@ -30,7 +31,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
 
         // Super Admin Routes (with additional checks)
-        Route::middleware(['role:Super Admin', '2fa'])->group(function () {
+        Route::middleware(['role:Super Admin', '2fa', 'scope:admin:*', 'token.role'])->group(function () {
 
             Route::get('/login-history', [AuthController::class, 'loginHistory']);
 
@@ -64,6 +65,11 @@ Route::middleware('health_api', 'check_country')->group(function () {
             });
 
         });
+        Route::get('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'index']);
+        Route::put('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'updateTokenPolicy']);
+        Route::get('tokens', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'listTokens']);
+        Route::post('/tokens/{jti}/rotate', [AuthController::class, 'rotateToken']);
+        Route::delete('/auth/token/revoke/{jti}', [AuthController::class, 'revokeToken']);
 
     });
 
