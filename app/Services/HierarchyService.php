@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\Category;
-use App\Models\Subcategory;
+use App\Domains\Catalog\Admin\Models\Category;
+use App\Domains\Catalog\Admin\Models\Subcategory;
 
 class HierarchyService
 {

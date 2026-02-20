@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Front;
 
+use App\Domains\Catalog\Admin\Models\Category;
+use App\Domains\Catalog\Admin\Models\Specialty;
+use App\Domains\Catalog\Admin\Models\Subcategory;
+use App\Domains\Catalog\Admin\Models\SubSpecialty;
+use App\Domains\Catalog\Admin\Requests\StoreCategoryRequest;
+use App\Domains\Catalog\Admin\Requests\StoreSubcategoryRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\StoreSubcategoryRequest;
-use App\Models\Category;
-use App\Models\Specialty;
-use App\Models\Subcategory;
-use App\Models\SubSpecialty;
 use App\Services\HierarchyService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
