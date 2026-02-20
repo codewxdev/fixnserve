@@ -15,8 +15,11 @@ class UserSession extends Model
         'location',
         'risk_score',
         'last_activity_at',
+        'expires_at',
+        'revoked_at',
         'logout_at',
         'is_revoked',
+        'device_id',
     ];
 
     protected $casts = [

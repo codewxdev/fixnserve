@@ -14,7 +14,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
     Route::get('/skill/search', [SkillController::class, 'search']);
 
     // Main Authenticated Routes Group with User Status Check
-    Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
+    Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session'])->group(function () {
         Route::prefix('skills')->group(function () {
             Route::post('/add', [SkillController::class, 'addSkills']);
         });

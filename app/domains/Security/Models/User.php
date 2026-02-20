@@ -310,4 +310,9 @@ class User extends Authenticatable implements JWTSubject
             'consultant',
         ]);
     }
+
+    public function devices()
+    {
+        return $this->hasMany(Device::class);
+    }
 }

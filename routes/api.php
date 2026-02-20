@@ -53,7 +53,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         ]);
     });
     // Main Authenticated Routes Group with User Status Check
-    Route::middleware(['auth:api', 'user.active', 'active.session'])->group(function () {
+    Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'validate.session'])->group(function () {
         // /////////middleware for blocking order for soft_disable country/////////
         Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders'])->group(function () {
             // //////////////////////////book slot for consultant////////////
@@ -159,14 +159,14 @@ Route::middleware('health_api', 'check_country')->group(function () {
         });
 
     });
-    Route::middleware(['auth:api', 'active.session'])->prefix('admin')->group(function () {
+    Route::middleware(['auth:api', 'active.session', 'scope:read:basic'])->prefix('admin')->group(function () {
         Route::apiResource('subscription-plans', SubscriptionPlanController::class);
         Route::apiResource('subscription-entitlements', SubscriptionEntitlementController::class);
         Route::apiResource('promotions', PromotionController::class);
         Route::apiResource('promotion-slots', PromotionSlotController::class);
         Route::post('/trasportation/type', [TransportTypeController::class, 'store']);
     });
-    Route::middleware('auth:api', 'kill:subscriptions', 'active.session')->group(function () {
+    Route::middleware('auth:api', 'kill:subscriptions', 'active.session', 'scope:read:basic')->group(function () {
 
         Route::post('/subscribe', [SubscriptionController::class, 'subscribe']);
         Route::post('/unsubscribe', [SubscriptionController::class, 'cancel']);

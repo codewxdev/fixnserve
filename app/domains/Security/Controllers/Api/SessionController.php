@@ -6,7 +6,6 @@ use App\Domains\Security\Models\UserSession;
 use App\Http\Controllers\Controller;
 use App\Models\BlacklistedToken;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class SessionController extends Controller
 {
@@ -146,13 +145,12 @@ class SessionController extends Controller
     private function revokeSession(UserSession $session)
     {
         // Super Admin session ko skip karna
-        if ($session->user->role === 'Super Admin') {
+        if ($session->user->roles === 'Super Admin') {
             return; // kuch bhi revoke nahi
         }
 
         // Get token expiry from JWT
-        $payload = JWTAuth::setToken($session->token)->getPayload();
-        $expiresAt = now()->setTimestamp($payload->get('exp'));
+        $expiresAt = $session->expires_at;
 
         // Store in DB blacklist
         BlacklistedToken::updateOrCreate(
@@ -165,6 +163,7 @@ class SessionController extends Controller
         // Update session
         $session->update([
             'is_revoked' => true,
+            'revoked_at' => now(),
             'logout_at' => now(),
         ]);
     }
