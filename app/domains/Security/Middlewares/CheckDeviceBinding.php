@@ -2,6 +2,7 @@
 
 namespace App\Domains\Security\Middlewares;
 
+use App\Domains\Security\Models\Device;
 use App\Domains\Security\Models\UserSession;
 use Closure;
 use Illuminate\Http\Request;
@@ -16,22 +17,41 @@ class CheckDeviceBinding
      */
     public function handle($request, Closure $next)
     {
-        $payload = JWTAuth::parseToken()->getPayload();
-        $jti = $payload->get('jti');
+        try {
+            $payload = JWTAuth::parseToken()->getPayload();
+            $jti = $payload->get('jti');
 
-        $session = UserSession::where('jwt_id', $jti)
-            ->where('is_revoked', false)
-            ->first();
+            $session = UserSession::where('jwt_id', $jti)
+                ->where('is_revoked', false)
+                ->first();
+            if (! $session) {
+                abort(401, 'Session revoked');
+            }
 
-        if (! $session) {
-            abort(401, 'Session revoked');
+            // 🔐 Get fingerprint from request
+            $fingerprint = $request->header('X-Device-Fingerprint');
+            // dd($fingerprint);
+            if (! $fingerprint) {
+                abort(401, 'Device fingerprint missing');
+            }
+
+            $device = Device::where('fingerprint', $fingerprint)
+                ->where('user_id', $session->user_id)
+                ->first();
+
+            if (! $device) {
+                abort(401, 'Device not recognized');
+            }
+
+            // 🚨 Compare with session device
+            if ($session->device_id !== $device->id) {
+                abort(401, 'Device mismatch');
+            }
+
+            return $next($request);
+
+        } catch (\Exception $e) {
+            abort(401, 'Invalid token');
         }
-
-        if ($session->device !== ($request->userAgent() ?? 'Unknown')) {
-            // dd('Device mismatch: expected '.$session->device.', got '.($request->userAgent() ?? 'Unknown'));
-            abort(401, 'Device mismatch');
-        }
-
-        return $next($request);
     }
 }

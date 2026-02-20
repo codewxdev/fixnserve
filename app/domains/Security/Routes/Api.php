@@ -74,8 +74,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
 
             Route::prefix('devices')->group(function () {
                 Route::get('/policies', [DeviceController::class, 'getPolicies']);
-                Route::patch('/policies', [DeviceController::class, 'updatePolicies']);
-
+                Route::post('/policy', [DeviceController::class, 'storeOrUpdatePolicy']);
                 Route::get('/insights', [DeviceController::class, 'insights']);
                 Route::get('/', [DeviceController::class, 'index']);
 

@@ -79,6 +79,31 @@ class User extends Authenticatable implements JWTSubject
         'created_at',
         'updated_at',
         'email_verified_at',
+        'mode',
+        'uuid',
+        'lat',           // Added
+        'lon',
+        'country_id',  // Only country_id needed now
+        'phone_status',  // Added
+        'rating',        // Added
+        'favourite', // Add UUID to fillable
+        'dob',
+        'gender',
+        'is_2fa_enabled',
+        'google2fa_secret',
+        'current_address',
+        'address',
+        'city',
+        'state',
+        'zipcode',
+        'last_password_changed_at',
+        'force_password_reset',
+        'phone_verified_at',
+        'phone_otp',
+        'pending_phone',
+        'image',
+        'phone',
+
     ];
 
     /**

@@ -16,6 +16,7 @@ class CheckScope
     public function handle($request, Closure $next, ...$requiredScopes)
     {
         $payload = JWTAuth::parseToken()->getPayload();
+        // dd($payload);
         $tokenScopes = $payload->get('scopes', []);
 
         foreach ($requiredScopes as $scope) {
