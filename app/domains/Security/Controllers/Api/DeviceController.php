@@ -17,20 +17,27 @@ class DeviceController extends Controller
         return response()->json($policy);
     }
 
-    // 2. Update policies
-    public function updatePolicies(Request $request)
+    public function storeOrUpdatePolicy(Request $request)
     {
         $data = $request->validate([
-            'max_trusted_devices' => 'integer|min:1',
+            'max_trusted_devices' => 'required|integer|min:1',
             'trust_expiration_days' => 'nullable|integer|min:1',
-            'require_otp_new_device' => 'boolean',
-            'block_rooted_devices' => 'boolean',
+            'require_otp_new_device' => 'required|boolean',
+            'block_rooted_devices' => 'required|boolean',
         ]);
-
+        // dD($data);
         $policy = DevicePolicy::first();
-        $policy->update($data);
+        if ($policy) {
+            $policy->update($data);
+        } else {
+            $policy = DevicePolicy::create($data);
+        }
 
-        return response()->json(['message' => 'Policies updated', 'policy' => $policy]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Device policy saved successfully',
+            'policy' => $policy,
+        ]);
     }
 
     // 3. Device stats / insights

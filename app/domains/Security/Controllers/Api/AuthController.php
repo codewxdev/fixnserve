@@ -356,7 +356,14 @@ class AuthController extends Controller
         }
 
         $jwtId = (string) Str::uuid();
-        $token = JWTAuth::claims(['jti' => $jwtId])->fromUser($user);
+        $scopes = $this->resolveScopes($user);
+
+        $token = JWTAuth::claims([
+            'jti' => $jwtId,
+            'role' => $user->role,
+            'scopes' => $scopes,
+        ])->fromUser($user);
+        // $token = JWTAuth::claims(['jti' => $jwtId,])->fromUser($user);
 
         // Create user session after successful 2FA
         $this->createSession($user, $token, $jwtId, $request);
