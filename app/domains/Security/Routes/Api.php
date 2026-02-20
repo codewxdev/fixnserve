@@ -2,6 +2,7 @@
 
 use App\Domains\Security\Controllers\Api\AuthController;
 use App\Domains\Security\Controllers\Api\AuthGovernanceController;
+use App\Domains\Security\Controllers\Api\DeviceController;
 use App\Domains\Security\Controllers\Api\PasswordResetCodeController;
 use App\Domains\Security\Controllers\Api\SessionController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
@@ -64,12 +65,25 @@ Route::middleware('health_api', 'check_country')->group(function () {
                 Route::post('/force-reset', [AuthGovernanceController::class, 'forcePasswordReset']);
             });
 
+            Route::get('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'index']);
+            Route::put('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'updateTokenPolicy']);
+            Route::get('tokens', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'listTokens']);
+            Route::post('/tokens/{jti}/rotate', [AuthController::class, 'rotateToken']);
+            Route::delete('/auth/token/revoke/{jti}', [AuthController::class, 'revokeToken']);
+
+            Route::prefix('devices')->group(function () {
+                Route::get('/policies', [DeviceController::class, 'getPolicies']);
+                Route::patch('/policies', [DeviceController::class, 'updatePolicies']);
+
+                Route::get('/insights', [DeviceController::class, 'insights']);
+                Route::get('/', [DeviceController::class, 'index']);
+
+                Route::post('{device}/trust', [DeviceController::class, 'trust']);
+                Route::post('{device}/revoke', [DeviceController::class, 'revoke']);
+                Route::post('{device}/ban', [DeviceController::class, 'ban']);
+                Route::post('{device}/unban', [DeviceController::class, 'unban']);
+            });
         });
-        Route::get('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'index']);
-        Route::put('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'updateTokenPolicy']);
-        Route::get('tokens', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'listTokens']);
-        Route::post('/tokens/{jti}/rotate', [AuthController::class, 'rotateToken']);
-        Route::delete('/auth/token/revoke/{jti}', [AuthController::class, 'revokeToken']);
 
     });
 

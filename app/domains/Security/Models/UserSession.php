@@ -19,6 +19,7 @@ class UserSession extends Model
         'revoked_at',
         'logout_at',
         'is_revoked',
+        'device_id',
     ];
 
     protected $casts = [

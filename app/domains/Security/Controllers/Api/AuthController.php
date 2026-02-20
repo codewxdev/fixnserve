@@ -11,11 +11,11 @@ use App\Domains\Security\Rules\DynamicPasswordRule;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\Wallet;
+use Illuminate\Container\Attributes\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Jenssegers\Agent\Agent;
 use PragmaRX\Google2FA\Google2FA;
 use Twilio\Rest\Client;
 use Tymon\JWTAuth\Facades\JWTAuth; // Or GdImageBackEnd if Imagick is not installed
@@ -28,12 +28,13 @@ class AuthController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => [
-                'required',
-                'string',
-                'confirmed',
-                new DynamicPasswordRule,
-            ],
+            'password' => ['required', 'string', 'confirmed', new DynamicPasswordRule],
+            'fingerprint' => 'required|string',
+            'device_name' => 'required|string',
+            'os_version' => 'nullable|string',
+            'app_version' => 'nullable|string',
+            'is_rooted' => 'nullable|boolean',
+
         ]);
 
         DB::transaction(function () use ($request, &$user, &$token) {
@@ -49,29 +50,16 @@ class AuthController extends Controller
                 'balance' => 0,
                 'currency' => 'PKR',
             ]);
-
+            $this->resolveDevice($user, $request);
             // JWT generate
             $token = JWTAuth::fromUser($user);
 
             // Token payload (jti)
             $payload = JWTAuth::setToken($token)->getPayload();
+            $jwtId = $payload->get('jti') ?? (string) Str::uuid();
 
             // 🔥 SESSION STORE
-            $policy = TokenPolicy::current();
-
-            UserSession::create([
-                'user_id' => $user->id,
-                'jwt_id' => $payload->get('jti'),
-                'token' => hash('sha256', $token),
-                'device' => $request->header('User-Agent'),
-                'ip_address' => $request->ip(),
-                'location' => null,
-                'risk_score' => 0,
-                'last_activity_at' => now(),
-                'expires_at' => now()->addMinutes(
-                    $policy->access_token_ttl_minutes
-                ),
-            ]);
+            $this->createSession($user, $token, $jwtId, $request);
         });
 
         return response()->json([
@@ -87,6 +75,11 @@ class AuthController extends Controller
         $request->validate([
             'login' => 'required',
             'password' => 'required',
+            'fingerprint' => 'required|string',
+            'device_name' => 'required|string',
+            'os_version' => 'nullable|string',
+            'app_version' => 'nullable|string',
+            'is_rooted' => 'nullable|boolean',
         ]);
 
         $login = $request->login;
@@ -98,20 +91,16 @@ class AuthController extends Controller
         ];
 
         $jwtId = (string) Str::uuid();
-
         if (! $token = JWTAuth::claims([
             'jti' => $jwtId,
         ])->attempt($credentials)) {
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
-
         // ✅ NOW user exists
         $user = auth()->user();
-
+        // $device = Auth($user, $request);
         /* 🔐 Resolve scopes AFTER authentication */
         $scopes = $this->resolveScopes($user);
-        // dd($scopes);
-
         /* 🔄 Re-issue token WITH role + scopes */
         $token = JWTAuth::claims([
             'jti' => $jwtId,
@@ -124,21 +113,18 @@ class AuthController extends Controller
          ======================= */
 
         $authPolicy = AuthPolicy::current();
-
         /**
          * 1️⃣ Account status
          */
         if ($user->status !== 'active') {
             return response()->json(['error' => 'Account inactive'], 403);
         }
-
         /**
          * 2️⃣ LOGIN RULES (JSON BASED – ROLE + TIME)
          */
         $rules = $authPolicy->login_rules ?? [];
         $role = $user->role;
         $now = now()->format('H:i');
-
         // Role specific rule
         if (isset($rules['roles'][$role])) {
 
@@ -170,7 +156,6 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Login not allowed at this time'], 403);
             }
         }
-
         /**
          * 3️⃣ Force password reset
          */
@@ -180,7 +165,6 @@ class AuthController extends Controller
                 'message' => 'Password reset required by security policy',
             ], 403);
         }
-
         /**
          * 4️⃣ MFA POLICY (CONFIG DRIVEN)
          */
@@ -228,6 +212,36 @@ class AuthController extends Controller
         auth()->factory()->setTTL($ttl);
 
         return $this->respondWithToken($token);
+    }
+
+    protected function resolveDevice(User $user, Request $request)
+    {
+        $fingerprint = $request->fingerprint;
+
+        $device = \App\Domains\Security\Models\Device::where('fingerprint', $fingerprint)->first();
+
+        if ($device) {
+            // Existing device → update last seen
+            $device->update([
+                'last_ip' => $request->ip(),
+                'last_seen_at' => now(),
+            ]);
+
+            return $device;
+        }
+
+        // New device
+        return \App\Domains\Security\Models\Device::create([
+            'user_id' => $user->id,
+            'device_name' => $request->device_name,
+            'fingerprint' => $fingerprint,
+            'os_version' => $request->os_version,
+            'app_version' => $request->app_version,
+            'last_ip' => $request->ip(),
+            'trust_status' => 'unverified',
+            'last_seen_at' => now(),
+            'is_rooted' => $request->is_rooted ?? false,
+        ]);
     }
 
     protected function resolveScopes($user): array
@@ -359,16 +373,16 @@ class AuthController extends Controller
      */
     protected function createSession(User $user, $token, $jwtId, Request $request)
     {
-        // $agent = new Agent;
-        // $agent->setUserAgent($request->userAgent());
         $policy = TokenPolicy::current();
+
+        $device = $this->resolveDevice($user, $request);
 
         UserSession::create([
             'user_id' => $user->id,
             'jwt_id' => $jwtId,
             'token' => hash('sha256', $token),
-            'device' => $request->userAgent() ?: 'Unknown',
-            // 'device' => $agent->device() ?: 'Unknown',
+            'device' => $device->device_name,
+            'device_id' => $device->id,
             'ip_address' => $request->ip(),
             'location' => null,
             'risk_score' => 0,
@@ -376,6 +390,7 @@ class AuthController extends Controller
             'expires_at' => now()->addMinutes(
                 $policy->access_token_ttl_minutes
             ),
+
         ]);
     }
 
