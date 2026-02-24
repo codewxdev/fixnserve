@@ -22,6 +22,8 @@ class UserSession extends Model
         'device_id',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $casts = [
         'last_activity_at' => 'datetime',
         'logout_at' => 'datetime',

@@ -4,13 +4,12 @@ namespace App\Domains\Security\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DevicePolicy extends Model
+class GeoRule extends Model
 {
     protected $fillable = [
-        'max_trusted_devices',
-        'trust_expiration_days',
-        'require_otp_new_device',
-        'block_rooted_devices',
+        'country_code',
+        'status',
+        'is_default',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

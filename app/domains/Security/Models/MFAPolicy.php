@@ -12,6 +12,8 @@ class MFAPolicy extends Model
 
     protected $casts = ['allowed_methods' => 'array'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public static function current()
     {
         return self::first() ?? self::create([

@@ -4,13 +4,15 @@ namespace App\Domains\Security\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DevicePolicy extends Model
+class IpRule extends Model
 {
     protected $fillable = [
-        'max_trusted_devices',
-        'trust_expiration_days',
-        'require_otp_new_device',
-        'block_rooted_devices',
+        'cidr',
+        'type',
+        'applies_to',
+        'comment',
+        'expires_at',
+        'is_active',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];

@@ -383,6 +383,31 @@ class AuthController extends Controller
         $policy = TokenPolicy::current();
 
         $device = $this->resolveDevice($user, $request);
+        // dd($device);
+        // 🌍 Resolve Geo From IP
+        $ip = $request->ip();
+        if (app()->environment('local') && ($ip === '127.0.0.1' || $ip === '::1')) {
+            $ip = '8.8.8.8'; // Google DNS (USA)
+
+        }
+        try {
+            $geo = geoip($ip);
+
+            $country = $geo->iso_code ?? null;
+            $city = $geo->city ?? null;
+            $latitude = $geo->lat ?? null;
+            $longitude = $geo->lon ?? null;
+
+            $location = $city && $country
+                ? $city.', '.$country
+                : $country;
+
+        } catch (\Exception $e) {
+            $country = null;
+            $latitude = null;
+            $longitude = null;
+            $location = null;
+        }
 
         UserSession::create([
             'user_id' => $user->id,
@@ -390,8 +415,11 @@ class AuthController extends Controller
             'token' => hash('sha256', $token),
             'device' => $device->device_name,
             'device_id' => $device->id,
-            'ip_address' => $request->ip(),
-            'location' => null,
+            'ip_address' => $ip,
+            'country' => $country,
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'location' => $location,
             'risk_score' => 0,
             'last_activity_at' => now(),
             'expires_at' => now()->addMinutes(

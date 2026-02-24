@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('ip_rules', function (Blueprint $table) {
+            $table->id();
+            $table->string('cidr'); // 192.168.1.0/24 or single IP
+            $table->enum('type', ['allow', 'deny']);
+            $table->string('applies_to')->default('global'); // role or global
+            $table->text('comment')->nullable();
+            $table->timestamp('expires_at')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('ip_rules');
+    }
+};

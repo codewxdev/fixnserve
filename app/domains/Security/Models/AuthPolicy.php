@@ -13,6 +13,8 @@ class AuthPolicy extends Model
         'login_rules',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     protected $casts = [
         'login_rules' => 'array',
     ];
