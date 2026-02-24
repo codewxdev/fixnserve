@@ -18,6 +18,9 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::post('/role-permission', [RolePermissionController::class, 'assignPermission']);
             Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
             Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
+            Route::post('/role-permission/module', [RolePermissionController::class, 'assignModuleToRole']);
+
+
             Route::prefix('users')->group(function () {
                 Route::post('/assign-role', [UserRoleController::class, 'assignRole']);
                 Route::post('/assign-permissions', [UserRoleController::class, 'assignPermissionsToUser']);
