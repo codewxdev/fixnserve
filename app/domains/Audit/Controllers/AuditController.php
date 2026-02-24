@@ -36,5 +36,20 @@ class AuditController
     public function dataRetentionLegalHolds()
     {
         return view('Admin.audit_compliance.data_retention_&_legal_holds.index');
+    }  
+    
+    // public function userActivityAudit()
+    // {
+    //     return view('Admin.audit_compliance.audit_search.index');
+    // }
+
+    public function auditSearchReplayForensics()
+    {
+        return view('Admin.audit_compliance.audit_search.index');
     }   
+
+    public function complianceMonitoringAlerts()
+    {
+        return view('Admin.audit_compliance.compiliance_monitoring_&_ai.index');
+    }
 }

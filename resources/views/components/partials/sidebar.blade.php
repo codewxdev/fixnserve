@@ -188,9 +188,9 @@
                             style="color: rgb(var(--text-muted));">Regulatory Reporting & Exports</a></li>
                     <li><a href="{{route('audit.data_retention_legal_holds')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Data Retention & Legal Holds</a></li>
-                    <li><a href="" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.user_activity_audit') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Audit Search, Replay & Forensics</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.compliance_monitoring_alerts') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Compliance Monitoring & Alerts</a></li>
                 </ul>
             </li>

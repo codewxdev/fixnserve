@@ -23,3 +23,11 @@ Route::get('/audit/regulatory-reporting-exports', [AuditController::class, 'regu
 
 // data retention & legal holds Routes
 Route::get('/audit/data-retention-legal-holds', [AuditController::class, 'dataRetentionLegalHolds'])->name('audit.data_retention_legal_holds');
+
+
+// audit search, replay & forensics Routes
+Route::get('/audit/user-activity-audit', [AuditController::class, 'auditSearchReplayForensics'])->name('audit.user_activity_audit');
+
+
+// compliance monitoring & alerts Routes
+Route::get('/audit/compliance-monitoring-alerts', [AuditController::class, 'complianceMonitoringAlerts'])->name('audit.compliance_monitoring_alerts');
