@@ -221,14 +221,19 @@
 
             async function fetchCountries() {
                 const listContainer = document.getElementById('regions-list');
+                
                 if (!listContainer) return;
 
                 listContainer.innerHTML = '<div class="text-center theme-text-muted mt-10">Fetching live data...</div>';
 
+                // Get the token from local storage
+                const token = localStorage.getItem('token');
+
                 try {
                     const response = await fetch('/api/countries', {
                         headers: {
-                            'Accept': 'application/json'
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}`
                         }
                     });
 
@@ -427,12 +432,16 @@
                 btn.disabled = true;
                 btn.innerHTML = 'Saving...';
 
+                // Get the token from local storage
+                const token = localStorage.getItem('token');
+
                 try {
                     const response = await fetch(`/api/countries/${selectedRegionId}`, {
                         method: 'PATCH',
                         headers: {
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
+                            'Authorization': `Bearer ${token}`,
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                                 'content')
                         },

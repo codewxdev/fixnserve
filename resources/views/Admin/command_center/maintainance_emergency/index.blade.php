@@ -299,7 +299,7 @@
 
             // --- API CALLER ---
             async callApi(endpoint, method, body = null) {
-                const token = localStorage.getItem('api_token') || localStorage.getItem('token');
+                const token = localStorage.getItem('token');
                 if (!token) this.showToast('Authentication Token Missing.', 'danger');
 
                 const options = {
