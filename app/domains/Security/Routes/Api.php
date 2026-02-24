@@ -22,6 +22,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
 
     Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
+    
 
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'device.bind', 'token.role', 'network.security'])->group(function () {

@@ -15,13 +15,13 @@ class SessionController extends Controller
      */
     public function index(Request $request)
     {
-        $sessions = UserSession::with('user')
-            ->whereNull('logout_at')
-            ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
-            ->when($request->role, fn ($q) => $q->where('role', $request->role))
-            ->when($request->region, fn ($q) => $q->where('region', $request->region))
-            ->latest('last_activity_at')
-            ->get();
+        $sessions = UserSession::with('user')->get();
+
+            // ->whereNull('logout_at')
+            // ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
+            // ->when($request->role, fn ($q) => $q->where('role', $request->role))
+            // ->when($request->region, fn ($q) => $q->where('region', $request->region))
+            // ->latest('last_activity_at')
 
         return response()->json($sessions);
     }
@@ -51,7 +51,7 @@ class SessionController extends Controller
         ]);
     }
 
-    /**
+     /**
      * 4️⃣ Revoke All Sessions for a User
      * POST /api/sessions/revoke-all
      */
@@ -68,13 +68,14 @@ class SessionController extends Controller
             'message' => 'All user sessions revoked',
         ]);
     }
-
+  
     /**
      * 5️⃣ Force Logout by Role
      * POST /api/sessions/revoke-role
      */
     public function revokeByRole(Request $request)
     {
+         
         $request->validate([
             'role' => 'required|string',
         ]);

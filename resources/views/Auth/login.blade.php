@@ -17,9 +17,9 @@
             <div>
                 <zabel for="email" class="block text-sm font-medium mb-2" style="color: #021056;">Email
                     Address</label>
-                <input type="email" name="email" id="email" placeholder="you@example.com" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
-                    style="color: #021056; background-color: white;">
+                    <input type="email" name="email" id="email" placeholder="you@example.com" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
+                        style="color: #021056; background-color: white;">
             </div>
 
             <div>
@@ -96,69 +96,86 @@
 @endsection
 @push('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
-        // Store the user's email temporarily for 2FA verification
-        let currentAuthEmail = '';
-        // Store the temporary access token for 2FA setup (enable_2fa status)
-        let tempAccessToken = '';
 
-        // Helper function to set button state
+    <script>
+        const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4').then(FingerprintJS => FingerprintJS.load());
+    </script>
+
+    <script>
+        // 1. Global Variables
+        let currentAuthEmail = '';
+        let tempAccessToken = '';
+        let currentVisitorId = ''; // Add this
+        let currentDeviceInfo = null; // Add this
+
+        // 2. Helper Functions
         function setButtonLoading(button, isLoading, originalText = 'Log In') {
             button.disabled = isLoading;
             button.innerHTML = isLoading ?
                 `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Processing...` : originalText;
+                </svg> Processing...` : originalText;
         }
 
-        // Helper function to show 2FA modal
         function showTwoFAModal(title, email, isSetupMode = false, qrCodeUrl = null, secret = null) {
-
-
             document.getElementById("twoFactorModal").style.display = 'flex';
             document.getElementById("twoFactorTitle").innerText = title;
             document.getElementById("twoFactorEmail").value = email;
 
-            // Setup mode: show QR code
             if (isSetupMode) {
-                // const qrCodeKeyUri = qrCodeUrl; // This is your otpauth://... string
-
-                // The library renders the QR code inside the <div> with id="qrcode"
+                document.getElementById("qrcode").innerHTML = ""; // Clear old QR code if any
                 const qr = new QRCode(document.getElementById("qrcode"), {
-                    text: qrCodeUrl, // <-- The essential part: pass the URI string here
-                    width: 200, // Optional: Set the size
-                    height: 200, // Optional: Set the size
+                    text: qrCodeUrl,
+                    width: 200,
+                    height: 200,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
-                    correctLevel: QRCode.CorrectLevel.H // High error correction level
+                    correctLevel: QRCode.CorrectLevel.H
                 });
-
-                //
-
-                // Construct the Google Charts API URL
-                // const googleChartApiUrl = `https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=${encodeURIComponent(qrCodeKeyUri)}`;
                 document.getElementById("qrCodeSection").classList.remove('hidden');
-                // document.getElementById("qrcode").src = qrCodeUrl;
                 document.getElementById("twoFactorSecret").innerText = secret;
             } else {
-                // Verification mode: hide QR code
                 document.getElementById("qrCodeSection").classList.add('hidden');
             }
         }
 
-        // Helper function to hide 2FA modal
         function hideTwoFAModal() {
             document.getElementById("twoFactorModal").style.display = 'none';
             document.getElementById("twoFactorErrorMessageContainer").classList.add('hidden');
             document.getElementById("twoFactorErrorMessage").innerText = '';
-            document.getElementById("otpCode").value = ''; // Clear OTP field
+            document.getElementById("otpCode").value = '';
         }
 
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let browserName = "Unknown Browser";
+            let osName = "Unknown OS";
 
-        // --- LOGIN FORM SUBMISSION HANDLER ---
-        document.getElementById("loginForm").addEventListener("submit", function(e) {
+            if (ua.indexOf("Win") !== -1) osName = "Windows";
+            if (ua.indexOf("Mac") !== -1) osName = "MacOS";
+            if (ua.indexOf("Linux") !== -1) osName = "Linux";
+            if (ua.indexOf("Android") !== -1) osName = "Android";
+            if (ua.indexOf("like Mac") !== -1) osName = "iOS";
+
+            if (ua.indexOf("Firefox") > -1) browserName = "Firefox";
+            else if (ua.indexOf("SamsungBrowser") > -1) browserName = "Samsung Internet";
+            else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) browserName = "Opera";
+            else if (ua.indexOf("Trident") > -1) browserName = "Internet Explorer";
+            else if (ua.indexOf("Edge") > -1) browserName = "Edge";
+            else if (ua.indexOf("Chrome") > -1) browserName = "Chrome";
+            else if (ua.indexOf("Safari") > -1) browserName = "Safari";
+
+            return {
+                os_version: osName,
+                device_name: browserName + " on " + osName,
+                app_version: navigator.appVersion,
+                is_rooted: false
+            };
+        }
+
+        // 3. Login Form Submission (With Device Fingerprint)
+        document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
             const loginButton = document.getElementById("loginButton");
@@ -170,74 +187,76 @@
             errorMessageContainer.classList.add('hidden');
             errorMessage.innerText = '';
 
-            fetch("http://localhost:8000/api/auth/login", {
+            try {
+                // Get Fingerprint Safely
+                let visitorId = "unknown-device-" + Math.random().toString(36).substring(2, 10);
+                try {
+                    if (typeof fpPromise !== 'undefined') {
+                        const fp = await fpPromise;
+                        const result = await fp.get();
+                        visitorId = result.visitorId;
+                    }
+                } catch (fpError) {
+                    console.warn("FingerprintJS fallback used.");
+                }
+
+                const deviceInfo = getDeviceInfo();
+
+                currentVisitorId = visitorId;
+                currentDeviceInfo = deviceInfo;
+
+                const payload = {
+                    login: currentAuthEmail,
+                    password: document.getElementById("password").value,
+                    fingerprint: visitorId,
+                    device_name: deviceInfo.device_name,
+                    os_version: deviceInfo.os_version,
+                    app_version: deviceInfo.app_version,
+                    is_rooted: deviceInfo.is_rooted
+                };
+
+                const res = await fetch("http://localhost:8000/api/auth/login", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json",
-                        // NOTE: X-CSRF-TOKEN is typically not needed for a stateless API login with JWT.
-                        // Keeping it here for Laravel Blade context, but good to know for API development.
                         "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]') ? document
                             .querySelector('meta[name="csrf-token"]').getAttribute('content') : ''
                     },
-                    body: JSON.stringify({
-                        login: currentAuthEmail,
-                        password: document.getElementById("password").value
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    localStorage.setItem('api_token', data
-                        .access_token);
-
-                    // Assuming 'response.token' holds the value
-                    if (data.status === '2fa_required') {
-
-                        // Admin/Super Admin needs to verify 2FA before login
-                        tempAccessToken = data
-                            .access_token; // Keep token for potential future use or re-login flow
-                        showTwoFAModal('2FA Verification Required', currentAuthEmail, false);
-                        document.getElementById('twoFactorForm').setAttribute('data-mode', 'verify');
-
-                    } else if (data.status === 'enable_2fa') {
-                        // Admin/Super Admin needs to SET UP 2FA
-                        tempAccessToken = data
-                            .access_token; // Use this token to authenticate the enable2FA API call
-                        return enable2FA(data.access_token);
-
-                    } else if (data.access_token && data.token_type === 'bearer') {
-                        // Successful login for non-admin user or admin after a flow change
-                        localStorage.setItem('token', data.access_token);
-                        // The backend should return user data here if needed, but the current respondWithToken does not.
-                        // Let's assume you'll update the backend response for non-2fa users to be consistent or
-                        // rely on a separate API call post-login. For now, redirect.
-                        document.cookie = `token=${data.token}; path=/; SameSite=Lax`;
-                        window.location.href = "/platform-overview";
-
-                    } else if (data.error) {
-                        // Failed login (e.g., Invalid credentials - 401 response from backend)
-                        errorMessage.innerText = data.error;
-                        errorMessageContainer.classList.remove('hidden');
-
-                    } else {
-                        // Fallback error
-                        errorMessage.innerText = "An unknown error occurred. Please try again.";
-                        errorMessageContainer.classList.remove('hidden');
-                    }
-                })
-                .catch(err => {
-                    // Network or unhandled error
-                    console.error(err);
-                    errorMessage.innerText =
-                        "Could not connect to the server. Check your network or try again later.";
-                    errorMessageContainer.classList.remove('hidden');
-                })
-                .finally(() => {
-                    setButtonLoading(loginButton, false, 'Log In');
+                    body: JSON.stringify(payload)
                 });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data.error || data.message || "Invalid credentials or validation error.");
+                }
+
+                if (data.status === '2fa_required') {
+                    tempAccessToken = data.access_token;
+                    showTwoFAModal('2FA Verification Required', currentAuthEmail, false);
+                    document.getElementById('twoFactorForm').setAttribute('data-mode', 'verify');
+                } else if (data.status === 'enable_2fa') {
+                    tempAccessToken = data.access_token;
+                    return enable2FA(data.access_token);
+                } else if (data.access_token && data.token_type === 'bearer') {
+                    localStorage.setItem('token', data.access_token);
+                    document.cookie = `token=${data.access_token}; path=/; SameSite=Lax`;
+                    window.location.href = "/platform-overview"; // Redirect route
+                } else if (data.error || data.message) {
+                    errorMessage.innerText = data.error || data.message;
+                    errorMessageContainer.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Login Error:", err);
+                errorMessage.innerText = err.message || "Could not connect to the server. Check your network.";
+                errorMessageContainer.classList.remove('hidden');
+            } finally {
+                setButtonLoading(loginButton, false, 'Log In');
+            }
         });
 
-        // --- 2FA ENABLE/SETUP FLOW ---
+        // 4. Enable 2FA Setup
         function enable2FA(tempToken) {
             const loginButton = document.getElementById("loginButton");
 
@@ -246,14 +265,11 @@
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json",
-                        // The key change: use the temporary token for API call
                         "Authorization": `Bearer ${tempToken}`
                     },
                 })
                 .then(res => res.json())
                 .then(data => {
-
-
                     if (data.status === 'setup_initiated' && data.qrcode_url) {
                         showTwoFAModal(
                             'Setup Two-Factor Authentication',
@@ -262,15 +278,11 @@
                             data.qrcode_url,
                             data.secret
                         );
-                        document
-                            .getElementById('twoFactorForm')
-                            .setAttribute('data-mode', 'setup-verify');
+                        document.getElementById('twoFactorForm').setAttribute('data-mode', 'setup-verify');
                     } else {
-                        console.error(data);
                         alert(data.error || "Failed to initiate 2FA setup.");
                     }
                 })
-
                 .catch(err => {
                     console.error("2FA Enable Error:", err);
                     alert("An error occurred during 2FA setup initiation.");
@@ -280,7 +292,7 @@
                 });
         }
 
-        // --- 2FA FORM SUBMISSION HANDLER (Verification) ---
+        // 5. Verify 2FA Form Submission
         document.getElementById("twoFactorForm").addEventListener("submit", function(e) {
             e.preventDefault();
 
@@ -288,13 +300,11 @@
             const errorMessageContainer = document.getElementById("twoFactorErrorMessageContainer");
             const errorMessage = document.getElementById("twoFactorErrorMessage");
             const otpCode = document.getElementById("otpCode").value;
-            const mode = e.currentTarget.getAttribute('data-mode');
 
             setButtonLoading(verifyButton, true, 'Verify & Log In');
             errorMessageContainer.classList.add('hidden');
             errorMessage.innerText = '';
 
-            // Verification API call
             fetch("http://localhost:8000/api/2fa/verify", {
                     method: "POST",
                     headers: {
@@ -303,27 +313,27 @@
                     },
                     body: JSON.stringify({
                         email: document.getElementById("twoFactorEmail").value,
-                        otp: otpCode
+                        otp: otpCode,
+                        fingerprint: currentVisitorId,
+                        device_name: currentDeviceInfo.device_name,
+                        os_version: currentDeviceInfo.os_version,
+                        app_version: currentDeviceInfo.app_version,
+                        is_rooted: currentDeviceInfo.is_rooted
                     })
                 })
                 .then(res => res.json())
                 .then(data => {
-
                     if (data.status === 'success' && data.token) {
                         localStorage.setItem('token', data.token);
-
-                        // --- ADD THIS BLOCK ---
-                        // Set a cookie so the browser sends the token on reload/redirect
                         document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
-                        // ----------------------
 
                         if (data.user) {
                             localStorage.setItem("user", JSON.stringify(data.user));
                         }
 
+                        // Replace with your actual dashboard route
                         window.location.href = "{{ route('platform_overview.index') }}";
                     } else if (data.error) {
-                        // Failed verification (e.g., Invalid OTP)
                         errorMessage.innerText = data.error;
                         errorMessageContainer.classList.remove('hidden');
                     } else {
@@ -337,15 +347,13 @@
                     errorMessageContainer.classList.remove('hidden');
                 })
                 .finally(() => {
-                    // Adjust button text based on the mode
                     setButtonLoading(verifyButton, false, 'Verify & Log In');
                 });
         });
 
-        // --- BACK BUTTON HANDLER ---
+        // 6. Back Button Handler
         document.getElementById("twoFAModalBack").addEventListener("click", function() {
             hideTwoFAModal();
-            // Clear temporary data on back
             tempAccessToken = '';
             currentAuthEmail = '';
         });
