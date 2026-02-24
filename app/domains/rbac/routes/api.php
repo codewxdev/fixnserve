@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('health_api', 'check_country')->group(function () {
 
     // Main Authenticated Routes Group with User Status Check
-    Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session'])->group(function () {
+    Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'network.security'])->group(function () {
 
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {

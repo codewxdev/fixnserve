@@ -5,12 +5,14 @@ use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
 use App\Domains\Command\Models\KillSwitch;
 use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
+use App\Domains\Security\Middlewares\CheckNetworkSecurity;
 use App\Domains\Security\Middlewares\CheckTokenRole;
 use App\Domains\Security\Middlewares\Ensure2FAEnabled;
 use App\Domains\Security\Middlewares\EnsureActiveSession;
 use App\Domains\Security\Middlewares\LoginMethodPolicyMiddleware;
 use App\Domains\Security\Middlewares\MFAPolicyMiddleware;
 use App\Domains\Security\Middlewares\ValidateUserSession;
+use App\Domains\Security\Models\DualApproval;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -62,6 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'network.security' => CheckNetworkSecurity::class,
             'device.bind' => \App\Domains\Security\Middlewares\CheckDeviceBinding::class,
             'token.role' => CheckTokenRole::class,
             'scope' => \App\Domains\Security\Middlewares\CheckScope::class,
@@ -125,5 +128,9 @@ return Application::configure(basePath: dirname(__DIR__))
             });
 
         })->everyMinute();
+        $schedule->command('privileges:revoke')->everyMinute();
+        DualApproval::where('status', 'pending')
+            ->where('expires_at', '<', now())
+            ->update(['status' => 'expired']);
 
     })->create();

@@ -15,6 +15,8 @@ class PasswordPolicy extends Model
         'force_rotation_days',
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     public static function current()
     {
         return self::first() ?? self::create();
