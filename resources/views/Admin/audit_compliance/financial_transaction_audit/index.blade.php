@@ -30,11 +30,11 @@
             </h1>
             <p class="theme-text-muted mt-1 text-sm">Full financial traceability with cryptographic snapshot linking.</p>
         </div>
-        <div class="flex gap-3">
+        {{-- <div class="flex gap-3">
             <button class="px-4 py-2 theme-bg-card border theme-border rounded-lg text-sm font-medium hover:bg-white/5 transition-colors flex items-center gap-2">
                 <i data-lucide="file-check" class="w-4 h-4"></i> Reconciliation Report
             </button>
-        </div>
+        </div> --}}
     </div>
 
     {{-- FINANCIAL METRICS SNAPSHOT --}}

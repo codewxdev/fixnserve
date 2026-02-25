@@ -7,7 +7,7 @@
         <header class="flex flex-col md:flex-row md:items-end md:justify-between space-y-4 md:space-y-0">
             <div>
                 {{-- Breadcrumb --}}
-                <nav class="text-xs font-semibold uppercase tracking-wider theme-text-muted mb-2">
+                {{-- <nav class="text-xs font-semibold uppercase tracking-wider theme-text-muted mb-2">
                     <ol class="inline-flex items-center space-x-1 md:space-x-2">
                         <li><a href="#" class="hover:underline transition-colors" style="color: rgb(var(--brand-primary));">Dashboard</a></li>
                         <li><span class="theme-text-muted">/</span></li>
@@ -15,7 +15,7 @@
                         <li><span class="theme-text-muted">/</span></li>
                         <li style="color: rgb(var(--brand-primary));">Role Registry</li>
                     </ol>
-                </nav>
+                </nav> --}}
 
                 {{-- Title --}}
                 <h1 class="text-3xl md:text-4xl font-extrabold theme-text-main tracking-tight">

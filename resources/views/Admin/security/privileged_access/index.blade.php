@@ -29,7 +29,6 @@
                         <h3 class="font-semibold theme-text-main flex items-center gap-2">
                             <i data-lucide="timer" class="w-4 h-4" style="color: rgb(var(--brand-primary));"></i> Active Elevations
                         </h3>
-                        <span class="bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 text-xs font-bold px-2 py-1 rounded">2 ACTIVE</span>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -38,48 +37,15 @@
                                 <tr>
                                     <th class="px-6 py-3">User</th>
                                     <th class="px-6 py-3">Role / Scope</th>
-                                    <th class="px-6 py-3">Reason</th>
+                                    <th class="px-6 py-3">Justification</th>
                                     <th class="px-6 py-3">Time Remaining</th>
                                     <th class="px-6 py-3 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y theme-border" style="border-color: rgb(var(--border-color));">
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-6 py-4 font-medium theme-text-main">Javed Baloch</td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-col">
-                                            <span class="text-xs font-bold text-red-500">SUPER ADMIN</span>
-                                            <span class="text-[10px] theme-text-muted">Scope: Full System</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 theme-text-muted text-xs">"Fixing Payout DB Schema"</td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2 font-mono font-bold" style="color: rgb(var(--brand-primary));">
-                                            <i data-lucide="clock" class="w-3 h-3"></i> 00:42:15
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-xs text-red-500 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded transition-colors">REVOKE</button>
-                                    </td>
-                                </tr>
-
-                                <tr class="hover:bg-white/5 transition-colors">
-                                    <td class="px-6 py-4 font-medium theme-text-main">Support Lead</td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-col">
-                                            <span class="text-xs font-bold text-amber-500">USER IMPERSONATION</span>
-                                            <span class="text-[10px] theme-text-muted">Target: User #9921</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 theme-text-muted text-xs">"Ticket #8821 Debug"</td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex items-center gap-2 font-mono text-amber-500 font-bold">
-                                            <i data-lucide="clock" class="w-3 h-3"></i> 00:08:30
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <button class="text-xs text-red-500 border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded transition-colors">REVOKE</button>
-                                    </td>
+                            {{-- DYNAMIC LIST FOR ACTIVE ELEVATIONS --}}
+                            <tbody id="active-elevations-list" class="divide-y theme-border" style="border-color: rgb(var(--border-color));">
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center">Loading active elevations...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -92,43 +58,11 @@
                         <h3 class="font-semibold theme-text-main flex items-center gap-2">
                             <i data-lucide="users" class="w-4 h-4 text-amber-500"></i> Pending Dual Approvals
                         </h3>
-                        <span class="bg-amber-500/10 text-amber-500 border border-amber-500/20 text-xs font-bold px-2 py-1 rounded">1 PENDING</span>
                     </div>
 
-                    <div class="p-6 space-y-4">
-                        
-                        <div class="border theme-border rounded-lg p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between hover:bg-white/5 transition-colors">
-                            <div class="flex items-start gap-4">
-                                <div class="bg-amber-500/10 p-2 rounded-lg text-amber-500 mt-1 border border-amber-500/20">
-                                    <i data-lucide="banknote" class="w-6 h-6"></i>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold theme-text-main">Large Payout Release</h4>
-                                    <p class="text-sm theme-text-muted">Amount: <span class="font-mono font-bold theme-text-main">$15,000.00</span> | To: Vendor XYZ Ltd.</p>
-                                    <div class="flex items-center gap-4 mt-2 text-xs">
-                                        <span class="theme-text-muted">Requester: <span class="theme-text-main font-medium">Finance Manager</span></span>
-                                        <span class="theme-text-muted">|</span>
-                                        <span class="theme-text-muted">Time: 10 mins ago</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex flex-col items-end gap-2 min-w-[140px]">
-                                <div class="flex items-center gap-1 text-xs font-bold theme-text-muted mb-1">
-                                    <span>Progress:</span>
-                                    <span style="color: rgb(var(--brand-primary));">1 / 2</span>
-                                </div>
-                                <div class="flex -space-x-2 overflow-hidden mb-2">
-                                    <img class="inline-block h-6 w-6 rounded-full ring-2 theme-ring" src="https://ui-avatars.com/api/?name=Ali+Raza&background=0D8ABC&color=fff" alt="" title="Approved by Ali">
-                                    <div class="inline-block h-6 w-6 rounded-full ring-2 theme-ring theme-bg-body flex items-center justify-center text-[10px] theme-text-muted font-bold border theme-border border-dashed">?</div>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button class="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded shadow-sm hover:bg-green-700 transition">APPROVE</button>
-                                    <button class="px-3 py-1 theme-bg-body border theme-border theme-text-muted text-xs font-bold rounded hover:bg-white/10 transition">REJECT</button>
-                                </div>
-                            </div>
-                        </div>
-
+                    {{-- DYNAMIC LIST FOR PENDING APPROVALS --}}
+                    <div id="pending-approvals-list" class="p-6 space-y-4">
+                        <p class="text-sm theme-text-muted text-center">Loading pending approvals...</p>
                     </div>
                 </div>
 
@@ -144,32 +78,20 @@
                         </h3>
                     </div>
                     <div class="p-4 space-y-4">
-                        
                         <div class="flex items-center justify-between pb-3 border-b theme-border">
                             <div>
                                 <p class="text-sm font-medium theme-text-main">Max Elevation Time</p>
                                 <p class="text-xs theme-text-muted">Auto-revoke after duration</p>
                             </div>
-                            <span class="text-xs font-bold theme-bg-body border theme-border px-2 py-1 rounded theme-text-muted">1 Hour</span>
+                            <span class="text-xs font-bold theme-bg-body border theme-border px-2 py-1 rounded theme-text-muted">2 Hours</span>
                         </div>
-
-                        <div class="flex items-center justify-between pb-3 border-b theme-border">
-                            <div>
-                                <p class="text-sm font-medium theme-text-main">Payout Threshold</p>
-                                <p class="text-xs theme-text-muted">Requires Dual Approval</p>
-                            </div>
-                            <span class="text-xs font-bold theme-bg-body border theme-border px-2 py-1 rounded theme-text-muted">>$1,000</span>
-                        </div>
-
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-sm font-medium theme-text-main">Refund Threshold</p>
-                                <p class="text-xs theme-text-muted">Requires Dual Approval</p>
+                                <p class="text-sm font-medium theme-text-main">Dual Approval</p>
+                                <p class="text-xs theme-text-muted">Requires Level 1 & Level 2</p>
                             </div>
-                            <span class="text-xs font-bold theme-bg-body border theme-border px-2 py-1 rounded theme-text-muted">>$500</span>
+                            <span class="text-xs font-bold theme-bg-body border theme-border px-2 py-1 rounded text-amber-500">Strict</span>
                         </div>
-
-                        <button class="w-full mt-4 text-xs font-bold hover:underline" style="color: rgb(var(--brand-primary));">EDIT POLICIES</button>
                     </div>
                 </div>
 
@@ -178,34 +100,13 @@
                     <h3 class="font-semibold flex items-center gap-2 mb-4 text-white">
                         <i data-lucide="file-text" class="w-4 h-4 text-gray-400"></i> Recent Audit
                     </h3>
-                    <div class="space-y-4 text-xs font-mono">
-                        
-                        <div class="flex gap-3">
-                            <div class="min-w-[4px] bg-green-500 rounded-full"></div>
-                            <div>
-                                <p class="text-gray-400">10:42 AM</p>
-                                <p class="text-white">Admin <span class="text-green-400">APPROVED</span> Payout #991</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-3">
-                            <div class="min-w-[4px] bg-red-500 rounded-full"></div>
-                            <div>
-                                <p class="text-gray-400">09:15 AM</p>
-                                <p class="text-white">System <span class="text-red-400">REVOKED</span> User #44 JIT Access (Expired)</p>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-3">
-                            <div class="min-w-[4px] bg-indigo-500 rounded-full"></div>
-                            <div>
-                                <p class="text-gray-400">09:00 AM</p>
-                                <p class="text-white">Javed <span class="text-indigo-400">REQUESTED</span> Elevation</p>
-                            </div>
-                        </div>
-
+                    
+                    {{-- DYNAMIC LIST FOR AUDIT LOGS --}}
+                    <div id="audit-logs-list" class="space-y-4 text-xs font-mono max-h-[300px] overflow-y-auto pr-2">
+                        <p class="text-gray-400">Loading logs...</p>
                     </div>
-                    <button class="w-full mt-4 py-2 bg-white/10 text-gray-300 text-xs rounded hover:bg-white/20 transition">View Full Logs</button>
+                    
+                    <button onclick="loadAuditLogs()" class="w-full mt-4 py-2 bg-white/10 text-gray-300 text-xs rounded hover:bg-white/20 transition">Refresh Logs</button>
                 </div>
 
             </div>
@@ -217,39 +118,40 @@
         <div class="theme-bg-card rounded-xl shadow-2xl max-w-md w-full p-6 border theme-border">
             <h3 class="text-lg font-bold theme-text-main mb-4">Request Temporary Access</h3>
             
-            <form action="#" method="POST">
+            <form id="request-elevation-form" onsubmit="submitElevationRequest(event)">
                 <div class="space-y-4">
                     
                     <div>
                         <label class="block text-sm font-medium theme-text-muted mb-1">Role / Permission</label>
-                        <select class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5">
-                            <option>Super Admin (Full Access)</option>
-                            <option>Finance Manager (Payouts)</option>
-                            <option>User Impersonation (Support)</option>
+                        <select id="req_requested_role" required class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5">
+                            <option value="super_admin">Super Admin (Full Access)</option>
+                            <option value="finance_manager">Finance Manager (Payouts)</option>
+                            <option value="support_impersonate">User Impersonation (Support)</option>
                         </select>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium theme-text-muted mb-1">Duration Needed</label>
-                        <select class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5">
-                            <option>15 Minutes</option>
-                            <option>30 Minutes</option>
-                            <option>1 Hour (Max)</option>
+                        <select id="req_duration_minutes" required class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5">
+                            <option value="15">15 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                            <option value="60">1 Hour</option>
+                            <option value="120">2 Hours (Max)</option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium theme-text-muted mb-1">Reason / Ticket ID</label>
-                        <textarea rows="3" placeholder="Why do you need this access? e.g. 'Resolving Payout Bug #123'" 
+                        <label class="block text-sm font-medium theme-text-muted mb-1">Justification</label>
+                        <textarea id="req_justification" required rows="3" placeholder="Why do you need this access? e.g. 'Resolving Payout Bug #123'" 
                             class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5"></textarea>
                     </div>
 
                 </div>
 
                 <div class="mt-6 flex justify-end gap-3">
-                    <button type="button" onclick="document.getElementById('access-modal').classList.add('hidden')" 
+                    <button type="button" onclick="closeRequestModal()" 
                         class="px-4 py-2 theme-text-muted hover:bg-white/5 rounded-lg transition">Cancel</button>
-                    <button type="submit" 
+                    <button type="submit" id="submit-btn"
                         class="px-4 py-2 text-white rounded-lg font-medium shadow-sm hover:opacity-90 transition"
                         style="background-color: rgb(var(--brand-primary));">Submit Request</button>
                 </div>
@@ -261,19 +163,175 @@
 @push('scripts')
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
+        const API_BASE = 'http://127.0.0.1:8000/api';
+
+        // 1. Authorization Headers Helper
+        const getHeaders = () => {
+            const token = localStorage.getItem('token');
+            if (!token) console.warn("No authentication token found in localStorage.");
+            return {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+        };
+
+        // 2. Modal Controls
+        function openRequestModal() { document.getElementById('access-modal').classList.remove('hidden'); }
+        function closeRequestModal() { document.getElementById('access-modal').classList.add('hidden'); }
+
+        // 3. Request Elevation
+        async function submitElevationRequest(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Submitting...'; 
+            btn.disabled = true;
+
+            const payload = {
+                requested_role: document.getElementById('req_requested_role').value,
+                duration_minutes: parseInt(document.getElementById('req_duration_minutes').value),
+                justification: document.getElementById('req_justification').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/privileges/request`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert('Elevation requested successfully!');
+                    closeRequestModal();
+                    document.getElementById('request-elevation-form').reset();
+                    // loadActiveElevations(); // Refresh list agar aapke paas GET API ho
+                } else {
+                    const data = await response.json();
+                    alert(`Error: ${data.message || 'Validation Failed'}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Network error. Failed to communicate with server.');
+            } finally {
+                btn.innerText = originalText; 
+                btn.disabled = false;
+            }
+        }
+
+        // 4. Terminate Privilege
+        async function terminatePrivilege(id) {
+            if (!confirm('Are you sure you want to terminate this access immediately?')) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/privileges/terminate/${id}`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    alert('Privilege terminated.');
+                    // loadActiveElevations(); // Refresh list
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // 5. Dual Approval Actions
+        async function handleDualApproval(actionType, id) {
+            let endpoint = '';
+            
+            switch(actionType) {
+                case 'approve_l1': endpoint = `/dual-approval/approve-level1/${id}`; break;
+                case 'approve_l2': endpoint = `/dual-approval/approve-level2/${id}`; break;
+                case 'execute': endpoint = `/dual-approval/execute/${id}`; break;
+                // Using standard privileges deny endpoint as per your instructions
+                case 'deny': endpoint = `/privileges/deny/${id}`; break; 
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`Success: ${data.message || 'Action completed'}`);
+                    loadAuditLogs(); // Refresh logs to show new event
+                    // loadPendingApprovals(); // Refresh pending list
+                } else {
+                    alert(`Error: ${data.message || 'Action failed'}`);
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Server connection failed.');
+            }
+        }
+
+        // 6. Fetch Audit Logs
+        async function loadAuditLogs() {
+            const container = document.getElementById('audit-logs-list');
+            container.innerHTML = '<p class="text-gray-400">Loading...</p>';
+
+            try {
+                // Fetching via GET since controller `auditApprovalLogs` typically maps to a GET request
+                const response = await fetch(`${API_BASE}/dual-approval/audit-logs`, {
+                    method: 'GET', 
+                    headers: getHeaders()
+                });
+
+                if (response.ok) {
+                    const logs = await response.json();
+                    container.innerHTML = '';
+                    
+                    if (logs.length === 0) {
+                        container.innerHTML = '<p class="text-gray-400">No logs found.</p>';
+                        return;
+                    }
+
+                    logs.forEach(log => {
+                        let colorClass = 'text-gray-400';
+                        let dotClass = 'bg-gray-500';
+                        
+                        if (log.event.includes('approved')) { colorClass = 'text-green-400'; dotClass = 'bg-green-500'; }
+                        else if (log.event.includes('denied') || log.event.includes('terminated')) { colorClass = 'text-red-400'; dotClass = 'bg-red-500'; }
+                        else if (log.event.includes('requested')) { colorClass = 'text-indigo-400'; dotClass = 'bg-indigo-500'; }
+
+                        const date = new Date(log.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                        container.innerHTML += `
+                            <div class="flex gap-3">
+                                <div class="min-w-[4px] ${dotClass} rounded-full"></div>
+                                <div>
+                                    <p class="text-gray-400">${date}</p>
+                                    <p class="text-white">User #${log.actor_id} <span class="${colorClass}">${log.event.toUpperCase()}</span> Dual Approval #${log.dual_approval_id}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                container.innerHTML = '<p class="text-red-400">Failed to load logs.</p>';
+                console.error("Audit log error:", error);
+            }
+        }
+
+        // Initialize Everything
         document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
-        });
+            loadAuditLogs(); // Load logs automatically on page load
 
-        function openRequestModal() {
-            document.getElementById('access-modal').classList.remove('hidden');
-        }
+            // TODO: Yahan aap apni Active Elevations aur Pending Approvals GET karne ki JS likh sakte hain
+            // Example: loadActiveElevations(); loadPendingApprovals();
+        });
     </script>
 @endpush
 
 @push('styles')
 <style>
-    /* Custom Ring Color for avatars based on theme */
     .theme-ring {
         --tw-ring-color: rgb(var(--bg-card));
     }

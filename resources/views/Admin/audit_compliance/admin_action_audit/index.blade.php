@@ -36,12 +36,12 @@
                 </h1>
                 <p class="theme-text-muted mt-1 text-sm">Immutable oversight of all privileged actions. Data cannot be modified or deleted.</p>
             </div>
-            <div class="flex gap-3">
+            {{-- <div class="flex gap-3">
                 <button onclick="exportAuditLogs()" class="flex items-center gap-2 px-4 py-2 theme-bg-card border theme-border rounded-lg text-sm font-medium hover:bg-white/5 theme-text-main transition-colors shadow-sm">
                     <i data-lucide="download-cloud" class="w-4 h-4"></i>
                     <span>Export CSV</span>
                 </button>
-            </div>
+            </div> --}}
         </div>
         
         {{-- Immutable Status Indicator --}}

@@ -15,9 +15,9 @@
                 </h1>
                 <p class="theme-text-muted mt-1 text-sm">Reconstruct actor timelines and system states for deep-dive investigations.</p>
             </div>
-            <button class="px-4 py-2 theme-brand-bg text-white rounded-lg text-sm font-bold flex items-center gap-2" style="background-color: rgb(var(--brand-primary));">
+            {{-- <button class="px-4 py-2 theme-brand-bg text-white rounded-lg text-sm font-bold flex items-center gap-2" style="background-color: rgb(var(--brand-primary));">
                 <i data-lucide="file-archive" class="w-4 h-4"></i> Export Forensic Bundle
-            </button>
+            </button> --}}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

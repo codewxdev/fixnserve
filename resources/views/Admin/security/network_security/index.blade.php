@@ -55,7 +55,7 @@
                 </div>
 
                 {{-- AI DETECTION (Static for now as no API provided for this) --}}
-                <div class="theme-bg-card rounded-xl shadow-sm border theme-border p-6">
+                {{-- <div class="theme-bg-card rounded-xl shadow-sm border theme-border p-6">
                     <h3 class="font-semibold theme-text-main mb-4 flex items-center gap-2">
                         <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i> AI Detection: Impossible Travel
                     </h3>
@@ -78,7 +78,7 @@
                             </button>
                         </div>
                     </div>
-                </div>
+                </div> --}}
 
             </div>
 
