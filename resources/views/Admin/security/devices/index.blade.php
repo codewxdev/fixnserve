@@ -10,13 +10,13 @@
                 <h1 class="text-2xl font-bold theme-text-main">Device Trust & Fingerprinting</h1>
                 <p class="theme-text-muted mt-1">Manage recognized devices and enforce hardware-level security policies.</p>
             </div>
-            <div class="flex gap-3">
+            {{-- <div class="flex gap-3">
                 <button onclick="exportDeviceLog()"
                     class="flex items-center gap-2 px-4 py-2 theme-bg-card border theme-border rounded-lg text-sm font-medium hover:bg-white/5 theme-text-main transition-colors shadow-sm">
                     <i data-lucide="download" class="w-4 h-4"></i>
                     <span>Export Device Log</span>
                 </button>
-            </div>
+            </div> --}}
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
