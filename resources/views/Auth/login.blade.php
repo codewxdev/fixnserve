@@ -105,14 +105,15 @@
         // 1. Global Variables
         let currentAuthEmail = '';
         let tempAccessToken = '';
-        let currentVisitorId = ''; // Add this
-        let currentDeviceInfo = null; // Add this
+        let currentVisitorId = '';
+        let currentDeviceInfo = null;
 
         // 2. Helper Functions
         function setButtonLoading(button, isLoading, originalText = 'Log In') {
+            if (!button) return;
             button.disabled = isLoading;
             button.innerHTML = isLoading ?
-                `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg> Processing...` : originalText;
@@ -124,8 +125,8 @@
             document.getElementById("twoFactorEmail").value = email;
 
             if (isSetupMode) {
-                document.getElementById("qrcode").innerHTML = ""; // Clear old QR code if any
-                const qr = new QRCode(document.getElementById("qrcode"), {
+                document.getElementById("qrcode").innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
                     text: qrCodeUrl,
                     width: 200,
                     height: 200,
@@ -174,7 +175,7 @@
             };
         }
 
-        // 3. Login Form Submission (With Device Fingerprint)
+        // 3. Login Form Submission
         document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
@@ -188,20 +189,17 @@
             errorMessage.innerText = '';
 
             try {
-                // Get Fingerprint Safely
+                // Get Fingerprint
                 let visitorId = "unknown-device-" + Math.random().toString(36).substring(2, 10);
                 try {
-                    if (typeof fpPromise !== 'undefined') {
-                        const fp = await fpPromise;
-                        const result = await fp.get();
-                        visitorId = result.visitorId;
-                    }
+                    const fp = await fpPromise;
+                    const result = await fp.get();
+                    visitorId = result.visitorId;
                 } catch (fpError) {
                     console.warn("FingerprintJS fallback used.");
                 }
 
                 const deviceInfo = getDeviceInfo();
-
                 currentVisitorId = visitorId;
                 currentDeviceInfo = deviceInfo;
 
@@ -220,8 +218,8 @@
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]') ? document
-                            .querySelector('meta[name="csrf-token"]').getAttribute('content') : ''
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                            'content') || ''
                     },
                     body: JSON.stringify(payload)
                 });
@@ -229,27 +227,26 @@
                 const data = await res.json();
 
                 if (!res.ok) {
-                    throw new Error(data.error || data.message || "Invalid credentials or validation error.");
+                    throw new Error(data.error || data.message || "Invalid credentials.");
                 }
 
                 if (data.status === '2fa_required') {
-                    tempAccessToken = data.access_token;
+                    tempAccessToken = data.access_token; // Matches your login controller
+                    // Fingerprint ko store karein taake 2FA modal ya baad mein use ho sakay
+                    localStorage.setItem('device_fingerprint', currentVisitorId);
                     showTwoFAModal('2FA Verification Required', currentAuthEmail, false);
-                    document.getElementById('twoFactorForm').setAttribute('data-mode', 'verify');
                 } else if (data.status === 'enable_2fa') {
-                    tempAccessToken = data.access_token;
-                    return enable2FA(data.access_token);
-                } else if (data.access_token && data.token_type === 'bearer') {
+                    tempAccessToken = data.access_token; // Matches your login controller
+                    enable2FA(data.access_token);
+                    localStorage.setItem('device_fingerprint', currentVisitorId);
+                } else if (data.access_token) {
                     localStorage.setItem('token', data.access_token);
                     document.cookie = `token=${data.access_token}; path=/; SameSite=Lax`;
-                    window.location.href = "/platform-overview"; // Redirect route
-                } else if (data.error || data.message) {
-                    errorMessage.innerText = data.error || data.message;
-                    errorMessageContainer.classList.remove('hidden');
+                    window.location.href = "{{ route('platform_overview.index') }}";
+                    localStorage.setItem('device_fingerprint', currentVisitorId);
                 }
             } catch (err) {
-                console.error("Login Error:", err);
-                errorMessage.innerText = err.message || "Could not connect to the server. Check your network.";
+                errorMessage.innerText = err.message;
                 errorMessageContainer.classList.remove('hidden');
             } finally {
                 setButtonLoading(loginButton, false, 'Log In');
@@ -258,8 +255,6 @@
 
         // 4. Enable 2FA Setup
         function enable2FA(tempToken) {
-            const loginButton = document.getElementById("loginButton");
-
             fetch("http://localhost:8000/api/2fa/enable", {
                     method: "POST",
                     headers: {
@@ -271,29 +266,17 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'setup_initiated' && data.qrcode_url) {
-                        showTwoFAModal(
-                            'Setup Two-Factor Authentication',
-                            currentAuthEmail,
-                            true,
-                            data.qrcode_url,
-                            data.secret
-                        );
-                        document.getElementById('twoFactorForm').setAttribute('data-mode', 'setup-verify');
+                        showTwoFAModal('Setup Two-Factor Authentication', currentAuthEmail, true, data.qrcode_url, data
+                            .secret);
                     } else {
                         alert(data.error || "Failed to initiate 2FA setup.");
                     }
                 })
-                .catch(err => {
-                    console.error("2FA Enable Error:", err);
-                    alert("An error occurred during 2FA setup initiation.");
-                })
-                .finally(() => {
-                    setButtonLoading(loginButton, false, 'Log In');
-                });
+                .catch(err => console.error("2FA Enable Error:", err));
         }
 
-        // 5. Verify 2FA Form Submission
-        document.getElementById("twoFactorForm").addEventListener("submit", function(e) {
+        // 5. Verify 2FA Form Submission (CRITICAL FIXES HERE)
+        document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
             const verifyButton = document.getElementById("verify2FAButton");
@@ -303,9 +286,17 @@
 
             setButtonLoading(verifyButton, true, 'Verify & Log In');
             errorMessageContainer.classList.add('hidden');
-            errorMessage.innerText = '';
 
-            fetch("http://localhost:8000/api/2fa/verify", {
+            try {
+                // Ensure device info is still available
+                if (!currentVisitorId) {
+                    const fp = await fpPromise;
+                    const result = await fp.get();
+                    currentVisitorId = result.visitorId;
+                    currentDeviceInfo = getDeviceInfo();
+                }
+
+                const res = await fetch("http://localhost:8000/api/2fa/verify", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -320,43 +311,33 @@
                         app_version: currentDeviceInfo.app_version,
                         is_rooted: currentDeviceInfo.is_rooted
                     })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success' && data.token) {
-                        localStorage.setItem('token', data.token);
-                        document.cookie = `token=${data.token}; path=/; max-age=86400; SameSite=Lax`;
-
-                        if (data.user) {
-                            localStorage.setItem("user", JSON.stringify(data.user));
-                        }
-
-                        // Replace with your actual dashboard route
-                        window.location.href = "{{ route('platform_overview.index') }}";
-                    } else if (data.error) {
-                        errorMessage.innerText = data.error;
-                        errorMessageContainer.classList.remove('hidden');
-                    } else {
-                        errorMessage.innerText = "Verification failed. Please check your code and try again.";
-                        errorMessageContainer.classList.remove('hidden');
-                    }
-                })
-                .catch(err => {
-                    console.error("2FA Verification Error:", err);
-                    errorMessage.innerText = "Could not connect to the verification server. Try again.";
-                    errorMessageContainer.classList.remove('hidden');
-                })
-                .finally(() => {
-                    setButtonLoading(verifyButton, false, 'Verify & Log In');
                 });
+
+                const data = await res.json();
+
+                // Check for 'success' status and 'access_token' (matching your verify2FA controller)
+                if (data.status === 'success' && data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                    document.cookie = `token=${data.access_token}; path=/; max-age=86400; SameSite=Lax`;
+
+                    if (data.user) {
+                        localStorage.setItem("user", JSON.stringify(data.user));
+                    }
+
+                    window.location.href = "{{ route('platform_overview.index') }}";
+                } else {
+                    errorMessage.innerText = data.error || "Verification failed. Check your code.";
+                    errorMessageContainer.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMessage.innerText = "Connection error. Please try again.";
+                errorMessageContainer.classList.remove('hidden');
+            } finally {
+                setButtonLoading(verifyButton, false, 'Verify & Log In');
+            }
         });
 
-        // 6. Back Button Handler
-        document.getElementById("twoFAModalBack").addEventListener("click", function() {
-            hideTwoFAModal();
-            tempAccessToken = '';
-            currentAuthEmail = '';
-        });
+        document.getElementById("twoFAModalBack").addEventListener("click", hideTwoFAModal);
     </script>
 @endpush
 

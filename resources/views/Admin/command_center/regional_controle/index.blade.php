@@ -43,7 +43,8 @@
 
             {{-- LEFT PANEL: REGION LIST --}}
             <div class="theme-bg-card rounded-xl border theme-border flex flex-col shadow-lg overflow-hidden">
-                <div class="p-4 border-b theme-border rounded-t-xl shrink-0" style="background-color: rgba(var(--bg-body), 0.5);">
+                <div class="p-4 border-b theme-border rounded-t-xl shrink-0"
+                    style="background-color: rgba(var(--bg-body), 0.5);">
                     <div class="relative">
                         <input type="text" id="search-input" onkeyup="filterList()" placeholder="Search Country..."
                             class="w-full theme-bg-body border theme-border theme-text-main text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 pl-9">
@@ -61,16 +62,18 @@
             </div>
 
             {{-- RIGHT PANEL: INTERACTIVE MAP --}}
-            <div class="lg:col-span-2 theme-bg-card rounded-xl border theme-border overflow-hidden shadow-lg relative group">
-                <div class="absolute top-4 left-4 z-10 backdrop-blur px-3 py-1 rounded border theme-border text-xs theme-text-main" 
-                     style="background-color: rgba(var(--bg-body), 0.8);">
+            <div
+                class="lg:col-span-2 theme-bg-card rounded-xl border theme-border overflow-hidden shadow-lg relative group">
+                <div class="absolute top-4 left-4 z-10 backdrop-blur px-3 py-1 rounded border theme-border text-xs theme-text-main"
+                    style="background-color: rgba(var(--bg-body), 0.8);">
                     <span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1"></span> Enabled
                     <span class="w-2 h-2 rounded-full bg-yellow-500 inline-block mx-1"></span> Soft Disabled
                     <span class="w-2 h-2 rounded-full bg-red-500 inline-block mx-1"></span> Hard Disabled
                 </div>
 
                 <div class="w-full h-full relative theme-bg-body">
-                    <div class="absolute inset-0 opacity-40 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png')] bg-cover bg-center grayscale">
+                    <div
+                        class="absolute inset-0 opacity-40 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png')] bg-cover bg-center grayscale">
                     </div>
 
                     <div id="map-markers"></div>
@@ -82,16 +85,17 @@
     {{-- MODAL --}}
     <div id="control-modal"
         class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity duration-300">
-        
+
         <div class="theme-bg-card rounded-xl shadow-2xl w-full max-w-lg border theme-border transform transition-all scale-95"
             id="modal-content">
 
-            <div class="p-5 border-b theme-border flex justify-between items-center rounded-t-xl" style="background-color: rgba(var(--bg-body), 0.5);">
+            <div class="p-5 border-b theme-border flex justify-between items-center rounded-t-xl"
+                style="background-color: rgba(var(--bg-body), 0.5);">
                 <div>
                     <h3 class="text-lg font-bold theme-text-main flex items-center gap-2">
                         <span id="modal-region-name">Region Name</span>
-                        <span id="modal-current-badge"
-                            class="text-[10px] uppercase px-2 py-0.5 rounded border theme-border" style="background-color: rgba(255,255,255,0.1);">Loading...</span>
+                        <span id="modal-current-badge" class="text-[10px] uppercase px-2 py-0.5 rounded border theme-border"
+                            style="background-color: rgba(255,255,255,0.1);">Loading...</span>
                     </h3>
                     <p class="text-xs theme-text-muted">Modify availability status</p>
                 </div>
@@ -170,7 +174,8 @@
                 </div>
             </div>
 
-            <div class="p-4 border-t theme-border rounded-b-xl flex justify-end gap-3" style="background-color: rgba(var(--bg-body), 0.5);">
+            <div class="p-4 border-t theme-border rounded-b-xl flex justify-end gap-3"
+                style="background-color: rgba(var(--bg-body), 0.5);">
                 <button onclick="closeModal()"
                     class="px-4 py-2 text-sm theme-text-muted hover:text-white transition">Cancel</button>
                 <button onclick="saveStatus()" id="save-btn"
@@ -221,32 +226,28 @@
 
             async function fetchCountries() {
                 const listContainer = document.getElementById('regions-list');
-                
                 if (!listContainer) return;
 
                 listContainer.innerHTML = '<div class="text-center theme-text-muted mt-10">Fetching live data...</div>';
 
-                // Get the token from local storage
+                // Headers prepare karein
                 const token = localStorage.getItem('token');
+                const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
 
                 try {
                     const response = await fetch('/api/countries', {
                         headers: {
                             'Accept': 'application/json',
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${token}`,
+                            'X-Device-Fingerprint': fingerprint // <-- Fingerprint yahan add kiya
                         }
                     });
 
                     const result = await response.json();
-                    
-                    let countriesArray = [];
-                    if (result.data && Array.isArray(result.data)) {
-                        countriesArray = result.data;
-                    } else if (Array.isArray(result)) {
-                        countriesArray = result;
-                    }
+                    // ... rest of your logic to handle result
 
-                    // Map Backend Data
+                    // (Existing logic to map regionsData...)
+                    let countriesArray = result.data || result;
                     regionsData = countriesArray.map(country => ({
                         id: country.id,
                         name: country.name,
@@ -432,8 +433,9 @@
                 btn.disabled = true;
                 btn.innerHTML = 'Saving...';
 
-                // Get the token from local storage
+                // Headers prepare karein
                 const token = localStorage.getItem('token');
+                const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
 
                 try {
                     const response = await fetch(`/api/countries/${selectedRegionId}`, {
@@ -442,6 +444,7 @@
                             'Content-Type': 'application/json',
                             'Accept': 'application/json',
                             'Authorization': `Bearer ${token}`,
+                            'X-Device-Fingerprint': fingerprint, // <-- Fingerprint yahan bhi add kiya
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
                                 'content')
                         },
@@ -457,7 +460,8 @@
 
                     filterView(currentFilter);
                     closeModal();
-                    alert(`Success! ${region.name} status updated.`);
+                    // Custom Alert or Toast
+                    console.log(`Success! ${region.name} status updated.`);
 
                 } catch (error) {
                     console.error(error);
