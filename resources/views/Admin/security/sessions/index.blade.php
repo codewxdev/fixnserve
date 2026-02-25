@@ -23,14 +23,15 @@
         </div>
 
         {{-- FILTERS --}}
-        <div class="theme-bg-card p-4 rounded-xl border theme-border shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
+        <div
+            class="theme-bg-card p-4 rounded-xl border theme-border shadow-sm mb-6 flex flex-wrap gap-4 items-center justify-between">
             <div class="flex gap-4 flex-1">
                 <div class="relative w-full max-w-sm">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 theme-text-muted"></i>
                     <input type="text" id="search-input" placeholder="Search user, IP, or Device..."
                         class="pl-10 w-full theme-bg-body border theme-border rounded-lg text-sm theme-text-main focus:ring-2 focus:ring-blue-500 placeholder-gray-500">
                 </div>
-                
+
                 {{-- NEW: Status Filter --}}
                 <select id="status-filter"
                     class="theme-bg-body border theme-border theme-text-main rounded-lg text-sm focus:ring-2 focus:ring-blue-500">
@@ -44,7 +45,7 @@
                     <option value="all">All Risk Levels</option>
                     <option value="high">High Risk (>50)</option>
                     <option value="medium">Medium Risk (10-50)</option>
-                    <option value="low">Low Risk (<10)</option>
+                    <option value="low">Low Risk (<10)< /option>
                 </select>
             </div>
             <div class="text-sm theme-text-muted">
@@ -118,10 +119,15 @@
 
         function getHeaders() {
             const token = localStorage.getItem('token');
+            // LocalStorage se fingerprint uthayen jo humne login par save kiya tha
+            const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
+
             return {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer ' + token,
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                // X-Device-Fingerprint header yahan add kar diya
+                'X-Device-Fingerprint': fingerprint
             };
         }
 
@@ -141,12 +147,14 @@
         async function fetchRoles() {
             const select = document.getElementById('role-select');
             try {
-                const response = await fetch(`${API_BASE}/roles`, { headers: getHeaders() });
-                if(response.ok) {
+                const response = await fetch(`${API_BASE}/roles`, {
+                    headers: getHeaders()
+                });
+                if (response.ok) {
                     const data = await response.json();
                     const roles = Array.isArray(data) ? data : (data.data || []);
                     select.innerHTML = '';
-                    if(roles.length === 0) {
+                    if (roles.length === 0) {
                         select.innerHTML = '<option disabled>No roles found</option>';
                         return;
                     }
@@ -166,29 +174,40 @@
 
         async function fetchSessions() {
             const tbody = document.getElementById('sessions-table-body');
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8"><i data-lucide="loader-2" class="animate-spin w-6 h-6 mx-auto"></i></td></tr>`;
+            tbody.innerHTML =
+                `<tr><td colspan="7" class="text-center py-8"><i data-lucide="loader-2" class="animate-spin w-6 h-6 mx-auto"></i></td></tr>`;
             lucide.createIcons();
 
             try {
-                const response = await fetch(`${API_BASE}/sessions`, { headers: getHeaders() });
+                const response = await fetch(`${API_BASE}/sessions`, {
+                    headers: getHeaders()
+                });
                 const data = await response.json();
                 const sessions = Array.isArray(data) ? data : (data.data || []);
                 renderTable(sessions);
             } catch (error) {
                 console.error(error);
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-red-500 py-4">Error loading sessions</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="7" class="text-center text-red-500 py-4">Error loading sessions</td></tr>`;
             }
         }
 
         async function revokeSession(id) {
             if (!confirm('Are you sure? This will log the user out from THIS device only.')) return;
             try {
-                const response = await fetch(`${API_BASE}/sessions/${id}/revoke`, { method: 'POST', headers: getHeaders() });
+                const response = await fetch(`${API_BASE}/sessions/${id}/revoke`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
                 if (response.ok) {
                     showToast("Success", "Single session terminated.");
                     fetchSessions();
-                } else { alert("Failed to revoke session."); }
-            } catch (error) { alert("Network error."); }
+                } else {
+                    alert("Failed to revoke session.");
+                }
+            } catch (error) {
+                alert("Network error.");
+            }
         }
 
         async function revokeUserAllSessions(userId, userName) {
@@ -197,14 +216,21 @@
                 const response = await fetch(`${API_BASE}/sessions/revoke-all`, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ user_id: userId })
+                    body: JSON.stringify({
+                        user_id: userId
+                    })
                 });
                 if (response.ok) {
                     const result = await response.json();
                     showToast("Success", result.message || "User logged out from all devices.");
                     fetchSessions();
-                } else { alert("Failed to revoke user sessions."); }
-            } catch (error) { console.error(error); alert("Network error."); }
+                } else {
+                    alert("Failed to revoke user sessions.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Network error.");
+            }
         }
 
         async function revokeByRole() {
@@ -212,21 +238,35 @@
             const role = roleSelect.value;
             const btn = document.getElementById('confirm-revoke-btn');
 
-            if (!role) { alert("Please select a role first."); return; }
-            if (btn) { btn.innerText = "Processing..."; btn.disabled = true; }
+            if (!role) {
+                alert("Please select a role first.");
+                return;
+            }
+            if (btn) {
+                btn.innerText = "Processing...";
+                btn.disabled = true;
+            }
 
             try {
                 const response = await fetch(`${API_BASE}/sessions/revoke-role`, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ role: role })
+                    body: JSON.stringify({
+                        role: role
+                    })
                 });
                 const result = await response.json();
                 alert(result.message);
                 document.getElementById('role-modal').classList.add('hidden');
                 fetchSessions();
-            } catch (error) { alert("Error revoking roles."); } 
-            finally { if (btn) { btn.innerText = "Confirm Logout"; btn.disabled = false; } }
+            } catch (error) {
+                alert("Error revoking roles.");
+            } finally {
+                if (btn) {
+                    btn.innerText = "Confirm Logout";
+                    btn.disabled = false;
+                }
+            }
         }
 
         async function flagSession(id) {
@@ -236,10 +276,17 @@
                 const response = await fetch(`${API_BASE}/sessions/${id}/flag`, {
                     method: 'POST',
                     headers: getHeaders(),
-                    body: JSON.stringify({ risk_score: score })
+                    body: JSON.stringify({
+                        risk_score: score
+                    })
                 });
-                if (response.ok) { showToast("Alert", "Risk score updated."); fetchSessions(); }
-            } catch (error) { console.error(error); }
+                if (response.ok) {
+                    showToast("Alert", "Risk score updated.");
+                    fetchSessions();
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
 
         // ==============================
@@ -262,7 +309,8 @@
                 // 1. Search Filter
                 const uName = s.user ? s.user.name.toLowerCase() : '';
                 const uEmail = s.user ? s.user.email.toLowerCase() : '';
-                const matchSearch = (uName.includes(searchInput) || uEmail.includes(searchInput) || (s.ip_address && s.ip_address.includes(searchInput)));
+                const matchSearch = (uName.includes(searchInput) || uEmail.includes(searchInput) || (s.ip_address &&
+                    s.ip_address.includes(searchInput)));
 
                 // 2. Risk Filter
                 let matchRisk = true;
@@ -291,20 +339,23 @@
                 const userName = session.user ? session.user.name : 'Unknown';
                 const userEmail = session.user ? session.user.email : 'No Email';
                 const userInitial = userName.charAt(0);
-                const lastActive = session.last_activity_at ? new Date(session.last_activity_at).toLocaleTimeString() : 'N/A';
-                
+                const lastActive = session.last_activity_at ? new Date(session.last_activity_at)
+                .toLocaleTimeString() : 'N/A';
+
                 // Determine Active Status
-                const isActive = (session.is_revoked == 0 || session.is_revoked == false) && (session.logout_at == null);
+                const isActive = (session.is_revoked == 0 || session.is_revoked == false) && (session.logout_at ==
+                    null);
 
                 // Badge Logic Risk
                 let riskBadgeColor = 'bg-green-500/10 text-green-500 border border-green-500/20';
                 if (session.risk_score > 50) riskBadgeColor = 'bg-red-500/10 text-red-500 border border-red-500/20';
-                else if (session.risk_score > 10) riskBadgeColor = 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20';
+                else if (session.risk_score > 10) riskBadgeColor =
+                    'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20';
 
                 // Badge Logic Status
-                let statusBadge = isActive 
-                    ? '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-500/10 text-green-500 border border-green-500/20"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active</span>'
-                    : '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/20">Inactive</span>';
+                let statusBadge = isActive ?
+                    '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-500/10 text-green-500 border border-green-500/20"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active</span>' :
+                    '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/20">Inactive</span>';
 
                 // Disable actions if inactive
                 const disableActionsClass = !isActive ? 'opacity-50 pointer-events-none grayscale' : '';
