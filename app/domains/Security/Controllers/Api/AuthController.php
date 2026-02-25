@@ -40,7 +40,7 @@ class AuthController extends Controller
         DB::transaction(function () use ($request, &$user, &$token) {
 
             $user = User::create([
-                'name' => $request->first_name . ' ' . $request->last_name,
+                'name' => $request->first_name.' '.$request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
@@ -301,7 +301,7 @@ class AuthController extends Controller
         }
     }
 
-    //javed
+    // javed
     // public function logout(Request $request)
     // {
     //     // 1. Token get karein
@@ -329,13 +329,13 @@ class AuthController extends Controller
     //     try {
     //         auth()->logout(); // Ye token ko invalid kar dega
     //     } catch (\Exception $e) {
-    //         // Agar token pehly se expired hai to koi masla nahi, 
+    //         // Agar token pehly se expired hai to koi masla nahi,
     //         // humne DB update kar diya hai, wo zaroori tha.
     //     }
 
     //     return response()->json(['message' => 'Logged out successfully']);
     // }
-    
+
     public function refresh()
     {
         return response()->json(['token' => auth()->refresh()]);
@@ -373,42 +373,99 @@ class AuthController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+
         if (! $user) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
         $google2fa = new Google2FA;
-        $valid = $google2fa->verifyKey($user->google2fa_secret, $request->otp);
 
-        if (! $valid) {
+        if (! $google2fa->verifyKey($user->google2fa_secret, $request->otp)) {
             return response()->json(['error' => 'Invalid OTP'], 401);
         }
 
-        // Enable 2FA after first successful verification
         if (! $user->is_2fa_enabled) {
-            $user->is_2fa_enabled = 1;
+            $user->is_2fa_enabled = true;
             $user->save();
         }
 
+        $policy = TokenPolicy::current();
+
+        // ✅ SET TTL BEFORE TOKEN GENERATION
+        auth()->factory()->setTTL($policy->access_token_ttl_minutes);
+
         $jwtId = (string) Str::uuid();
-        $scopes = $this->resolveScopes($user);
 
         $token = JWTAuth::claims([
             'jti' => $jwtId,
-            'role' => $user->role,
-            'scopes' => $scopes,
+            'role' => $user->getRoleNames()->first(), // ✅ FIX
+            'roles' => $user->getRoleNames()->toArray(),
+            'scopes' => $this->resolveScopes($user),
         ])->fromUser($user);
-        // $token = JWTAuth::claims(['jti' => $jwtId,])->fromUser($user);
+        // dd(JWTAuth::setToken($token)->getPayload());
 
-        // Create user session after successful 2FA
+        // DO NOT use login() here
+
         $this->createSession($user, $token, $jwtId, $request);
 
         return response()->json([
             'status' => 'success',
-            'token' => $token,
+            'access_token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => $user,
         ]);
     }
+
+    // public function verify2FA(Request $request)
+    // {
+    //     $request->validate([
+    //         'email' => 'required|email',
+    //         'otp' => 'required',
+    //     ]);
+
+    //     $policy = TokenPolicy::current();
+
+    //     auth()->factory()->setTTL($policy->access_token_ttl_minutes);
+
+    //     $user = User::where('email', $request->email)->first();
+    //     if (! $user) {
+    //         return response()->json(['error' => 'User not found'], 404);
+    //     }
+
+    //     $google2fa = new Google2FA;
+    //     $valid = $google2fa->verifyKey($user->google2fa_secret, $request->otp);
+
+    //     if (! $valid) {
+    //         return response()->json(['error' => 'Invalid OTP'], 401);
+    //     }
+
+    //     // Enable 2FA after first successful verification
+    //     if (! $user->is_2fa_enabled) {
+    //         $user->is_2fa_enabled = 1;
+    //         $user->save();
+    //     }
+    //     auth()->login($user);
+    //     $jwtId = (string) Str::uuid();
+    //     $scopes = $this->resolveScopes($user);
+
+    //     $token = JWTAuth::claims([
+    //         'jti' => $jwtId,
+    //         'role' => $user->role,
+    //         'scopes' => $scopes,
+    //         'mfa_verified' => true,
+    //     ])->fromUser($user);
+    //     // $token = JWTAuth::claims(['jti' => $jwtId,])->fromUser($user);
+
+    //     // Create user session after successful 2FA
+    //     $this->createSession($user, $token, $jwtId, $request);
+
+    //     return response()->json([
+    //         'status' => 'success',
+    //         'token' => $token,
+    //         'user' => $user,
+    //     ]);
+    // }
 
     /**
      * Helper: Create User Session
@@ -457,6 +514,7 @@ class AuthController extends Controller
             'location' => $location,
             'risk_score' => 0,
             'last_activity_at' => now(),
+            'mfa_verified' => 1,
             'expires_at' => now()->addMinutes(
                 $policy->access_token_ttl_minutes
             ),
@@ -521,13 +579,13 @@ class AuthController extends Controller
         if ($request->hasFile('image')) {
 
             // Delete old image if exists
-            if ($user->image && \Storage::exists('public/profile_images/' . $user->image)) {
-                \Storage::delete('public/profile_images/' . $user->image);
+            if ($user->image && \Storage::exists('public/profile_images/'.$user->image)) {
+                \Storage::delete('public/profile_images/'.$user->image);
             }
 
             // Save new image
             $file = $request->file('image');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
 
             $file->storeAs('public/profile_images/', $filename);
 
@@ -548,7 +606,7 @@ class AuthController extends Controller
             'data' => [
                 'user' => $user,
                 'profile_image_url' => $user->image
-                    ? asset('storage/profile_images/' . $user->image)
+                    ? asset('storage/profile_images/'.$user->image)
                     : null,
             ],
         ]);

@@ -17,9 +17,9 @@ class Ensure2FAEnabled
         if (! $user || ! $user->is_2fa_enabled) {
 
             // If browser request, redirect to login (or a specific 2FA setup page)
-            if ($request->acceptsHtml()) {
-                return redirect()->route('login.index')->withErrors('2FA Verification Required.');
-            }
+            // if ($request->acceptsHtml()) {
+            //     return redirect()->route('login.index')->withErrors('2FA Verification Required.');
+            // }
 
             return response()->json([
                 'error' => '2FA not verified. Access denied.',

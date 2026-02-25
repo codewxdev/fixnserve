@@ -18,8 +18,9 @@ class EnsureActiveSession
     public function handle($request, Closure $next)
     {
         try {
-            $token = $request->bearerToken();
-            $payload = JWTAuth::setToken($token)->getPayload();
+            $token = JWTAuth::parseToken();
+            $payload = $token->getPayload();
+
             $jti = $payload->get('jti');
 
             if (
@@ -45,10 +46,13 @@ class EnsureActiveSession
             $session->update([
                 'last_activity_at' => now(),
             ]);
+            // dd($request);
 
             return $next($request);
 
         } catch (\Exception $e) {
+            // dd($e->getMessage(), $e->getFile(), $e->getLine());
+
             return response()->json([
                 'message' => 'Invalid or expired token',
             ], 401);

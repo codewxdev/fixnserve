@@ -22,10 +22,10 @@ Route::middleware('health_api', 'check_country')->group(function () {
 
     Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
-    
 
     // Main Authenticated Routes Group with User Status Check
-    Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'device.bind', 'token.role', 'network.security'])->group(function () {
+    //  'user.active', 'active.session', 'device.bind', 'token.role', 'network.security'
+    Route::middleware(['auth:api', 'user.active', 'active.session', 'device.bind', 'token.role', 'network.security'])->group(function () {
 
         // Auth Routes
         Route::get('/auth/me', [AuthController::class, 'me']);
@@ -37,7 +37,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
         Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
 
         // Super Admin Routes (with additional checks)
-        Route::middleware(['role:Super Admin', '2fa', 'scope:admin:*', 'token.role'])->group(function () {
+        Route::middleware(['role:Super Admin', '2fa', 'scope:admin:*'])->group(function () {
             Route::get('/login-history', [AuthController::class, 'loginHistory']);
             Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
             // /////////////////////session managment//////////////////////////

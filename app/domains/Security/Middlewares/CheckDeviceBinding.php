@@ -18,7 +18,9 @@ class CheckDeviceBinding
     public function handle($request, Closure $next)
     {
         try {
-            $payload = JWTAuth::parseToken()->getPayload();
+            $token = JWTAuth::parseToken();
+            $payload = $token->getPayload();
+
             $jti = $payload->get('jti');
 
             $session = UserSession::where('jwt_id', $jti)

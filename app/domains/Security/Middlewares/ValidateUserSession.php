@@ -18,8 +18,9 @@ class ValidateUserSession
     public function handle(Request $request, Closure $next): Response
     {
         try {
+            $token = JWTAuth::getToken();
 
-            $payload = JWTAuth::parseToken()->getPayload();
+            $payload = JWTAuth::setToken($token)->getPayload();
 
             $jti = $payload->get('jti');
 
@@ -36,6 +37,7 @@ class ValidateUserSession
                 ], 401);
 
             }
+            dd($token);
 
             // Update activity
             $session->update([

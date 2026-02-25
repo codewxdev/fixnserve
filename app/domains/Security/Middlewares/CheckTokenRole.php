@@ -15,7 +15,13 @@ class CheckTokenRole
      */
     public function handle($request, Closure $next)
     {
-        $payload = JWTAuth::parseToken()->getPayload();
+
+        $token = JWTAuth::getToken();
+
+        $payload = JWTAuth::setToken($token)->getPayload();
+        // dd($payload);
+        // $payload = JWTAuth::parseToken()->getPayload();
+        // dd($payload); // Debugging line to inspect the token payload
         $tokenRole = $payload->get('role');
         $userRole = auth()->user()->role;
 
