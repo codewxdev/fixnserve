@@ -10,7 +10,9 @@ class IpRuleController extends Controller
 {
     public function index()
     {
-        return IpRule::latest()->get();
+        $iprules = IpRule::latest()->get();
+
+        return response()->json($iprules);
     }
 
     public function store(Request $request)
@@ -45,7 +47,7 @@ class IpRuleController extends Controller
     public function destroy($id)
     {
         $ipRule = IpRule::findOrFail($id);
-        if (!$ipRule) {
+        if (! $ipRule) {
             return response()->json(['message' => 'Not Found'], 404);
         }
         $ipRule->delete();

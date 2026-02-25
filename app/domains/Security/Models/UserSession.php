@@ -20,6 +20,7 @@ class UserSession extends Model
         'logout_at',
         'is_revoked',
         'device_id',
+        'mfa_verified',
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
