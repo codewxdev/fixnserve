@@ -2,6 +2,7 @@
 
 namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Audit\Services\AdminAuditService;
 use App\Domains\Security\Models\AuthPolicy;
 use App\Domains\Security\Models\MFAPolicy;
 use App\Domains\Security\Models\TokenPolicy;
@@ -18,10 +19,19 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 use Twilio\Rest\Client;
-use Tymon\JWTAuth\Facades\JWTAuth; // Or GdImageBackEnd if Imagick is not installed
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+// Or GdImageBackEnd if Imagick is not installed
 
 class AuthController extends Controller
 {
+    protected $audit;
+
+    public function __construct(AdminAuditService $audit)
+    {
+        $this->audit = $audit;
+    }
+
     public function register(Request $request)
     {
         $request->validate([
@@ -94,6 +104,19 @@ class AuthController extends Controller
         if (! $token = JWTAuth::claims([
             'jti' => $jwtId,
         ])->attempt($credentials)) {
+
+            $this->audit->log([
+                'action_type' => 'login_failed',
+                'target_type' => 'User',
+                'target_id' => null,
+                'before_state' => null,
+                'after_state' => [
+                    'login' => $request->login,
+                    'ip' => $request->ip(),
+                ],
+                'reason_code' => 'Invalid credentials',
+            ]);
+
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
         // ✅ NOW user exists
@@ -205,6 +228,18 @@ class AuthController extends Controller
          * 5️⃣ Create session (NORMAL USERS)
          */
         $this->createSession($user, $token, $jwtId, $request);
+        // 🔐 AUDIT LOG — LOGIN SUCCESS
+        $this->audit->log([
+            'action_type' => 'login_success',
+            'target_type' => 'User',
+            'target_id' => $user->id,
+            'before_state' => null,
+            'after_state' => [
+                'device' => $request->device_name,
+                'ip' => $request->ip(),
+            ],
+            'reason_code' => 'User login successful',
+        ]);
         $policy = TokenPolicy::current();
 
         $ttl = $policy->access_token_ttl_minutes;
@@ -286,6 +321,19 @@ class AuthController extends Controller
                         'revoked_at' => now(),
 
                     ]);
+                // 🔐 AUDIT LOG — LOGOUT
+                $this->audit->log([
+                    'action_type' => 'logout',
+                    'target_type' => 'User',
+                    'target_id' => auth()->id(),
+                    'before_state' => [
+                        'jwt_id' => $jti,
+                    ],
+                    'after_state' => [
+                        'revoked' => true,
+                    ],
+                    'reason_code' => 'User initiated logout',
+                ]);
             }
             // Log out the user from auth
             auth()->logout();
@@ -407,6 +455,12 @@ class AuthController extends Controller
         // DO NOT use login() here
 
         $this->createSession($user, $token, $jwtId, $request);
+        $this->audit->log([
+            'action_type' => '2fa_verified',
+            'target_type' => 'User',
+            'target_id' => $user->id,
+            'reason_code' => 'MFA verification successful',
+        ]);
 
         return response()->json([
             'status' => 'success',
