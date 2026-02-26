@@ -79,7 +79,6 @@ class User extends Authenticatable implements JWTSubject
         'updated_at',
         'email_verified_at',
         'mode',
-        'uuid',
         'lat',           // Added
         'lon',
         'country_id',  // Only country_id needed now
@@ -88,7 +87,6 @@ class User extends Authenticatable implements JWTSubject
         'favourite', // Add UUID to fillable
         'dob',
         'gender',
-        'is_2fa_enabled',
         'google2fa_secret',
         'current_address',
         'address',
