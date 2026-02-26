@@ -37,7 +37,7 @@ class ValidateUserSession
                 ], 401);
 
             }
-            dd($token);
+            // dd($token);
 
             // Update activity
             $session->update([
