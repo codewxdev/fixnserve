@@ -121,6 +121,8 @@ class AuthController extends Controller
         }
         // ✅ NOW user exists
         $user = auth()->user();
+        auth()->login($user);
+        // dd($auth);
         // $device = Auth($user, $request);
         /* 🔐 Resolve scopes AFTER authentication */
         $scopes = $this->resolveScopes($user);
@@ -130,6 +132,9 @@ class AuthController extends Controller
             'role' => $user->role,
             'scopes' => $scopes,
         ])->fromUser($user);
+
+        $payload = JWTAuth::setToken($token)->getPayload();
+        // dd($payload);
 
         /* =======================
          | AUTH GOVERNANCE CHECKS
@@ -192,6 +197,7 @@ class AuthController extends Controller
          * 4️⃣ MFA POLICY (CONFIG DRIVEN)
          */
         $mfaPolicy = MFAPolicy::current();
+        // dd($mfaPolicy);
         $mfaRequired = false;
 
         if ($mfaPolicy->enforcement_policy === 'all_users') {
@@ -438,6 +444,7 @@ class AuthController extends Controller
         }
 
         $policy = TokenPolicy::current();
+        auth()->login($user);
 
         // ✅ SET TTL BEFORE TOKEN GENERATION
         auth()->factory()->setTTL($policy->access_token_ttl_minutes);
@@ -446,8 +453,8 @@ class AuthController extends Controller
 
         $token = JWTAuth::claims([
             'jti' => $jwtId,
-            'role' => $user->getRoleNames()->first(), // ✅ FIX
-            'roles' => $user->getRoleNames()->toArray(),
+            'role' => $user->role,
+            // 'roles' => $user->getRoleNames()->toArray(),
             'scopes' => $this->resolveScopes($user),
         ])->fromUser($user);
         // dd(JWTAuth::setToken($token)->getPayload());
@@ -465,8 +472,8 @@ class AuthController extends Controller
         return response()->json([
             'status' => 'success',
             'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60,
+            // 'token_type' => 'bearer',
+            // 'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => $user,
         ]);
     }
@@ -500,6 +507,7 @@ class AuthController extends Controller
     //         $user->save();
     //     }
     //     auth()->login($user);
+
     //     $jwtId = (string) Str::uuid();
     //     $scopes = $this->resolveScopes($user);
 
@@ -513,6 +521,12 @@ class AuthController extends Controller
 
     //     // Create user session after successful 2FA
     //     $this->createSession($user, $token, $jwtId, $request);
+    //     $this->audit->log([
+    //         'action_type' => '2fa_verified',
+    //         'target_type' => 'User',
+    //         'target_id' => $user->id,
+    //         'reason_code' => 'MFA verification successful',
+    //     ]);
 
     //     return response()->json([
     //         'status' => 'success',
