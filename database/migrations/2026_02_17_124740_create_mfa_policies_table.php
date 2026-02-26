@@ -19,7 +19,7 @@ return new class extends Migration
                 'all_users',
             ])->default('admins_only');
 
-            $table->json('allowed_methods')->nullable()->comment('List of allowed MFA methods, e.g., ["totp", "sms"]');
+            $table->json('allowed_methods')->nullable()->comment('List of allowed MFA methods, e.g., ["totp", "sms"]')->default(json_encode(['totp']));
             $table->timestamps();
         });
     }
