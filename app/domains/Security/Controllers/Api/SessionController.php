@@ -2,6 +2,7 @@
 
 namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Audit\Services\SecurityAuditService;
 use App\Domains\Security\Models\UserSession;
 use App\Http\Controllers\Controller;
 use App\Models\BlacklistedToken;
@@ -9,6 +10,13 @@ use Illuminate\Http\Request;
 
 class SessionController extends Controller
 {
+    protected $securityAudit;
+
+    public function __construct(SecurityAuditService $securityAudit)
+    {
+        $this->securityAudit = $securityAudit;
+    }
+
     /**
      * 1️⃣ List Active Sessions
      * GET /api/sessions
@@ -17,11 +25,11 @@ class SessionController extends Controller
     {
         $sessions = UserSession::with('user')->get();
 
-            // ->whereNull('logout_at')
-            // ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
-            // ->when($request->role, fn ($q) => $q->where('role', $request->role))
-            // ->when($request->region, fn ($q) => $q->where('region', $request->region))
-            // ->latest('last_activity_at')
+        // ->whereNull('logout_at')
+        // ->when($request->user_id, fn ($q) => $q->where('user_id', $request->user_id))
+        // ->when($request->role, fn ($q) => $q->where('role', $request->role))
+        // ->when($request->region, fn ($q) => $q->where('region', $request->region))
+        // ->latest('last_activity_at')
 
         return response()->json($sessions);
     }
@@ -52,7 +60,7 @@ class SessionController extends Controller
         ]);
     }
 
-     /**
+    /**
      * 4️⃣ Revoke All Sessions for a User
      * POST /api/sessions/revoke-all
      */
@@ -69,14 +77,14 @@ class SessionController extends Controller
             'message' => 'All user sessions revoked',
         ]);
     }
-  
+
     /**
      * 5️⃣ Force Logout by Role
      * POST /api/sessions/revoke-role
      */
     public function revokeByRole(Request $request)
     {
-         
+
         $request->validate([
             'role' => 'required|string',
         ]);
@@ -147,13 +155,23 @@ class SessionController extends Controller
     {
         // Super Admin session ko skip karna
         if ($session->user->roles === 'Super Admin') {
-            return; // kuch bhi revoke nahi
+
+            // Optional: log skipped attempt
+            $this->securityAudit->log(
+                'session_revocation_skipped',
+                [
+                    'reason' => 'Super Admin protected session',
+                    'session_id' => $session->id,
+                ],
+                auth()->user()
+            );
+
+            return;
         }
 
-        // Get token expiry from JWT
         $expiresAt = $session->expires_at;
 
-        // Store in DB blacklist
+        // Blacklist token
         BlacklistedToken::updateOrCreate(
             ['jwt_id' => $session->jwt_id],
             [
@@ -167,5 +185,18 @@ class SessionController extends Controller
             'revoked_at' => now(),
             'logout_at' => now(),
         ]);
+
+        // 🔐 SECURITY AUDIT LOG
+        $this->securityAudit->log(
+            'session_revoked',
+            [
+                'revoked_user_id' => $session->user_id,
+                'session_id' => $session->id,
+                'jwt_id' => $session->jwt_id,
+                'ip_address' => $session->ip_address,
+                'device' => $session->device_name,
+            ],
+            auth()->user() // actor (admin/system)
+        );
     }
 }

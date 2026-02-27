@@ -64,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'admin.audit' => \App\Domains\Audit\Middlewares\AdminAuditMiddleware::class,
+            // 'admin.audit' => \App\Domains\Audit\Middlewares\AdminAuditMiddleware::class,
             'network.security' => CheckNetworkSecurity::class,
             'device.bind' => \App\Domains\Security\Middlewares\CheckDeviceBinding::class,
             'token.role' => CheckTokenRole::class,

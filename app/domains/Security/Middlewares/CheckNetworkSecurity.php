@@ -42,7 +42,8 @@ class CheckNetworkSecurity
             if ($this->ipMatchesCidr($ip, $rule->cidr)) {
 
                 if ($rule->type === 'deny') {
-                    abort(403, 'Access denied by IP rule');
+                    return response()->json(['error' => 'Access denied by IP rule'], 403);
+                    // abort(403, 'Access denied by IP rule');
                 }
 
                 if ($rule->type === 'allow') {
@@ -70,7 +71,8 @@ class CheckNetworkSecurity
 
         if ($geoRule) {
             if ($geoRule->status === 'blocked') {
-                abort(403, 'Access denied by country policy');
+                // abort(403, 'Access denied from your location');
+                return response()->json(['error' => 'Access denied from your location'], 403);
             }
 
             if ($geoRule->status === 'allowed') {
@@ -82,7 +84,9 @@ class CheckNetworkSecurity
         $defaultRule = GeoRule::where('is_default', true)->first();
 
         if ($defaultRule && $defaultRule->status === 'blocked') {
-            abort(403, 'Access denied by default geo policy');
+
+            // abort(403, 'Access denied by default geo policy');
+            return response()->json(['error' => 'Access denied by default geo policy'], 403);
         }
 
         return $next($request);

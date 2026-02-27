@@ -23,10 +23,12 @@ class CheckTokenRole
         // $payload = JWTAuth::parseToken()->getPayload();
         // dd($payload); // Debugging line to inspect the token payload
         $tokenRole = $payload->get('role');
-        $userRole = auth()->user()->role;
+        // dd($tokenRole);
+        $userRole = auth()->user()->getRoleNames()->first(); // Assuming single role per user
 
         if ($tokenRole !== $userRole) {
-            abort(403, 'Role changed. Re-login required.');
+            return response()->json(['error' => 'Role changed. Re-login required.'], 403);
+            // abort(403, 'Role changed. Re-login required.');
         }
 
         return $next($request);

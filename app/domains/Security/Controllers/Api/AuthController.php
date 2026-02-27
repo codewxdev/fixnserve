@@ -3,6 +3,7 @@
 namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Audit\Services\AdminAuditService;
+use App\Domains\Audit\Services\SecurityAuditService;
 use App\Domains\Security\Models\AuthPolicy;
 use App\Domains\Security\Models\MFAPolicy;
 use App\Domains\Security\Models\TokenPolicy;
@@ -27,9 +28,12 @@ class AuthController extends Controller
 {
     protected $audit;
 
-    public function __construct(AdminAuditService $audit)
+    protected $securityAudit;
+
+    public function __construct(AdminAuditService $audit, SecurityAuditService $securityAudit)
     {
         $this->audit = $audit;
+        $this->securityAudit = $securityAudit;
     }
 
     public function register(Request $request)
@@ -104,23 +108,25 @@ class AuthController extends Controller
         if (! $token = JWTAuth::claims([
             'jti' => $jwtId,
         ])->attempt($credentials)) {
+            $user = User::where($fieldType, $login)->first();
 
-            $this->audit->log([
-                'action_type' => 'login_failed',
-                'target_type' => 'User',
-                'target_id' => null,
-                'before_state' => null,
-                'after_state' => [
-                    'login' => $request->login,
-                    'ip' => $request->ip(),
+            $this->securityAudit->log(
+                'failed_login',
+                [
+                    'login_field' => $fieldType,
+                    'login_value' => $login,
+                    'device_name' => $request->device_name,
+                    'fingerprint' => $request->fingerprint,
                 ],
-                'reason_code' => 'Invalid credentials',
-            ]);
+                $user // may be null
+            );
 
             return response()->json(['error' => 'Invalid credentials'], 401);
         }
         // ✅ NOW user exists
         $user = auth()->user();
+        // $this->resolveDevice($user, $request);
+
         auth()->login($user);
         // dd($auth);
         // $device = Auth($user, $request);
@@ -129,11 +135,11 @@ class AuthController extends Controller
         /* 🔄 Re-issue token WITH role + scopes */
         $token = JWTAuth::claims([
             'jti' => $jwtId,
-            'role' => $user->role,
+            'role' => $user->getRoleNames()->first(),
             'scopes' => $scopes,
         ])->fromUser($user);
 
-        $payload = JWTAuth::setToken($token)->getPayload();
+        // $payload = JWTAuth::setToken($token)->getPayload();
         // dd($payload);
 
         /* =======================
@@ -151,7 +157,7 @@ class AuthController extends Controller
          * 2️⃣ LOGIN RULES (JSON BASED – ROLE + TIME)
          */
         $rules = $authPolicy->login_rules ?? [];
-        $role = $user->role;
+        $role = $user->getRoleNames()->first() ?? 'default';
         $now = now()->format('H:i');
         // Role specific rule
         if (isset($rules['roles'][$role])) {
@@ -214,6 +220,15 @@ class AuthController extends Controller
         if ($mfaRequired) {
 
             if ($user->is_2fa_enabled) {
+                $this->securityAudit->log(
+                    'mfa_challenge_triggered',
+                    [
+                        'method' => 'TOTP',
+                        'device' => $request->device_name,
+                    ],
+                    $user
+                );
+
                 return response()->json([
                     'status' => '2fa_required',
                     'email' => $user->email,
@@ -221,6 +236,7 @@ class AuthController extends Controller
                     'token_type' => 'bearer',
                     'expires_in' => auth()->factory()->getTTL() * 60,
                 ]);
+
             }
 
             return response()->json([
@@ -234,18 +250,23 @@ class AuthController extends Controller
          * 5️⃣ Create session (NORMAL USERS)
          */
         $this->createSession($user, $token, $jwtId, $request);
-        // 🔐 AUDIT LOG — LOGIN SUCCESS
-        $this->audit->log([
-            'action_type' => 'login_success',
-            'target_type' => 'User',
-            'target_id' => $user->id,
-            'before_state' => null,
-            'after_state' => [
-                'device' => $request->device_name,
-                'ip' => $request->ip(),
-            ],
-            'reason_code' => 'User login successful',
-        ]);
+        // 🔐 AUDIT LOG — LOGIN SUCCESS\
+        if (! $user->hasRole(['Admin', 'Super Admin'])) {
+            $this->audit->log([
+                'action_type' => 'login_success',
+                'target_type' => 'User',
+                'target_id' => $user->id,
+                'before_state' => null,
+                'device_fingerprint' => $request->fingerprint,
+
+                'after_state' => [
+                    'device' => $request->device_name,
+                    'ip' => $request->ip(),
+                ],
+                'reason_code' => 'User login successful',
+            ]);
+        }
+
         $policy = TokenPolicy::current();
 
         $ttl = $policy->access_token_ttl_minutes;
@@ -332,6 +353,8 @@ class AuthController extends Controller
                     'action_type' => 'logout',
                     'target_type' => 'User',
                     'target_id' => auth()->id(),
+                    'device_fingerprint' => $request->fingerprint,
+
                     'before_state' => [
                         'jwt_id' => $jti,
                     ],
@@ -453,8 +476,8 @@ class AuthController extends Controller
 
         $token = JWTAuth::claims([
             'jti' => $jwtId,
-            'role' => $user->role,
-            // 'roles' => $user->getRoleNames()->toArray(),
+            'roles' => $user->getRoleNames()->toArray(),
+            'role' => $user->getRoleNames()->first(),
             'scopes' => $this->resolveScopes($user),
         ])->fromUser($user);
         // dd(JWTAuth::setToken($token)->getPayload());
@@ -722,24 +745,46 @@ class AuthController extends Controller
     public function rotateToken($jti)
     {
         $session = UserSession::where('jwt_id', $jti)->firstOrFail();
-        // dd($session);
-        // revoke old
+
+        $user = auth()->user();
+
+        // Store old token info before revoke
+        $oldJti = $session->jwt_id;
+        $oldIp = $session->ip_address;
+        $oldDevice = $session->device_name;
+
+        // 🔴 Revoke old session
         $session->update([
             'is_revoked' => true,
             'revoked_at' => now(),
         ]);
 
-        // issue new token
-        $newJti = Str::uuid();
-        $user = auth()->user();
+        // 🟢 Issue new token
+        $newJti = (string) Str::uuid();
 
         $newToken = JWTAuth::claims([
             'jti' => $newJti,
-            'role' => $user->role,
+            'role' => $user->getRoleNames()->first(),
             'scopes' => $this->resolveScopes($user),
         ])->fromUser($user);
 
         $this->createSession($user, $newToken, $newJti, request());
+        // dd($session);
+
+        // 🔐 SECURITY AUDIT LOG
+        $this->securityAudit->log(
+            'token_rotated',
+            [
+                'user_id' => $user->id,
+                'old_jti' => $oldJti,
+                'new_jti' => $newJti,
+                'old_ip' => $oldIp,
+                'current_ip' => request()->ip(),
+                'device' => $oldDevice,
+                'rotated_by' => $user->id,
+            ],
+            $user // actor
+        );
 
         return response()->json([
             'message' => 'Token rotated',
