@@ -6,7 +6,7 @@
         {{-- A. Header Section --}}
         <header class="flex flex-col md:flex-row md:items-end md:justify-between space-y-4 md:space-y-0">
             <div>
-                
+
                 {{-- Title --}}
                 <h1 class="text-3xl md:text-4xl font-extrabold theme-text-main tracking-tight">
                     Access Matrix
@@ -15,12 +15,14 @@
                     Provide a single, visual truth of access. Map organizational roles to atomic platform capabilities.
                 </p>
             </div>
-            
+
             <div class="flex items-center gap-3">
-                 <button onclick="window.loadMatrixData()"
+                <button onclick="window.loadMatrixData()"
                     class="inline-flex items-center px-4 py-2 theme-bg-card border theme-border theme-text-main font-semibold rounded-xl shadow-sm hover:bg-white/5 transition-all duration-300">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                        </path>
                     </svg>
                     Sync Data
                 </button>
@@ -30,39 +32,47 @@
         {{-- B. Matrix Interface --}}
         <section class="space-y-4">
             {{-- Toolbar --}}
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-bg-card p-4 rounded-2xl border theme-border shadow-sm">
+            <div
+                class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-bg-card p-4 rounded-2xl border theme-border shadow-sm">
                 <div class="flex items-center gap-4">
                     <h2 class="text-lg font-bold theme-text-main">Role vs Permission Mapping</h2>
-                    <span class="px-2.5 py-1 rounded-md text-xs font-medium theme-bg-body theme-text-muted border theme-border" id="matrix-stats">Loading stats...</span>
+                    <span
+                        class="px-2.5 py-1 rounded-md text-xs font-medium theme-bg-body theme-text-muted border theme-border"
+                        id="matrix-stats">Loading stats...</span>
                 </div>
 
                 <div class="relative">
                     <input type="text" id="matrix-search" placeholder="Filter permissions..."
                         class="pl-10 pr-4 py-2 theme-bg-body border theme-border rounded-xl text-sm theme-text-main focus:ring-2 placeholder-gray-500 w-64 outline-none"
-                        style="--tw-ring-color: rgb(var(--brand-primary));"
-                        onkeyup="window.renderMatrixView()">
+                        style="--tw-ring-color: rgb(var(--brand-primary));" onkeyup="window.renderMatrixView()">
                     <svg class="w-4 h-4 theme-text-muted absolute left-3 top-3" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </div>
             </div>
 
             {{-- The Grid --}}
             <div class="theme-bg-card rounded-2xl shadow-sm border theme-border overflow-hidden relative min-h-[500px]">
-                
+
                 {{-- Loader --}}
-                <div id="matrix-loading" class="absolute inset-0 bg-black/50 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 mb-4" style="border-color: rgb(var(--brand-primary));"></div>
-                    <span class="font-semibold animate-pulse" style="color: rgb(var(--brand-primary));">Constructing Matrix...</span>
+                <div id="matrix-loading"
+                    class="absolute inset-0 bg-black/50 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 mb-4"
+                        style="border-color: rgb(var(--brand-primary));"></div>
+                    <span class="font-semibold animate-pulse" style="color: rgb(var(--brand-primary));">Constructing
+                        Matrix...</span>
                 </div>
 
                 <div class="overflow-x-auto overflow-y-auto max-h-[70vh] custom-scrollbar pb-4 relative">
                     <table class="w-full text-sm text-left border-collapse">
-                        <thead id="matrix-header" class="theme-text-main sticky top-0 z-20 shadow-sm backdrop-blur-md" style="background-color: rgba(var(--bg-card), 0.95);">
+                        <thead id="matrix-header" class="theme-text-main sticky top-0 z-20 shadow-sm backdrop-blur-md"
+                            style="background-color: rgba(var(--bg-card), 0.95);">
                             {{-- Headers Injected via JS --}}
                         </thead>
-                        <tbody id="matrix-body" class="divide-y theme-border" style="border-color: rgb(var(--border-color));">
+                        <tbody id="matrix-body" class="divide-y theme-border"
+                            style="border-color: rgb(var(--border-color));">
                             {{-- Body Injected via JS --}}
                         </tbody>
                     </table>
@@ -75,10 +85,23 @@
 @push('styles')
     <style>
         /* Premium Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: rgb(var(--border-color)); border-radius: 20px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: rgb(var(--text-muted)); }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgb(var(--border-color));
+            border-radius: 20px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgb(var(--text-muted));
+        }
 
         /* --- PERMISSION TOGGLE SWITCHES --- */
         .toggle-track {
@@ -105,17 +128,17 @@
         }
 
         /* Checked State */
-        input:checked + .toggle-track {
+        input:checked+.toggle-track {
             background-color: rgb(var(--brand-primary)) !important;
             border-color: rgb(var(--brand-primary));
         }
 
-        input:checked ~ .toggle-dot {
+        input:checked~.toggle-dot {
             transform: translateX(1.25rem);
         }
 
         /* Disabled State (For Super Admin) */
-        input:disabled + .toggle-track {
+        input:disabled+.toggle-track {
             opacity: 0.5;
             cursor: not-allowed;
             background-color: rgb(var(--brand-primary)) !important;
@@ -139,11 +162,11 @@
 
         /* Ensure sticky headers intersecting sticky columns stay on top */
         thead th.permission-cell {
-            z-index: 25; 
+            z-index: 25;
         }
 
-        tbody tr:hover td:not(.permission-cell) { 
-            background-color: rgba(255,255,255,0.02); 
+        tbody tr:hover td:not(.permission-cell) {
+            background-color: rgba(255, 255, 255, 0.02);
         }
     </style>
 @endpush
@@ -169,8 +192,10 @@
             }
 
             const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'theme-bg-card border theme-border' : 'bg-red-500/20 border border-red-500/50';
-            toast.className = `${bgColor} theme-text-main px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-300`;
+            const bgColor = type === 'success' ? 'theme-bg-card border theme-border' :
+                'bg-red-500/20 border border-red-500/50';
+            toast.className =
+                `${bgColor} theme-text-main px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-300`;
             const icon = type === 'success' ?
                 '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' :
                 '<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
@@ -187,11 +212,15 @@
 
         // --- 2. API Handler ---
         async function fetchData(endpoint, method = 'GET', body = null) {
+            const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
+
             const headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': CSRF_TOKEN,
+                'X-Device-Fingerprint': fingerprint
             };
+
             if (AUTH_TOKEN) headers['Authorization'] = `Bearer ${AUTH_TOKEN}`;
 
             try {
@@ -200,14 +229,23 @@
                     headers,
                     body: body ? JSON.stringify(body) : null
                 });
-                
+
                 const text = await response.text();
                 let data = {};
                 if (text) {
-                    try { data = JSON.parse(text); } catch(e) { data = { message: text }; }
+                    try {
+                        data = JSON.parse(text);
+                    } catch (e) {
+                        data = {
+                            message: text
+                        };
+                    }
                 }
 
-                if (!response.ok) throw { status: response.status, data };
+                if (!response.ok) throw {
+                    status: response.status,
+                    data
+                };
                 return data;
             } catch (error) {
                 console.error(`API Error:`, error);
@@ -227,7 +265,8 @@
                 ]);
 
                 // Parse Roles (Assuming response contains a 'data' array or is an array directly)
-                const rawRoles = Array.isArray(roleRes.data) ? roleRes.data : (Array.isArray(roleRes) ? roleRes : []);
+                const rawRoles = Array.isArray(roleRes.data) ? roleRes.data : (Array.isArray(roleRes) ? roleRes :
+                []);
                 roles = rawRoles.map(r => ({
                     ...r,
                     // Map inner permissions to a simple array of names for easy checking
@@ -240,7 +279,8 @@
                 });
 
                 // Parse Permissions
-                const rawPerms = Array.isArray(permRes.data) ? permRes.data : (Array.isArray(permRes) ? permRes : []);
+                const rawPerms = Array.isArray(permRes.data) ? permRes.data : (Array.isArray(permRes) ? permRes :
+                []);
                 permissions = rawPerms.map(p => ({
                     ...p,
                     category: p.category || getFallbackCategory(p.name)
@@ -254,7 +294,8 @@
                 }, {});
 
                 // Update Stats text
-                document.getElementById('matrix-stats').textContent = `${roles.length} Roles • ${permissions.length} Permissions`;
+                document.getElementById('matrix-stats').textContent =
+                    `${roles.length} Roles • ${permissions.length} Permissions`;
 
                 renderMatrixView();
 
@@ -279,7 +320,8 @@
             const searchTerm = document.getElementById('matrix-search').value.toLowerCase();
 
             // Render Header (Roles)
-            let hHtml = `<tr><th class="permission-cell px-6 py-4 text-xs font-bold uppercase tracking-wider theme-bg-card">Capabilities</th>`;
+            let hHtml =
+                `<tr><th class="permission-cell px-6 py-4 text-xs font-bold uppercase tracking-wider theme-bg-card">Capabilities</th>`;
             roles.forEach(r => {
                 const isSuper = r.name.toLowerCase() === 'super admin';
                 hHtml += `
@@ -298,8 +340,9 @@
 
             categories.forEach(cat => {
                 // Filter permissions in this category based on search
-                const filteredPerms = permissionsByCategory[cat].filter(p => p.name.toLowerCase().includes(searchTerm));
-                
+                const filteredPerms = permissionsByCategory[cat].filter(p => p.name.toLowerCase().includes(
+                    searchTerm));
+
                 if (filteredPerms.length === 0) return; // Skip category if empty due to search
 
                 // Category Header Row
@@ -319,11 +362,11 @@
                                     <span>${p.name}</span>
                                 </div>
                             </td>`;
-                            
+
                     roles.forEach(r => {
                         const hasPermission = r.permissions_list.includes(p.name);
                         const isSuper = r.name.toLowerCase() === 'super admin';
-                        
+
                         row += `
                             <td class="role-cell px-4 py-3 text-center align-middle transition-colors">
                                 <label class="relative inline-flex items-center cursor-pointer">
@@ -341,9 +384,10 @@
                     body.innerHTML += row + '</tr>';
                 });
             });
-            
+
             if (body.innerHTML === '') {
-                 body.innerHTML = `<tr><td colspan="${roles.length + 1}" class="px-6 py-10 text-center theme-text-muted">No permissions match your search.</td></tr>`;
+                body.innerHTML =
+                    `<tr><td colspan="${roles.length + 1}" class="px-6 py-10 text-center theme-text-muted">No permissions match your search.</td></tr>`;
             }
         };
 
@@ -361,7 +405,7 @@
             }
 
             // 1. Optimistic UI Update (Update local state)
-            const oldList = [...role.permissions_list]; 
+            const oldList = [...role.permissions_list];
 
             if (checkbox.checked) {
                 if (!role.permissions_list.includes(permName)) {

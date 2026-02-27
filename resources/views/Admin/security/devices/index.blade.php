@@ -156,12 +156,15 @@
         // --- API Helper ---
         async function apiRequest(endpoint, method = 'GET', body = null) {
             const token = localStorage.getItem('token');
+            const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
+
             const options = {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'X-Device-Fingerprint': fingerprint
                 }
             };
             if (body) options.body = JSON.stringify(body);

@@ -167,70 +167,6 @@
         </div>
     </div>
 
-    {{-- CREATE TOKEN MODAL --}}
-    {{-- <div id="create-token-modal"
-        class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="theme-bg-card rounded-xl shadow-2xl max-w-lg w-full p-6 border theme-border">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold theme-text-main">Issue New Access Token</h3>
-                <button onclick="closeCreateModal()" class="theme-text-muted hover:text-white">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <form id="create-token-form" onsubmit="handleTokenCreate(event)">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium theme-text-muted mb-1">Token Name</label>
-                        <input type="text" placeholder="e.g., Payment Service Worker"
-                            class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5"
-                            required>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium theme-text-muted mb-2">Capabilities (Scopes)</label>
-                        <div class="grid grid-cols-2 gap-2 theme-bg-body p-3 rounded-lg border theme-border">
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded border-gray-300 focus:ring-2 checkbox-brand">
-                                <span class="text-sm theme-text-main">read:users</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded border-gray-300 focus:ring-2 checkbox-brand">
-                                <span class="text-sm theme-text-main">write:users</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded border-gray-300 focus:ring-2 checkbox-brand">
-                                <span class="text-sm theme-text-main">read:finance</span>
-                            </label>
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" class="rounded text-red-500 focus:ring-red-500 border-red-500/50">
-                                <span class="text-sm text-red-500 font-medium">admin:full</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium theme-text-muted mb-1">Expiration</label>
-                        <select
-                            class="w-full theme-bg-body border theme-border rounded-lg theme-text-main focus:ring-2 focus:ring-blue-500 p-2.5">
-                            <option value="30">30 Days</option>
-                            <option value="60">60 Days</option>
-                            <option value="365">1 Year</option>
-                            <option value="0" class="text-red-500 font-bold">Never (Dangerous)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="mt-6 flex justify-end gap-3">
-                    <button type="button" onclick="closeCreateModal()"
-                        class="px-4 py-2 theme-text-muted hover:bg-white/5 rounded-lg border theme-border transition">Cancel</button>
-                    <button type="submit"
-                        class="px-4 py-2 text-white rounded-lg font-medium shadow-sm hover:opacity-90 transition"
-                        style="background-color: rgb(var(--brand-primary));">Generate Token</button>
-                </div>
-            </form>
-        </div>
-    </div> --}}
 @endsection
 
 @push('scripts')
@@ -245,12 +181,16 @@
         // --- API Helper ---
         async function apiRequest(endpoint, method = 'GET', body = null) {
             const token = localStorage.getItem('token');
+
+            const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
+
             const options = {
                 method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'X-Device-Fingerprint': fingerprint
                 }
             };
             if (body) options.body = JSON.stringify(body);
@@ -344,14 +284,17 @@
             });
         }
 
+        
         // --- 3. Actions: Rotate & Revoke ---
         async function rotateToken(id) {
             if (!confirm('Are you sure? Old tokens will be invalidated.')) return;
 
-            // We send basic info so the 'devices' table insert doesn't fail
+            // LocalStorage se real fingerprint uthayen
+            const realFingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
+
             const deviceData = {
-                device_name: navigator.userAgent.split(' ')[0] || 'Web Browser',
-                fingerprint: btoa(navigator.userAgent).substring(0, 16), // Simple fake fingerprint
+                device_name: "Web Browser", // Aap navigation.userAgent se bhi nikal sakte hain
+                fingerprint: realFingerprint, // <-- Fake ki jagah Real fingerprint use karein
                 os_version: navigator.platform,
                 app_version: '1.0.0'
             };

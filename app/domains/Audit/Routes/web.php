@@ -1,6 +1,6 @@
 <?php
 
-use App\Domains\Audit\Controllers\AuditController;
+use App\Domains\Audit\Controllers\Front\AuditController;
 use Illuminate\Support\Facades\Route;
  
 // admin action audit Routes

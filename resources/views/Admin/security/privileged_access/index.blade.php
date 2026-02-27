@@ -172,7 +172,8 @@
             return {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'X-Device-Fingerprint': localStorage.getItem('device_fingerprint') || 'unknown'
             };
         };
 
