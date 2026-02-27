@@ -299,9 +299,36 @@
         }
 
         async function handleAction(id, action) {
+            let payload = null;
+
+            // Ban ya Unban dono ke liye reason aur reason_code lazmi hai
+            if (action === 'ban' || action === 'unban') {
+                const actionType = action.toUpperCase();
+                const reasonText = prompt(`Enter reason for ${actionType}:`);
+
+                // Agar user cancel kar de ya khali chore to request nahi bhejni
+                if (!reasonText) {
+                    alert(`Reason is required to ${action}. Action cancelled.`);
+                    return;
+                }
+
+                payload = {
+                    reason: reasonText,
+                    reason_code: `MANUAL_${actionType}` // e.g., MANUAL_BAN or MANUAL_UNBAN
+                };
+            }
+
+            // Confirmation dialog
             if (!confirm(`Are you sure you want to ${action} this device?`)) return;
-            const res = await apiRequest(`/api/devices/${id}/${action}`, 'POST');
+
+            // API Request call with payload
+            const res = await apiRequest(`/api/devices/${id}/${action}`, 'POST', payload);
+
             if (res) {
+                // Success feedback
+                showToast("Success", `Device ${action}ed successfully.`);
+
+                // Refresh UI
                 fetchDevices();
                 fetchDeviceInsights();
             }

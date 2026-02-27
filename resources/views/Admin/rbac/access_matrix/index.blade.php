@@ -6,25 +6,21 @@
         {{-- A. Header Section --}}
         <header class="flex flex-col md:flex-row md:items-end md:justify-between space-y-4 md:space-y-0">
             <div>
-
-                {{-- Title --}}
-                <h1 class="text-3xl md:text-4xl font-extrabold theme-text-main tracking-tight">
-                    Access Matrix
-                </h1>
+                <h1 class="text-3xl md:text-4xl font-extrabold theme-text-main tracking-tight">Access Matrix</h1>
                 <p class="text-base theme-text-muted mt-2 max-w-2xl">
-                    Provide a single, visual truth of access. Map organizational roles to atomic platform capabilities.
+                    Map organizational roles to atomic platform capabilities and manage module-level locks.
                 </p>
             </div>
 
             <div class="flex items-center gap-3">
                 <button onclick="window.loadMatrixData()"
-                    class="inline-flex items-center px-4 py-2 theme-bg-card border theme-border theme-text-main font-semibold rounded-xl shadow-sm hover:bg-white/5 transition-all duration-300">
+                    class="inline-flex items-center px-4 py-2 theme-bg-card border theme-border theme-text-main font-semibold rounded-xl shadow-sm hover:bg-white/5 transition-all">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
                         </path>
                     </svg>
-                    Sync Data
+                    Refresh Matrix
                 </button>
             </div>
         </header>
@@ -34,17 +30,24 @@
             {{-- Toolbar --}}
             <div
                 class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 theme-bg-card p-4 rounded-2xl border theme-border shadow-sm">
-                <div class="flex items-center gap-4">
-                    <h2 class="text-lg font-bold theme-text-main">Role vs Permission Mapping</h2>
-                    <span
-                        class="px-2.5 py-1 rounded-md text-xs font-medium theme-bg-body theme-text-muted border theme-border"
-                        id="matrix-stats">Loading stats...</span>
+                <div class="flex items-center gap-6">
+                    <div>
+                        <h2 class="text-lg font-bold theme-text-main">Role vs Permission Mapping</h2>
+                        <span class="text-xs theme-text-muted" id="matrix-stats">Initializing...</span>
+                    </div>
+                    {{-- Legend --}}
+                    <div class="hidden lg:flex items-center gap-4 border-l theme-border pl-6">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500"></span><span
+                                class="text-xs">Read/Write</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span><span
+                                class="text-xs">System Lock</span></div>
+                    </div>
                 </div>
 
                 <div class="relative">
-                    <input type="text" id="matrix-search" placeholder="Filter permissions..."
-                        class="pl-10 pr-4 py-2 theme-bg-body border theme-border rounded-xl text-sm theme-text-main focus:ring-2 placeholder-gray-500 w-64 outline-none"
-                        style="--tw-ring-color: rgb(var(--brand-primary));" onkeyup="window.renderMatrixView()">
+                    <input type="text" id="matrix-search" placeholder="Search permissions or modules..."
+                        class="pl-10 pr-4 py-2 theme-bg-body border theme-border rounded-xl text-sm theme-text-main focus:ring-2 w-72 outline-none"
+                        onkeyup="window.renderMatrixView()">
                     <svg class="w-4 h-4 theme-text-muted absolute left-3 top-3" fill="none" stroke="currentColor"
                         viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -55,30 +58,49 @@
 
             {{-- The Grid --}}
             <div class="theme-bg-card rounded-2xl shadow-sm border theme-border overflow-hidden relative min-h-[500px]">
-
                 {{-- Loader --}}
                 <div id="matrix-loading"
                     class="absolute inset-0 bg-black/50 backdrop-blur-sm z-30 flex flex-col items-center justify-center">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 mb-4"
-                        style="border-color: rgb(var(--brand-primary));"></div>
-                    <span class="font-semibold animate-pulse" style="color: rgb(var(--brand-primary));">Constructing
-                        Matrix...</span>
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 mb-4 border-blue-500"></div>
+                    <span class="font-semibold text-blue-400 animate-pulse">Syncing Policies...</span>
                 </div>
 
-                <div class="overflow-x-auto overflow-y-auto max-h-[70vh] custom-scrollbar pb-4 relative">
+                <div class="overflow-x-auto overflow-y-auto max-h-[75vh] custom-scrollbar relative">
                     <table class="w-full text-sm text-left border-collapse">
-                        <thead id="matrix-header" class="theme-text-main sticky top-0 z-20 shadow-sm backdrop-blur-md"
-                            style="background-color: rgba(var(--bg-card), 0.95);">
-                            {{-- Headers Injected via JS --}}
+                        <thead id="matrix-header"
+                            class="theme-text-main sticky top-0 z-20 shadow-sm backdrop-blur-md bg-opacity-95 bg-inherit">
+                            {{-- JS Injected --}}
                         </thead>
-                        <tbody id="matrix-body" class="divide-y theme-border"
-                            style="border-color: rgb(var(--border-color));">
-                            {{-- Body Injected via JS --}}
+                        <tbody id="matrix-body" class="divide-y theme-border">
+                            {{-- JS Injected --}}
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
+    </div>
+
+    {{-- Safety Confirmation Modal --}}
+    <div id="confirm-modal"
+        class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="theme-bg-card border theme-border w-full max-w-md rounded-2xl p-6 shadow-2xl scale-95 transition-transform duration-200"
+            id="modal-content">
+            <div class="flex items-center gap-4 mb-4 text-red-500">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h3 class="text-xl font-bold">Confirm Access Change</h3>
+            </div>
+            <p class="theme-text-muted text-sm mb-6" id="modal-text">Are you sure you want to modify these permissions? This
+                will impact active user sessions.</p>
+            <div class="flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 theme-text-muted font-semibold">Cancel</button>
+                <button id="modal-confirm-btn"
+                    class="px-6 py-2 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-900/20 hover:bg-red-700 transition-all">Confirm
+                    Update</button>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -90,69 +112,47 @@
             width: 8px;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background-color: rgb(var(--border-color));
             border-radius: 20px;
         }
 
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background-color: rgb(var(--text-muted));
-        }
-
-        /* --- PERMISSION TOGGLE SWITCHES --- */
+        /* Toggle Switches */
         .toggle-track {
-            width: 2.75rem;
-            height: 1.5rem;
+            width: 2.5rem;
+            height: 1.25rem;
             background-color: rgba(var(--border-color), 0.8);
             border-radius: 9999px;
-            transition: background-color 0.2s ease-in-out;
+            transition: all 0.2s;
             cursor: pointer;
-            border: 1px solid rgba(var(--border-color), 1);
         }
 
         .toggle-dot {
-            width: 1.1rem;
-            height: 1.1rem;
+            width: 0.9rem;
+            height: 0.9rem;
             background-color: white;
             border-radius: 50%;
             position: absolute;
-            top: 0.2rem;
+            top: 0.17rem;
             left: 0.2rem;
-            transition: transform 0.2s ease-in-out;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            pointer-events: none;
+            transition: transform 0.2s;
         }
 
-        /* Checked State */
         input:checked+.toggle-track {
-            background-color: rgb(var(--brand-primary)) !important;
-            border-color: rgb(var(--brand-primary));
+            background-color: #3b82f6 !important;
         }
 
         input:checked~.toggle-dot {
-            transform: translateX(1.25rem);
+            transform: translateX(1.2rem);
         }
 
-        /* Disabled State (For Super Admin) */
         input:disabled+.toggle-track {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
-            background-color: rgb(var(--brand-primary)) !important;
-        }
-
-        /* Table Styling Requirements for Matrix */
-        .role-cell {
-            min-width: 140px;
-            border-left: 1px solid rgb(var(--border-color));
         }
 
         .permission-cell {
-            min-width: 280px;
-            /* Sticky Left Column */
+            min-width: 300px;
             position: sticky;
             left: 0;
             z-index: 10;
@@ -160,280 +160,260 @@
             border-right: 1px solid rgb(var(--border-color));
         }
 
-        /* Ensure sticky headers intersecting sticky columns stay on top */
-        thead th.permission-cell {
-            z-index: 25;
-        }
-
-        tbody tr:hover td:not(.permission-cell) {
-            background-color: rgba(255, 255, 255, 0.02);
+        .module-header {
+            background-color: rgba(59, 130, 246, 0.08);
         }
     </style>
 @endpush
 
 @push('scripts')
     <script>
-        const AUTH_TOKEN = localStorage.getItem('token');
-        const BASE_URL = 'http://127.0.0.1:8000/api';
-        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
-
         let roles = [];
         let permissions = [];
-        let permissionsByCategory = {};
+        let modules = {};
+        let pendingAction = null;
 
-        // --- 1. Notification Toast ---
-        function showToaster(message, type = 'success') {
-            let container = document.getElementById('toast-container');
-            if (!container) {
-                container = document.createElement('div');
-                container.id = 'toast-container';
-                container.className = 'fixed bottom-5 right-5 space-y-3 z-[100]';
-                document.body.appendChild(container);
-            }
+        const API = {
+            fetch: async (url, method = 'GET', body = null) => {
+                try {
+                    const res = await fetch(`http://127.0.0.1:8000/api${url}`, {
+                        method,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json', // Yeh server ko batata hai ke humein sirf JSON chahiye
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: body ? JSON.stringify(body) : null
+                    });
 
-            const toast = document.createElement('div');
-            const bgColor = type === 'success' ? 'theme-bg-card border theme-border' :
-                'bg-red-500/20 border border-red-500/50';
-            toast.className =
-                `${bgColor} theme-text-main px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-300`;
-            const icon = type === 'success' ?
-                '<svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' :
-                '<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
-
-            toast.innerHTML = `${icon}<span class="font-medium text-sm">${message}</span>`;
-            container.appendChild(toast);
-
-            requestAnimationFrame(() => toast.classList.remove('translate-y-10', 'opacity-0'));
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // --- 2. API Handler ---
-        async function fetchData(endpoint, method = 'GET', body = null) {
-            const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
-
-            const headers = {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': CSRF_TOKEN,
-                'X-Device-Fingerprint': fingerprint
-            };
-
-            if (AUTH_TOKEN) headers['Authorization'] = `Bearer ${AUTH_TOKEN}`;
-
-            try {
-                const response = await fetch(`${BASE_URL}${endpoint}`, {
-                    method,
-                    headers,
-                    body: body ? JSON.stringify(body) : null
-                });
-
-                const text = await response.text();
-                let data = {};
-                if (text) {
-                    try {
-                        data = JSON.parse(text);
-                    } catch (e) {
-                        data = {
-                            message: text
-                        };
+                    // Check karein agar response JSON hai
+                    const contentType = res.headers.get("content-type");
+                    if (contentType && contentType.indexOf("application/json") !== -1) {
+                        const data = await res.json();
+                        if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
+                        return data;
+                    } else {
+                        // Agar server ne HTML bhej di (Error page)
+                        const text = await res.text();
+                        console.error("Server returned non-JSON response:", text);
+                        throw new Error(`Server Error: Received HTML instead of JSON (Status: ${res.status})`);
                     }
+                } catch (error) {
+                    console.error("Fetch Error:", error);
+                    throw error;
                 }
-
-                if (!response.ok) throw {
-                    status: response.status,
-                    data
-                };
-                return data;
-            } catch (error) {
-                console.error(`API Error:`, error);
-                throw error;
             }
-        }
+        };
 
-        // --- 3. Initial Loader ---
+        // --- Data Management ---
+
         window.loadMatrixData = async function() {
             try {
                 document.getElementById('matrix-loading').classList.remove('hidden');
 
-                // Fetch Roles and Permissions concurrently
                 const [roleRes, permRes] = await Promise.all([
-                    fetchData('/roles'),
-                    fetchData('/permissions')
+                    API.fetch('/roles'),
+                    API.fetch('/permissions')
                 ]);
 
-                // Parse Roles (Assuming response contains a 'data' array or is an array directly)
-                const rawRoles = Array.isArray(roleRes.data) ? roleRes.data : (Array.isArray(roleRes) ? roleRes :
-                []);
-                roles = rawRoles.map(r => ({
-                    ...r,
-                    // Map inner permissions to a simple array of names for easy checking
-                    permissions_list: (r.permissions || []).map(p => p.name)
-                })).sort((a, b) => {
-                    // Force Super Admin to the first column
-                    if (a.name.toLowerCase() === 'super admin') return -1;
-                    if (b.name.toLowerCase() === 'super admin') return 1;
+                // --- DEBUGGING: Console mein check karein ke data kis shakal mein aa raha hai ---
+                console.log("Roles Response:", roleRes);
+                console.log("Permissions Response:", permRes);
+
+                // Roles ko safely nikaalein
+                const rawRoles = roleRes.data || roleRes;
+                roles = Array.isArray(rawRoles) ? rawRoles : (rawRoles.data ? rawRoles.data : []);
+
+                // Permissions ko safely nikaalein (Yehi masla kar raha tha)
+                const rawPerms = permRes.data || permRes;
+                // Agar Laravel pagination use ho rahi hai to data.data mein array hota hai
+                permissions = Array.isArray(rawPerms) ? rawPerms : (rawPerms.data ? rawPerms.data : []);
+
+                if (!Array.isArray(permissions)) {
+                    throw new Error("Permissions data is not an array. Check API structure.");
+                }
+
+                // Roles sorting (Super Admin ko hamesha pehle rakhein)
+                roles.sort((a, b) => {
+                    if (a.name.toLowerCase().includes('super')) return -1;
                     return a.name.localeCompare(b.name);
                 });
 
-                // Parse Permissions
-                const rawPerms = Array.isArray(permRes.data) ? permRes.data : (Array.isArray(permRes) ? permRes :
-                []);
-                permissions = rawPerms.map(p => ({
-                    ...p,
-                    category: p.category || getFallbackCategory(p.name)
-                }));
-
-                // Group Permissions by Category
-                permissionsByCategory = permissions.reduce((acc, p) => {
-                    if (!acc[p.category]) acc[p.category] = [];
-                    acc[p.category].push(p);
+                // Group by category (Module)
+                modules = permissions.reduce((acc, p) => {
+                    const cat = p.category || 'General Operations';
+                    if (!acc[cat]) acc[cat] = [];
+                    acc[cat].push(p);
                     return acc;
                 }, {});
 
-                // Update Stats text
                 document.getElementById('matrix-stats').textContent =
-                    `${roles.length} Roles • ${permissions.length} Permissions`;
-
+                    `${roles.length} Roles | ${permissions.length} Permissions`;
                 renderMatrixView();
 
             } catch (e) {
-                showToaster(e.data?.message || 'Failed to sync matrix data', 'error');
+                console.error("Matrix Load Error:", e);
+                showToaster(e.message || 'Failed to initialize matrix', 'error');
             } finally {
                 document.getElementById('matrix-loading').classList.add('hidden');
             }
         };
 
-        function getFallbackCategory(name) {
-            const n = name.toLowerCase();
-            if (n.includes('finance') || n.includes('refund')) return 'Finance Operations';
-            if (n.includes('user') || n.includes('ban')) return 'User Management';
-            return 'System Controls';
-        }
-
-        // --- 4. Render Logic ---
         window.renderMatrixView = function() {
             const header = document.getElementById('matrix-header');
             const body = document.getElementById('matrix-body');
-            const searchTerm = document.getElementById('matrix-search').value.toLowerCase();
+            const query = document.getElementById('matrix-search').value.toLowerCase();
 
-            // Render Header (Roles)
+            // 1. Render Header
             let hHtml =
-                `<tr><th class="permission-cell px-6 py-4 text-xs font-bold uppercase tracking-wider theme-bg-card">Capabilities</th>`;
+                `<tr><th class="permission-cell px-6 py-5 text-xs font-black uppercase theme-bg-card">Module & Capabilities</th>`;
             roles.forEach(r => {
-                const isSuper = r.name.toLowerCase() === 'super admin';
-                hHtml += `
-                <th class="role-cell px-4 py-4 text-center">
-                    <div class="flex flex-col items-center">
-                        <span class="text-sm font-bold theme-text-main">${r.name}</span>
-                        ${isSuper ? '<span class="text-[10px] uppercase font-bold text-red-500 bg-red-500/10 border border-red-500/20 px-1.5 py-0.5 rounded mt-1">Locked</span>' : ''}
-                    </div>
-                </th>`;
+                hHtml += `<th class="px-4 py-5 text-center min-w-[120px] border-l theme-border">
+                <span class="text-sm font-bold block">${r.name}</span>
+                ${r.name.toLowerCase().includes('super') ? '<span class="text-[9px] text-red-500 font-bold uppercase">Locked</span>' : ''}
+            </th>`;
             });
             header.innerHTML = hHtml + '</tr>';
 
-            // Render Body (Permissions grouped by Category)
+            // 2. Render Body
             body.innerHTML = '';
-            const categories = Object.keys(permissionsByCategory).sort();
+            Object.keys(modules).sort().forEach(modName => {
+                const perms = modules[modName].filter(p => p.name.toLowerCase().includes(query) || modName
+                    .toLowerCase().includes(query));
+                if (perms.length === 0) return;
 
-            categories.forEach(cat => {
-                // Filter permissions in this category based on search
-                const filteredPerms = permissionsByCategory[cat].filter(p => p.name.toLowerCase().includes(
-                    searchTerm));
+                // Module Row (Bulk Control)
+                let mHtml = `<tr class="module-header border-y theme-border">
+                <td class="permission-cell px-6 py-3 font-bold text-blue-500 uppercase tracking-tighter text-xs flex items-center justify-between">
+                    <span>📁 ${modName}</span>
+                </td>`;
 
-                if (filteredPerms.length === 0) return; // Skip category if empty due to search
-
-                // Category Header Row
-                body.innerHTML += `
-                    <tr style="background-color: rgba(var(--brand-primary), 0.05);">
-                        <td colspan="${roles.length + 1}" class="px-6 py-2 text-xs font-bold uppercase tracking-widest sticky left-0 z-10" style="color: rgb(var(--brand-primary)); border-bottom: 1px solid rgb(var(--border-color));">
-                            ${cat}
-                        </td>
-                    </tr>`;
+                roles.forEach(r => {
+                    const isSuper = r.name.toLowerCase().includes('super');
+                    mHtml += `<td class="text-center px-4 py-3 border-l theme-border">
+                    <button onclick="window.confirmModuleToggle('${r.name}', '${modName}')" 
+                        ${isSuper ? 'disabled' : ''}
+                        class="text-[10px] font-bold px-2 py-1 rounded border border-blue-500/30 text-blue-500 hover:bg-blue-500 hover:text-white transition-all">
+                        BULK
+                    </button>
+                </td>`;
+                });
+                body.innerHTML += mHtml + '</tr>';
 
                 // Permission Rows
-                filteredPerms.sort((a, b) => a.name.localeCompare(b.name)).forEach(p => {
-                    let row = `
-                        <tr>
-                            <td class="permission-cell px-6 py-3 text-sm font-medium theme-text-main group">
-                                <div class="flex items-center justify-between">
-                                    <span>${p.name}</span>
-                                </div>
-                            </td>`;
+                perms.forEach(p => {
+                    let row = `<tr><td class="permission-cell px-8 py-3 theme-text-main border-b theme-border">
+                    <div class="flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>
+                        <span class="font-medium">${p.name}</span>
+                    </div>
+                </td>`;
 
                     roles.forEach(r => {
-                        const hasPermission = r.permissions_list.includes(p.name);
-                        const isSuper = r.name.toLowerCase() === 'super admin';
+                        const hasPerm = (r.permissions || []).some(rp => rp.name === p.name);
+                        const isSuper = r.name.toLowerCase().includes('super');
 
-                        row += `
-                            <td class="role-cell px-4 py-3 text-center align-middle transition-colors">
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" class="sr-only peer"
-                                        ${hasPermission ? 'checked' : ''} 
-                                        ${isSuper ? 'disabled' : ''}
-                                        data-role-id="${r.id}" 
-                                        data-perm-name="${p.name}"
-                                        onchange="window.togglePermission(this)">
-                                    <div class="toggle-track"></div>
-                                    <div class="toggle-dot"></div>
-                                </label>
-                            </td>`;
+                        row += `<td class="px-4 py-3 text-center border-l theme-border align-middle">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" class="sr-only peer" 
+                                ${hasPerm ? 'checked' : ''} 
+                                ${isSuper ? 'disabled' : ''}
+                                onchange="window.confirmPermissionToggle(this, '${r.name}', '${p.name}')">
+                            <div class="toggle-track"></div>
+                            <div class="toggle-dot"></div>
+                        </label>
+                    </td>`;
                     });
                     body.innerHTML += row + '</tr>';
                 });
             });
-
-            if (body.innerHTML === '') {
-                body.innerHTML =
-                    `<tr><td colspan="${roles.length + 1}" class="px-6 py-10 text-center theme-text-muted">No permissions match your search.</td></tr>`;
-            }
         };
 
-        // --- 5. Action: Toggle Permission ---
-        window.togglePermission = async function(checkbox) {
-            const roleId = checkbox.dataset.roleId;
-            const permName = checkbox.dataset.permName;
-            const role = roles.find(r => r.id == roleId);
+        // --- Actions ---
 
-            // Safety check for Super Admin
-            if (role.name.toLowerCase() === 'super admin') {
-                checkbox.checked = true;
-                showToaster('System Protected: Cannot modify Super Admin', 'error');
-                return;
-            }
+        // 1. Individual Permission Toggle
+        window.confirmPermissionToggle = function(checkbox, roleName, permName) {
+            const isChecked = checkbox.checked;
+            // Immediate UI feedback for better UX
+            pendingAction = async () => {
+                try {
+                    const role = roles.find(r => r.name === roleName);
+                    let currentPerms = role.permissions.map(p => p.name);
 
-            // 1. Optimistic UI Update (Update local state)
-            const oldList = [...role.permissions_list];
+                    if (isChecked) currentPerms.push(permName);
+                    else currentPerms = currentPerms.filter(n => n !== permName);
 
-            if (checkbox.checked) {
-                if (!role.permissions_list.includes(permName)) {
-                    role.permissions_list.push(permName);
+                    await API.fetch('/role-permission', 'POST', {
+                        role: roleName,
+                        permissions: currentPerms
+                    });
+
+                    showToaster(`Updated ${permName} for ${roleName}`);
+                    loadMatrixData(); // Refresh to ensure sync
+                } catch (e) {
+                    checkbox.checked = !isChecked; // Revert
+                    showToaster(e.message || 'Update failed', 'error');
                 }
+            };
+
+            // Open Modal for safety if removing access
+            if (!isChecked) {
+                openModal(`Warning: Removing <b>${permName}</b> might restrict ${roleName} from essential features.`);
             } else {
-                role.permissions_list = role.permissions_list.filter(n => n !== permName);
-            }
-
-            // 2. Sync to API
-            try {
-                // The monolithic code payload: { role: 'Admin', permissions: ['perm1', 'perm2'] }
-                await fetchData('/role-permission', 'POST', {
-                    role: role.name,
-                    permissions: role.permissions_list
-                });
-
-                showToaster(`Access updated for ${role.name}`);
-
-            } catch (e) {
-                // Revert UI on failure
-                role.permissions_list = oldList;
-                checkbox.checked = !checkbox.checked;
-                showToaster(e.data?.message || 'Access synchronization failed', 'error');
+                pendingAction(); // Direct update for adding access
             }
         };
 
-        // Initialize
+        // 2. Module Level Toggle (Bulk)
+        window.confirmModuleToggle = function(roleName, moduleName) {
+            openModal(
+                `Action: Modify entire <b>${moduleName}</b> module for <b>${roleName}</b>? This will synchronize all related sub-permissions.`
+            );
+            pendingAction = async () => {
+                try {
+                    await API.fetch('/role-permission/module', 'POST', {
+                        role: roleName,
+                        module: moduleName.toLowerCase()
+                    });
+                    showToaster(`Module ${moduleName} updated for ${roleName}`);
+                    loadMatrixData();
+                } catch (e) {
+                    showToaster(e.message || 'Module update failed', 'error');
+                }
+            };
+        };
+
+        // --- UI Helpers ---
+
+        function openModal(text) {
+            document.getElementById('modal-text').innerHTML = text;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            pendingAction = null;
+        };
+
+        document.getElementById('modal-confirm-btn').onclick = () => {
+            if (pendingAction) pendingAction();
+            closeModal();
+        };
+
+        function showToaster(msg, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className =
+                `fixed bottom-10 right-10 px-6 py-4 rounded-2xl shadow-2xl z-[200] border transition-all duration-300 transform translate-y-20 ${type === 'success' ? 'bg-zinc-900 border-green-500/50 text-white' : 'bg-red-900 border-red-500 text-white'}`;
+            toast.innerHTML =
+                `<div class="flex items-center gap-3"><span>${type === 'success' ? '✅' : '❌'}</span> ${msg}</div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.remove('translate-y-20'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+
         document.addEventListener('DOMContentLoaded', loadMatrixData);
     </script>
 @endpush

@@ -14,11 +14,11 @@
             </h1>
             <p class="theme-text-muted mt-1 text-sm">Real-time monitoring of authentication integrity and access patterns.</p>
         </div>
-        <div class="flex gap-3">
+        {{-- <div class="flex gap-3">
             <button class="px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 rounded-lg text-sm font-medium hover:bg-red-500/20 transition-colors flex items-center gap-2">
                 <i data-lucide="unplug" class="w-4 h-4"></i> Revoke All Global Sessions
             </button>
-        </div>
+        </div> --}}
     </div>
 
     {{-- RISK ANALYTICS CARDS --}}

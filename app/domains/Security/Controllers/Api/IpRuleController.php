@@ -2,6 +2,7 @@
 
 namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Audit\Services\SecurityAuditService;
 use App\Domains\Security\Models\IpRule;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
