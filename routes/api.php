@@ -55,7 +55,7 @@ Route::middleware('health_api', 'check_country')->group(function () {
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'validate.session'])->group(function () {
         // /////////middleware for blocking order for soft_disable country/////////
-        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders'])->group(function () {
+        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders', 'platform.context'])->group(function () {
             // //////////////////////////book slot for consultant////////////
             Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
         });
