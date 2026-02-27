@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Domains\Audit\Controllers;
+namespace  App\Domains\Audit\Controllers\Front;
 
 
 class AuditController

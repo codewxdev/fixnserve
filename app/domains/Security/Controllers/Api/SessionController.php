@@ -43,6 +43,7 @@ class SessionController extends Controller
      */
     public function revoke($id)
     {
+        
         $session = UserSession::findOrFail($id);
         $this->revokeSession($session);
 
