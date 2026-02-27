@@ -2,6 +2,7 @@
 
 namespace App\Domains\Security\Controllers\Api;
 
+use App\Domains\Audit\Services\SecurityAuditService;
 use App\Domains\Security\Models\Device;
 use App\Domains\Security\Models\DevicePolicy;
 use App\Http\Controllers\Controller;
@@ -9,6 +10,13 @@ use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
+    protected $securityAudit;
+
+    public function __construct(SecurityAuditService $securityAudit)
+    {
+        $this->securityAudit = $securityAudit;
+    }
+
     // 1. Get current device policies
     public function getPolicies()
     {
@@ -84,17 +92,79 @@ class DeviceController extends Controller
     }
 
     // 7. Ban a device
-    public function ban(Device $device)
+    public function ban(Request $request, Device $device)
     {
-        $device->update(['trust_status' => 'banned']);
+        $request->validate([
+            'reason_code' => 'required|string',
+        ]);
+
+        $actor = auth()->user();
+
+        $beforeState = [
+            'trust_status' => $device->trust_status,
+        ];
+
+        $device->update([
+            'trust_status' => 'banned',
+        ]);
+
+        $afterState = [
+            'trust_status' => 'banned',
+        ];
+
+        // 🔐 SECURITY AUDIT
+        $this->securityAudit->log(
+            'device_banned',
+            [
+                'device_id' => $device->id,
+                'user_id' => $device->user_id,
+                'fingerprint' => $device->fingerprint,
+                'ip_address' => request()->ip(),
+            ],
+            $actor,
+            $beforeState,
+            $afterState,
+            $request->reason_code
+        );
 
         return response()->json(['message' => 'Device banned']);
     }
 
     // 8. Unban a device
-    public function unban(Device $device)
+    public function unban(Request $request, Device $device)
     {
-        $device->update(['trust_status' => 'unverified']);
+        $request->validate([
+            'reason_code' => 'required|string',
+        ]);
+
+        $actor = auth()->user();
+
+        $beforeState = [
+            'trust_status' => $device->trust_status,
+        ];
+
+        $device->update([
+            'trust_status' => 'unverified',
+        ]);
+
+        $afterState = [
+            'trust_status' => 'unverified',
+        ];
+
+        // 🔐 SECURITY AUDIT
+        $this->securityAudit->log(
+            'device_unbanned',
+            [
+                'device_id' => $device->id,
+                'user_id' => $device->user_id,
+                'fingerprint' => $device->fingerprint,
+                'ip_address' => request()->ip(),
+            ],
+            $actor,
+            $beforeState,
+            $afterState,
+            $request->reason_code
+        );
 
         return response()->json(['message' => 'Device unbanned']);
     }

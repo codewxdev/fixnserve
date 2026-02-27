@@ -20,7 +20,7 @@ class EnsureAuthMiddleware
 
         if (! $token) {
             // No token found -> Redirect to login
-            return redirect()->route('login.index');
+            return redirect()->route('login');
         }
 
         try {
@@ -29,7 +29,7 @@ class EnsureAuthMiddleware
 
             // 3. Authenticate the user based on the token
             if (! $user = JWTAuth::authenticate()) {
-                return redirect()->route('login.index')->withErrors(['error' => 'User not found']);
+                return redirect()->route('login')->withErrors(['error' => 'User not found']);
             }
 
             // 4. Manually log the user in for this request
@@ -37,8 +37,11 @@ class EnsureAuthMiddleware
             Auth::setUser($user);
 
         } catch (\Exception $e) {
+
+            // Token is invalid or expired -> Redirect to login
+            return redirect()->route('login')->withErrors(['error' => 'Session expired, please login again.']);
             // 5. If token is invalid or expired, redirect to login
-            return redirect()->route('login.index')->withErrors(['error' => 'Session expired, please login again.']);
+            // return redirect()->route('login.index')->withErrors(['error' => 'Session expired, please login again.']);
         }
 
         // 6. Proceed

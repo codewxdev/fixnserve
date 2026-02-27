@@ -32,7 +32,6 @@ class CheckDeviceBinding
 
             // 🔐 Get fingerprint from request
             $fingerprint = $request->header('X-Device-Fingerprint');
-            // dd($fingerprint);
             if (! $fingerprint) {
                 abort(401, 'Device fingerprint missing');
             }
@@ -53,7 +52,9 @@ class CheckDeviceBinding
             return $next($request);
 
         } catch (\Exception $e) {
-            abort(401, 'Invalid token');
+            // dd($e->getMessage());
+            return response()->json(['error' => 'Unauthorized - '.$e->getMessage()], 401);
+
         }
     }
 }

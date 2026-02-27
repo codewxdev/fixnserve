@@ -45,6 +45,7 @@ class ValidateUserSession
             ]);
 
         } catch (\Exception $e) {
+            // \Log::error('Error validating user session: ' . $e->getMessage());
 
             return response()->json([
                 'error' => 'Unauthorized',
