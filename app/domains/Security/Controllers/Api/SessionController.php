@@ -35,7 +35,6 @@ class SessionController extends Controller
     }
 
     /**
-     * 2️⃣ View Session Details
      * GET /api/sessions/{id}
      */
     public function show($id)
@@ -66,6 +65,7 @@ class SessionController extends Controller
      */
     public function revokeAll(Request $request)
     {
+        
         $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
@@ -84,7 +84,7 @@ class SessionController extends Controller
      */
     public function revokeByRole(Request $request)
     {
-
+    
         $request->validate([
             'role' => 'required|string',
         ]);

@@ -118,11 +118,16 @@
         const API_BASE = "{{ url('/api') }}";
 
         function getHeaders() {
+            const token = localStorage.getItem('token');
+            // LocalStorage se fingerprint uthayen jo humne login par save kiya tha
+            const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
+
             return {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('token'),
+                'Authorization': 'Bearer ' + token,
                 'Accept': 'application/json',
-                'X-Device-Fingerprint': localStorage.getItem('device_fingerprint') || 'unknown'
+                // X-Device-Fingerprint header yahan add kar diya
+                'X-Device-Fingerprint': fingerprint
             };
         }
 
@@ -135,185 +140,312 @@
         // 2. CORE FUNCTIONS
         // ==============================
 
+        function openRevokeRoleModal() {
+            document.getElementById('role-modal').classList.remove('hidden');
+        }
+
         async function fetchRoles() {
             const select = document.getElementById('role-select');
-            if(!select) return;
-            
             try {
-                const response = await fetch(`${API_BASE}/roles`, { headers: getHeaders() });
-                const data = await response.json();
-                const roles = Array.isArray(data) ? data : (data.data || []);
-                
-                select.innerHTML = roles.map(role => {
-                    const name = (typeof role === 'object') ? role.name : role;
-                    return `<option value="${name}">${name.charAt(0).toUpperCase() + name.slice(1)}</option>`;
-                }).join('');
+                const response = await fetch(`${API_BASE}/roles`, {
+                    headers: getHeaders()
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    const roles = Array.isArray(data) ? data : (data.data || []);
+                    select.innerHTML = '';
+                    if (roles.length === 0) {
+                        select.innerHTML = '<option disabled>No roles found</option>';
+                        return;
+                    }
+                    roles.forEach(role => {
+                        const roleName = (typeof role === 'object' && role.name) ? role.name : role;
+                        const displayName = roleName.charAt(0).toUpperCase() + roleName.slice(1);
+                        select.innerHTML += `<option value="${roleName}">${displayName}</option>`;
+                    });
+                } else {
+                    select.innerHTML = '<option disabled>Failed to load roles</option>';
+                }
             } catch (error) {
                 console.error("Role fetch error:", error);
+                select.innerHTML = '<option disabled>Error loading roles</option>';
             }
         }
 
         async function fetchSessions() {
             const tbody = document.getElementById('sessions-table-body');
-            tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8"><i data-lucide="loader-2" class="animate-spin w-6 h-6 mx-auto"></i></td></tr>`;
+            tbody.innerHTML =
+                `<tr><td colspan="7" class="text-center py-8"><i data-lucide="loader-2" class="animate-spin w-6 h-6 mx-auto"></i></td></tr>`;
             lucide.createIcons();
 
             try {
-                const response = await fetch(`${API_BASE}/sessions`, { headers: getHeaders() });
+                const response = await fetch(`${API_BASE}/sessions`, {
+                    headers: getHeaders()
+                });
                 const data = await response.json();
-                // Controller directly returns the array
-                renderTable(Array.isArray(data) ? data : []);
+                const sessions = Array.isArray(data) ? data : (data.data || []);
+                renderTable(sessions);
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-red-500 py-4">Failed to load sessions.</td></tr>`;
+                console.error(error);
+                tbody.innerHTML =
+                    `<tr><td colspan="7" class="text-center text-red-500 py-4">Error loading sessions</td></tr>`;
             }
         }
 
-        async function handleAction(url, method = 'POST', body = null) {
+        async function revokeSession(id) {
+            if (!confirm('Are you sure? This will log the user out from THIS device only.')) return;
             try {
-                const response = await fetch(url, {
-                    method: method,
+                const response = await fetch(`${API_BASE}/sessions/${id}/revoke`, {
+                    method: 'POST',
+                    headers: getHeaders()
+                });
+                if (response.ok) {
+                    showToast("Success", "Single session terminated.");
+                    fetchSessions();
+                } else {
+                    alert("Failed to revoke session.");
+                }
+            } catch (error) {
+                alert("Network error.");
+            }
+        }
+
+        async function revokeUserAllSessions(userId, userName) {
+            if (!confirm(`DANGER: Are you sure you want to log out ${userName} from ALL devices?`)) return;
+            try {
+                const response = await fetch(`${API_BASE}/sessions/revoke-all`, {
+                    method: 'POST',
                     headers: getHeaders(),
-                    body: body ? JSON.stringify(body) : null
+                    body: JSON.stringify({
+                        user_id: userId
+                    })
+                });
+                if (response.ok) {
+                    const result = await response.json();
+                    showToast("Success", result.message || "User logged out from all devices.");
+                    fetchSessions();
+                } else {
+                    alert("Failed to revoke user sessions.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Network error.");
+            }
+        }
+
+        async function revokeByRole() {
+            const roleSelect = document.getElementById('role-select');
+            const role = roleSelect.value;
+            const btn = document.getElementById('confirm-revoke-btn');
+            const modal = document.getElementById('role-modal');
+
+            if (!role) {
+                alert("Please select a role first.");
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to log out ALL users with the role: ${role}?`)) {
+                return;
+            }
+
+            if (btn) {
+                btn.innerText = "Processing...";
+                btn.disabled = true;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/sessions/revoke-role`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        role: role
+                    })
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    showToast("Success", result.message);
-                    fetchSessions();
+                    console.log("Role revoke result:", result);
+                    alert(result.message || "Role sessions revoked successfully.");
+                    if (modal) modal.classList.add('hidden');
+                    fetchSessions(); // Refresh table
                 } else {
-                    // Agar SQL error aaye to yahan alert dikhayega
-                    alert("Error: " + (result.message || "Server Side Error (Check database constraints)"));
+                    // Agar SQL error ya validation error aaye
+                    console.error("Server Error:", result);
+                    alert("Server Error: " + (result.message || "Failed to revoke sessions by role."));
                 }
             } catch (error) {
-                alert("Network error. Please try again.");
+                console.error("Fetch Error:", error);
+                alert("Network error. Please check your connection.");
+            } finally {
+                if (btn) {
+                    btn.innerText = "Confirm Logout";
+                    btn.disabled = false;
+                }
             }
         }
 
-        function revokeSession(id) {
-            if (confirm('Revoke this specific session?')) {
-                handleAction(`${API_BASE}/sessions/${id}/revoke`);
-            }
-        }
-
-        function revokeUserAllSessions(userId, userName) {
-            if (confirm(`Log out ${userName} from ALL devices?`)) {
-                handleAction(`${API_BASE}/sessions/revoke-all`, 'POST', { user_id: userId });
-            }
-        }
-
-        function flagSession(id) {
-            const score = prompt("Enter Risk Score (0-100):", "99");
-            if (score !== null) {
-                handleAction(`${API_BASE}/sessions/${id}/flag`, 'POST', { risk_score: score });
+        async function flagSession(id) {
+            const score = prompt("Enter new Risk Score (0-100):", "99");
+            if (score === null) return;
+            try {
+                const response = await fetch(`${API_BASE}/sessions/${id}/flag`, {
+                    method: 'POST',
+                    headers: getHeaders(),
+                    body: JSON.stringify({
+                        risk_score: score
+                    })
+                });
+                if (response.ok) {
+                    showToast("Alert", "Risk score updated.");
+                    fetchSessions();
+                }
+            } catch (error) {
+                console.error(error);
             }
         }
 
         // ==============================
-        // 3. RENDER TABLE
+        // 3. RENDER TABLE (UPDATED)
         // ==============================
 
         function renderTable(sessions) {
             const tbody = document.getElementById('sessions-table-body');
-            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const searchInput = document.getElementById('search-input').value.toLowerCase();
             const riskFilter = document.getElementById('risk-filter').value;
-            const statusFilter = document.getElementById('status-filter').value;
+            const statusFilter = document.getElementById('status-filter').value; // Get Status Filter
+
+            tbody.innerHTML = '';
 
             const filtered = sessions.filter(s => {
-                const isActive = !s.is_revoked && !s.logout_at;
-                const name = s.user?.name?.toLowerCase() || '';
-                const email = s.user?.email?.toLowerCase() || '';
-                const ip = s.ip_address?.toLowerCase() || '';
+                // Determine Active Status
+                // Logic: Active if not revoked AND no logout time set
+                const isActive = (s.is_revoked == 0 || s.is_revoked == false) && (s.logout_at == null);
 
-                const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || ip.includes(searchTerm);
-                const matchesRisk = riskFilter === 'all' || 
-                    (riskFilter === 'high' && s.risk_score > 50) ||
-                    (riskFilter === 'medium' && s.risk_score >= 10 && s.risk_score <= 50) ||
-                    (riskFilter === 'low' && s.risk_score < 10);
-                const matchesStatus = statusFilter === 'all' || 
-                    (statusFilter === 'active' && isActive) || 
-                    (statusFilter === 'inactive' && !isActive);
+                // 1. Search Filter
+                const uName = s.user ? s.user.name.toLowerCase() : '';
+                const uEmail = s.user ? s.user.email.toLowerCase() : '';
+                const matchSearch = (uName.includes(searchInput) || uEmail.includes(searchInput) || (s.ip_address &&
+                    s.ip_address.includes(searchInput)));
 
-                return matchesSearch && matchesRisk && matchesStatus;
+                // 2. Risk Filter
+                let matchRisk = true;
+                if (riskFilter === 'high') matchRisk = s.risk_score > 50;
+                if (riskFilter === 'medium') matchRisk = s.risk_score >= 10 && s.risk_score <= 50;
+                if (riskFilter === 'low') matchRisk = s.risk_score < 10;
+
+                // 3. Status Filter (NEW)
+                let matchStatus = true;
+                if (statusFilter === 'active') matchStatus = isActive;
+                if (statusFilter === 'inactive') matchStatus = !isActive;
+
+                return matchSearch && matchRisk && matchStatus;
             });
 
             document.getElementById('session-count').innerText = filtered.length;
 
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center theme-text-muted">No sessions found.</td></tr>`;
+                tbody.innerHTML =
+                    `<tr><td colspan="7" class="px-6 py-8 text-center theme-text-muted">No sessions found matching filters.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(s => {
-                const isActive = !s.is_revoked && !s.logout_at;
-                const riskColor = s.risk_score > 50 ? 'text-red-500 bg-red-500/10 border-red-500/20' : 
-                                 s.risk_score > 10 ? 'text-yellow-500 bg-yellow-500/10 border-yellow-500/20' : 
-                                 'text-green-500 bg-green-500/10 border-green-500/20';
+            filtered.forEach(session => {
+                const userId = session.user ? session.user.id : null;
+                const userName = session.user ? session.user.name : 'Unknown';
+                const userEmail = session.user ? session.user.email : 'No Email';
+                const userInitial = userName.charAt(0);
+                const lastActive = session.last_activity_at ? new Date(session.last_activity_at)
+                    .toLocaleTimeString() : 'N/A';
 
-                return `
+                // Determine Active Status
+                const isActive = (session.is_revoked == 0 || session.is_revoked == false) && (session.logout_at ==
+                    null);
+
+                // Badge Logic Risk
+                let riskBadgeColor = 'bg-green-500/10 text-green-500 border border-green-500/20';
+                if (session.risk_score > 50) riskBadgeColor = 'bg-red-500/10 text-red-500 border border-red-500/20';
+                else if (session.risk_score > 10) riskBadgeColor =
+                    'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20';
+
+                // Badge Logic Status
+                let statusBadge = isActive ?
+                    '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-500/10 text-green-500 border border-green-500/20"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active</span>' :
+                    '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-500/10 text-gray-500 border border-gray-500/20">Inactive</span>';
+
+                // Disable actions if inactive
+                const disableActionsClass = !isActive ? 'opacity-50 pointer-events-none grayscale' : '';
+
+                let actionsHtml = `
+                    <button onclick="flagSession(${session.id})" class="p-1.5 hover:bg-yellow-500/10 text-yellow-500 rounded transition" title="Flag Risk">
+                        <i data-lucide="flag" class="w-4 h-4"></i>
+                    </button>
+                    
+                    <button onclick="revokeSession(${session.id})" class="p-1.5 hover:bg-orange-500/10 text-orange-500 rounded transition ${disableActionsClass}" title="Kill This Session Only">
+                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                    </button>
+                `;
+
+                if (userId) {
+                    actionsHtml += `
+                        <button onclick="revokeUserAllSessions(${userId}, '${userName}')" class="p-1.5 hover:bg-red-500/10 text-red-500 rounded transition border border-transparent hover:border-red-500/30 ${disableActionsClass}" title="Log Out ${userName} from ALL Devices">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    `;
+                }
+
+                const row = `
                     <tr class="hover:bg-white/5 transition-colors group">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 text-primary font-bold text-xs">
-                                    ${(s.user?.name || 'U')[0]}
+                                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs" style="background-color: rgba(var(--brand-primary), 0.1); color: rgb(var(--brand-primary));">
+                                    ${userInitial}
                                 </div>
                                 <div>
-                                    <div class="font-medium theme-text-main">${s.user?.name || 'Unknown'}</div>
-                                    <div class="text-xs theme-text-muted">${s.user?.email || ''}</div>
+                                    <div class="font-medium theme-text-main">${userName}</div>
+                                    <div class="text-xs theme-text-muted">${userEmail}</div>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-4">
-                            <div class="flex items-center gap-2 theme-text-main">
-                                <i data-lucide="monitor" class="w-4 h-4 opacity-50"></i> ${s.device || 'Unknown'}
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="monitor" class="w-4 h-4 theme-text-muted"></i>
+                                <span class="theme-text-main">${session.device || 'Unknown'}</span>
                             </div>
-                            <div class="text-xs theme-text-muted mt-1 font-mono">${s.ip_address || ''}</div>
+                            <div class="text-xs theme-text-muted mt-1 font-mono">${session.ip_address || ''}</div>
                         </td>
-                        <td class="px-6 py-4 text-xs theme-text-main">${s.location || 'Unknown'}</td>
                         <td class="px-6 py-4">
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-medium border ${riskColor}">
-                                ${s.risk_score}%
+                            <span class="theme-text-main text-xs">${session.location || 'Unknown'}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${riskBadgeColor}">
+                                ${session.risk_score}%
                             </span>
                         </td>
                         <td class="px-6 py-4">
-                            ${isActive ? 
-                                `<span class="inline-flex items-center gap-1.5 text-green-500 text-xs font-bold"><div class="w-1.5 h-1.5 rounded-full bg-green-500"></div> Active</span>` : 
-                                `<span class="text-gray-500 text-xs font-bold">Inactive</span>`}
+                            ${statusBadge}
                         </td>
-                        <td class="px-6 py-4 theme-text-muted text-xs">
-                            ${s.last_activity_at ? new Date(s.last_activity_at).toLocaleTimeString() : 'N/A'}
-                        </td>
+                        <td class="px-6 py-4 theme-text-muted text-xs">${lastActive}</td>
                         <td class="px-6 py-4 text-right">
-                            <div class="flex items-center justify-end gap-2 ${!isActive ? 'opacity-40 grayscale pointer-events-none' : ''}">
-                                <button onclick="flagSession(${s.id})" class="p-1.5 hover:bg-yellow-500/10 text-yellow-500 rounded transition"><i data-lucide="flag" class="w-4 h-4"></i></button>
-                                <button onclick="revokeSession(${s.id})" class="p-1.5 hover:bg-orange-500/10 text-orange-500 rounded transition"><i data-lucide="x-circle" class="w-4 h-4"></i></button>
-                                <button onclick="revokeUserAllSessions(${s.user_id}, '${s.user?.name}')" class="p-1.5 hover:bg-red-500/10 text-red-500 rounded transition"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            <div class="flex items-center justify-end gap-2">
+                                ${actionsHtml}
                             </div>
                         </td>
                     </tr>
                 `;
-            }).join('');
-            
+                tbody.innerHTML += row;
+            });
             lucide.createIcons();
         }
 
-        // --- Event Listeners ---
-        document.getElementById('search-input').addEventListener('input', () => renderTable(window.lastSessions || []));
-        document.getElementById('risk-filter').addEventListener('change', () => renderTable(window.lastSessions || []));
-        document.getElementById('status-filter').addEventListener('change', () => renderTable(window.lastSessions || []));
-
-        // Override fetchSessions to cache data for filtering
-        const originalFetch = fetchSessions;
-        fetchSessions = async function() {
-            const response = await fetch(`${API_BASE}/sessions`, { headers: getHeaders() });
-            const data = await response.json();
-            window.lastSessions = Array.isArray(data) ? data : [];
-            renderTable(window.lastSessions);
-        };
+        // --- UTILS ---
+        document.getElementById('search-input').addEventListener('input', fetchSessions);
+        document.getElementById('risk-filter').addEventListener('change', fetchSessions);
+        // ADDED: Listener for Status Filter
+        document.getElementById('status-filter').addEventListener('change', fetchSessions);
 
         function showToast(title, message) {
-            console.log(`[${title}] ${message}`);
-            // Agar aapke paas toast library hai to yahan call karein
+            console.log(title, message);
         }
     </script>
 @endpush
