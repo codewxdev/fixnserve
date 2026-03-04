@@ -27,6 +27,15 @@ class AuditAdminController extends Controller
         return response()->json($audit);
     }
 
+    public function securityAudit()
+    {
+        $audit = SecurityAuditLog::with('user') // Assuming you have a relationship defined for the user who performed the action
+            ->orderBy('occurred_at', 'desc')
+            ->get();
+
+        return response()->json($audit);
+    }
+
     public function overview()
     {
         $now = now();

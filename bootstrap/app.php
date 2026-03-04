@@ -1,11 +1,17 @@
 <?php
 
 use App\Domains\Command\Jobs\CalculateApiMetrics;
+use App\Domains\Command\Middlewares\EnsureApiHealthMetrics;
+use App\Domains\Command\Middlewares\EnsureBlockOrdersForSoftDisabledCountry;
+use App\Domains\Command\Middlewares\EnsureCountryStatus;
 use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
+use App\Domains\Command\Middlewares\EnsureMaintenance;
 use App\Domains\Command\Models\KillSwitch;
 use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
+use App\Domains\Security\Middlewares\CheckDeviceBinding;
 use App\Domains\Security\Middlewares\CheckNetworkSecurity;
+use App\Domains\Security\Middlewares\CheckScope;
 use App\Domains\Security\Middlewares\CheckTokenRole;
 use App\Domains\Security\Middlewares\Ensure2FAEnabled;
 use App\Domains\Security\Middlewares\EnsureActiveSession;
@@ -13,6 +19,7 @@ use App\Domains\Security\Middlewares\LoginMethodPolicyMiddleware;
 use App\Domains\Security\Middlewares\MFAPolicyMiddleware;
 use App\Domains\Security\Middlewares\ValidateUserSession;
 use App\Domains\Security\Models\DualApproval;
+use App\Domains\System\Middlewares\ApplyPlatformDefaults;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -64,19 +71,19 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'platform.context' => \App\Domains\System\Middlewares\ApplyPlatformDefaults::class,
+            'platform.context' => ApplyPlatformDefaults::class,
             'network.security' => CheckNetworkSecurity::class,
-            'device.bind' => \App\Domains\Security\Middlewares\CheckDeviceBinding::class,
+            'device.bind' => CheckDeviceBinding::class,
             'token.role' => CheckTokenRole::class,
-            'scope' => \App\Domains\Security\Middlewares\CheckScope::class,
+            'scope' => CheckScope::class,
             'validate.session' => ValidateUserSession::class,
             'login.policy' => LoginMethodPolicyMiddleware::class,
             'mfa.policy' => MFAPolicyMiddleware::class,
             'active.session' => EnsureActiveSession::class,
             'emergency' => EnsureEmergencyOverrideMiddleware::class,
             'kill' => EnsureKillSwitch::class,
-            'check_maintenance' => App\Domains\Command\Middlewares\EnsureMaintenance::class,
-            'health_api' => App\Domains\Command\Middlewares\EnsureApiHealthMetrics::class,
+            'check_maintenance' => EnsureMaintenance::class,
+            'health_api' => EnsureApiHealthMetrics::class,
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'super.admin' => \App\Domains\RBAC\Middlewares\EnsureCheckSuperAdmin::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
@@ -84,8 +91,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'user.active' => EnsureCheckUserStatus::class,
             'service.provider' => EnsureServiceProviderRole::class,
-            'check_country' => App\Domains\Command\Middlewares\EnsureCountryStatus::class,
-            'block_soft_country_orders' => App\Domains\Command\Middlewares\EnsureBlockOrdersForSoftDisabledCountry::class,
+            'check_country' => EnsureCountryStatus::class,
+            'block_soft_country_orders' => EnsureBlockOrdersForSoftDisabledCountry::class,
 
         ]);
     })

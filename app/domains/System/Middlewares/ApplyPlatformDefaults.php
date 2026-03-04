@@ -49,6 +49,31 @@ class ApplyPlatformDefaults
             }
         }
 
+        // PLATFORM FLOW TOGGLES
+        $toggles = $platform['toggles'] ?? [];
+
+        // Example: Block order APIs
+        if (
+            isset($toggles['orders_enabled']) &&
+            $toggles['orders_enabled'] === false &&
+            $request->is('api/orders*')
+        ) {
+            return response()->json([
+                'error' => 'Orders are currently disabled by platform policy',
+            ], 503);
+        }
+
+        // Example: Block payments
+        if (
+            isset($toggles['payments_enabled']) &&
+            $toggles['payments_enabled'] === false &&
+            $request->is('api/payments*')
+        ) {
+            return response()->json([
+                'error' => 'Payments are currently disabled by platform policy',
+            ], 503);
+        }
+
         return $next($request);
     }
 }
