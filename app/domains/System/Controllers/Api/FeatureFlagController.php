@@ -3,6 +3,7 @@
 namespace App\Domains\System\Controllers\Api;
 
 use App\Domains\System\Models\FeatureFlag;
+use App\Domains\System\Models\FeatureFlagLog;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -36,6 +37,12 @@ class FeatureFlagController extends Controller
         ]);
 
         $flag = FeatureFlag::create($request->only('key', 'type', 'value'));
+        FeatureFlagLog::create([
+            'feature_flag_id' => $flag->id,
+            'changed_by' => $request->user()->id,
+            'old_value' => null,
+            'new_value' => $flag->value,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -49,10 +56,34 @@ class FeatureFlagController extends Controller
     {
         $flag->update($request->only('type', 'value'));
 
+        FeatureFlagLog::create([
+            'feature_flag_id' => $flag->id,
+            'changed_by' => $request->user()->id,
+            'old_value' => $flag->getOriginal('value'),
+            'new_value' => $flag->value,
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Feature flag updated',
             'data' => $flag,
+        ]);
+    }
+
+    // 4️⃣ Delete flag
+    public function destroy(Request $request, FeatureFlag $flag)
+    {
+        FeatureFlagLog::create([
+            'feature_flag_id' => $flag->id,
+            'changed_by' => $request->user()->id,
+            'old_value' => $flag->value,
+            'new_value' => null,
+        ]);
+        $flag->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Feature flag deleted',
         ]);
     }
 }

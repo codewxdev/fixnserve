@@ -20,6 +20,7 @@ use App\Domains\Security\Middlewares\MFAPolicyMiddleware;
 use App\Domains\Security\Middlewares\ValidateUserSession;
 use App\Domains\Security\Models\DualApproval;
 use App\Domains\System\Middlewares\ApplyPlatformDefaults;
+use App\Domains\System\Middlewares\CheckFeatureFlag;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -71,6 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'feature' => CheckFeatureFlag::class,
             'platform.context' => ApplyPlatformDefaults::class,
             'network.security' => CheckNetworkSecurity::class,
             'device.bind' => CheckDeviceBinding::class,
