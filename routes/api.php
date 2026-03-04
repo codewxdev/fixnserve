@@ -60,7 +60,10 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
         });
         // ////////////////middleware for payment routes////////////////
-        Route::middleware('kill:payments')->group(function () {});
+        Route::middleware('kill:payments','platform.context')->group(function () {
+
+
+        });
 
         Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);

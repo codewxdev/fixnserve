@@ -20,4 +20,9 @@ class SecurityAuditLog extends Model
         static::updating(fn () => false);
         static::deleting(fn () => false);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(\App\Domains\Security\Models\User::class);
+    }
 }
