@@ -7,6 +7,6 @@ class SystemController
 {
     public function index()
     {
-        return view('system.index');
+        return view('Admin.system.global_preferences.index');
     }
 }
