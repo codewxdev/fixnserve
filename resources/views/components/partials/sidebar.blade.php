@@ -225,11 +225,11 @@
                     x-cloak>
                     <li><a href="{{ route('settings.global') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Global Platform Preferences</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.feature_control') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Feature Flag & Release Control</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Environment & Deployment Config</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.localization') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Localization & Internationalization</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Geo & Map Configuration</a></li>
@@ -843,7 +843,7 @@
                             style="color: rgb(var(--text-muted));">Static Pages & Legal Content</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Blog & Educational Content</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Localization & Translations</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">AI Content Moderation</a></li>
