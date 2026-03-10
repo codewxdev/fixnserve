@@ -85,19 +85,19 @@
         class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
         <div class="theme-bg-card border theme-border w-full max-w-md rounded-2xl p-6 shadow-2xl scale-95 transition-transform duration-200"
             id="modal-content">
-            <div class="flex items-center gap-4 mb-4 text-red-500">
+            <div class="flex items-center gap-4 mb-4 text-red-500" id="modal-icon-container">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <h3 class="text-xl font-bold">Confirm Access Change</h3>
+                <h3 class="text-xl font-bold" id="modal-title">Confirm Access Change</h3>
             </div>
             <p class="theme-text-muted text-sm mb-6" id="modal-text">Are you sure you want to modify these permissions? This
                 will impact active user sessions.</p>
             <div class="flex justify-end gap-3">
                 <button onclick="closeModal()" class="px-4 py-2 theme-text-muted font-semibold">Cancel</button>
                 <button id="modal-confirm-btn"
-                    class="px-6 py-2 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-900/20 hover:bg-red-700 transition-all">Confirm
+                    class="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold shadow-lg hover:bg-blue-700 transition-all">Confirm
                     Update</button>
             </div>
         </div>
@@ -168,32 +168,35 @@
 
 @push('scripts')
     <script>
+        // Make API Base URL dynamic via Laravel helper
+        const BASE_API_URL = "{{ url('http://127.0.0.1:8000/api') }}";
         let roles = [];
         let permissions = [];
         let modules = {};
         let pendingAction = null;
 
         const API = {
-            fetch: async (url, method = 'GET', body = null) => {
+            fetch: async (endpoint, method = 'GET', body = null) => {
                 try {
-                    const res = await fetch(`http://127.0.0.1:8000/api${url}`, {
+                    const res = await fetch(`${BASE_API_URL}${endpoint}`, {
                         method,
                         headers: {
                             'Content-Type': 'application/json',
-                            'Accept': 'application/json', // Yeh server ko batata hai ke humein sirf JSON chahiye
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            'Accept': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                            // CSRF token in case session-based auth is also active
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                                'content')
                         },
                         body: body ? JSON.stringify(body) : null
                     });
 
-                    // Check karein agar response JSON hai
                     const contentType = res.headers.get("content-type");
                     if (contentType && contentType.indexOf("application/json") !== -1) {
                         const data = await res.json();
                         if (!res.ok) throw new Error(data.message || `Error ${res.status}`);
                         return data;
                     } else {
-                        // Agar server ne HTML bhej di (Error page)
                         const text = await res.text();
                         console.error("Server returned non-JSON response:", text);
                         throw new Error(`Server Error: Received HTML instead of JSON (Status: ${res.status})`);
@@ -206,7 +209,7 @@
         };
 
         // --- Data Management ---
-
+        // --- Data Management ---
         window.loadMatrixData = async function() {
             try {
                 document.getElementById('matrix-loading').classList.remove('hidden');
@@ -216,39 +219,43 @@
                     API.fetch('/permissions')
                 ]);
 
-                // --- DEBUGGING: Console mein check karein ke data kis shakal mein aa raha hai ---
-                console.log("Roles Response:", roleRes);
-                console.log("Permissions Response:", permRes);
+                // 1. Roles Data Extract karna
+                roles = Array.isArray(roleRes.data) ? roleRes.data :
+                    (Array.isArray(roleRes) ? roleRes : []);
 
-                // Roles ko safely nikaalein
-                const rawRoles = roleRes.data || roleRes;
-                roles = Array.isArray(rawRoles) ? rawRoles : (rawRoles.data ? rawRoles.data : []);
+                // 2. Permissions Data Extract karna (Backend se already grouped object aa raha hai)
+                const permissionsData = permRes.data || {};
 
-                // Permissions ko safely nikaalein (Yehi masla kar raha tha)
-                const rawPerms = permRes.data || permRes;
-                // Agar Laravel pagination use ho rahi hai to data.data mein array hota hai
-                permissions = Array.isArray(rawPerms) ? rawPerms : (rawPerms.data ? rawPerms.data : []);
+                modules = {}; // UI mein render karne ke liye
+                permissions = []; // Total count show karne ke liye
 
-                if (!Array.isArray(permissions)) {
-                    throw new Error("Permissions data is not an array. Check API structure.");
+                // Object ko loop kar ke modules aur permissions set karna
+                for (const [modName, permsArray] of Object.entries(permissionsData)) {
+                    // Agar backend se module ka naam empty "" aa raha hai toh usko naam de dein
+                    const cleanModName = (modName === null || modName.trim() === "") ? "General Operations" :
+                        modName;
+
+                    if (!modules[cleanModName]) {
+                        modules[cleanModName] = [];
+                    }
+
+                    modules[cleanModName].push(...permsArray);
+                    permissions.push(...permsArray); // Flat array mein bhi add kar lein
                 }
 
-                // Roles sorting (Super Admin ko hamesha pehle rakhein)
+                // Roles ko sort karna (Super Admin hamesha pehle)
                 roles.sort((a, b) => {
-                    if (a.name.toLowerCase().includes('super')) return -1;
-                    return a.name.localeCompare(b.name);
+                    const nameA = a.name ? a.name.toLowerCase() : '';
+                    const nameB = b.name ? b.name.toLowerCase() : '';
+                    if (nameA.includes('super')) return -1;
+                    return nameA.localeCompare(nameB);
                 });
 
-                // Group by category (Module)
-                modules = permissions.reduce((acc, p) => {
-                    const cat = p.category || 'General Operations';
-                    if (!acc[cat]) acc[cat] = [];
-                    acc[cat].push(p);
-                    return acc;
-                }, {});
-
+                // Top par total stats update karna
                 document.getElementById('matrix-stats').textContent =
                     `${roles.length} Roles | ${permissions.length} Permissions`;
+
+                // Matrix (Table) draw karna
                 renderMatrixView();
 
             } catch (e) {
@@ -258,7 +265,6 @@
                 document.getElementById('matrix-loading').classList.add('hidden');
             }
         };
-
         window.renderMatrixView = function() {
             const header = document.getElementById('matrix-header');
             const body = document.getElementById('matrix-body');
@@ -290,11 +296,19 @@
 
                 roles.forEach(r => {
                     const isSuper = r.name.toLowerCase().includes('super');
+
+                    // Determine if role has all permissions of this module (to toggle UI text)
+                    const rolePerms = (r.permissions || []).map(p => p.name);
+                    const modulePerms = modules[modName].map(p => p.name);
+                    const hasAll = modulePerms.length > 0 && modulePerms.every(p => rolePerms.includes(
+                        p));
+
                     mHtml += `<td class="text-center px-4 py-3 border-l theme-border">
-                    <button onclick="window.confirmModuleToggle('${r.name}', '${modName}')" 
+                    <button onclick="window.confirmModuleToggle('${r.name}', '${modName}', ${hasAll})" 
                         ${isSuper ? 'disabled' : ''}
-                        class="text-[10px] font-bold px-2 py-1 rounded border border-blue-500/30 text-blue-500 hover:bg-blue-500 hover:text-white transition-all">
-                        BULK
+                        class="text-[10px] font-bold px-2 py-1 rounded border transition-all 
+                        ${hasAll ? 'border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white' : 'border-blue-500/30 text-blue-500 hover:bg-blue-500 hover:text-white'}">
+                        ${hasAll ? 'REVOKE ALL' : 'GRANT ALL'}
                     </button>
                 </td>`;
                 });
@@ -334,59 +348,104 @@
         // 1. Individual Permission Toggle
         window.confirmPermissionToggle = function(checkbox, roleName, permName) {
             const isChecked = checkbox.checked;
-            // Immediate UI feedback for better UX
+
             pendingAction = async () => {
                 try {
                     const role = roles.find(r => r.name === roleName);
-                    let currentPerms = role.permissions.map(p => p.name);
+                    // Get current permissions
+                    let currentPerms = (role.permissions || []).map(p => p.name);
 
-                    if (isChecked) currentPerms.push(permName);
-                    else currentPerms = currentPerms.filter(n => n !== permName);
+                    // Add or remove based on toggle state
+                    if (isChecked) {
+                        if (!currentPerms.includes(permName)) currentPerms.push(permName);
+                    } else {
+                        currentPerms = currentPerms.filter(n => n !== permName);
+                    }
 
+                    // DYNAMIC: Backend uses syncPermissions, so we send the whole updated array
                     await API.fetch('/role-permission', 'POST', {
                         role: roleName,
-                        permissions: currentPerms
+                        permissions: currentPerms,
+                        justification: `UI Toggle for ${permName}`
                     });
 
                     showToaster(`Updated ${permName} for ${roleName}`);
                     loadMatrixData(); // Refresh to ensure sync
                 } catch (e) {
-                    checkbox.checked = !isChecked; // Revert
+                    checkbox.checked = !isChecked; // Revert checkbox on error
                     showToaster(e.message || 'Update failed', 'error');
                 }
             };
 
-            // Open Modal for safety if removing access
             if (!isChecked) {
-                openModal(`Warning: Removing <b>${permName}</b> might restrict ${roleName} from essential features.`);
+                openModal(`Warning: Removing <b>${permName}</b> might restrict ${roleName} from essential features.`,
+                    true);
             } else {
-                pendingAction(); // Direct update for adding access
+                pendingAction(); // Direct update for adding access (less annoying UI)
             }
         };
 
         // 2. Module Level Toggle (Bulk)
-        window.confirmModuleToggle = function(roleName, moduleName) {
-            openModal(
-                `Action: Modify entire <b>${moduleName}</b> module for <b>${roleName}</b>? This will synchronize all related sub-permissions.`
-            );
-            pendingAction = async () => {
-                try {
-                    await API.fetch('/role-permission/module', 'POST', {
-                        role: roleName,
-                        module: moduleName.toLowerCase()
-                    });
-                    showToaster(`Module ${moduleName} updated for ${roleName}`);
-                    loadMatrixData();
-                } catch (e) {
-                    showToaster(e.message || 'Module update failed', 'error');
-                }
-            };
+        window.confirmModuleToggle = function(roleName, moduleName, hasAll) {
+            const modulePerms = modules[moduleName].map(p => p.name);
+
+            if (hasAll) {
+                openModal(`Action: <b>Revoke</b> entire <b>${moduleName}</b> module access for <b>${roleName}</b>?`,
+                    true);
+                pendingAction = async () => {
+                    try {
+                        // DYNAMIC: Using backend's DELETE route to remove multiple permissions
+                        await API.fetch('/role-permission', 'DELETE', {
+                            role: roleName,
+                            permissions: modulePerms,
+                            justification: `Bulk Revoked module: ${moduleName}`
+                        });
+                        showToaster(`Module ${moduleName} revoked from ${roleName}`);
+                        loadMatrixData();
+                    } catch (e) {
+                        showToaster(e.message || 'Module revoke failed', 'error');
+                    }
+                };
+            } else {
+                openModal(`Action: <b>Grant</b> entire <b>${moduleName}</b> module access for <b>${roleName}</b>?`,
+                    false);
+                pendingAction = async () => {
+                    try {
+                        // DYNAMIC: Using backend's module assign route
+                        await API.fetch('/role-permission/module', 'POST', {
+                            role: roleName,
+                            module: moduleName
+                        });
+                        showToaster(`Module ${moduleName} granted to ${roleName}`);
+                        loadMatrixData();
+                    } catch (e) {
+                        showToaster(e.message || 'Module grant failed', 'error');
+                    }
+                };
+            }
         };
 
         // --- UI Helpers ---
 
-        function openModal(text) {
+        function openModal(text, isDestructive = false) {
             document.getElementById('modal-text').innerHTML = text;
+
+            const btn = document.getElementById('modal-confirm-btn');
+            const icon = document.getElementById('modal-icon-container');
+            const title = document.getElementById('modal-title');
+
+            if (isDestructive) {
+                btn.className =
+                    "px-6 py-2 bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-900/20 hover:bg-red-700 transition-all";
+                icon.className = "flex items-center gap-4 mb-4 text-red-500";
+                title.innerText = "Confirm Removal";
+            } else {
+                btn.className =
+                    "px-6 py-2 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-900/20 hover:bg-blue-700 transition-all";
+                icon.className = "flex items-center gap-4 mb-4 text-blue-500";
+                title.innerText = "Confirm Assignment";
+            }
+
             document.getElementById('confirm-modal').classList.remove('hidden');
         }
 
@@ -407,7 +466,11 @@
             toast.innerHTML =
                 `<div class="flex items-center gap-3"><span>${type === 'success' ? '✅' : '❌'}</span> ${msg}</div>`;
             document.body.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-20'), 10);
+
+            requestAnimationFrame(() => {
+                setTimeout(() => toast.classList.remove('translate-y-20'), 10);
+            });
+
             setTimeout(() => {
                 toast.classList.add('opacity-0');
                 setTimeout(() => toast.remove(), 500);
