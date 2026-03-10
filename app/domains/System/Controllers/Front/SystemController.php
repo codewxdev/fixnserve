@@ -29,4 +29,22 @@ class SystemController
     {
         return view('Admin.system.rate_limit_&_throttling.index'); 
     }   
+
+    public function configurationVersioning()
+    {
+        return view('Admin.system.configuration_versioning_&_rollback.index'); 
+    }
+
+    public function configurationImpactAnalysis()
+    {
+        return view('Admin.system.configuration_access_analysis.index'); 
+    }
+
+    public function accessControl()
+    {
+        return view('Admin.system.access_control_&_governance.index'); 
+    }
+
+
+     
 }
