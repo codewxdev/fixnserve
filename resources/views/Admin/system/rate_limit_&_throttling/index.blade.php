@@ -1,281 +1,212 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="w-full px-4 py-6 max-w-7xl mx-auto">
-    
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-[rgb(var(--text-main))]">Geo & Map Configuration</h2>
-            <p class="text-sm text-[rgb(var(--text-muted))] mt-1">Control location-based behavior and restrictions.</p>
+            <h2 class="text-2xl font-bold text-[rgb(var(--text-main))]">Rate Limits & Throttling</h2>
+            <p class="text-sm text-[rgb(var(--text-muted))] mt-1">Protect system stability and integrations.</p>
         </div>
-        <div class="flex items-center gap-3">
-            <div class="hidden md:flex items-center text-xs text-[rgb(var(--text-muted))] bg-[rgb(var(--item-active-bg))] px-3 py-1.5 rounded-full border border-[rgb(var(--border-color))]">
-                <span class="font-medium text-[rgb(var(--brand-primary))]">Geo Config</span>
-                <svg class="w-3 h-3 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span>Routing Engine</span>
-                <svg class="w-3 h-3 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span>Availability</span>
-                <svg class="w-3 h-3 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span>Apps</span>
-            </div>
-            
-            <button id="emergencyLockBtn" onclick="toggleEmergencyLock()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center transition duration-150 ease-in-out shadow-sm">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                Emergency Geo-Lock
+        <div>
+            <button id="emergencyThrottleBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium flex items-center gap-2 transition-all duration-300 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span id="emergencyText">Enable Emergency Throttling</span>
             </button>
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+    <form action="#" method="POST" id="rateLimitForm">
+        @csrf
         
-        <div class="xl:col-span-4 flex flex-col gap-6">
-            <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-[rgb(var(--border-color))]">
-                <div class="px-6 py-4 border-b border-[rgb(var(--border-color))] bg-[rgb(var(--item-active-bg))] rounded-t-lg">
-                    <h5 class="text-lg font-semibold text-[rgb(var(--text-main))]">Core Settings</h5>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-[rgb(var(--border-color))] overflow-hidden flex flex-col">
+                <div class="bg-[rgb(var(--item-active-bg))] px-6 py-4 border-b border-[rgb(var(--border-color))]">
+                    <h5 class="text-lg font-medium text-[rgb(var(--text-main))]">Global & API Controls</h5>
                 </div>
-                <div class="p-6">
-                    <form>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">Map Provider Selection</label>
-                            <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[rgb(var(--border-color))] focus:outline-none focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))] sm:text-sm rounded-md border text-[rgb(var(--text-main))] bg-[rgb(var(--bg-card))]">
-                                <option value="google">Google Maps API</option>
-                                <option value="mapbox">Mapbox</option>
-                                <option value="osm">OpenStreetMap</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">Distance Calculation Mode</label>
-                            <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[rgb(var(--border-color))] focus:outline-none focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))] sm:text-sm rounded-md border text-[rgb(var(--text-main))] bg-[rgb(var(--bg-card))]">
-                                <option value="driving">Routing Engine (Actual Driving Dist.)</option>
-                                <option value="haversine">Haversine (Straight Line)</option>
-                                <option value="manhattan">Manhattan Distance</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-6">
-                            <label class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">Default Service Radius (km)</label>
-                            <input type="number" value="15" class="mt-1 block w-full rounded-md border-[rgb(var(--border-color))] bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border py-2 px-3 focus:border-[rgb(var(--brand-primary))] focus:ring-[rgb(var(--brand-primary))] sm:text-sm">
-                            <p class="text-xs text-[rgb(var(--text-muted))] mt-1">Maximum allowed distance for delivery/service allocation.</p>
-                        </div>
-
-                        <button type="button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-secondary))] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[rgb(var(--brand-primary))] transition duration-150">
-                            Save Configuration
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <div class="xl:col-span-8">
-            <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-[rgb(var(--border-color))] h-full flex flex-col">
-                <div class="px-6 py-4 border-b border-[rgb(var(--border-color))] flex justify-between items-center bg-[rgb(var(--item-active-bg))] rounded-t-lg">
-                    <h5 class="text-lg font-semibold text-[rgb(var(--text-main))]">Geofencing & Regional Rules</h5>
-                    <button onclick="toggleModal('addGeofenceModal')" class="bg-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-secondary))] text-white text-sm font-medium py-1.5 px-3 rounded transition duration-150">
-                        + Add Geofence
-                    </button>
-                </div>
-                
-                <div class="overflow-x-auto flex-1">
-                    <table class="min-w-full divide-y divide-[rgb(var(--border-color))]">
-                        <thead class="bg-[rgb(var(--item-active-bg))]">
-                            <tr>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Zone Name</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Type</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Details</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Status</th>
-                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-[rgb(var(--bg-card))] divide-y divide-[rgb(var(--border-color))]">
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-[rgb(var(--text-main))]">Downtown Hub</div>
-                                    <div class="text-xs text-[rgb(var(--text-muted))]">Polygon (14 points)</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-green-100 text-green-800 border border-green-200">Service Area</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-muted))]">
-                                    Base fare multiplier: 1.0x
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <label class="relative inline-flex items-center cursor-pointer" title="Enable/Disable Region">
-                                        <input type="checkbox" class="sr-only peer" checked>
-                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[rgb(var(--brand-primary))] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[rgb(var(--bg-card))] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[rgb(var(--bg-card))] after:border-[rgb(var(--border-color))] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[rgb(var(--brand-primary))]"></div>
-                                    </label>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="text-[rgb(var(--brand-primary))] hover:text-[rgb(var(--brand-secondary))] mr-3">Edit</button>
-                                    <button class="text-red-600 hover:text-red-800">Delete</button>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-[rgb(var(--text-main))]">Military Cantonment</div>
-                                    <div class="text-xs text-[rgb(var(--text-muted))]">Radius: 5km</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-red-100 text-red-800 border border-red-200">Restricted Zone</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-muted))]">
-                                    No pickups/drop-offs
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <label class="relative inline-flex items-center cursor-pointer" title="Enable/Disable Region">
-                                        <input type="checkbox" class="sr-only peer" checked>
-                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[rgb(var(--brand-primary))] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[rgb(var(--bg-card))] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[rgb(var(--bg-card))] after:border-[rgb(var(--border-color))] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[rgb(var(--brand-primary))]"></div>
-                                    </label>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="text-[rgb(var(--brand-primary))] hover:text-[rgb(var(--brand-secondary))] mr-3">Edit</button>
-                                    <button class="text-red-600 hover:text-red-800">Delete</button>
-                                </td>
-                            </tr>
-                            
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-[rgb(var(--text-main))]">Airport Terminal</div>
-                                    <div class="text-xs text-[rgb(var(--text-muted))]">Polygon (8 points)</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-md bg-yellow-100 text-yellow-800 border border-yellow-200">Surcharge Zone</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-[rgb(var(--text-muted))]">
-                                    Fee: +150 PKR
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <label class="relative inline-flex items-center cursor-pointer" title="Enable/Disable Region">
-                                        <input type="checkbox" class="sr-only peer">
-                                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[rgb(var(--brand-primary))] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-[rgb(var(--bg-card))] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-[rgb(var(--bg-card))] after:border-[rgb(var(--border-color))] after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[rgb(var(--brand-primary))]"></div>
-                                    </label>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <button class="text-[rgb(var(--brand-primary))] hover:text-[rgb(var(--brand-secondary))] mr-3">Edit</button>
-                                    <button class="text-red-600 hover:text-red-800">Delete</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="addGeofenceModal" class="hidden relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-    <div class="fixed inset-0 z-10 overflow-y-auto">
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-lg bg-[rgb(var(--bg-card))] text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-                <div class="bg-[rgb(var(--bg-card))] px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-[rgb(var(--border-color))]">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold leading-6 text-[rgb(var(--text-main))]" id="modal-title">Add New Geofence</h3>
-                        <button onclick="toggleModal('addGeofenceModal')" class="text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))]">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                        </button>
+                <div class="p-6 flex-1 space-y-4">
+                    <div>
+                        <label for="api_rate_limit" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            API Rate Limits <span class="text-xs font-normal opacity-70">(requests / minute)</span>
+                        </label>
+                        <input type="number" id="api_rate_limit" name="api_rate_limit" value="1000" required
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
                     </div>
-                    <form>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="col-span-2 sm:col-span-1 mb-4">
-                                <label class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">Zone Name</label>
-                                <input type="text" class="mt-1 block w-full rounded-md border-[rgb(var(--border-color))] bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border py-2 px-3 focus:border-[rgb(var(--brand-primary))] focus:ring-[rgb(var(--brand-primary))] sm:text-sm" placeholder="e.g. North Side Block">
-                            </div>
-                            <div class="col-span-2 sm:col-span-1 mb-4">
-                                <label class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">Rule Type</label>
-                                <select class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-[rgb(var(--border-color))] focus:outline-none focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))] sm:text-sm rounded-md border text-[rgb(var(--text-main))] bg-[rgb(var(--bg-card))]">
-                                    <option value="service">Service Area</option>
-                                    <option value="restricted">Restricted Zone</option>
-                                    <option value="surcharge">Surcharge Zone</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-2">Draw Area on Map</label>
-                            <div class="w-full h-64 bg-gray-200 rounded-md border border-[rgb(var(--border-color))] flex items-center justify-center relative overflow-hidden">
-                                <span class="text-gray-500 text-sm font-medium z-10 bg-white/80 px-3 py-1 rounded shadow-sm">Map Integration Canvas</span>
-                                <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle, #000 1px, transparent 1px); background-size: 20px 20px;"></div>
-                            </div>
-                            <div class="flex gap-2 mt-2">
-                                <button type="button" class="text-xs bg-[rgb(var(--item-active-bg))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-main))] px-3 py-1.5 rounded hover:bg-gray-100">Draw Polygon</button>
-                                <button type="button" class="text-xs bg-[rgb(var(--item-active-bg))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-main))] px-3 py-1.5 rounded hover:bg-gray-100">Draw Circle</button>
-                                <button type="button" class="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-1.5 rounded hover:bg-red-100 ml-auto">Clear Shape</button>
-                            </div>
-                        </div>
-                    </form>
+                    <div>
+                        <label for="burst_limit" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            Burst Limits <span class="text-xs font-normal opacity-70">(requests / second)</span>
+                        </label>
+                        <input type="number" id="burst_limit" name="burst_limit" value="50" required
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
+                    </div>
                 </div>
-                <div class="bg-[rgb(var(--item-active-bg))] px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" class="inline-flex w-full justify-center rounded-md bg-[rgb(var(--brand-primary))] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[rgb(var(--brand-secondary))] sm:ml-3 sm:w-auto">Save Geofence</button>
-                    <button onclick="toggleModal('addGeofenceModal')" type="button" class="mt-3 inline-flex w-full justify-center rounded-md bg-[rgb(var(--bg-card))] px-3 py-2 text-sm font-semibold text-[rgb(var(--text-main))] shadow-sm ring-1 ring-inset ring-[rgb(var(--border-color))] hover:bg-[rgb(var(--item-active-bg))] sm:mt-0 sm:w-auto">Cancel</button>
+            </div>
+
+            <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-[rgb(var(--border-color))] overflow-hidden flex flex-col">
+                <div class="bg-[rgb(var(--item-active-bg))] px-6 py-4 border-b border-[rgb(var(--border-color))]">
+                    <h5 class="text-lg font-medium text-[rgb(var(--text-main))]">Entity Restrictions</h5>
+                </div>
+                <div class="p-6 flex-1 space-y-4">
+                    <div>
+                        <label for="user_limit" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            Per-User Limits <span class="text-xs font-normal opacity-70">(requests / minute)</span>
+                        </label>
+                        <input type="number" id="user_limit" name="user_limit" value="60" required
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
+                    </div>
+                    <div>
+                        <label for="ip_limit" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            Per-IP Limits <span class="text-xs font-normal opacity-70">(requests / minute)</span>
+                        </label>
+                        <input type="number" id="ip_limit" name="ip_limit" value="120" required
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-[rgb(var(--border-color))] overflow-hidden mb-6">
+            <div class="bg-[rgb(var(--item-active-bg))] px-6 py-4 border-b border-[rgb(var(--border-color))]">
+                <h5 class="text-lg font-medium text-[rgb(var(--text-main))]">Channel-Specific Throttles</h5>
+            </div>
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label for="sms_throttle" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            SMS Limits <span class="text-xs font-normal opacity-70">(msgs / min)</span>
+                        </label>
+                        <input type="number" id="sms_throttle" name="sms_throttle" value="20"
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
+                    </div>
+                    <div>
+                        <label for="push_throttle" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            Push Limits <span class="text-xs font-normal opacity-70">(msgs / min)</span>
+                        </label>
+                        <input type="number" id="push_throttle" name="push_throttle" value="100"
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
+                    </div>
+                    <div>
+                        <label for="email_throttle" class="block text-sm font-medium text-[rgb(var(--text-muted))] mb-1">
+                            Email Limits <span class="text-xs font-normal opacity-70">(msgs / min)</span>
+                        </label>
+                        <input type="number" id="email_throttle" name="email_throttle" value="50"
+                            class="w-full bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] border border-[rgb(var(--border-color))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))] focus:border-[rgb(var(--brand-primary))]">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-yellow-300 overflow-hidden mb-8">
+            <div class="bg-yellow-50 px-6 py-4 border-b border-yellow-200 flex justify-between items-center">
+                <h5 class="text-lg font-medium text-yellow-900">Temporary Overrides</h5>
+                <button type="button" id="addOverrideBtn" class="bg-yellow-200 hover:bg-yellow-300 text-yellow-900 text-sm font-medium px-3 py-1.5 rounded transition-colors">
+                    + Add Override
+                </button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-[rgb(var(--text-muted))] mb-4">Set temporary limits for specific IPs, Users, or API Keys during maintenance or special events.</p>
+                
+                <div id="overridesList" class="space-y-4">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end mb-8">
+            <button type="submit" class="bg-[rgb(var(--brand-primary))] hover:bg-[rgb(var(--brand-secondary))] text-white font-semibold py-2.5 px-8 rounded-md shadow-sm transition-colors">
+                Save Limits
+            </button>
+        </div>
+    </form>
 </div>
 @endsection
 
 @push('scripts')
 <script>
-    // Modal Toggle Function
-    function toggleModal(modalID) {
-        document.getElementById(modalID).classList.toggle("hidden");
-    }
-
-    // Emergency Geo-Lock Simulation
-    function toggleEmergencyLock() {
-        const btn = document.getElementById('emergencyLockBtn');
-        const isLocked = btn.classList.contains('bg-gray-800');
+    document.addEventListener('DOMContentLoaded', function() {
         
-        if (!isLocked) {
-            const confirmLock = confirm("⚠️ WARNING: Enabling Emergency Geo-Lock will instantly suspend ALL service availability in all regions and halt the routing engine. Proceed?");
+        // --- Emergency Throttling Toggle ---
+        const emergencyBtn = document.getElementById('emergencyThrottleBtn');
+        const emergencyText = document.getElementById('emergencyText');
+        let isEmergencyActive = false;
+
+        emergencyBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            isEmergencyActive = !isEmergencyActive;
             
-            if (confirmLock) {
-                btn.classList.replace('bg-red-600', 'bg-gray-800');
-                btn.classList.replace('hover:bg-red-700', 'hover:bg-gray-900');
-                btn.innerHTML = `
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    System Locked
+            if(isEmergencyActive) {
+                this.classList.add('emergency-active');
+                this.classList.replace('bg-red-600', 'bg-red-700');
+                emergencyText.innerText = "System Locked (Strict Limits)";
+                // Replace Icon with a Lock
+                this.querySelector('svg').outerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
                 `;
-                alert("🚨 Emergency Geo-Lock ACTIVATED. All services halted.");
-            }
-        } else {
-            const unlock = confirm("Are you sure you want to disable the lock and resume normal operations?");
-            if (unlock) {
-                btn.classList.replace('bg-gray-800', 'bg-red-600');
-                btn.classList.replace('hover:bg-gray-900', 'hover:bg-red-700');
-                btn.innerHTML = `
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    Emergency Geo-Lock
+                alert('Emergency Throttling Enabled! System is running on minimum thresholds.');
+            } else {
+                this.classList.remove('emergency-active');
+                this.classList.replace('bg-red-700', 'bg-red-600');
+                emergencyText.innerText = "Enable Emergency Throttling";
+                // Replace Icon back to warning
+                this.querySelector('svg').outerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
                 `;
-                alert("✅ System Unlocked. Normal routing and service availability restored.");
             }
+        });
+
+        // --- Temporary Overrides Logic ---
+        const addOverrideBtn = document.getElementById('addOverrideBtn');
+        const overridesList = document.getElementById('overridesList');
+        let overrideCount = 0;
+
+        addOverrideBtn.addEventListener('click', function() {
+            overrideCount++;
+            const rowId = 'override-' + overrideCount;
+            
+            // Updated template literal with CSS variables to match theme dynamically
+            const rowHTML = `
+                <div class="flex flex-col md:flex-row gap-4 items-end bg-[rgb(var(--item-active-bg))] p-4 rounded-md border border-[rgb(var(--border-color))]" id="${rowId}">
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs font-medium text-[rgb(var(--text-muted))] mb-1">Target Type</label>
+                        <select name="overrides[${overrideCount}][type]" class="w-full border border-[rgb(var(--border-color))] bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))]">
+                            <option value="ip">IP Address</option>
+                            <option value="user">User ID</option>
+                            <option value="api_key">API Key</option>
+                        </select>
+                    </div>
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs font-medium text-[rgb(var(--text-muted))] mb-1">Target Identifier</label>
+                        <input type="text" name="overrides[${overrideCount}][identifier]" placeholder="e.g. 192.168.1.1" 
+                            class="w-full border border-[rgb(var(--border-color))] bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))]">
+                    </div>
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs font-medium text-[rgb(var(--text-muted))] mb-1">New Limit (req/min)</label>
+                        <input type="number" name="overrides[${overrideCount}][limit]" placeholder="e.g. 5000" 
+                            class="w-full border border-[rgb(var(--border-color))] bg-[rgb(var(--bg-card))] text-[rgb(var(--text-main))] rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--brand-primary))]">
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <button type="button" onclick="removeOverride('${rowId}')" 
+                            class="w-full md:w-auto bg-[rgb(var(--bg-card))] text-red-600 border border-red-200 hover:bg-red-50 hover:border-red-300 px-4 py-2 rounded-md font-medium transition-colors">
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            overridesList.insertAdjacentHTML('beforeend', rowHTML);
+        });
+
+        // Global function to remove override row
+        window.removeOverride = function(id) {
+            const el = document.getElementById(id);
+            if(el) { el.remove(); }
         }
-    }
+    });
 </script>
 @endpush
 
-@push('styles')
-<style>
-    /* Global SaaS Theme CSS Variables definition */
-    body.theme-saas {
-        --brand-primary: 79, 70, 229;     /* Indigo-600 */
-        --brand-secondary: 67, 56, 202;   /* Indigo-700 */
-        --bg-body: 243, 244, 246;         /* Gray-100 */
-        --bg-card: 255, 255, 255;         /* White */
-        --bg-sidebar: 255, 255, 255;      /* White */
-        --border-color: 229, 231, 235;    /* Gray-200 */
-        --sidebar-border: 229, 231, 235;  /* Gray-200 */
-        --text-main: 17, 24, 39;          /* Gray-900 */
-        --text-muted: 107, 114, 128;      /* Gray-500 */
-        --item-active-bg: 243, 244, 246;  /* Gray-100 */
-    }
-    
-    /* Ensure the body visually adopts the variable values if the class is present */
-    body.theme-saas {
-        background-color: rgb(var(--bg-body));
-        color: rgb(var(--text-main));
-    }
-</style>
-@endpush
+ 
