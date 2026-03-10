@@ -19,4 +19,14 @@ class SystemController
     {
         return view('Admin.system.localization_&_internationalization.index'); 
     }
+
+    public function geo()
+    {
+        return view('Admin.system.geo_&_map.index'); 
+    }
+
+    public function rateLimit()
+    {
+        return view('Admin.system.rate_limit_&_throttling.index'); 
+    }   
 }
