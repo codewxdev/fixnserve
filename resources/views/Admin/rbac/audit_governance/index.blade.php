@@ -29,7 +29,7 @@
 
             </div>
         </header>
- 
+
         {{-- C. Audit Log Viewer --}}
         <section class="theme-bg-card rounded-2xl shadow-sm border theme-border overflow-hidden">
             {{-- Toolbar --}}
@@ -122,8 +122,7 @@
                         </svg>
                         Event Record Details
                     </h3>
-                    <button onclick="window.closeDiffViewer()"
-                        class="theme-text-muted hover:text-white transition-colors">
+                    <button onclick="window.closeDiffViewer()" class="theme-text-muted hover:text-white transition-colors">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12" />
@@ -193,125 +192,82 @@
 
 @push('scripts')
     <script>
+        window.auditLogs = [];
         const AUTH_TOKEN = localStorage.getItem('token');
         const BASE_URL = 'http://127.0.0.1:8000/api';
-        const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
-        let auditLogs = [];
-
-        // --- Mock Data Generator (In case backend API isn't ready yet) ---
-        function generateMockLogs() {
-            const events = ['permission_assigned', 'permission_removed', 'role_created', 'role_modified'];
-            const roles = ['Support Admin', 'Finance Admin', 'Super Admin', 'Read-Only Auditor'];
-            const perms = ['view_users', 'export_ledger', 'refund_execute', 'bypass_kyc'];
-            const actors = ['john.doe@admin.com', 'system_policy_engine', 'sarah.k@admin.com'];
-
-            let logs = [];
-            for (let i = 0; i < 15; i++) {
-                const isAdd = Math.random() > 0.5;
-                logs.push({
-                    id: `log_${Math.random().toString(36).substr(2, 9)}`,
-                    timestamp: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString(),
-                    actor: actors[Math.floor(Math.random() * actors.length)],
-                    event_type: events[Math.floor(Math.random() * events.length)],
-                    target_role: roles[Math.floor(Math.random() * roles.length)],
-                    justification: Math.random() > 0.3 ? 'JIRA-4922 Security Request' :
-                        'Standard onboarding protocol',
-                    payload: {
-                        added: isAdd ? [perms[Math.floor(Math.random() * perms.length)]] : [],
-                        removed: !isAdd ? [perms[Math.floor(Math.random() * perms.length)]] : []
-                    }
-                });
-            }
-            return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        }
-
-        // --- Fetch Logic ---
         async function loadAuditData() {
             const loader = document.getElementById('audit-loading');
-            loader.classList.remove('hidden');
+            if (loader) loader.classList.remove('hidden');
 
             try {
-                // Try fetching from the API endpoint if it exists
-                const response = await fetch(`${BASE_URL}/audit-logs`, {
+                const response = await fetch(`${BASE_URL}/permission-audit`, {
                     headers: {
                         'Authorization': `Bearer ${AUTH_TOKEN}`,
                         'Accept': 'application/json'
                     }
                 });
 
-                if (response.ok) {
-                    const data = await response.json();
-                    auditLogs = data.data || data;
-                } else {
-                    // Fallback to mock data if endpoint doesn't exist yet
-                    console.warn("Audit API not found, using simulated intelligence data.");
-                    auditLogs = generateMockLogs();
-                }
+                const result = await response.json();
+                // Laravel usually returns data in result.data or result directly
+                window.auditLogs = result.data || result;
 
-                document.getElementById('log-total').innerText = auditLogs.length;
-                window.filterLogs(); // Renders the table
+                document.getElementById('log-total').innerText = window.auditLogs.length;
+                window.filterLogs();
 
             } catch (e) {
-                console.error(e);
-                auditLogs = generateMockLogs(); // Fallback
-                window.filterLogs();
+                console.error("Fetch Error:", e);
             } finally {
-                setTimeout(() => loader.classList.add('hidden'), 500); // Visual delay
+                if (loader) setTimeout(() => loader.classList.add('hidden'), 500);
             }
         }
 
-        // --- Rendering & Filtering ---
         window.filterLogs = function() {
             const eventFilter = document.getElementById('filter-event-type').value;
             const search = document.getElementById('log-search').value.toLowerCase();
             const body = document.getElementById('audit-body');
+
+            if (!body) return;
             body.innerHTML = '';
 
-            let filtered = auditLogs.filter(log => {
+            let filtered = window.auditLogs.filter(log => {
+                // Hum actor name handle kar rahe hain (assuming API returns actor object with name)
+                const actorName = log.actor?.name || `User ID: ${log.actor_id}`;
+                const targetRole = log.target_role || '';
+                const justification = log.justification || '';
+
                 const matchEvent = eventFilter === 'All' || log.event_type === eventFilter;
-                const matchSearch = log.actor.toLowerCase().includes(search) ||
-                    log.target_role.toLowerCase().includes(search) ||
-                    log.justification.toLowerCase().includes(search);
+                const matchSearch = actorName.toLowerCase().includes(search) ||
+                    targetRole.toLowerCase().includes(search) ||
+                    justification.toLowerCase().includes(search);
+
                 return matchEvent && matchSearch;
             });
 
             document.getElementById('log-count').innerText = filtered.length;
 
-            if (filtered.length === 0) {
-                body.innerHTML =
-                    `<tr><td colspan="6" class="px-6 py-10 text-center theme-text-muted">No audit records found matching criteria.</td></tr>`;
-                return;
-            }
-
             filtered.forEach(log => {
-                // Format Badge
-                let eventBadge = '';
-                if (log.event_type.includes('assign') || log.event_type.includes('create')) {
-                    eventBadge =
-                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-green-500/10 text-green-500 border border-green-500/20">Grant / Create</span>`;
-                } else if (log.event_type.includes('remove') || log.event_type.includes('revoke')) {
-                    eventBadge =
-                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-500/10 text-red-500 border border-red-500/20">Revoke / Delete</span>`;
-                } else {
-                    eventBadge =
-                        `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 border border-blue-500/20">Modify</span>`;
-                }
-
-                // Format Date
-                const dateObj = new Date(log.timestamp);
-                const timeStr =
-                    `${dateObj.toLocaleDateString()} ${dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                // Helper for Badge Color
+                const badgeClass = getBadgeStyle(log.event_type);
+                const dateStr = new Date(log.created_at).toLocaleString();
 
                 const row = `
-                <tr class="hover:bg-white/5 transition-colors group">
-                    <td class="px-6 py-4 font-mono text-xs theme-text-muted whitespace-nowrap">${timeStr}</td>
-                    <td class="px-6 py-4 theme-text-main font-medium">${log.actor}</td>
-                    <td class="px-6 py-4">${eventBadge}</td>
-                    <td class="px-6 py-4 font-mono text-xs theme-text-muted">@${log.target_role.replace(/\s+/g, '_').toLowerCase()}</td>
-                    <td class="px-6 py-4 text-xs theme-text-muted truncate max-w-xs">${log.justification || 'N/A'}</td>
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="px-6 py-4 font-mono text-xs theme-text-muted whitespace-nowrap">${dateStr}</td>
+                    <td class="px-6 py-4 theme-text-main font-medium">${log.actor?.name || 'System ID: '+log.actor_id}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${badgeClass}">
+                            ${log.event_type.replace(/_/g, ' ')}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 font-mono text-xs theme-text-muted">
+                        ${log.target_role ? '@' + log.target_role.toLowerCase() : 'N/A'}
+                    </td>
+                    <td class="px-6 py-4 text-xs theme-text-muted truncate max-w-xs" title="${log.justification}">
+                        ${log.justification || 'No justification provided'}
+                    </td>
                     <td class="px-6 py-4 text-right">
-                        <button onclick="window.viewDiff('${log.id}')" class="px-3 py-1.5 theme-bg-body border theme-border rounded text-xs font-semibold theme-text-main hover:bg-white/10 transition-colors">
+                        <button onclick="window.viewDiff(${log.id})" class="px-3 py-1.5 theme-bg-body border theme-border rounded text-xs font-semibold theme-text-main hover:bg-white/10">
                             View Diff
                         </button>
                     </td>
@@ -320,26 +276,52 @@
             });
         };
 
-        // --- Diff Viewer Modal ---
+        // Helper to style badges based on event_type
+        function getBadgeStyle(type) {
+            if (type.includes('assigned') || type.includes('granted') || type.includes('created'))
+                return 'bg-green-500/10 text-green-500 border border-green-500/20';
+            if (type.includes('removed') || type.includes('deactivated'))
+                return 'bg-red-500/10 text-red-500 border border-red-500/20';
+            return 'bg-blue-500/10 text-blue-500 border border-blue-500/20';
+        }
+
         window.viewDiff = function(id) {
-            const log = auditLogs.find(l => l.id === id);
+            const log = window.auditLogs.find(l => l.id == id);
             if (!log) return;
 
-            document.getElementById('modal-actor').innerText = log.actor;
-            document.getElementById('modal-time').innerText = new Date(log.timestamp).toLocaleString();
+            document.getElementById('modal-actor').innerText = log.actor?.name || `ID: ${log.actor_id}`;
+            document.getElementById('modal-time').innerText = new Date(log.created_at).toLocaleString();
 
             const addedBox = document.getElementById('modal-diff-added');
             const removedBox = document.getElementById('modal-diff-removed');
 
-            if (log.payload && log.payload.added && log.payload.added.length > 0) {
-                addedBox.innerHTML = log.payload.added.map(p => `+ Assigned: <b>${p}</b>`).join('<br>');
+            // Helper function to format JSON into a clean list
+            const formatData = (data, prefix) => {
+                if (!data) return `No data available`;
+
+                // Agar data string hai to parse karein, warna object use karein
+                let obj = typeof data === 'string' ? JSON.parse(data) : data;
+
+                return Object.entries(obj).map(([key, value]) => {
+                    return `<div class="flex justify-between py-1 border-b border-white/5 last:border-0">
+                        <span class="font-bold opacity-70">${key}:</span>
+                        <span class="font-mono">${value}</span>
+                    </div>`;
+                }).join('');
+            };
+
+            // UI update karein
+            if (log.new_value) {
+                addedBox.innerHTML = `<div class="mb-2 font-bold text-xs uppercase underline">New State (+)</div>` +
+                    formatData(log.new_value);
                 addedBox.classList.remove('hidden');
             } else {
                 addedBox.classList.add('hidden');
             }
 
-            if (log.payload && log.payload.removed && log.payload.removed.length > 0) {
-                removedBox.innerHTML = log.payload.removed.map(p => `- Revoked: <b>${p}</b>`).join('<br>');
+            if (log.old_value) {
+                removedBox.innerHTML = `<div class="mb-2 font-bold text-xs uppercase underline">Old State (-)</div>` +
+                    formatData(log.old_value);
                 removedBox.classList.remove('hidden');
             } else {
                 removedBox.classList.add('hidden');
@@ -352,7 +334,6 @@
             document.getElementById('diffViewerModal').classList.add('hidden');
         };
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', loadAuditData);
     </script>
 @endpush
