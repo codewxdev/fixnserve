@@ -3,10 +3,11 @@
 namespace App\Domains\System\Controllers\Api;
 
 use App\Domains\System\Models\FeatureFlag;
-use App\Http\Controllers\Controller;
+use App\Domains\System\Models\FeatureFlagLog;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class FeatureFlagController extends Controller
+class FeatureFlagController extends BaseApiController
 {
      
     public function index(Request $request)
@@ -20,12 +21,11 @@ class FeatureFlagController extends Controller
         foreach ($flags as $flag) {
             $result[$flag->key] = FeatureFlag::isEnabled($flag->key, $user);
         }
+        if (empty($result)) {
+            return $this->notFound('No feature flags found');
+        }
 
-        // dd($result);
-        return response()->json([
-            'success' => true,
-            'data' => $flags,
-        ]);
+        return $this->success($result);
     }
 
     
@@ -38,12 +38,14 @@ class FeatureFlagController extends Controller
         ]);
 
         $flag = FeatureFlag::create($request->only('key', 'type', 'value'));
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Feature flag created',
-            'data' => $flag,
+        FeatureFlagLog::create([
+            'feature_flag_id' => $flag->id,
+            'changed_by' => $request->user()->id,
+            'old_value' => null,
+            'new_value' => $flag->value,
         ]);
+
+        return $this->success($flag, 'Feature flag created', 201);
     }
 
      
@@ -51,10 +53,27 @@ class FeatureFlagController extends Controller
     {
         $flag->update($request->only('type', 'value'));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Feature flag updated',
-            'data' => $flag,
+        FeatureFlagLog::create([
+            'feature_flag_id' => $flag->id,
+            'changed_by' => $request->user()->id,
+            'old_value' => $flag->getOriginal('value'),
+            'new_value' => $flag->value,
         ]);
+
+        return $this->success($flag, 'Feature flag updated');
+    }
+
+    // 4️⃣ Delete flag
+    public function destroy(Request $request, FeatureFlag $flag)
+    {
+        FeatureFlagLog::create([
+            'feature_flag_id' => $flag->id,
+            'changed_by' => $request->user()->id,
+            'old_value' => $flag->value,
+            'new_value' => null,
+        ]);
+        $flag->delete();
+
+        return $this->success([], 'Feature flag deleted');
     }
 }

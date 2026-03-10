@@ -20,6 +20,11 @@ use App\Domains\Security\Middlewares\MFAPolicyMiddleware;
 use App\Domains\Security\Middlewares\ValidateUserSession;
 use App\Domains\Security\Models\DualApproval;
 use App\Domains\System\Middlewares\ApplyPlatformDefaults;
+use App\Domains\System\Middlewares\CheckFeatureFlag;
+use App\Domains\System\Middlewares\DetectCountry;
+use App\Domains\System\Middlewares\InitializeLanguage;
+use App\Domains\System\Middlewares\SetCurrency;
+use App\Domains\System\Middlewares\SetLocale;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -71,6 +76,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
+            'country.detect' => DetectCountry::class,
+            'locale.set' => SetLocale::class,
+            'currency.set' => SetCurrency::class,
+            'language.initialize' => InitializeLanguage::class,
+
             'platform.context' => ApplyPlatformDefaults::class,
             'network.security' => CheckNetworkSecurity::class,
             'device.bind' => CheckDeviceBinding::class,
@@ -94,12 +104,15 @@ return Application::configure(basePath: dirname(__DIR__))
             'check_country' => EnsureCountryStatus::class,
             'block_soft_country_orders' => EnsureBlockOrdersForSoftDisabledCountry::class,
 
+            'feature' => CheckFeatureFlag::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+        // $schedule->command('update:api-controllers')->weekly();
         $schedule->command('promotions:expire')->everyMinute();
         $schedule->command('security:password-rotation')->daily();
         $schedule->job(new CalculateApiMetrics)->everyMinute();

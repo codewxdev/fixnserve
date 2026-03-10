@@ -29,21 +29,20 @@ use App\Models\Country;
 use App\Models\Currency;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api', 'check_country')->group(function () {
+Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
 
     Route::apiResource('notification-types', NotificationTypeController::class);
 
     // ////////////////////////////////////consultant route/////////////////////
     Route::get('getSlot', [ConsultantBookingController::class, 'getSlots']);
-    Route::get('/countries', function () {
-        return response()->json([
-            'success' => true,
-            'data' => Country::orderBy('name')->get(),
-        ]);
-    });
 
     Route::get('/countries', function () {
-        return Country::all();
+        $country = Country::orderBy('name')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $country,
+        ]);
     });
 
     Route::get('/currences', function () {
@@ -54,16 +53,23 @@ Route::middleware('health_api', 'check_country')->group(function () {
     });
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'validate.session'])->group(function () {
+
+        // ///////////////feature flag middleware example route//////////////////////
+        Route::middleware('feature:advanced_reports')->group(function () {
+            // Route::get('/advanced-reports', function () {
+            //     return response()->json([
+            //         'success' => true,
+            //         'message' => 'Welcome to the advanced reports feature!',
+            //     ]);
+            // });
+        });
         // /////////middleware for blocking order for soft_disable country/////////
         Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders', 'platform.context'])->group(function () {
             // //////////////////////////book slot for consultant////////////
             Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
         });
         // ////////////////middleware for payment routes////////////////
-        Route::middleware('kill:payments','platform.context')->group(function () {
-
-
-        });
+        Route::middleware('kill:payments', 'platform.context')->group(function () {});
 
         Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);

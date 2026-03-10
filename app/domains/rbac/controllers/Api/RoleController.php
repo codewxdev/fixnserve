@@ -3,12 +3,11 @@
 namespace App\Domains\RBAC\Controllers\Api;
 
 use App\Domains\RBAC\Services\Audit;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 
-class RoleController extends Controller
+class RoleController extends BaseApiController
 {
     protected $audit;
 
@@ -21,25 +20,23 @@ class RoleController extends Controller
     public function index(?Role $role = null)
     {
         if ($role) {
-            return ApiResponse::success($role, 'Role fetched successfully');
+            return $this->success($role, 'role_fetched');
         }
 
         $roles = Role::with('permissions')->get();
 
-        return response()->json([
-            'data' => $roles,
-        ]);
+        return $this->success($roles, 'roles_fetched');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|unique:roles,name',
             'justification' => 'nullable|string',
         ]);
 
         $role = Role::create([
-            'name' => $request->name,
+            'name' => $validated['name'],
             'guard_name' => 'api',
         ]);
 
@@ -50,15 +47,15 @@ class RoleController extends Controller
             'permission' => null,
             'old_value' => null,
             'new_value' => $role->toArray(),
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        return ApiResponse::success($role, 'Role created', 201);
+        return $this->success($role, 'role_created', 201);
     }
 
     public function update(Request $request, Role $role)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|unique:roles,name,'.$role->id,
             'justification' => 'nullable|string',
         ]);
@@ -66,7 +63,7 @@ class RoleController extends Controller
         $old = $role->toArray();
 
         $role->update([
-            'name' => $request->name,
+            'name' => $validated['name'],
         ]);
 
         // 🔐 Audit Log
@@ -76,10 +73,10 @@ class RoleController extends Controller
             'permission' => null,
             'old_value' => $old,
             'new_value' => $role->toArray(),
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        return ApiResponse::success($role, 'Role updated');
+        return $this->success($role, 'role_updated');
     }
 
     public function destroy(Request $request, Role $role)
@@ -99,6 +96,6 @@ class RoleController extends Controller
             'justification' => $request->justification,
         ]);
 
-        return ApiResponse::success(null, 'Role deleted');
+        return $this->success(null, 'role_deleted');
     }
 }

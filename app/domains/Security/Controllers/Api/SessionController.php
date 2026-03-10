@@ -4,11 +4,11 @@ namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Audit\Services\SecurityAuditService;
 use App\Domains\Security\Models\UserSession;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use App\Models\BlacklistedToken;
 use Illuminate\Http\Request;
 
-class SessionController extends Controller
+class SessionController extends BaseApiController
 {
     protected $securityAudit;
 
@@ -31,7 +31,7 @@ class SessionController extends Controller
         // ->when($request->region, fn ($q) => $q->where('region', $request->region))
         // ->latest('last_activity_at')
 
-        return response()->json($sessions);
+        return $this->success($sessions);
     }
 
     /**
@@ -41,7 +41,7 @@ class SessionController extends Controller
     {
         $session = UserSession::with('user')->findOrFail($id);
 
-        return response()->json($session);
+        return $this->success($session);
     }
 
     /**
@@ -50,13 +50,11 @@ class SessionController extends Controller
      */
     public function revoke($id)
     {
-        
+
         $session = UserSession::findOrFail($id);
         $this->revokeSession($session);
 
-        return response()->json([
-            'message' => 'Session revoked successfully',
-        ]);
+        return $this->success(['message' => 'Session revoked successfully']);
     }
 
     /**
@@ -65,7 +63,7 @@ class SessionController extends Controller
      */
     public function revokeAll(Request $request)
     {
-        
+
         $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
@@ -73,7 +71,7 @@ class SessionController extends Controller
         $user = UserSession::where('user_id', $request->user_id)
             ->whereNull('logout_at')->each(fn ($session) => $this->revokeSession($session));
 
-        return response()->json([
+        return $this->success([
             'message' => 'All user sessions revoked',
         ]);
     }
@@ -84,7 +82,7 @@ class SessionController extends Controller
      */
     public function revokeByRole(Request $request)
     {
-    
+
         $request->validate([
             'role' => 'required|string',
         ]);
@@ -102,7 +100,7 @@ class SessionController extends Controller
                 }
             });
 
-        return response()->json([
+        return $this->success([
             'message' => "All {$request->role} sessions revoked",
         ]);
     }
@@ -121,7 +119,7 @@ class SessionController extends Controller
             ->whereNull('logout_at')
             ->each(fn ($session) => $this->revokeSession($session));
 
-        return response()->json([
+        return $this->success([
             'message' => "All sessions in {$request->region} revoked",
         ]);
     }
@@ -142,7 +140,7 @@ class SessionController extends Controller
             'risk_score' => $request->risk_score,
         ]);
 
-        return response()->json([
+        return $this->success([
             'message' => 'Session risk score updated',
             'risk_score' => $request->risk_score,
         ]);

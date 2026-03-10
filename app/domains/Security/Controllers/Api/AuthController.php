@@ -10,7 +10,7 @@ use App\Domains\Security\Models\TokenPolicy;
 use App\Domains\Security\Models\User;
 use App\Domains\Security\Models\UserSession;
 use App\Domains\Security\Rules\DynamicPasswordRule;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use App\Models\Country;
 use App\Models\Wallet;
 use Illuminate\Container\Attributes\Auth;
@@ -24,7 +24,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 // Or GdImageBackEnd if Imagick is not installed
 
-class AuthController extends Controller
+class AuthController extends BaseApiController
 {
     protected $audit;
 
@@ -76,12 +76,10 @@ class AuthController extends Controller
             $this->createSession($user, $token, $jwtId, $request);
         });
 
-        return response()->json([
-            'status' => true,
-            'message' => 'User registered successfully',
+        return $this->success([
             'user' => $user,
             'access_token' => $token,
-        ], 201);
+        ], 'user_registered', 201);
     }
 
     public function login(Request $request)
@@ -121,7 +119,7 @@ class AuthController extends Controller
                 $user // may be null
             );
 
-            return response()->json(['error' => 'Invalid credentials'], 401);
+            return $this->error('invalid_credentials', 401);
         }
         // ✅ NOW user exists
         $user = auth()->user();
@@ -151,7 +149,7 @@ class AuthController extends Controller
          * 1️⃣ Account status
          */
         if ($user->status !== 'active') {
-            return response()->json(['error' => 'Account inactive'], 403);
+            return $this->error('account_inactive', 403);
         }
         /**
          * 2️⃣ LOGIN RULES (JSON BASED – ROLE + TIME)
@@ -166,7 +164,7 @@ class AuthController extends Controller
 
             // Role blocked
             if (($roleRule['allowed'] ?? true) === false) {
-                return response()->json(['error' => 'Login not allowed for this role'], 403);
+                return $this->error('login_not_allowed_for_this_role', 403);
             }
 
             // Role time window
@@ -175,7 +173,7 @@ class AuthController extends Controller
                     $now < $roleRule['time']['from'] ||
                     $now > $roleRule['time']['to']
                 ) {
-                    return response()->json(['error' => 'Login not allowed at this time'], 403);
+                    return $this->error('login_not_allowed_at_this_time', 403);
                 }
             }
 
@@ -187,17 +185,14 @@ class AuthController extends Controller
                 $now < $rules['default']['time']['from'] ||
                 $now > $rules['default']['time']['to']
             ) {
-                return response()->json(['error' => 'Login not allowed at this time'], 403);
+                return $this->error('login_not_allowed_at_this_time', 403);
             }
         }
         /**
          * 3️⃣ Force password reset
          */
         if ($user->force_password_reset) {
-            return response()->json([
-                'status' => 'password_reset_required',
-                'message' => 'Password reset required by security policy',
-            ], 403);
+            return $this->error('password_reset_required', 403);
         }
         /**
          * 4️⃣ MFA POLICY (CONFIG DRIVEN)
@@ -229,21 +224,15 @@ class AuthController extends Controller
                     $user
                 );
 
-                return response()->json([
+                return $this->success([
                     'status' => '2fa_required',
                     'email' => $user->email,
                     'access_token' => $token,
-                    'token_type' => 'bearer',
-                    'expires_in' => auth()->factory()->getTTL() * 60,
                 ]);
 
             }
 
-            return response()->json([
-                'status' => 'enable_2fa',
-                'message' => 'Two-factor authentication is required.',
-                'access_token' => $token,
-            ]);
+            return $this->error('enable_2fa', 403);
         }
 
         /**
@@ -321,7 +310,9 @@ class AuthController extends Controller
 
     public function me()
     {
-        return response()->json(auth()->user());
+        $user = auth()->user();
+
+        return $this->success($user);
     }
 
     public function logout(Request $request)
@@ -330,7 +321,7 @@ class AuthController extends Controller
         $token = $request->bearerToken();
 
         if (! $token) {
-            return response()->json(['message' => 'Token not provided'], 400);
+            return $this->error('Token not provided', 400);
         }
 
         try {
@@ -367,14 +358,14 @@ class AuthController extends Controller
             // Log out the user from auth
             auth()->logout();
 
-            return response()->json(['message' => 'Logged out successfully']);
+            return $this->success(['message' => 'Logged out successfully']);
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-            return response()->json(['message' => 'Token has expired'], 401);
+            return $this->error('Token has expired', 401);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['message' => 'Invalid token'], 401);
+            return $this->error('Invalid token', 401);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Logout failed', 'error' => $e->getMessage()], 500);
+            return $this->error('Logout failed', 500);
         }
     }
 

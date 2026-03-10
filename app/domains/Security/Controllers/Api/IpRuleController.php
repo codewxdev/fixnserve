@@ -4,10 +4,10 @@ namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Audit\Services\SecurityAuditService;
 use App\Domains\Security\Models\IpRule;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class IpRuleController extends Controller
+class IpRuleController extends BaseApiController
 {
     protected $securityAudit;
 
@@ -20,7 +20,7 @@ class IpRuleController extends Controller
     {
         $iprules = IpRule::latest()->get();
 
-        return response()->json($iprules);
+        return $this->success(['iprules' => $iprules]);
     }
 
     public function store(Request $request)
@@ -33,7 +33,9 @@ class IpRuleController extends Controller
             'expires_at' => 'nullable|date',
         ]);
 
-        return IpRule::create($data);
+        $ipRule = IpRule::create($data);
+
+        return $this->success(['ipRule' => $ipRule], 'IP rule created successfully');
     }
 
     public function update(Request $request, $id)
@@ -74,11 +76,7 @@ class IpRuleController extends Controller
             $data['reason_code']  // Reason code
         );
 
-        return response()->json([
-            'status' => true,
-            'message' => 'IP rule updated successfully',
-            'data' => $afterState,
-        ]);
+        return $this->success(['ipRule' => $ipRule], 'IP rule updated successfully');
     }
 
     public function destroy($id)
@@ -89,6 +87,6 @@ class IpRuleController extends Controller
         }
         $ipRule->delete();
 
-        return response()->json(['message' => 'Deleted']);
+        return $this->success(null, 'IP rule deleted successfully');
     }
 }

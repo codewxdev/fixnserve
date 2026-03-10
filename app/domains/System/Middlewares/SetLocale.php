@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Domains\System\Middlewares;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class SetLocale
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $country = app('country');
+
+        app()->setLocale($country->default_language);
+
+        return $next($request);
+    }
+}

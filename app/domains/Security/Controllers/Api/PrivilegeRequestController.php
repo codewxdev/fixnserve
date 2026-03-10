@@ -3,10 +3,10 @@
 namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Security\Models\PrivilegeRequest;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class PrivilegeRequestController extends Controller
+class PrivilegeRequestController extends BaseApiController
 {
     public function requestElevation(Request $request)
     {
@@ -15,13 +15,14 @@ class PrivilegeRequestController extends Controller
             'justification' => 'required|string',
             'duration_minutes' => 'required|integer|min:5|max:120',
         ]);
-
-        return PrivilegeRequest::create([
+        $privilege = PrivilegeRequest::create([
             'user_id' => auth()->id(),
             'requested_role' => $data['requested_role'],
             'justification' => $data['justification'],
             'expires_at' => now()->addMinutes($data['duration_minutes']),
         ]);
+
+        return $this->success(['message' => 'Privilege request submitted', 'privilege' => $privilege]);
     }
 
     public function approve($id)
@@ -42,7 +43,7 @@ class PrivilegeRequestController extends Controller
         $user = $request->user;
         $user->assignRole($request->requested_role);
 
-        return response()->json(['message' => 'Privilege approved']);
+        return $this->success(['message' => 'Privilege approved']);
     }
 
     public function deny($id)
@@ -55,7 +56,7 @@ class PrivilegeRequestController extends Controller
             'approved_at' => now(),
         ]);
 
-        return response()->json(['message' => 'Privilege denied']);
+        return $this->success(['message' => 'Privilege denied']);
     }
 
     public function extend(Request $request, $id)
@@ -67,7 +68,7 @@ class PrivilegeRequestController extends Controller
                 ->addMinutes($request->extra_minutes),
         ]);
 
-        return response()->json(['message' => 'Extended']);
+        return $this->success(['message' => 'Extended']);
     }
 
     public function terminate($id)
@@ -80,6 +81,6 @@ class PrivilegeRequestController extends Controller
             'status' => 'terminated',
         ]);
 
-        return response()->json(['message' => 'Privilege terminated']);
+        return $this->success(['message' => 'Privilege terminated']);
     }
 }

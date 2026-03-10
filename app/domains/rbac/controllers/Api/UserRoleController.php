@@ -4,11 +4,10 @@ namespace App\Domains\RBAC\Controllers\Api;
 
 use App\Domains\RBAC\Services\Audit;
 use App\Domains\Security\Models\User;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class UserRoleController extends Controller
+class UserRoleController extends BaseApiController
 {
     protected $audit;
 
@@ -19,24 +18,23 @@ class UserRoleController extends Controller
 
     public function assignRole(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'user_uuid' => 'required|exists:users,uuid',
             'role' => 'required|exists:roles,name',
             'justification' => 'nullable|string',
         ]);
 
-        $user = User::where('uuid', $request->user_uuid)->firstOrFail();
+        $user = User::where('uuid', $validated['user_uuid'])->firstOrFail();
 
         // OLD ROLES
         $oldRoles = $user->getRoleNames()->toArray();
 
-        // Sync role (overwrite)
-        $user->syncRoles([$request->role]);
+        // Sync role
+        $user->syncRoles([$validated['role']]);
 
         // NEW ROLES
         $newRoles = $user->getRoleNames()->toArray();
 
-        // Diff
         $added = array_values(array_diff($newRoles, $oldRoles));
         $removed = array_values(array_diff($oldRoles, $newRoles));
 
@@ -46,7 +44,7 @@ class UserRoleController extends Controller
             'target_user' => $user->uuid,
             'old_value' => $oldRoles,
             'new_value' => $newRoles,
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
         if (! empty($added)) {
@@ -54,7 +52,7 @@ class UserRoleController extends Controller
                 'event_type' => 'role_assigned_to_user',
                 'target_user' => $user->uuid,
                 'permission' => json_encode($added),
-                'justification' => $request->justification,
+                'justification' => $validated['justification'] ?? null,
             ]);
         }
 
@@ -63,36 +61,29 @@ class UserRoleController extends Controller
                 'event_type' => 'role_removed_from_user',
                 'target_user' => $user->uuid,
                 'permission' => json_encode($removed),
-                'justification' => $request->justification,
+                'justification' => $validated['justification'] ?? null,
             ]);
         }
 
-        return ApiResponse::success(
-            $newRoles,
-            'Role assigned successfully'
-        );
+        return $this->success($newRoles, 'role_assigned_to_user');
     }
 
     public function assignPermissionsToUser(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'user_uuid' => 'required|exists:users,uuid',
             'permissions' => 'required|array',
             'justification' => 'nullable|string',
         ]);
 
-        $user = User::where('uuid', $request->user_uuid)->firstOrFail();
+        $user = User::where('uuid', $validated['user_uuid'])->firstOrFail();
 
-        // OLD PERMISSIONS
         $oldPermissions = $user->permissions->pluck('name')->toArray();
 
-        // Sync permissions
-        $user->syncPermissions($request->permissions);
+        $user->syncPermissions($validated['permissions']);
 
-        // NEW PERMISSIONS
         $newPermissions = $user->permissions->pluck('name')->toArray();
 
-        // Diff
         $added = array_values(array_diff($newPermissions, $oldPermissions));
         $removed = array_values(array_diff($oldPermissions, $newPermissions));
 
@@ -101,32 +92,23 @@ class UserRoleController extends Controller
             'target_user' => $user->uuid,
             'old_value' => $oldPermissions,
             'new_value' => $newPermissions,
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        return ApiResponse::success(
-            $newPermissions,
-            'Permissions assigned directly to user'
-        );
+        return $this->success($newPermissions, 'user_permissions_assigned');
     }
 
     public function getUserRoles($id)
     {
         $user = User::where('uuid', $id)->firstOrFail();
 
-        return ApiResponse::success(
-            $user->getRoleNames(),
-            'User roles fetched successfully'
-        );
+        return $this->success($user->getRoleNames(), 'user_roles_fetched');
     }
 
     public function getUserPermissions($id)
     {
         $user = User::where('uuid', $id)->firstOrFail();
 
-        return ApiResponse::success(
-            $user->getAllPermissions(),
-            'User permissions fetched successfully'
-        );
+        return $this->success($user->getAllPermissions(), 'user_permissions_fetched');
     }
 }

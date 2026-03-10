@@ -3,11 +3,11 @@
 namespace App\Domains\System\Controllers\Api;
 
 use App\Domains\System\Services\PlatformPreferenceService;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
-class PlatformPreferenceController extends Controller
+class PlatformPreferenceController extends BaseApiController
 {
     public function update(Request $request)
     {
@@ -23,7 +23,7 @@ class PlatformPreferenceController extends Controller
             $data['rollout_mode']
         );
 
-        return response()->json([
+        return $this->success([
             'message' => 'Platform preferences updated',
             'version' => $result->version,
         ]);
@@ -31,6 +31,8 @@ class PlatformPreferenceController extends Controller
 
     public function current()
     {
-        return Cache::get('platform_preferences');
+        $service = Cache::get('platform_preferences');
+
+        return $this->success($service);
     }
 }

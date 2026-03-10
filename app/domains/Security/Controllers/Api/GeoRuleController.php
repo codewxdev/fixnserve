@@ -3,14 +3,16 @@
 namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Security\Models\GeoRule;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class GeoRuleController extends Controller
+class GeoRuleController extends BaseApiController
 {
     public function index()
     {
-        return GeoRule::all();
+        $geoRules = GeoRule::all();
+
+        return $this->success(['geoRules' => $geoRules]);
     }
 
     public function updateCountry(Request $request)
@@ -20,10 +22,12 @@ class GeoRuleController extends Controller
             'status' => 'required|in:allowed,blocked',
         ]);
 
-        return GeoRule::updateOrCreate(
+        $geoRule = GeoRule::updateOrCreate(
             ['country_code' => $data['country_code']],
             ['status' => $data['status']]
         );
+
+        return $this->success(['geoRule' => $geoRule], 'Geo rule updated successfully');
     }
 
     public function updateDefault(Request $request)
@@ -34,10 +38,12 @@ class GeoRuleController extends Controller
 
         GeoRule::query()->update(['is_default' => false]);
 
-        return GeoRule::create([
+        $geoRule = GeoRule::create([
             'country_code' => '*',
             'status' => $request->policy === 'deny_all' ? 'blocked' : 'allowed',
             'is_default' => true,
         ]);
+
+        return $this->success(['geoRule' => $geoRule], 'Default geo rule updated successfully');
     }
 }

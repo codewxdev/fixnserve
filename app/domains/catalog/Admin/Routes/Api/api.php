@@ -9,7 +9,7 @@ use App\Domains\Catalog\Admin\Controllers\Api\SubcategoryController;
 use App\Domains\Catalog\Admin\Controllers\Api\SubSpecialtyController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api', 'check_country')->group(function () {
+Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
     Route::get('/skill/suggested', [SkillController::class, 'suggested']);
     Route::get('/skill/search', [SkillController::class, 'search']);
 
