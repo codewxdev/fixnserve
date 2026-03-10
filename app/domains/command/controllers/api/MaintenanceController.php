@@ -3,22 +3,25 @@
 namespace App\Domains\Command\Controllers\Api;
 
 use App\Domains\Command\Models\Maintenance;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class MaintenanceController extends Controller
+class MaintenanceController extends BaseApiController
 {
     public function index()
     {
         $data = Maintenance::get();
 
-        return response()->json(['data' => $data, 'message' => 'data fetch successfuly']);
+        return $this->success(
+            $data,
+            'maintenance_data_fetched'
+        );
     }
 
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $validated = $request->validate([
             'type' => ['required', Rule::in(['global', 'module', 'region'])],
             'module' => 'nullable|string',
             'country_id' => 'nullable|exists:countries,id',
@@ -28,28 +31,34 @@ class MaintenanceController extends Controller
             'ends_at' => 'nullable|date|after:starts_at',
         ]);
 
-        $status = now()->gte($data['starts_at'])
+        $status = now()->gte($validated['starts_at'])
             ? 'active'
             : 'scheduled';
 
         $maintenance = Maintenance::create([
-            ...$data,
+            ...$validated,
             'status' => $status,
             'created_by' => auth()->id(),
         ]);
 
         cache()->forget('maintenance:active');
 
-        return response()->json($maintenance, 201);
+        return $this->success(
+            $maintenance,
+            'maintenance_created',
+            201
+        );
     }
 
     public function updateStatus(Maintenance $maintenance)
     {
         $maintenance->update(['status' => 'cancelled']);
+
         cache()->forget('maintenance:active');
 
-        return response()->json([
-            'message' => 'Maintenance cancelled',
-        ]);
+        return $this->success(
+            null,
+            'maintenance_cancelled'
+        );
     }
 }

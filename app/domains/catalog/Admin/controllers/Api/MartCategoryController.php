@@ -3,26 +3,22 @@
 namespace App\Domains\Catalog\Admin\Controllers\Api;
 
 use App\Domains\Catalog\Admin\Models\MartCategory;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class MartCategoryController extends Controller
+class MartCategoryController extends BaseApiController
 {
     public function index()
     {
         $categories = MartCategory::latest()->get();
 
-        return ApiResponse::success(
+        return $this->success(
             $categories,
-            'Mart categories fetched successfully'
+            'mart_categories_fetched'
         );
     }
 
-    /**
-     * Store a newly created resource.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -32,7 +28,11 @@ class MartCategoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $category = MartCategory::create($request->only([
@@ -41,39 +41,39 @@ class MartCategoryController extends Controller
             'status',
         ]));
 
-        return ApiResponse::success(
+        return $this->success(
             $category,
-            'Category created successfully',
+            'mart_category_created',
             201
         );
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $category = MartCategory::find($id);
 
         if (! $category) {
-            return ApiResponse::notFound('Mart category not found');
+            return $this->error(
+                'mart_category_not_found',
+                404
+            );
         }
 
-        return ApiResponse::success(
+        return $this->success(
             $category,
-            'Category fetched successfully'
+            'mart_category_fetched'
         );
     }
 
-    /**
-     * Update the specified resource.
-     */
     public function update(Request $request, $id)
     {
         $category = MartCategory::find($id);
 
         if (! $category) {
-            return ApiResponse::notFound('Mart category not found');
+            return $this->error(
+                'mart_category_not_found',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
@@ -83,7 +83,11 @@ class MartCategoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $category->update($request->only([
@@ -92,28 +96,28 @@ class MartCategoryController extends Controller
             'status',
         ]));
 
-        return ApiResponse::success(
+        return $this->success(
             $category,
-            'Category updated successfully'
+            'mart_category_updated'
         );
     }
 
-    /**
-     * Remove the specified resource.
-     */
     public function destroy($id)
     {
         $category = MartCategory::find($id);
 
         if (! $category) {
-            return ApiResponse::notFound('Mart category not found');
+            return $this->error(
+                'mart_category_not_found',
+                404
+            );
         }
 
         $category->delete();
 
-        return ApiResponse::success(
+        return $this->success(
             null,
-            'Category deleted successfully'
+            'mart_category_deleted'
         );
     }
 }

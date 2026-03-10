@@ -3,18 +3,20 @@
 namespace App\Domains\Catalog\Admin\Controllers\Api;
 
 use App\Domains\Catalog\Admin\Models\MartSubCategory;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class MartSubCategoryController extends Controller
+class MartSubCategoryController extends BaseApiController
 {
     public function index()
     {
         $subCategories = MartSubCategory::with('category')->latest()->get();
 
-        return ApiResponse::success($subCategories, 'Subcategories fetched successfully');
+        return $this->success(
+            $subCategories,
+            'mart_subcategories_fetched'
+        );
     }
 
     public function store(Request $request)
@@ -27,7 +29,11 @@ class MartSubCategoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $subCategory = MartSubCategory::create($request->only([
@@ -37,24 +43,39 @@ class MartSubCategoryController extends Controller
             'status',
         ]));
 
-        return ApiResponse::success($subCategory, 'Subcategory created successfully', 201);
+        return $this->success(
+            $subCategory,
+            'mart_subcategory_created',
+            201
+        );
     }
 
     public function show($id)
     {
         $subCategory = MartSubCategory::with('category')->find($id);
+
         if (! $subCategory) {
-            return ApiResponse::notFound('Subcategory not found');
+            return $this->error(
+                'mart_subcategory_not_found',
+                404
+            );
         }
 
-        return ApiResponse::success($subCategory, 'Subcategory fetched successfully');
+        return $this->success(
+            $subCategory,
+            'mart_subcategory_fetched'
+        );
     }
 
     public function update(Request $request, $id)
     {
         $subCategory = MartSubCategory::find($id);
+
         if (! $subCategory) {
-            return ApiResponse::notFound('Subcategory not found');
+            return $this->error(
+                'mart_subcategory_not_found',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
@@ -65,7 +86,11 @@ class MartSubCategoryController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $subCategory->update($request->only([
@@ -75,18 +100,28 @@ class MartSubCategoryController extends Controller
             'status',
         ]));
 
-        return ApiResponse::success($subCategory, 'Subcategory updated successfully');
+        return $this->success(
+            $subCategory,
+            'mart_subcategory_updated'
+        );
     }
 
     public function destroy($id)
     {
         $subCategory = MartSubCategory::find($id);
+
         if (! $subCategory) {
-            return ApiResponse::notFound('Subcategory not found');
+            return $this->error(
+                'mart_subcategory_not_found',
+                404
+            );
         }
 
         $subCategory->delete();
 
-        return ApiResponse::success(null, 'Subcategory deleted successfully');
+        return $this->success(
+            null,
+            'mart_subcategory_deleted'
+        );
     }
 }

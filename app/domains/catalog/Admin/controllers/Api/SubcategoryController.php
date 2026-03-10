@@ -3,17 +3,19 @@
 namespace App\Domains\Catalog\Admin\Controllers\Api;
 
 use App\Domains\Catalog\Admin\Models\Subcategory;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class SubcategoryController extends Controller
+class SubcategoryController extends BaseApiController
 {
     public function index()
     {
         $subcategories = Subcategory::with('category')->get();
 
-        return ApiResponse::success($subcategories, 'Subcategories fetched successfully');
+        return $this->success(
+            $subcategories,
+            'subcategories_fetched'
+        );
     }
 
     public function store(Request $request)
@@ -23,40 +25,76 @@ class SubcategoryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $sub = Subcategory::create($request->only(['category_id', 'name']));
+        $sub = Subcategory::create(
+            $request->only(['category_id', 'name'])
+        );
 
-        return ApiResponse::success($sub, 'Subcategory created successfully', 201);
+        return $this->success(
+            $sub,
+            'subcategory_created',
+            201
+        );
     }
 
     public function show($id)
     {
-        $sub = Subcategory::findOrFail($id);
+        $sub = Subcategory::find($id);
 
-        return ApiResponse::success($sub, 'Subcategory fetched successfully');
+        if (! $sub) {
+            return $this->error(
+                'subcategory_not_found',
+                404
+            );
+        }
+
+        return $this->success(
+            $sub,
+            'subcategory_fetched'
+        );
     }
 
     public function update(Request $request, $id)
     {
-        $sub = Subcategory::findOrFail($id);
+        $sub = Subcategory::find($id);
+
+        if (! $sub) {
+            return $this->error(
+                'subcategory_not_found',
+                404
+            );
+        }
 
         $request->validate([
             'category_id' => 'nullable|exists:categories,id',
             'name' => 'nullable|string|max:255',
         ]);
 
-        $sub->update($request->only(['category_id', 'name']));
+        $sub->update(
+            $request->only(['category_id', 'name'])
+        );
 
-        return ApiResponse::success($sub, 'Subcategory updated successfully');
+        return $this->success(
+            $sub,
+            'subcategory_updated'
+        );
     }
 
     public function destroy($id)
     {
-        $deleted = Subcategory::destroy($id);
+        $sub = Subcategory::find($id);
 
-        if ($deleted) {
-            return ApiResponse::success(null, 'Subcategory deleted successfully');
+        if (! $sub) {
+            return $this->error(
+                'subcategory_not_found',
+                404
+            );
         }
 
-        return ApiResponse::error('Subcategory not found', 404);
+        $sub->delete();
+
+        return $this->success(
+            null,
+            'subcategory_deleted'
+        );
     }
 }

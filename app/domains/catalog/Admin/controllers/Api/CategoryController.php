@@ -3,58 +3,62 @@
 namespace App\Domains\Catalog\Admin\Controllers\Api;
 
 use App\Domains\Catalog\Admin\Models\Category;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategoryController extends BaseApiController
 {
     public function index()
     {
         $categories = Category::all();
 
-        return ApiResponse::success($categories, 'Categories fetched successfully');
+        return $this->success(
+            $categories,
+            'categories_fetched'
+        );
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
         ]);
 
-        $category = Category::create([
-            'name' => $request->name,
-            'type' => $request->type,
-        ]);
+        $category = Category::create($validated);
 
-        return ApiResponse::success($category, 'Category created successfully', 201);
+        return $this->success(
+            $category,
+            'category_created',
+            201
+        );
     }
 
     public function show($id)
     {
         $category = Category::findOrFail($id);
 
-        return ApiResponse::success($category, 'Category fetched successfully');
+        return $this->success(
+            $category,
+            'category_fetched'
+        );
     }
 
     public function update(Request $request, $id)
     {
         $category = Category::findOrFail($id);
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
-
         ]);
 
-        $category->update([
-            'name' => $request->name,
-            'type' => $request->type,
+        $category->update($validated);
 
-        ]);
-
-        return ApiResponse::success($category, 'Category updated successfully');
+        return $this->success(
+            $category,
+            'category_updated'
+        );
     }
 
     public function destroy($id)
@@ -62,6 +66,9 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return ApiResponse::success(null, 'Category deleted successfully');
+        return $this->success(
+            null,
+            'category_deleted'
+        );
     }
 }

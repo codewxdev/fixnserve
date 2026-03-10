@@ -1,33 +1,37 @@
 <?php
 
-// app/Http/Controllers/Api/SpecialtyController.php
-
 namespace App\Domains\Catalog\Admin\Controllers\Api;
 
 use App\Domains\Catalog\Admin\Models\Specialty;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class SpecialtyController extends Controller
+class SpecialtyController extends BaseApiController
 {
     public function index()
     {
         $specialties = Specialty::with('subCategory')->get();
 
-        return ApiResponse::success($specialties, 'Specialties fetched successfully');
+        return $this->success(
+            $specialties,
+            'specialties_fetched'
+        );
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subcategory_id' => 'required',
+            'subcategory_id' => 'required|exists:sub_categories,id',
             'name' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $specialty = Specialty::create([
@@ -35,9 +39,9 @@ class SpecialtyController extends Controller
             'name' => $request->name,
         ]);
 
-        return ApiResponse::success(
+        return $this->success(
             $specialty->load('subCategory'),
-            'Specialty created successfully',
+            'specialty_created',
             201
         );
     }
@@ -47,10 +51,16 @@ class SpecialtyController extends Controller
         $specialty = Specialty::with('subCategory')->find($id);
 
         if (! $specialty) {
-            return ApiResponse::notFound('Specialty not found');
+            return $this->error(
+                'specialty_not_found',
+                404
+            );
         }
 
-        return ApiResponse::success($specialty);
+        return $this->success(
+            $specialty,
+            'specialty_fetched'
+        );
     }
 
     public function update(Request $request, $id)
@@ -58,26 +68,33 @@ class SpecialtyController extends Controller
         $specialty = Specialty::find($id);
 
         if (! $specialty) {
-            return ApiResponse::notFound('Specialty not found');
+            return $this->error(
+                'specialty_not_found',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
-            'subcategory_id' => 'required',
+            'subcategory_id' => 'required|exists:sub_categories,id',
             'name' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $specialty->update([
-            'sub_category_id' => $request->sub_category_id,
+            'subcategory_id' => $request->subcategory_id,
             'name' => $request->name,
         ]);
 
-        return ApiResponse::success(
+        return $this->success(
             $specialty->load('subCategory'),
-            'Specialty updated successfully'
+            'specialty_updated'
         );
     }
 
@@ -86,11 +103,17 @@ class SpecialtyController extends Controller
         $specialty = Specialty::find($id);
 
         if (! $specialty) {
-            return ApiResponse::notFound('Specialty not found');
+            return $this->error(
+                'specialty_not_found',
+                404
+            );
         }
 
         $specialty->delete();
 
-        return ApiResponse::success(null, 'Specialty deleted successfully');
+        return $this->success(
+            null,
+            'specialty_deleted'
+        );
     }
 }

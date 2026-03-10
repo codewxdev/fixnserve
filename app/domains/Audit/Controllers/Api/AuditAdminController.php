@@ -5,46 +5,55 @@ namespace App\Domains\Audit\Controllers\Api;
 use App\Domains\Audit\Models\AdminActionLog;
 use App\Domains\Audit\Models\SecurityAuditLog;
 use App\Domains\RBAC\Models\PermissionAuditLog;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class AuditAdminController extends Controller
+class AuditAdminController extends BaseApiController
 {
-    public function AdminAudit(Request $request)
+    public function adminAudit(Request $request)
     {
-        $audits = AdminActionLog::with('user') // Assuming you have a relationship defined for the user who performed the action
-            ->orderBy('performed_at', 'desc')->get();
+        $audits = AdminActionLog::with('user')
+            ->orderBy('performed_at', 'desc')
+            ->get();
 
-        return response()->json($audits);
+        return $this->success(
+            $audits,
+            'admin_audit_logs_fetched'
+        );
     }
 
     public function permissionAudit()
     {
-        $audit = PermissionAuditLog::with('permission') // Assuming you have a relationship defined for the permission being audited
+        $audit = PermissionAuditLog::with('permission')
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return response()->json($audit);
+        return $this->success(
+            $audit,
+            'permission_audit_logs_fetched'
+        );
     }
 
     public function securityAudit()
     {
-        $audit = SecurityAuditLog::with('user') // Assuming you have a relationship defined for the user who performed the action
+        $audit = SecurityAuditLog::with('user')
             ->orderBy('occurred_at', 'desc')
             ->get();
 
-        return response()->json($audit);
+        return $this->success(
+            $audit,
+            'security_audit_logs_fetched'
+        );
     }
 
     public function overview()
     {
-        $now = now();
         $last24 = now()->subDay();
         $prev24 = now()->subDays(2);
 
         /*
         |--------------------------------------------------------------------------
-        | 1️⃣ FAILED LOGINS (24H)
+        | 1️⃣ FAILED LOGINS
         |--------------------------------------------------------------------------
         */
 
@@ -88,7 +97,7 @@ class AuditAdminController extends Controller
             ->where('occurred_at', '>=', $last24)
             ->count();
 
-        return response()->json([
+        return $this->success([
             'failed_logins_24h' => [
                 'count' => $failedCurrent,
                 'percentage_change' => $failedChange,
@@ -100,6 +109,6 @@ class AuditAdminController extends Controller
             'token_rotations_24h' => [
                 'count' => $tokenRotations,
             ],
-        ]);
+        ], 'audit_overview_fetched');
     }
 }

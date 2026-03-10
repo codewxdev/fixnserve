@@ -1,22 +1,22 @@
 <?php
 
-// app/Http/Controllers/Api/SubSpecialtyController.php
-
 namespace App\Domains\Catalog\Admin\Controllers\Api;
 
 use App\Domains\Catalog\Admin\Models\SubSpecialty;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class SubSpecialtyController extends Controller
+class SubSpecialtyController extends BaseApiController
 {
     public function index()
     {
         $subSpecialties = SubSpecialty::with('specialty')->get();
 
-        return ApiResponse::success($subSpecialties, 'Sub specialties fetched successfully');
+        return $this->success(
+            $subSpecialties,
+            'sub_specialties_fetched'
+        );
     }
 
     public function store(Request $request)
@@ -27,7 +27,11 @@ class SubSpecialtyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $subSpecialty = SubSpecialty::create([
@@ -35,9 +39,9 @@ class SubSpecialtyController extends Controller
             'name' => $request->name,
         ]);
 
-        return ApiResponse::success(
+        return $this->success(
             $subSpecialty->load('specialty'),
-            'Sub specialty created successfully',
+            'sub_specialty_created',
             201
         );
     }
@@ -47,10 +51,16 @@ class SubSpecialtyController extends Controller
         $subSpecialty = SubSpecialty::with('specialty')->find($id);
 
         if (! $subSpecialty) {
-            return ApiResponse::notFound('Sub specialty not found');
+            return $this->error(
+                'sub_specialty_not_found',
+                404
+            );
         }
 
-        return ApiResponse::success($subSpecialty);
+        return $this->success(
+            $subSpecialty,
+            'sub_specialty_fetched'
+        );
     }
 
     public function update(Request $request, $id)
@@ -58,7 +68,10 @@ class SubSpecialtyController extends Controller
         $subSpecialty = SubSpecialty::find($id);
 
         if (! $subSpecialty) {
-            return ApiResponse::notFound('Sub specialty not found');
+            return $this->error(
+                'sub_specialty_not_found',
+                404
+            );
         }
 
         $validator = Validator::make($request->all(), [
@@ -67,7 +80,11 @@ class SubSpecialtyController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return ApiResponse::validationError($validator->errors()->toArray());
+            return $this->error(
+                'validation_error',
+                422,
+                $validator->errors()
+            );
         }
 
         $subSpecialty->update([
@@ -75,9 +92,9 @@ class SubSpecialtyController extends Controller
             'name' => $request->name,
         ]);
 
-        return ApiResponse::success(
+        return $this->success(
             $subSpecialty->load('specialty'),
-            'Sub specialty updated successfully'
+            'sub_specialty_updated'
         );
     }
 
@@ -86,11 +103,17 @@ class SubSpecialtyController extends Controller
         $subSpecialty = SubSpecialty::find($id);
 
         if (! $subSpecialty) {
-            return ApiResponse::notFound('Sub specialty not found');
+            return $this->error(
+                'sub_specialty_not_found',
+                404
+            );
         }
 
         $subSpecialty->delete();
 
-        return ApiResponse::success(null, 'Sub specialty deleted successfully');
+        return $this->success(
+            null,
+            'sub_specialty_deleted'
+        );
     }
 }
