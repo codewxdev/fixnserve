@@ -14,7 +14,7 @@ class AuditAdminController extends Controller
     {
         $audits = AdminActionLog::with('user') // Assuming you have a relationship defined for the user who performed the action
             ->orderBy('performed_at', 'desc')->get();
-
+ 
         return response()->json($audits);
     }
 
