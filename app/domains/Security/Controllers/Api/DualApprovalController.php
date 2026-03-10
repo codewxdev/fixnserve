@@ -5,10 +5,11 @@ namespace App\Domains\Security\Controllers\Api;
 use App\Domains\Command\Models\KillSwitch;
 use App\Domains\Security\Models\ApprovalAuditLog;
 use App\Domains\Security\Models\DualApproval;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
-class DualApprovalController extends Controller
+class DualApprovalController extends BaseApiController
 {
     protected function logEvent($approvalId, $event, Request $request)
     {
@@ -39,7 +40,9 @@ class DualApprovalController extends Controller
 
         $this->logEvent($approval->id, 'requested', $request);
 
-        return $approval;
+        return $this->success([
+            'approval' => $approval,
+        ], 'approval_request_created');
     }
 
     public function approveLevel1(Request $request, $id)
@@ -47,11 +50,11 @@ class DualApprovalController extends Controller
         $approval = DualApproval::findOrFail($id);
 
         if ($approval->requested_by == auth()->id()) {
-            return response()->json(['message' => 'Requester cannot approve'], 403);
+            return $this->error('requester_cannot_approve', 403);
         }
 
         if ($approval->status !== 'pending') {
-            return response()->json(['message' => 'Invalid state'], 400);
+            return $this->error('invalid_approval_state', 400);
         }
 
         $approval->update([
@@ -62,7 +65,7 @@ class DualApprovalController extends Controller
 
         $this->logEvent($approval->id, 'approved_level_1', $request);
 
-        return response()->json(['message' => 'Level 1 approved']);
+        return $this->success([], 'level1_approved');
     }
 
     public function approveLevel2(Request $request, $id)
@@ -70,15 +73,15 @@ class DualApprovalController extends Controller
         $approval = DualApproval::findOrFail($id);
 
         if ($approval->requested_by == auth()->id()) {
-            abort(403, 'Requester cannot approve');
+            return $this->error('requester_cannot_approve', 403);
         }
 
         if ($approval->approved_by_level_1 == auth()->id()) {
-            abort(403, 'Same approver not allowed');
+            return $this->error('same_approver_not_allowed', 403);
         }
 
         if ($approval->status !== 'approved_level_1') {
-            abort(400, 'Invalid state');
+            return $this->error('invalid_approval_state', 400);
         }
 
         $approval->update([
@@ -89,53 +92,59 @@ class DualApprovalController extends Controller
 
         $this->logEvent($approval->id, 'approved_level_2', $request);
 
-        return response()->json(['message' => 'Fully approved']);
+        return $this->success([], 'level2_approved');
     }
 
     public function execute(Request $request, $id)
     {
-        $request = DualApproval::findOrFail($id);
+        $approval = DualApproval::findOrFail($id);
 
-        if ($request->status !== 'approved') {
-            abort(403, 'Not fully approved');
+        if ($approval->status !== 'approved') {
+            return $this->error('approval_not_completed', 403);
         }
 
-        DB::transaction(function () use ($request) {
-            switch ($request->action_type) {
+        DB::transaction(function () use ($approval) {
+
+            switch ($approval->action_type) {
+
                 case 'refund':
-                    // $this->processRefund($request->payload);
+                    // $this->processRefund($approval->payload);
                     break;
-                case 'payout':    // case 'payout':
-                    // $this->processPayout($request->payload);
+
+                case 'payout':
+                    // $this->processPayout($approval->payload);
                     break;
+
                 case 'kill_switch':
-                    $payload = $request->payload;
+                    $payload = $approval->payload;
 
                     KillSwitch::create([
                         'scope' => $payload['scope'],
                         'type' => $payload['type'],
                         'reason' => $payload['reason'],
                         'expires_at' => $payload['expires_at'],
-                        'created_by' => $request->requested_by,
+                        'created_by' => $approval->requested_by,
                     ]);
 
                     break;
             }
         });
 
-        $request->update([
+        $approval->update([
             'status' => 'executed',
         ]);
 
-        $this->logEvent($request->id, 'executed', $request);
+        $this->logEvent($approval->id, 'executed', $request);
 
-        return response()->json(['message' => 'Action executed']);
+        return $this->success([], 'action_executed');
     }
 
     public function auditApprovalLogs()
     {
         $logs = ApprovalAuditLog::with('dualApproval')->get();
 
-        return response()->json($logs);
+        return $this->success([
+            'logs' => $logs,
+        ], 'approval_logs_fetched');
     }
 }

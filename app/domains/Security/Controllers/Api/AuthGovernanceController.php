@@ -6,18 +6,18 @@ use App\Domains\Security\Models\AuthPolicy;
 use App\Domains\Security\Models\MFAPolicy;
 use App\Domains\Security\Models\PasswordPolicy;
 use App\Domains\Security\Models\User;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class AuthGovernanceController extends Controller
+class AuthGovernanceController extends BaseApiController
 {
     public function index()
     {
-        return response()->json([
+        return $this->success([
             'auth_policy' => AuthPolicy::current(),
             'mfa_policy' => MFAPolicy::current(),
             'password_policy' => PasswordPolicy::current(),
-        ]);
+        ], 'security_policies_fetched');
     }
 
     public function updateLoginMethods(Request $request)
@@ -27,9 +27,6 @@ class AuthGovernanceController extends Controller
             'phone_otp' => 'required|boolean',
             'oauth' => 'required|boolean',
             'login_rules' => 'nullable|array',
-            // 'restricted_roles' => 'nullable|array',
-            // 'login_start_time' => 'nullable',
-            // 'login_end_time' => 'nullable',
         ]);
 
         AuthPolicy::current()->update([
@@ -39,7 +36,7 @@ class AuthGovernanceController extends Controller
             'login_rules' => $data['login_rules'] ?? null,
         ]);
 
-        return response()->json(['message' => 'Login methods updated']);
+        return $this->success([], 'login_methods_updated');
     }
 
     public function updateMFA(Request $request)
@@ -55,7 +52,7 @@ class AuthGovernanceController extends Controller
             'allowed_methods' => $data['methods'],
         ]);
 
-        return response()->json(['message' => 'MFA policy updated']);
+        return $this->success([], 'mfa_policy_updated');
     }
 
     public function updatePasswordRules(Request $request)
@@ -78,13 +75,15 @@ class AuthGovernanceController extends Controller
             'force_rotation_days' => $data['rotation_after_90days'] ?? null,
         ]);
 
-        return response()->json(['message' => 'Password rules updated']);
+        return $this->success([], 'password_rules_updated');
     }
 
     public function forcePasswordReset()
     {
-        User::query()->update(['force_password_reset' => true]);
+        User::query()->update([
+            'force_password_reset' => true,
+        ]);
 
-        return response()->json(['message' => 'Password reset forced for all users']);
+        return $this->success([], 'password_reset_forced');
     }
 }

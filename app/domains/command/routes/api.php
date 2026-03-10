@@ -10,7 +10,7 @@ use App\Models\Country;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api', 'check_country')->group(function () {
+Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
     Route::prefix('metrics')->group(function () {
         Route::get('/summary', [MetricsController::class, 'summary']);
         Route::get('/latency/timeseries', [MetricsController::class, 'latencyTimeSeries']);

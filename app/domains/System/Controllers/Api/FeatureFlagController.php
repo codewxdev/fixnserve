@@ -4,10 +4,10 @@ namespace App\Domains\System\Controllers\Api;
 
 use App\Domains\System\Models\FeatureFlag;
 use App\Domains\System\Models\FeatureFlagLog;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class FeatureFlagController extends Controller
+class FeatureFlagController extends BaseApiController
 {
     // 1️⃣ Get all enabled flags for logged in user
     public function index(Request $request)
@@ -20,11 +20,11 @@ class FeatureFlagController extends Controller
         foreach ($flags as $flag) {
             $result[$flag->key] = FeatureFlag::isEnabled($flag->key, $user);
         }
+        if (empty($result)) {
+            return $this->notFound('No feature flags found');
+        }
 
-        return response()->json([
-            'success' => true,
-            'data' => $result,
-        ]);
+        return $this->success($result);
     }
 
     // 2️⃣ Create new feature flag
@@ -44,11 +44,7 @@ class FeatureFlagController extends Controller
             'new_value' => $flag->value,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Feature flag created',
-            'data' => $flag,
-        ]);
+        return $this->success($flag, 'Feature flag created', 201);
     }
 
     // 3️⃣ Update flag (Enable/Disable / Rollout change)
@@ -63,11 +59,7 @@ class FeatureFlagController extends Controller
             'new_value' => $flag->value,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Feature flag updated',
-            'data' => $flag,
-        ]);
+        return $this->success($flag, 'Feature flag updated');
     }
 
     // 4️⃣ Delete flag
@@ -81,9 +73,6 @@ class FeatureFlagController extends Controller
         ]);
         $flag->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Feature flag deleted',
-        ]);
+        return $this->success([], 'Feature flag deleted');
     }
 }

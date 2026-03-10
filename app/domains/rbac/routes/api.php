@@ -6,7 +6,7 @@ use App\Domains\RBAC\Controllers\Api\RolePermissionController;
 use App\Domains\RBAC\Controllers\Api\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api', 'check_country')->group(function () {
+Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
 
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'network.security'])->group(function () {
@@ -19,7 +19,6 @@ Route::middleware('health_api', 'check_country')->group(function () {
             Route::delete('/role-permission', [RolePermissionController::class, 'removePermission']);
             Route::get('/role-permission/{role}', [RolePermissionController::class, 'getPermissions']);
             Route::post('/role-permission/module', [RolePermissionController::class, 'assignModuleToRole']);
-
 
             Route::prefix('users')->group(function () {
                 Route::post('/assign-role', [UserRoleController::class, 'assignRole']);

@@ -12,7 +12,7 @@ use App\Domains\Security\Controllers\Api\SessionController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api', 'check_country')->group(function () {
+Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
 
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:login', 'login.policy']);

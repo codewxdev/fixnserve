@@ -30,8 +30,7 @@ class CountrySeeder extends Seeder
         // Step 1: Fetch countries from REST Countries API
         $response = Http::withoutVerifying()
             ->timeout(30)
-            ->get('https://restcountries.com/v3.1/all?fields=name,cca2,idd,flags');
-
+            ->get('https://restcountries.com/v3.1/all?fields=name,cca2,idd,flags,currencies');
         if (! $response->successful()) {
             // Log error if API fails
             $this->command->error('Failed to fetch countries from API');
@@ -65,7 +64,20 @@ class CountrySeeder extends Seeder
 
             // Step 4: Get phone length using PhoneService
             $phoneLength = $this->phoneService->getPhoneLengthForCountry($iso2);
+            $currencyCode = null;
 
+            if (! empty($country['currencies'])) {
+                $currencyCode = array_key_first($country['currencies']);
+            }
+
+            $decimalSeparator = '.';
+            $thousandSeparator = ',';
+            $euCountries = ['de', 'fr', 'es', 'it', 'nl', 'be'];
+
+            if (in_array(strtolower($iso2), $euCountries)) {
+                $decimalSeparator = ',';
+                $thousandSeparator = '.';
+            }
             // Step 5: Get example number (optional)
             $exampleNumber = $this->phoneService->getExampleNumber($iso2);
 
@@ -77,7 +89,9 @@ class CountrySeeder extends Seeder
                     'phone_code' => $phoneCode,
                     'flag_url' => $country['flags']['png'] ?? null,
                     'phone_length' => $phoneLength,
-
+                    'currency_code' => $currencyCode,
+                    'decimal_separator' => $decimalSeparator,
+                    'thousand_separator' => $thousandSeparator,
                 ]
             );
 

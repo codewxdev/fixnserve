@@ -4,11 +4,10 @@ namespace App\Domains\RBAC\Controllers\Api;
 
 use App\Domains\RBAC\Models\Permission;
 use App\Domains\RBAC\Services\Audit;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
-class PermissionController extends Controller
+class PermissionController extends BaseApiController
 {
     protected $audit;
 
@@ -17,52 +16,42 @@ class PermissionController extends Controller
         $this->audit = $audit;
     }
 
-    // public function index(?Permission $permission = null)
-    // {
-    //     if ($permission) {
-    //         return ApiResponse::success($permission, 'Permission fetched');
-    //     }
-
-    //     return ApiResponse::success(Permission::all(), 'Permissions fetched');
-    // }
-
     public function index()
     {
-        $permissions = Permission::all()->groupBy('module'); // Group by module
+        $permissions = Permission::all()->groupBy('module');
 
-        return ApiResponse::success($permissions, 'Permissions fetched by module');
+        return $this->success($permissions, 'permissions_fetched');
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|unique:permissions,name',
-            'module' => 'required|string', // ✅ Add module
+            'module' => 'required|string',
             'justification' => 'nullable|string',
         ]);
 
         $permission = Permission::create([
-            'name' => $request->name,
+            'name' => $validated['name'],
             'guard_name' => 'api',
-            'module' => $request->module, // ✅ Save module
+            'module' => $validated['module'],
         ]);
 
-        // 🔐 Audit Log
         $this->audit->log([
             'event_type' => 'permission_created',
             'target_role' => null,
             'permission' => $permission->name,
             'old_value' => null,
-            'new_value' => ['name' => $permission->name],
-            'justification' => $request->justification,
+            'new_value' => $permission->toArray(),
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        return ApiResponse::success($permission, 'Permission created', 201);
+        return $this->success($permission, 'permission_created', 201);
     }
 
     public function update(Request $request, Permission $permission)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|unique:permissions,name,'.$permission->id,
             'module' => 'required|string',
             'justification' => 'nullable|string',
@@ -71,32 +60,29 @@ class PermissionController extends Controller
         $old = $permission->toArray();
 
         $permission->update([
-            'name' => $request->name,
-            'module' => $request->module,
+            'name' => $validated['name'],
+            'module' => $validated['module'],
         ]);
 
-        // 🔐 Audit Log
         $this->audit->log([
             'event_type' => 'permission_updated',
             'target_role' => null,
             'permission' => $permission->name,
             'old_value' => $old,
             'new_value' => $permission->toArray(),
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        return ApiResponse::success($permission, 'Permission updated');
+        return $this->success($permission, 'permission_updated');
     }
 
     public function destroy(Request $request, Permission $permission)
     {
         $old = $permission->toArray();
-
         $permissionName = $permission->name;
 
         $permission->delete();
 
-        // 🔐 Audit Log
         $this->audit->log([
             'event_type' => 'permission_deleted',
             'target_role' => null,
@@ -106,6 +92,6 @@ class PermissionController extends Controller
             'justification' => $request->justification,
         ]);
 
-        return ApiResponse::success(null, 'Permission deleted');
+        return $this->success(null, 'permission_deleted');
     }
 }

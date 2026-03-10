@@ -38,9 +38,12 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
+
         },
          "files": [
-        "app/Helpers/NotificationHelper.php"
+        "app/Helpers/NotificationHelper.php",
+                "app/Helpers/Global.php"
+
     ]
     },
     "autoload-dev": {

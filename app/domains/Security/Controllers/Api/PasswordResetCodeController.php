@@ -3,8 +3,7 @@
 namespace App\Domains\Security\Controllers\Api;
 
 use App\Domains\Security\Models\User;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use App\Mail\ResetPasswordCodeMail;
 use App\Models\PasswordResetCode;
 use Carbon\Carbon;
@@ -12,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
-class PasswordResetCodeController extends Controller
+class PasswordResetCodeController extends BaseApiController
 {
     // STEP 1 — Send OTP
     public function sendResetCode(Request $request)
@@ -33,7 +32,7 @@ class PasswordResetCodeController extends Controller
         // Send OTP email
         Mail::to($request->email)->send(new ResetPasswordCodeMail($code));
 
-        return ApiResponse::success(null, 'Reset code sent to your email');
+        return $this->success(null, 'Reset code sent to your email');
     }
 
     // STEP 2 — Verify OTP
@@ -51,10 +50,10 @@ class PasswordResetCodeController extends Controller
             ->first();
 
         if (! $record) {
-            return ApiResponse::error('Invalid or expired code', 422);
+            return $this->error('Invalid or expired code', 422);
         }
 
-        return ApiResponse::success(null, 'Code verified');
+        return $this->success('Code verified');
     }
 
     // STEP 3 — Reset Password
@@ -79,7 +78,7 @@ class PasswordResetCodeController extends Controller
             ->first();
 
         if (! $record) {
-            return ApiResponse::error('Invalid or expired code', 422);
+            return $this->error('Invalid or expired code', 422);
         }
 
         $user = User::where('email', $request->email)->first();
@@ -96,6 +95,6 @@ class PasswordResetCodeController extends Controller
         // Login user using JWT
         $token = auth('api')->login($user);
 
-        return ApiResponse::success(['access_token' => $token], 'Password reset successful');
+        return $this->success(['access_token' => $token], 'Password reset successful');
     }
 }

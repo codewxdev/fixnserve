@@ -3,12 +3,12 @@
 namespace App\Domains\RBAC\Controllers\Api;
 
 use App\Domains\RBAC\Services\Audit;
-use App\Helpers\ApiResponse;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class RolePermissionController extends Controller
+class RolePermissionController extends BaseApiController
 {
     protected $audit;
 
@@ -19,38 +19,33 @@ class RolePermissionController extends Controller
 
     public function assignPermission(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'role' => 'required|exists:roles,name',
             'permissions' => 'present|array',
             'justification' => 'nullable|string',
         ]);
 
-        $role = Role::findByName($request->role, 'api');
+        $role = Role::findByName($validated['role'], 'api');
 
-        // OLD STATE
         $oldPermissions = $role->permissions->pluck('name')->toArray();
 
-        // Sync permissions
-        $role->syncPermissions($request->permissions);
+        $role->syncPermissions($validated['permissions']);
 
-        // NEW STATE
         $newPermissions = $role->permissions->pluck('name')->toArray();
 
-        // Calculate diff
         $added = array_values(array_diff($newPermissions, $oldPermissions));
         $removed = array_values(array_diff($oldPermissions, $newPermissions));
 
-        // 🔐 Audit Log
+        // 🔐 Audit
         $this->audit->log([
             'event_type' => 'permissions_synced',
             'target_role' => $role->name,
             'permission' => null,
             'old_value' => $oldPermissions,
             'new_value' => $newPermissions,
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        // Optional: log detailed changes separately
         if (! empty($added)) {
             $this->audit->log([
                 'event_type' => 'permission_assigned',
@@ -58,7 +53,7 @@ class RolePermissionController extends Controller
                 'permission' => json_encode($added),
                 'old_value' => null,
                 'new_value' => $added,
-                'justification' => $request->justification,
+                'justification' => $validated['justification'] ?? null,
             ]);
         }
 
@@ -69,45 +64,39 @@ class RolePermissionController extends Controller
                 'permission' => json_encode($removed),
                 'old_value' => $removed,
                 'new_value' => null,
-                'justification' => $request->justification,
+                'justification' => $validated['justification'] ?? null,
             ]);
         }
 
-        return ApiResponse::success(
-            $newPermissions,
-            'Permissions synced successfully'
-        );
+        return $this->success($newPermissions, 'permissions_synced');
     }
 
     public function removePermission(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'role' => 'required|exists:roles,name',
             'permissions' => 'required|array',
             'justification' => 'nullable|string',
         ]);
 
-        $role = Role::findByName($request->role, 'api');
+        $role = Role::findByName($validated['role'], 'api');
 
         $oldPermissions = $role->permissions->pluck('name')->toArray();
 
-        $role->revokePermissionTo($request->permissions);
+        $role->revokePermissionTo($validated['permissions']);
 
         $newPermissions = $role->permissions->pluck('name')->toArray();
 
         $this->audit->log([
             'event_type' => 'permission_removed',
             'target_role' => $role->name,
-            'permission' => json_encode($request->permissions),
+            'permission' => json_encode($validated['permissions']),
             'old_value' => $oldPermissions,
             'new_value' => $newPermissions,
-            'justification' => $request->justification,
+            'justification' => $validated['justification'] ?? null,
         ]);
 
-        return ApiResponse::success(
-            $newPermissions,
-            'Permissions removed'
-        );
+        return $this->success($newPermissions, 'permissions_removed');
     }
 
     public function getPermissions($role)
@@ -120,33 +109,27 @@ class RolePermissionController extends Controller
                 return $permissions->pluck('name');
             });
 
-        return ApiResponse::success(
-            $grouped,
-            'Role permissions fetched module-wise'
-        );
+        return $this->success($grouped, 'role_permissions_fetched');
     }
 
     public function assignModuleToRole(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'role' => 'required|exists:roles,name',
             'module' => 'required|string',
         ]);
 
-        $role = \Spatie\Permission\Models\Role::findByName($request->role, 'api');
+        $role = Role::findByName($validated['role'], 'api');
 
-        // Get all permissions of that module
-        $permissions = \Spatie\Permission\Models\Permission::where('module', $request->module)
+        $permissions = Permission::where('module', $validated['module'])
             ->pluck('name')
             ->toArray();
 
-        // Assign all module permissions to role
         $role->givePermissionTo($permissions);
 
-        return response()->json([
-            'message' => 'Module assigned successfully',
-            'module' => $request->module,
+        return $this->success([
+            'module' => $validated['module'],
             'permissions' => $permissions,
-        ]);
+        ], 'module_assigned_to_role');
     }
 }
