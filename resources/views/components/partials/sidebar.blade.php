@@ -235,11 +235,11 @@
                             style="color: rgb(var(--text-muted));">Geo & Map Configuration</a></li>
                     <li><a href="{{ route('settings.rate_limit') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Rate Limits & Throttling</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.configuration_versioning') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Configuration Versioning & Rollback</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.configuration_impact_analysis') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Configuration Impact Analysis</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.access_control') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Access Control & Governance</a></li>
                 </ul>
             </li>
