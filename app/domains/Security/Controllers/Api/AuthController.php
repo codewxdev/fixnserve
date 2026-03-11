@@ -411,6 +411,7 @@ class AuthController extends BaseApiController
 
     public function enable2FA(Request $request)
     {
+        // dd($request);
         $google2fa = new Google2FA;
 
         $secret = $google2fa->generateSecretKey();

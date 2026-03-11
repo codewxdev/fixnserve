@@ -3,12 +3,18 @@
 namespace App\Models;
 
 use App\Domains\Catalog\Admin\Models\Skill;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Portfolio extends Model
 {
     use HasFactory;
+    use HasTranslations;
+
+    public array $translatable = ['project_title',
+        'role',
+        'description'];
 
     protected $fillable = [
         'user_id',

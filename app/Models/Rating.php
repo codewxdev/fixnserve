@@ -3,10 +3,16 @@
 namespace App\Models;
 
 use App\Domains\Security\Models\User;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Rating extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['review',
+    ];
+
     protected $fillable = [
         'user_id',
         'rateable_id',

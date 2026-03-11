@@ -2,10 +2,15 @@
 
 namespace App\Domains\RBAC\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class PermissionAuditLog extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['justification'];
+
     protected $fillable = [
         'actor_id',
         'event_type',

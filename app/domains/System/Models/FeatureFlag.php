@@ -2,10 +2,15 @@
 
 namespace App\Domains\System\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class FeatureFlag extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['key'];
+
     protected $fillable = ['key', 'type', 'value'];
 
     protected $casts = [

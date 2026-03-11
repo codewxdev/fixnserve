@@ -3,14 +3,19 @@
 namespace App\Models;
 
 use App\Domains\Security\Models\User;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class UserEducation extends Model
 {
     use HasFactory;
+    use HasTranslations;
 
     protected $table = 'user_educations';
+
+    public array $translatable = ['school', 'degree', 'diploma', 'description',
+    ];
 
     protected $fillable = [
         'user_id',

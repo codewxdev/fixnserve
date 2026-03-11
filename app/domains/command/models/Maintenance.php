@@ -2,10 +2,15 @@
 
 namespace App\Domains\Command\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Maintenance extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['reason', 'user_message'];
+
     protected $fillable = [
         'type',
         'module',
