@@ -16,7 +16,7 @@ class DomainRouteServiceProvider extends ServiceProvider
     protected function loadDomainRoutes(): void
     {
         // app/domains
-        $domainsPath = app_path('domains');
+        $domainsPath = app_path('Domains');
 
         if (! File::isDirectory($domainsPath)) {
             return;

@@ -176,6 +176,7 @@
         }
 
         // 3. Login Form Submission
+        // 3. Login Form Submission
         document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
@@ -225,26 +226,46 @@
                 });
 
                 const data = await res.json();
+                console.log("Login Response:", data);
 
-                if (!res.ok) {
+                // --- FIXES APPLIED HERE ---
+
+                // 1. Resolve response structure (handling BaseApiController wrap if exists)
+                const responseData = data.data ? data.data : data;
+
+                // 2. Intercept backend's 403 error specifically for 'enable_2fa' so we don't crash
+                const isEnable2FA = (res.status === 403 && (data.error === 'enable_2fa' || data.message ===
+                    'enable_2fa'));
+
+                // Throw error ONLY if it's a real failure, not our 2FA setup trigger
+                if (!res.ok && !isEnable2FA) {
                     throw new Error(data.error || data.message || "Invalid credentials.");
                 }
 
-                if (data.status === '2fa_required') {
-                    tempAccessToken = data.access_token; // Matches your login controller
-                    // Fingerprint ko store karein taake 2FA modal ya baad mein use ho sakay
+                // 3. Extract logic status and token safely
+                const logicalStatus = isEnable2FA ? 'enable_2fa' : responseData.status;
+                const accessToken = responseData.access_token || data.access_token;
+
+                if (logicalStatus === '2fa_required') {
+                    tempAccessToken = accessToken;
                     localStorage.setItem('device_fingerprint', currentVisitorId);
                     showTwoFAModal('2FA Verification Required', currentAuthEmail, false);
-                } else if (data.status === 'enable_2fa') {
-                    tempAccessToken = data.access_token; // Matches your login controller
-                    enable2FA(data.access_token);
+
+                } else if (logicalStatus === 'enable_2fa') {
+                    tempAccessToken = accessToken;
                     localStorage.setItem('device_fingerprint', currentVisitorId);
-                } else if (data.access_token) {
-                    localStorage.setItem('token', data.access_token);
-                    document.cookie = `token=${data.access_token}; path=/; SameSite=Lax`;
+                    enable2FA(accessToken);
+
+                } else if (accessToken) {
+                    // Normal successful login
+                    localStorage.setItem('token', accessToken);
+                    document.cookie = `token=${accessToken}; path=/; SameSite=Lax`;
                     window.location.href = "{{ route('platform_overview.index') }}";
                     localStorage.setItem('device_fingerprint', currentVisitorId);
+                } else {
+                    throw new Error("Unexpected response from server.");
                 }
+
             } catch (err) {
                 errorMessage.innerText = err.message;
                 errorMessageContainer.classList.remove('hidden');
@@ -256,6 +277,91 @@
         // 4. Enable 2FA Setup
         function enable2FA(tempToken) {
             fetch("http://localhost:8000/api/2fa/enable", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${tempToken}`
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'setup_initiated' && data.qrcode_url) {
+                        showTwoFAModal('Setup Two-Factor Authentication', currentAuthEmail, true, data.qrcode_url, data
+                            .secret);
+                    } else {
+                        alert(data.error || "Failed to initiate 2FA setup.");
+                    }
+                })
+                .catch(err => console.error("2FA Enable Error:", err));
+        }
+
+        // 5. Verify 2FA Form Submission
+        document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const verifyButton = document.getElementById("verify2FAButton");
+            const errorMessageContainer = document.getElementById("twoFactorErrorMessageContainer");
+            const errorMessage = document.getElementById("twoFactorErrorMessage");
+            const otpCode = document.getElementById("otpCode").value;
+
+            setButtonLoading(verifyButton, true, 'Verify & Log In');
+            errorMessageContainer.classList.add('hidden');
+
+            try {
+                // CRITICAL FIX: Ensure BOTH currentVisitorId and currentDeviceInfo are available
+                if (!currentVisitorId || !currentDeviceInfo) {
+                    const fp = await fpPromise;
+                    const result = await fp.get();
+                    currentVisitorId = result.visitorId;
+                    currentDeviceInfo = getDeviceInfo();
+                }
+
+                const res = await fetch("https://dashboard.sahorone.com/api/2fa/verify", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById("twoFactorEmail").value,
+                        otp: otpCode,
+                        fingerprint: currentVisitorId,
+                        device_name: currentDeviceInfo.device_name,
+                        os_version: currentDeviceInfo.os_version,
+                        app_version: currentDeviceInfo.app_version,
+                        is_rooted: currentDeviceInfo.is_rooted
+                    })
+                });
+
+                const data = await res.json();
+                const responseData = data.data ? data.data : data;
+
+                if (responseData.status === 'success' && responseData.access_token) {
+                    localStorage.setItem('token', responseData.access_token);
+                    document.cookie = `token=${responseData.access_token}; path=/; max-age=86400; SameSite=Lax`;
+
+                    if (responseData.user) {
+                        localStorage.setItem("user", JSON.stringify(responseData.user));
+                    }
+
+                    window.location.href = "{{ route('platform_overview.index') }}";
+                } else {
+                    errorMessage.innerText = data.error || responseData.error ||
+                        "Verification failed. Check your code.";
+                    errorMessageContainer.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMessage.innerText = "Connection error. Please try again.";
+                errorMessageContainer.classList.remove('hidden');
+            } finally {
+                setButtonLoading(verifyButton, false, 'Verify & Log In');
+            }
+        });
+
+        // 4. Enable 2FA Setup
+        function enable2FA(tempToken) {
+            fetch("https://dashboard.sahorone.com/api/2fa/enable", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -296,7 +402,7 @@
                     currentDeviceInfo = getDeviceInfo();
                 }
 
-                const res = await fetch("http://localhost:8000/api/2fa/verify", {
+                const res = await fetch("https://dashboard.sahorone.com/api/2fa/verify", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
