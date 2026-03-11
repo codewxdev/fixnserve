@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Controllers\Api;
+namespace App\Domains\Catalog\Controllers\Api;
 
-use App\Domains\Catalog\Admin\Models\Category;
+use App\Domains\Catalog\Models\Category;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
@@ -21,11 +21,15 @@ class CategoryController extends BaseApiController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255', // ✅ user just sends plain English
             'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
         ]);
 
-        $category = Category::create($validated);
+        // Save original record
+        $category = Category::create([
+            'name' => $validated['name'],
+            'type' => $validated['type'],
+        ]);
 
         return $this->success(
             $category,

@@ -1,11 +1,16 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Models;
+namespace App\Domains\Catalog\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['name'];
+
     protected $fillable = ['name', 'type'];
 
     protected $hidden = ['created_at', 'updated_at'];

@@ -1,28 +1,28 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Controllers\Api;
+namespace App\Domains\Catalog\Controllers\Api;
 
-use App\Domains\Catalog\Admin\Models\Specialty;
+use App\Domains\Catalog\Models\SubSpecialty;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class SpecialtyController extends BaseApiController
+class SubSpecialtyController extends BaseApiController
 {
     public function index()
     {
-        $specialties = Specialty::with('subCategory')->get();
+        $subSpecialties = SubSpecialty::with('specialty')->get();
 
         return $this->success(
-            $specialties,
-            'specialties_fetched'
+            $subSpecialties,
+            'sub_specialties_fetched'
         );
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subcategory_id' => 'required|exists:sub_categories,id',
+            'specialty_id' => 'required|exists:specialties,id',
             'name' => 'required|string|max:255',
         ]);
 
@@ -34,48 +34,48 @@ class SpecialtyController extends BaseApiController
             );
         }
 
-        $specialty = Specialty::create([
-            'subcategory_id' => $request->subcategory_id,
+        $subSpecialty = SubSpecialty::create([
+            'specialty_id' => $request->specialty_id,
             'name' => $request->name,
         ]);
 
         return $this->success(
-            $specialty->load('subCategory'),
-            'specialty_created',
+            $subSpecialty->load('specialty'),
+            'sub_specialty_created',
             201
         );
     }
 
     public function show($id)
     {
-        $specialty = Specialty::with('subCategory')->find($id);
+        $subSpecialty = SubSpecialty::with('specialty')->find($id);
 
-        if (! $specialty) {
+        if (! $subSpecialty) {
             return $this->error(
-                'specialty_not_found',
+                'sub_specialty_not_found',
                 404
             );
         }
 
         return $this->success(
-            $specialty,
-            'specialty_fetched'
+            $subSpecialty,
+            'sub_specialty_fetched'
         );
     }
 
     public function update(Request $request, $id)
     {
-        $specialty = Specialty::find($id);
+        $subSpecialty = SubSpecialty::find($id);
 
-        if (! $specialty) {
+        if (! $subSpecialty) {
             return $this->error(
-                'specialty_not_found',
+                'sub_specialty_not_found',
                 404
             );
         }
 
         $validator = Validator::make($request->all(), [
-            'subcategory_id' => 'required|exists:sub_categories,id',
+            'specialty_id' => 'required|exists:specialties,id',
             'name' => 'required|string|max:255',
         ]);
 
@@ -87,33 +87,33 @@ class SpecialtyController extends BaseApiController
             );
         }
 
-        $specialty->update([
-            'subcategory_id' => $request->subcategory_id,
+        $subSpecialty->update([
+            'specialty_id' => $request->specialty_id,
             'name' => $request->name,
         ]);
 
         return $this->success(
-            $specialty->load('subCategory'),
-            'specialty_updated'
+            $subSpecialty->load('specialty'),
+            'sub_specialty_updated'
         );
     }
 
     public function destroy($id)
     {
-        $specialty = Specialty::find($id);
+        $subSpecialty = SubSpecialty::find($id);
 
-        if (! $specialty) {
+        if (! $subSpecialty) {
             return $this->error(
-                'specialty_not_found',
+                'sub_specialty_not_found',
                 404
             );
         }
 
-        $specialty->delete();
+        $subSpecialty->delete();
 
         return $this->success(
             null,
-            'specialty_deleted'
+            'sub_specialty_deleted'
         );
     }
 }

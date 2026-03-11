@@ -1,13 +1,17 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Models;
+namespace App\Domains\Catalog\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MartSubCategory extends Model
 {
     use HasFactory;
+    use HasTranslations;
+
+    public array $translatable = ['name', 'description'];
 
     protected $fillable = [
         'mart_category_id',

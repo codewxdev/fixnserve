@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Controllers\Api;
+namespace App\Domains\Catalog\Controllers\Api;
 
-use App\Domains\Catalog\Admin\Models\MartSubCategory;
+use App\Domains\Catalog\Models\MartSubCategory;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;

@@ -1,30 +1,29 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Controllers\Api;
+namespace App\Domains\Catalog\Controllers\Api;
 
-use App\Domains\Catalog\Admin\Models\MartCategory;
+use App\Domains\Catalog\Models\Specialty;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class MartCategoryController extends BaseApiController
+class SpecialtyController extends BaseApiController
 {
     public function index()
     {
-        $categories = MartCategory::latest()->get();
+        $specialties = Specialty::with('subCategory')->get();
 
         return $this->success(
-            $categories,
-            'mart_categories_fetched'
+            $specialties,
+            'specialties_fetched'
         );
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'subcategory_id' => 'required|exists:sub_categories,id',
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -35,51 +34,49 @@ class MartCategoryController extends BaseApiController
             );
         }
 
-        $category = MartCategory::create($request->only([
-            'name',
-            'description',
-            'status',
-        ]));
+        $specialty = Specialty::create([
+            'subcategory_id' => $request->subcategory_id,
+            'name' => $request->name,
+        ]);
 
         return $this->success(
-            $category,
-            'mart_category_created',
+            $specialty->load('subCategory'),
+            'specialty_created',
             201
         );
     }
 
     public function show($id)
     {
-        $category = MartCategory::find($id);
+        $specialty = Specialty::with('subCategory')->find($id);
 
-        if (! $category) {
+        if (! $specialty) {
             return $this->error(
-                'mart_category_not_found',
+                'specialty_not_found',
                 404
             );
         }
 
         return $this->success(
-            $category,
-            'mart_category_fetched'
+            $specialty,
+            'specialty_fetched'
         );
     }
 
     public function update(Request $request, $id)
     {
-        $category = MartCategory::find($id);
+        $specialty = Specialty::find($id);
 
-        if (! $category) {
+        if (! $specialty) {
             return $this->error(
-                'mart_category_not_found',
+                'specialty_not_found',
                 404
             );
         }
 
         $validator = Validator::make($request->all(), [
+            'subcategory_id' => 'required|exists:sub_categories,id',
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -90,34 +87,33 @@ class MartCategoryController extends BaseApiController
             );
         }
 
-        $category->update($request->only([
-            'name',
-            'description',
-            'status',
-        ]));
+        $specialty->update([
+            'subcategory_id' => $request->subcategory_id,
+            'name' => $request->name,
+        ]);
 
         return $this->success(
-            $category,
-            'mart_category_updated'
+            $specialty->load('subCategory'),
+            'specialty_updated'
         );
     }
 
     public function destroy($id)
     {
-        $category = MartCategory::find($id);
+        $specialty = Specialty::find($id);
 
-        if (! $category) {
+        if (! $specialty) {
             return $this->error(
-                'mart_category_not_found',
+                'specialty_not_found',
                 404
             );
         }
 
-        $category->delete();
+        $specialty->delete();
 
         return $this->success(
             null,
-            'mart_category_deleted'
+            'specialty_deleted'
         );
     }
 }

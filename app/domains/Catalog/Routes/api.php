@@ -1,12 +1,12 @@
 <?php
 
-use App\Domains\Catalog\Admin\Controllers\Api\CategoryController;
-use App\Domains\Catalog\Admin\Controllers\Api\MartCategoryController;
-use App\Domains\Catalog\Admin\Controllers\Api\MartSubCategoryController;
-use App\Domains\Catalog\Admin\Controllers\Api\SkillController;
-use App\Domains\Catalog\Admin\Controllers\Api\SpecialtyController;
-use App\Domains\Catalog\Admin\Controllers\Api\SubcategoryController;
-use App\Domains\Catalog\Admin\Controllers\Api\SubSpecialtyController;
+use App\Domains\Catalog\Controllers\Api\CategoryController;
+use App\Domains\Catalog\Controllers\Api\MartCategoryController;
+use App\Domains\Catalog\Controllers\Api\MartSubCategoryController;
+use App\Domains\Catalog\Controllers\Api\SkillController;
+use App\Domains\Catalog\Controllers\Api\SpecialtyController;
+use App\Domains\Catalog\Controllers\Api\SubcategoryController;
+use App\Domains\Catalog\Controllers\Api\SubSpecialtyController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
@@ -25,6 +25,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::apiResource('specialties', SpecialtyController::class);
             Route::apiResource('sub-specialties', SubSpecialtyController::class);
             Route::apiResource('categories', CategoryController::class);
+
             Route::apiResource('subcategories', SubcategoryController::class);
             Route::apiResource('skills', SkillController::class);
 

@@ -1,12 +1,17 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Models;
+namespace App\Domains\Catalog\Models;
 
 use App\Models\Portfolio;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Skill extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['name'];
+
     protected $fillable = ['name'];
 
     protected $hidden = [

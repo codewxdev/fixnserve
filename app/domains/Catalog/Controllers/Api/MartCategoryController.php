@@ -1,29 +1,30 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Controllers\Api;
+namespace App\Domains\Catalog\Controllers\Api;
 
-use App\Domains\Catalog\Admin\Models\SubSpecialty;
+use App\Domains\Catalog\Models\MartCategory;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class SubSpecialtyController extends BaseApiController
+class MartCategoryController extends BaseApiController
 {
     public function index()
     {
-        $subSpecialties = SubSpecialty::with('specialty')->get();
+        $categories = MartCategory::latest()->get();
 
         return $this->success(
-            $subSpecialties,
-            'sub_specialties_fetched'
+            $categories,
+            'mart_categories_fetched'
         );
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'specialty_id' => 'required|exists:specialties,id',
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -34,49 +35,51 @@ class SubSpecialtyController extends BaseApiController
             );
         }
 
-        $subSpecialty = SubSpecialty::create([
-            'specialty_id' => $request->specialty_id,
-            'name' => $request->name,
-        ]);
+        $category = MartCategory::create($request->only([
+            'name',
+            'description',
+            'status',
+        ]));
 
         return $this->success(
-            $subSpecialty->load('specialty'),
-            'sub_specialty_created',
+            $category,
+            'mart_category_created',
             201
         );
     }
 
     public function show($id)
     {
-        $subSpecialty = SubSpecialty::with('specialty')->find($id);
+        $category = MartCategory::find($id);
 
-        if (! $subSpecialty) {
+        if (! $category) {
             return $this->error(
-                'sub_specialty_not_found',
+                'mart_category_not_found',
                 404
             );
         }
 
         return $this->success(
-            $subSpecialty,
-            'sub_specialty_fetched'
+            $category,
+            'mart_category_fetched'
         );
     }
 
     public function update(Request $request, $id)
     {
-        $subSpecialty = SubSpecialty::find($id);
+        $category = MartCategory::find($id);
 
-        if (! $subSpecialty) {
+        if (! $category) {
             return $this->error(
-                'sub_specialty_not_found',
+                'mart_category_not_found',
                 404
             );
         }
 
         $validator = Validator::make($request->all(), [
-            'specialty_id' => 'required|exists:specialties,id',
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -87,33 +90,34 @@ class SubSpecialtyController extends BaseApiController
             );
         }
 
-        $subSpecialty->update([
-            'specialty_id' => $request->specialty_id,
-            'name' => $request->name,
-        ]);
+        $category->update($request->only([
+            'name',
+            'description',
+            'status',
+        ]));
 
         return $this->success(
-            $subSpecialty->load('specialty'),
-            'sub_specialty_updated'
+            $category,
+            'mart_category_updated'
         );
     }
 
     public function destroy($id)
     {
-        $subSpecialty = SubSpecialty::find($id);
+        $category = MartCategory::find($id);
 
-        if (! $subSpecialty) {
+        if (! $category) {
             return $this->error(
-                'sub_specialty_not_found',
+                'mart_category_not_found',
                 404
             );
         }
 
-        $subSpecialty->delete();
+        $category->delete();
 
         return $this->success(
             null,
-            'sub_specialty_deleted'
+            'mart_category_deleted'
         );
     }
 }

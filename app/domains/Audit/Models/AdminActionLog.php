@@ -2,10 +2,15 @@
 
 namespace App\Domains\Audit\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class AdminActionLog extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['reason_code'];
+
     protected $guarded = [];
 
     public $timestamps = false;

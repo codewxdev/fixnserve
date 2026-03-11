@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Controllers\Api;
+namespace App\Domains\Catalog\Controllers\Api;
 
-use App\Domains\Catalog\Admin\Models\Subcategory;
+use App\Domains\Catalog\Models\Subcategory;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
