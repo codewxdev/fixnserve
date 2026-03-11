@@ -9,16 +9,6 @@
             <p class="text-sm text-[rgb(var(--text-muted))] mt-1">Control location-based behavior and restrictions.</p>
         </div>
         <div class="flex items-center gap-3">
-            <div class="hidden md:flex items-center text-xs text-[rgb(var(--text-muted))] bg-[rgb(var(--item-active-bg))] px-3 py-1.5 rounded-full border border-[rgb(var(--border-color))]">
-                <span class="font-medium text-[rgb(var(--brand-primary))]">Geo Config</span>
-                <svg class="w-3 h-3 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span>Routing Engine</span>
-                <svg class="w-3 h-3 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span>Availability</span>
-                <svg class="w-3 h-3 mx-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                <span>Apps</span>
-            </div>
-            
             <button id="emergencyLockBtn" onclick="toggleEmergencyLock()" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md inline-flex items-center transition duration-150 ease-in-out shadow-sm">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 Emergency Geo-Lock
@@ -26,8 +16,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6"> 
         <div class="xl:col-span-4 flex flex-col gap-6">
             <div class="bg-[rgb(var(--bg-card))] rounded-lg shadow-sm border border-[rgb(var(--border-color))]">
                 <div class="px-6 py-4 border-b border-[rgb(var(--border-color))] bg-[rgb(var(--item-active-bg))] rounded-t-lg">
