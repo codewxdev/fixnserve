@@ -5,11 +5,11 @@ namespace App\Domains\Command\Controllers\Api;
 use App\Domains\Audit\Services\AdminAuditService;
 use App\Domains\Command\Models\EmergencyOverride;
 use App\Domains\Command\Models\EmergencyOverrideLog;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
-class EmergencyOverrideController extends Controller
+class EmergencyOverrideController extends BaseApiController
 {
     protected $audit;
 
@@ -18,12 +18,9 @@ class EmergencyOverrideController extends Controller
         $this->audit = $audit;
     }
 
-    /**
-     * ACTIVATE emergency override
-     */
     public function activate(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'reason' => 'required|string|min:10',
             'duration_minutes' => 'nullable|integer|min:5|max:120',
         ]);
@@ -32,17 +29,15 @@ class EmergencyOverrideController extends Controller
             abort(403, 'Super Admin only');
         }
 
-        $duration = $request->duration_minutes ?? 30;
+        $duration = $validated['duration_minutes'] ?? 30;
 
-        // Create override
         $override = EmergencyOverride::create([
             'admin_id' => auth()->id(),
-            'reason' => $request->reason,
+            'reason' => $validated['reason'],
             'expires_at' => now()->addMinutes($duration),
             'active' => true,
         ]);
 
-        // Redis cache with auto-expiry
         Redis::setex(
             'emergency_override:admin:'.auth()->id(),
             $duration * 60,
@@ -52,7 +47,6 @@ class EmergencyOverrideController extends Controller
             ])
         );
 
-        // Override log
         EmergencyOverrideLog::create([
             'override_id' => $override->id,
             'admin_id' => auth()->id(),
@@ -60,7 +54,6 @@ class EmergencyOverrideController extends Controller
             'created_at' => now(),
         ]);
 
-        // 🔐 Enterprise Audit Log
         $this->audit->log([
             'action_type' => 'emergency_override_activated',
             'target_type' => 'EmergencyOverride',
@@ -72,10 +65,9 @@ class EmergencyOverrideController extends Controller
                 'duration_minutes' => $duration,
                 'ip' => $request->ip(),
             ],
-            'reason_code' => $request->reason,
+            'reason_code' => $validated['reason'],
         ]);
 
-        // High-risk duration detection
         if ($duration > 60) {
             $this->audit->log([
                 'action_type' => 'high_risk_override_duration',
@@ -85,15 +77,12 @@ class EmergencyOverrideController extends Controller
             ]);
         }
 
-        return response()->json([
-            'message' => 'Emergency override activated',
-            'expires_at' => $override->expires_at,
-        ]);
+        return $this->success(
+            ['expires_at' => $override->expires_at],
+            'emergency_override_activated'
+        );
     }
 
-    /**
-     * TERMINATE emergency override
-     */
     public function terminate(Request $request)
     {
         if (! auth()->user()->hasRole('Super Admin')) {
@@ -110,13 +99,10 @@ class EmergencyOverrideController extends Controller
 
         $oldState = $override->toArray();
 
-        // Update DB
         $override->update(['active' => false]);
 
-        // Remove Redis key
         Redis::del('emergency_override:admin:'.auth()->id());
 
-        // Override log
         EmergencyOverrideLog::create([
             'override_id' => $override->id,
             'admin_id' => auth()->id(),
@@ -124,7 +110,6 @@ class EmergencyOverrideController extends Controller
             'created_at' => now(),
         ]);
 
-        // 🔐 Enterprise Audit Log
         $this->audit->log([
             'action_type' => 'emergency_override_terminated',
             'target_type' => 'EmergencyOverride',
@@ -137,33 +122,26 @@ class EmergencyOverrideController extends Controller
             'reason_code' => 'Manual termination by Super Admin',
         ]);
 
-        return response()->json([
-            'message' => 'Emergency override terminated',
-        ]);
+        return $this->success(null, 'emergency_override_terminated');
     }
 
-    /**
-     * VIEW override logs
-     */
     public function logs()
     {
         if (! auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Super Admin only');
         }
 
-        return EmergencyOverrideLog::latest()->get();
+        $logs = EmergencyOverrideLog::latest()->get();
+
+        return $this->success($logs, 'override_logs_fetched');
     }
 
-    /**
-     * CRITICAL ACTION (Emergency Only)
-     */
     public function criticalAction(Request $request)
     {
         if (! auth()->user()->hasRole('Super Admin')) {
             abort(403, 'Super Admin only');
         }
 
-        // 🔐 Audit critical action
         $this->audit->log([
             'action_type' => 'emergency_critical_action_executed',
             'target_type' => 'System',
@@ -177,10 +155,12 @@ class EmergencyOverrideController extends Controller
             'reason_code' => 'Critical action executed under emergency override',
         ]);
 
-        return response()->json([
-            'message' => 'Critical action performed successfully!',
-            'performed_by' => auth()->id(),
-            'time' => now(),
-        ]);
+        return $this->success(
+            [
+                'performed_by' => auth()->id(),
+                'time' => now(),
+            ],
+            'critical_action_executed'
+        );
     }
 }

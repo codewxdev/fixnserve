@@ -2,10 +2,15 @@
 
 namespace App\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['action'];
+
     protected $fillable = [
         'admin_id',
         'action',

@@ -3,18 +3,18 @@
 namespace App\Domains\Command\Controllers\Api;
 
 use App\Domains\Command\Models\KillSwitch;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
 
-class KillSwitchController extends Controller
+class KillSwitchController extends BaseApiController
 {
     /**
      * Request a kill switch (Admin 1)
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'scope' => 'required|in:payments,orders,subscriptions,payouts,notifications',
             'type' => 'required|in:soft,hard',
             'reason' => 'required|string|min:10',
@@ -22,17 +22,17 @@ class KillSwitchController extends Controller
         ]);
 
         $kill = KillSwitch::create([
-            'scope' => $request->scope,
-            'type' => $request->type,
-            'reason' => $request->reason,
-            'expires_at' => $request->expires_at,
+            'scope' => $validated['scope'],
+            'type' => $validated['type'],
+            'reason' => $validated['reason'],
+            'expires_at' => $validated['expires_at'] ?? null,
             'created_by' => auth()->id(),
         ]);
 
-        return response()->json([
-            'message' => 'Kill switch request created',
-            'data' => $kill,
-        ], 201);
+        return $this->success(
+            $kill,
+            'kill_switch_request_created'
+        );
     }
 
     /**
@@ -40,19 +40,23 @@ class KillSwitchController extends Controller
      */
     public function cancel($id)
     {
-        $kill = KillSwitch::find($id);
+        $kill = KillSwitch::findOrFail($id);
 
         if ($kill->status != 'active') {
-            return response()->json(['message' => 'Invalid state'], 422);
+            return $this->error(
+                'invalid_kill_switch_state',
+                422
+            );
         }
 
         $kill->update(['status' => 'cancelled']);
 
         Redis::del("kill_switch:{$kill->scope}");
 
-        return response()->json([
-            'message' => 'Kill switch cancelled',
-        ]);
+        return $this->success(
+            null,
+            'kill_switch_cancelled'
+        );
     }
 
     /**
@@ -60,7 +64,11 @@ class KillSwitchController extends Controller
      */
     public function index()
     {
-        return KillSwitch::get();
+        $kills = KillSwitch::latest()->get();
 
+        return $this->success(
+            $kills,
+            'kill_switches_fetched'
+        );
     }
 }

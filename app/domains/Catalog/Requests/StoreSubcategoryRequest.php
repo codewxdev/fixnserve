@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domains\Catalog\Admin\Requests;
+namespace App\Domains\Catalog\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreCategoryRequest extends FormRequest
+class StoreSubcategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,7 +23,7 @@ class StoreCategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'type' => 'required|in:serviceProvider,professionalExpert,onlineConsultant,martVender',
+            'category_id' => 'required|exists:categories,id',
         ];
     }
 }

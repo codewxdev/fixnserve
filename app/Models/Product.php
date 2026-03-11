@@ -2,14 +2,19 @@
 
 namespace App\Models;
 
-use App\Domains\Catalog\Admin\Models\MartCategory;
-use App\Domains\Catalog\Admin\Models\MartSubCategory;
+use App\Domains\Catalog\Models\MartCategory;
+use App\Domains\Catalog\Models\MartSubCategory;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
     use HasFactory;
+    use HasTranslations;
+
+    public array $translatable = ['name',
+        'description'];
 
     protected $fillable = [
         'name',

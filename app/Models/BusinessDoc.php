@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use App\Domains\Security\Models\User;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class BusinessDoc extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['business_name', 'owner_name'];
+
     protected $fillable = [
         'business_name',
         'owner_name',

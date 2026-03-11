@@ -2,10 +2,15 @@
 
 namespace App\Domains\Audit\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class SecurityAuditLog extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['event_type'];
+
     protected $guarded = [];
 
     public $timestamps = false;

@@ -2,14 +2,14 @@
 
 namespace App\Domains\Command\Controllers\Api;
 
-use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Support\Facades\Redis;
 
-class QueueController
+class QueueController extends BaseApiController
 {
-    public function health(): JsonResponse
+    public function health()
     {
-        return response()->json([
+        $data = [
             [
                 'queue' => 'payment_processing',
                 'pending' => Redis::llen('queues:payment_processing') ?? 0,
@@ -24,6 +24,11 @@ class QueueController
                 'failure_rate' => 1.2,
                 'status' => 'paused',
             ],
-        ]);
+        ];
+
+        return $this->success(
+            $data,
+            'queue_health_fetched'
+        );
     }
 }

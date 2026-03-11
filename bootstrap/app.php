@@ -74,6 +74,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->encryptCookies(except: [
             'token',
         ]);
+        $middleware->use([
+            \Illuminate\Http\Middleware\HandleCors::class,
+        ]);
 
         $middleware->alias([
             'country.detect' => DetectCountry::class,

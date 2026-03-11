@@ -2,23 +2,23 @@
 
 namespace App\Domains\Command\Controllers\Api;
 
+use App\Http\Controllers\BaseApiController;
 use Illuminate\Support\Facades\Redis;
 
-class HealthController extends \App\Http\Controllers\Controller
+class HealthController extends BaseApiController
 {
     public function index()
     {
-        $keys = Redis::keys('metrics:summary:*'); // All endpoint metrics
+        $keys = Redis::keys('metrics:summary:*');
         $result = [];
 
         foreach ($keys as $key) {
+
             $endpoint = str_replace('metrics:summary:', '', $key);
             $metrics = Redis::hgetall($key);
 
-            // Total requests for error rate calculation
             $totalRequests = Redis::get("metrics:total_requests:$endpoint") ?? 1;
 
-            // Example dependency failures (DB, Redis, external API)
             $dependencies = [
                 'db' => Redis::get("metrics:deps:$endpoint:db") ?? 0,
                 'redis' => Redis::get("metrics:deps:$endpoint:redis") ?? 0,
@@ -36,6 +36,9 @@ class HealthController extends \App\Http\Controllers\Controller
             ];
         }
 
-        return response()->json($result);
+        return $this->success(
+            $result,
+            'health_metrics_fetched'
+        );
     }
 }

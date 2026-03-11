@@ -4,10 +4,16 @@ namespace App\Models;
 
 use App\Domains\Catalog\Admin\Models\Subcategory;
 use App\Domains\Security\Models\User;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Service extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['description',
+    ];
+
     protected $fillable = [
         'user_id',
         'category_id',
