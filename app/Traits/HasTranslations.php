@@ -48,6 +48,7 @@ trait HasTranslations
     // -----------------------------------------------
     public function setTranslations(string $field, array $localeValues): self
     {
+        // ✅ Get existing translations from column
         $translations = $this->translations ?? [];
 
         foreach ($localeValues as $locale => $value) {
@@ -56,8 +57,12 @@ trait HasTranslations
             }
         }
 
+        // ✅ Save back to translations column WITHOUT triggering observer again
         $this->translations = $translations;
-        $this->save();
+
+        static::withoutEvents(function () {
+            $this->save();
+        });
 
         return $this;
     }
@@ -96,6 +101,18 @@ trait HasTranslations
     // -----------------------------------------------
     // MAGIC: $post->title auto returns current locale
     // -----------------------------------------------
+    // public function getAttribute($key)
+    // {
+    //     if (
+    //         isset($this->translatable) &&
+    //         in_array($key, $this->translatable) &&
+    //         $this->exists
+    //     ) {
+    //         return $this->getTranslation($key);
+    //     }
+
+    //     return parent::getAttribute($key);
+    // }
     public function getAttribute($key)
     {
         if (
@@ -103,6 +120,15 @@ trait HasTranslations
             in_array($key, $this->translatable) &&
             $this->exists
         ) {
+            // ✅ Get raw value from attributes first
+            $rawValue = $this->attributes[$key] ?? null;
+
+            // ✅ If no translations exist yet, return raw value
+            $translations = $this->translations ?? [];
+            if (empty($translations)) {
+                return $rawValue;
+            }
+
             return $this->getTranslation($key);
         }
 
@@ -115,5 +141,24 @@ trait HasTranslations
     public function initializeHasTranslations(): void
     {
         $this->casts['translations'] = 'array';
+        $this->hidden[] = 'translations'; // ✅ adds to hidden automatically
+
+    }
+
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+
+        // Replace translatable fields with translated values
+        foreach ($this->translatable ?? [] as $field) {
+            if (isset($array[$field])) {
+                $array[$field] = $this->getTranslation($field);
+            }
+        }
+
+        // Remove translations column from all responses
+        unset($array['translations']);
+
+        return $array;
     }
 }

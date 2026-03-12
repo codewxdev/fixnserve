@@ -5,7 +5,7 @@ namespace App\Domains\Security\Console\Commands;
 use App\Domains\Security\Models\PrivilegeRequest;
 use Illuminate\Console\Command;
 
-class CheckPasswordRotation extends Command
+class RevokeExpiredPrivileges extends Command
 {
     public function handle()
     {
