@@ -20,6 +20,7 @@ use App\Domains\Security\Middlewares\MFAPolicyMiddleware;
 use App\Domains\Security\Middlewares\ValidateUserSession;
 use App\Domains\Security\Models\DualApproval;
 use App\Domains\System\Middlewares\ApplyPlatformDefaults;
+use App\Domains\System\Middlewares\CaptureConfigVersion;
 use App\Domains\System\Middlewares\CheckFeatureFlag;
 use App\Domains\System\Middlewares\CheckGeoLocation;
 use App\Domains\System\Middlewares\CheckRateLimit;
@@ -115,6 +116,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'geo.checkLocation' => CheckGeoLocation::class,
             'feature' => CheckFeatureFlag::class,
             'reason.code' => EnforceReasonCode::class,
+            'version.capture' => CaptureConfigVersion::class,
 
         ]);
     })
