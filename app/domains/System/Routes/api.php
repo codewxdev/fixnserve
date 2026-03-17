@@ -1,5 +1,6 @@
 <?php
 
+use App\Domains\System\Controllers\Api\ConfigurationVersioningController;
 use App\Domains\System\Controllers\Api\CountryController;
 use App\Domains\System\Controllers\Api\DualApprovalRuleController;
 use App\Domains\System\Controllers\Api\FeatureFlagController;
@@ -27,17 +28,20 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
 
             // Core Settings
             Route::get('/config', [GeoConfigurationController::class, 'getCoreSettings']);
-            Route::post('/config', [GeoConfigurationController::class, 'saveCoreSettings']);
+            Route::post('/config', [GeoConfigurationController::class, 'saveCoreSettings'])->middleware(['reason.code', 'version.capture']);
 
             // Geofences
             Route::get('/geofences', [GeoConfigurationController::class, 'getGeofences']);
             Route::post('/geofences', [GeoConfigurationController::class, 'addGeofence'])->middleware('reason.code');
-            Route::put('/geofences/{geofence}', [GeoConfigurationController::class, 'updateGeofence']);
-            Route::delete('/geofences/{geofence}', [GeoConfigurationController::class, 'deleteGeofence']);
+
+            Route::put('/geofences/{geofence}', [GeoConfigurationController::class, 'updateGeofence'])->middleware('version.capture');
+
+            Route::delete('/geofences/{geofence}', [GeoConfigurationController::class, 'deleteGeofence'])->middleware('version.capture');
+
             Route::patch('/geofences/{geofence}/toggle', [GeoConfigurationController::class, 'toggleGeofence']);
 
             // Emergency
-            Route::post('/emergency-lock', [GeoConfigurationController::class, 'emergencyGeoLock']);
+            Route::post('/emergency-lock', [GeoConfigurationController::class, 'emergencyGeoLock'])->middleware('version.capture');
 
             // Check location
             Route::post('/check-location', [GeoConfigurationController::class, 'checkLocation']);
@@ -47,17 +51,16 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
 
             // ✅ Get & Save limits
             Route::get('/', [RateLimitController::class, 'getConfig']);
-            Route::post('/save', [RateLimitController::class, 'saveLimits'])->middleware('reason.code');
+            Route::post('/save', [RateLimitController::class, 'saveLimits'])->middleware(['reason.code', 'version.capture']);
 
             // ✅ Emergency
-            Route::post('/emergency', [RateLimitController::class, 'emergencyThrottling']);
+            Route::post('/emergency', [RateLimitController::class, 'emergencyThrottling'])->middleware('version.capture');
 
             // ✅ Overrides
             Route::get('/overrides', [RateLimitController::class, 'getOverrides']);
             Route::post('/overrides', [RateLimitController::class, 'addOverride']);
             Route::delete('/overrides/{override}', [RateLimitController::class, 'deleteOverride']);
         });
-
         Route::prefix('access-control/grants')
             ->group(function () {
                 Route::get('/', [TimeBoundPrivilegeController::class, 'index']);   // Active grants
@@ -77,6 +80,25 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
                 Route::delete('/{reasonCode}', [ReasonCodeController::class, 'destroy']);
                 Route::post('/policy', [ReasonCodeController::class, 'savePolicy']);
             });
+        Route::prefix('config-versioning')->group(function () {
+            Route::get('/',
+                [ConfigurationVersioningController::class, 'index']);
+
+            Route::post('/manual-snapshot',
+                [ConfigurationVersioningController::class, 'createManualSnapshot']);
+
+            Route::get('/compare',
+                [ConfigurationVersioningController::class, 'compare']);
+
+            Route::get('/{snapshot}',
+                [ConfigurationVersioningController::class, 'show']);
+
+            Route::get('/{snapshot}/preview-rollback',
+                [ConfigurationVersioningController::class, 'previewRollback']);
+
+            Route::post('/{snapshot}/rollback',
+                [ConfigurationVersioningController::class, 'rollback']);
+        });
     });
 
     Route::prefix('countries')->group(function () {
