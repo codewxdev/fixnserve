@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class DomainRouteServiceProvider extends ServiceProvider
 {
@@ -25,7 +25,7 @@ class DomainRouteServiceProvider extends ServiceProvider
         foreach (File::directories($domainsPath) as $domainPath) {
 
             // app/domains/ModuleXyz/routes
-            $routesPath = $domainPath . '/routes';
+            $routesPath = $domainPath.'/Routes';
 
             if (! File::isDirectory($routesPath)) {
                 continue;
@@ -36,9 +36,9 @@ class DomainRouteServiceProvider extends ServiceProvider
             | Web Routes
             |--------------------------------------------------------------------------
             */
-            if (File::exists($routesPath . '/web.php')) {
+            if (File::exists($routesPath.'/web.php')) {
                 Route::middleware('web')
-                    ->group($routesPath . '/web.php');
+                    ->group($routesPath.'/web.php');
             }
 
             /*
@@ -46,10 +46,10 @@ class DomainRouteServiceProvider extends ServiceProvider
             | API Routes
             |--------------------------------------------------------------------------
             */
-            if (File::exists($routesPath . '/api.php')) {
+            if (File::exists($routesPath.'/api.php')) {
                 Route::prefix('api')
                     ->middleware('api')
-                    ->group($routesPath . '/api.php');
+                    ->group($routesPath.'/api.php');
             }
         }
     }

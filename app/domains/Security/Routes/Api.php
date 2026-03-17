@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
 
     Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login'])->middleware(['throttle:login', 'login.policy']);
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('login.policy');
     Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
     Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
     Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);

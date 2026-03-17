@@ -2,8 +2,10 @@
 
 namespace App\Observers;
 
+use App\Jobs\TranslateModelFields;
 use App\Services\TranslationService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class AutoTranslateObserver
 {
@@ -14,45 +16,60 @@ class AutoTranslateObserver
         $this->translator = $translator;
     }
 
-    // ✅ Fires automatically on every CREATE
     public function created(Model $model): void
     {
-        $this->translate($model);
+        Log::info('🔥 Observer fired for: '.get_class($model).' ID: '.$model->id);
+        $this->dispatchTranslation($model);
+
+        // $this->dispatchTranslation($model);
     }
 
-    // ✅ Fires automatically on every UPDATE
     public function updated(Model $model): void
     {
-        // Only re-translate if translatable fields changed
         if ($model->wasChanged($model->translatable ?? [])) {
-            $this->translate($model);
+            $this->dispatchTranslation($model);
         }
     }
 
-    private function translate(Model $model): void
+    private function dispatchTranslation(Model $model): void
     {
         if (empty($model->translatable)) {
             return;
         }
 
-        // Build array of fields to translate
+        // ✅ Fetch fresh model directly from DB — bypasses all trait issues
+        $freshModel = $model->newQuery()->find($model->id);
+
+        if (! $freshModel) {
+            \Log::info('❌ Fresh model not found for ID: '.$model->id);
+
+            return;
+        }
+
         $fieldsToTranslate = [];
         foreach ($model->translatable as $field) {
-            if (! empty($model->$field)) {
-                $fieldsToTranslate[$field] = $model->getRawOriginal($field) ?? $model->$field;
+            // ✅ Get raw value from fresh DB record
+            $value = $freshModel->getRawOriginal($field);
+
+            \Log::info("🔍 Field [{$field}] value: ".($value ?? 'NULL'));
+
+            if (! empty($value)) {
+                $fieldsToTranslate[$field] = $value;
             }
         }
+
+        \Log::info('📝 Fields to translate: '.json_encode($fieldsToTranslate));
 
         if (empty($fieldsToTranslate)) {
             return;
         }
 
-        // Auto translate all fields
-        $translated = $this->translator->translateFields($fieldsToTranslate);
+        TranslateModelFields::dispatch(
+            get_class($model),
+            $model->id,
+            $fieldsToTranslate
+        );
 
-        // Save without triggering observer again
-        foreach ($translated as $field => $locales) {
-            $model->setTranslations($field, $locales);
-        }
+        \Log::info('✅ Job dispatched for ID: '.$model->id);
     }
 }

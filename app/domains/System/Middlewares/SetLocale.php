@@ -8,16 +8,30 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
     public function handle(Request $request, Closure $next): Response
     {
         $country = app('country');
 
-        app()->setLocale($country->default_language);
+        // ✅ Check request locale first, fallback to country default
+        $requestedLocale = $request->header('Accept-Language')
+                        ?? $request->query('Accept-Language')
+                        ?? $request->query('locale')
+                        ?? null;
+
+        // ✅ Clean locale format (e.g. "ar-SA" → "ar")
+        if ($requestedLocale) {
+            $requestedLocale = strtolower(explode(',', $requestedLocale)[0]);
+            $requestedLocale = explode('-', $requestedLocale)[0];
+        }
+
+        // ✅ Use requested locale if valid, otherwise use country default
+        $availableLocales = config('app.available_locales', ['en', 'ar', 'fr', 'es', 'de', 'ur']);
+
+        $locale = ($requestedLocale && in_array($requestedLocale, $availableLocales))
+                    ? $requestedLocale
+                    : $country->default_language;
+
+        app()->setLocale($locale);
 
         return $next($request);
     }
