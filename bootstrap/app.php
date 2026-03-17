@@ -21,7 +21,10 @@ use App\Domains\Security\Middlewares\ValidateUserSession;
 use App\Domains\Security\Models\DualApproval;
 use App\Domains\System\Middlewares\ApplyPlatformDefaults;
 use App\Domains\System\Middlewares\CheckFeatureFlag;
+use App\Domains\System\Middlewares\CheckGeoLocation;
+use App\Domains\System\Middlewares\CheckRateLimit;
 use App\Domains\System\Middlewares\DetectCountry;
+use App\Domains\System\Middlewares\EnforceReasonCode;
 use App\Domains\System\Middlewares\InitializeLanguage;
 use App\Domains\System\Middlewares\SetCurrency;
 use App\Domains\System\Middlewares\SetLocale;
@@ -77,13 +80,16 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->use([
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+        $middleware->appendToGroup('api', [
+            CheckRateLimit::class,
+        ]);
 
         $middleware->alias([
+
             'country.detect' => DetectCountry::class,
             'locale.set' => SetLocale::class,
             'currency.set' => SetCurrency::class,
             'language.initialize' => InitializeLanguage::class,
-
             'platform.context' => ApplyPlatformDefaults::class,
             'network.security' => CheckNetworkSecurity::class,
             'device.bind' => CheckDeviceBinding::class,
@@ -106,8 +112,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'service.provider' => EnsureServiceProviderRole::class,
             'check_country' => EnsureCountryStatus::class,
             'block_soft_country_orders' => EnsureBlockOrdersForSoftDisabledCountry::class,
-
+            'geo.checkLocation' => CheckGeoLocation::class,
             'feature' => CheckFeatureFlag::class,
+            'reason.code' => EnforceReasonCode::class,
 
         ]);
     })
@@ -118,6 +125,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // $schedule->command('update:api-controllers')->weekly();
         $schedule->command('promotions:expire')->everyMinute();
         $schedule->command('security:password-rotation')->daily();
+        $schedule->command('privileges:revoke-expired')->everyMinute();
         $schedule->job(new CalculateApiMetrics)->everyMinute();
         $schedule->call(function () {
             // Activate scheduled maintenances

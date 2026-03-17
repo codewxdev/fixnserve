@@ -214,7 +214,7 @@
                     is_rooted: deviceInfo.is_rooted
                 };
 
-                const res = await fetch("http://localhost:8000/api/auth/login", {
+                const res = await fetch("{{ url('/api/auth/login') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -276,7 +276,7 @@
 
         // 4. Enable 2FA Setup
         function enable2FA(tempToken) {
-            fetch("http://localhost:8000/api/2fa/enable", {
+            fetch("{{ url('/api/2fa/enable') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -317,7 +317,7 @@
                     currentDeviceInfo = getDeviceInfo();
                 }
 
-                const res = await fetch("https://dashboard.sahorone.com/api/2fa/verify", {
+                const res = await fetch("{{ url('/api/2fa/verify') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -361,7 +361,7 @@
 
         // 4. Enable 2FA Setup
         function enable2FA(tempToken) {
-            fetch("https://dashboard.sahorone.com/api/2fa/enable", {
+            fetch("{{ url('/api/2fa/enable') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -402,7 +402,7 @@
                     currentDeviceInfo = getDeviceInfo();
                 }
 
-                const res = await fetch("https://dashboard.sahorone.com/api/2fa/verify", {
+                const res = await fetch("{{ url('/api/2fa/verify') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
