@@ -1,0 +1,704 @@
+﻿Folder PATH listing
+C:\XAMPP\HTDOCS\FIXNSERVE\APP   
++---Console
+|   \---Commands
+|           AddTranslationColumnToAllTables.php
+|           ExpirePromotionPurchases.php
+|           
++---Domains
+|   |   .DS_Store
+|   |   
+|   +---Accounts
+|   |   |   .DS_Store
+|   |   |   
+|   |   +---Controllers
+|   |   |   |   .DS_Store
+|   |   |   |   
+|   |   |   \---Front
+|   |   |           ConsultantController.php
+|   |   |           CustomerController.php
+|   |   |           MartController.php
+|   |   |           ProfessionalController.php
+|   |   |           ProviderController.php
+|   |   |           RiderController.php
+|   |   |           
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Requests
+|   |   |       StoreConsultantRequest.php
+|   |   |       StoreCustomerRequest.php
+|   |   |       StoreMartRequest.php
+|   |   |       StoreProfessionalRequest.php
+|   |   |       StoreProviderRequest.php
+|   |   |       StoreRiderRequest.php
+|   |   |       
+|   |   +---Routes
+|   |   |       web.php
+|   |   |       
+|   |   \---Services
+|   |           ConsultantBookingService.php
+|   |           ConsultantService.php
+|   |           CustomerService.php
+|   |           MartOnboardingService.php
+|   |           ServiceProvider.php
+|   |           
+|   +---Ai
+|   |   |   .DS_Store
+|   |   |   
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Analytics
+|   |   |   .DS_Store
+|   |   |   
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Audit
+|   |   |   .DS_Store
+|   |   |   
+|   |   +---Controllers
+|   |   |   +---Api
+|   |   |   |       AuditAdminController.php
+|   |   |   |       
+|   |   |   \---Front
+|   |   |           AuditController.php
+|   |   |           
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Middlewares
+|   |   |       AdminAuditMiddleware.php
+|   |   |       
+|   |   +---Models
+|   |   |       AdminActionLog.php
+|   |   |       SecurityAuditLog.php
+|   |   |       
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   |       api.php
+|   |   |       web.php
+|   |   |       
+|   |   \---Services
+|   |           AdminAuditService.php
+|   |           SecurityAuditService.php
+|   |           SecurityRiskEngine.php
+|   |           
+|   +---Catalog
+|   |   +---Controllers
+|   |   |   \---Api
+|   |   |           CategoryController.php
+|   |   |           MartCategoryController.php
+|   |   |           MartSubCategoryController.php
+|   |   |           SkillController.php
+|   |   |           SpecialtyController.php
+|   |   |           SubcategoryController.php
+|   |   |           SubSpecialtyController.php
+|   |   |           
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Models
+|   |   |       Category.php
+|   |   |       MartCategory.php
+|   |   |       MartSubCategory.php
+|   |   |       Skill.php
+|   |   |       Specialty.php
+|   |   |       Subcategory.php
+|   |   |       SubSpecialty.php
+|   |   |       
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Requests
+|   |   |       StoreCategoryRequest.php
+|   |   |       StoreSubcategoryRequest.php
+|   |   |       
+|   |   +---Routes
+|   |   |       api.php
+|   |   |       
+|   |   \---Services
+|   +---Cms
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Command
+|   |   |   .DS_Store
+|   |   |   
+|   |   +---Controllers
+|   |   |   +---Api
+|   |   |   |       EmergencyOverrideController.php
+|   |   |   |       HealthController.php
+|   |   |   |       IncidentController.php
+|   |   |   |       KillSwitchController.php
+|   |   |   |       MaintenanceController.php
+|   |   |   |       MetricsController.php
+|   |   |   |       QueueController.php
+|   |   |   |       
+|   |   |   \---Front
+|   |   |           MaintainanceController.php
+|   |   |           PlatformOverviewController.php
+|   |   |           RegionalController.php
+|   |   |           SystemHealthController.php
+|   |   |           
+|   |   +---Jobs
+|   |   |       CalculateApiMetrics.php
+|   |   |       
+|   |   +---Listeners
+|   |   +---Middlewares
+|   |   |       Ensure2FAEnabled.php
+|   |   |       EnsureActiveSession.php
+|   |   |       EnsureActiveSubscription.php
+|   |   |       EnsureApiHealthMetrics.php
+|   |   |       EnsureBlockOrdersForSoftDisabledCountry.php
+|   |   |       EnsureCountryStatus.php
+|   |   |       EnsureEmergencyOverrideMiddleware.php
+|   |   |       EnsureKillSwitch.php
+|   |   |       EnsureMaintenance.php
+|   |   |       
+|   |   +---Models
+|   |   |       EmergencyOverride.php
+|   |   |       EmergencyOverrideLog.php
+|   |   |       KillSwitch.php
+|   |   |       LoginHistory.php
+|   |   |       Maintenance.php
+|   |   |       
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   |       api.php
+|   |   |       web.php
+|   |   |       
+|   |   \---Services
+|   |           KillSwitchService.php
+|   |           MaintenanceService.php
+|   |           
+|   +---Delivery
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Disputes
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Finance
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Fraud
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Integrations
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Kyc
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Marketing
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Monetization
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Notifications
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Orders
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Payments
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---RBAC
+|   |   +---Controllers
+|   |   |   +---Api
+|   |   |   |       PermissionController.php
+|   |   |   |       RoleController.php
+|   |   |   |       RolePermissionController.php
+|   |   |   |       UserRoleController.php
+|   |   |   |       
+|   |   |   \---Front
+|   |   |           AccessMetrixController.php
+|   |   |           AuditGovernanceController.php
+|   |   |           PermissionController.php
+|   |   |           RoleController.php
+|   |   |           
+|   |   +---Middlewares
+|   |   |       EnsureCheckSuperAdmin.php
+|   |   |       EnsureServiceProviderRole.php
+|   |   |       
+|   |   +---Models
+|   |   |       Permission.php
+|   |   |       PermissionAuditLog.php
+|   |   |       Role.php
+|   |   |       
+|   |   +---Routes
+|   |   |       api.php
+|   |   |       web.php
+|   |   |       
+|   |   \---Services
+|   |           Audit.php
+|   |           
+|   +---Security
+|   |   +---Console
+|   |   |   \---Commands
+|   |   |           CheckPasswordRotation.php
+|   |   |           RevokeExpiredPrivileges.php
+|   |   |           
+|   |   +---Controllers
+|   |   |   +---Api
+|   |   |   |       AuthController.php
+|   |   |   |       AuthGovernanceController.php
+|   |   |   |       DeviceController.php
+|   |   |   |       DualApprovalController.php
+|   |   |   |       GeoRuleController.php
+|   |   |   |       IpRuleController.php
+|   |   |   |       PasswordResetCodeController.php
+|   |   |   |       PrivilegeRequestController.php
+|   |   |   |       SessionController.php
+|   |   |   |       TokenPolicyController.php
+|   |   |   |       
+|   |   |   \---Front
+|   |   |           SecuirtyController.php
+|   |   |           
+|   |   +---Middlewares
+|   |   |       CheckDeviceBinding.php
+|   |   |       CheckNetworkSecurity.php
+|   |   |       CheckScope.php
+|   |   |       CheckTokenRole.php
+|   |   |       Ensure2FAEnabled.php
+|   |   |       EnsureActiveSession.php
+|   |   |       EnsureAuthMiddleware.php
+|   |   |       LoginMethodPolicyMiddleware.php
+|   |   |       MFAPolicyMiddleware.php
+|   |   |       ValidateUserSession.php
+|   |   |       
+|   |   +---Models
+|   |   |       ApprovalAuditLog.php
+|   |   |       AuthPolicy.php
+|   |   |       Device.php
+|   |   |       DevicePolicy.php
+|   |   |       DualApproval.php
+|   |   |       GeoRule.php
+|   |   |       IpRule.php
+|   |   |       MFAPolicy.php
+|   |   |       PasswordPolicy.php
+|   |   |       PrivilegeRequest.php
+|   |   |       TokenPolicy.php
+|   |   |       User.php
+|   |   |       UserSession.php
+|   |   |       
+|   |   +---Policies
+|   |   +---Routes
+|   |   |       api.php
+|   |   |       web.php
+|   |   |       
+|   |   +---Rules
+|   |   |       DynamicPasswordRule.php
+|   |   |       
+|   |   \---Services
+|   |           AuthService.php
+|   |           
+|   +---Subscriptions
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   +---Support
+|   |   +---Controllers
+|   |   +---Dtos
+|   |   +---Enums
+|   |   +---Events
+|   |   +---Listeners
+|   |   +---Policies
+|   |   +---Repositories
+|   |   +---Routes
+|   |   \---Services
+|   \---System
+|       |   .DS_Store
+|       |   
+|       +---Console
+|       |   \---Commands
+|       |           RevokeExpiredPrivileges.php
+|       |           
+|       +---Controllers
+|       |   +---Api
+|       |   |       ConfigurationVersioningController.php
+|       |   |       CountryController.php
+|       |   |       DualApprovalRuleController.php
+|       |   |       FeatureFlagController.php
+|       |   |       GeoConfigurationController.php
+|       |   |       PlatformPreferenceController.php
+|       |   |       RateLimitController.php
+|       |   |       ReasonCodeController.php
+|       |   |       TimeBoundPrivilegeController.php
+|       |   |       
+|       |   \---Front
+|       |           SystemController.php
+|       |           
+|       +---Dtos
+|       +---Enums
+|       +---Events
+|       +---Helpers
+|       |       ResponseHelper.php
+|       |       
+|       +---languages
+|       |       ar.json
+|       |       en.json
+|       |       fr.json
+|       |       
+|       +---Listeners
+|       +---Middlewares
+|       |       ApplyPlatformDefaults.php
+|       |       CheckFeatureFlag.php
+|       |       CheckGeoLocation.php
+|       |       CheckRateLimit.php
+|       |       DetectCountry.php
+|       |       EnforceReasonCode.php
+|       |       InitializeLanguage.php
+|       |       LanguageMiddleware.php
+|       |       SetCurrency.php
+|       |       SetLocale.php
+|       |       
+|       +---Models
+|       |       ConfigurationSnapshot.php
+|       |       DualApprovalRule.php
+|       |       FeatureFlag.php
+|       |       FeatureFlagLog.php
+|       |       GeoConfiguration.php
+|       |       Geofence.php
+|       |       PlatformPreference.php
+|       |       RateLimitConfiguration.php
+|       |       ReasonCode.php
+|       |       ReasonCodePolicy.php
+|       |       TemporaryOverride.php
+|       |       TimeBoundPrivilege.php
+|       |       
+|       +---Policies
+|       +---Repositories
+|       +---Routes
+|       |       api.php
+|       |       web.php
+|       |       
+|       \---Services
+|               GeoService.php
+|               LocalizationService.php
+|               PlatformPreferenceService.php
+|               RateLimitService.php
+|               VersioningService.php
+|               
++---Helpers
+|       ApiResponse.php
+|       Global.php
+|       NotificationHelper.php
+|       
++---Http
+|   |   .DS_Store
+|   |   
+|   +---Controllers
+|   |   |   .DS_Store
+|   |   |   AuditLogController.php
+|   |   |   BaseApiController.php
+|   |   |   ConsultantBookingController.php
+|   |   |   Controller.php
+|   |   |   EmergencyOverrideController.php
+|   |   |   FavouriteController.php
+|   |   |   MetricsController.php
+|   |   |   OrderController.php
+|   |   |   PromotionController.php
+|   |   |   PromotionPurchaseController.php
+|   |   |   PromotionSlotController.php
+|   |   |   RatingController.php
+|   |   |   RiderVehicleController.php
+|   |   |   SubscriptionController.php
+|   |   |   SubscriptionEntitlementController.php
+|   |   |   SubscriptionPlanController.php
+|   |   |   SupportSlaLogController.php
+|   |   |   TransportTypeController.php
+|   |   |   WalletController.php
+|   |   |   WalletTransactionController.php
+|   |   |   
+|   |   +---Consultancy
+|   |   |       ConsultancyProfileController.php
+|   |   |       ConsultantWeekDayController.php
+|   |   |       
+|   |   +---Front
+|   |   |   |   .DS_Store
+|   |   |   |   AuthController.php
+|   |   |   |   CarController.php
+|   |   |   |   CmsController.php
+|   |   |   |   CodashboardController.php
+|   |   |   |   CooperateController.php
+|   |   |   |   FinanceController.php
+|   |   |   |   MarketingController.php
+|   |   |   |   NotificationController.php
+|   |   |   |   ReportController.php
+|   |   |   |   RolePermissionController.php
+|   |   |   |   ServiceController.php
+|   |   |   |   SubscriptionController.php
+|   |   |   |   
+|   |   |   \---User
+|   |   |           ConsultantController.php
+|   |   |           ProfessionalController.php
+|   |   |           ProviderController.php
+|   |   |           RiderController.php
+|   |   |           VendorController.php
+|   |   |           
+|   |   +---MartVender
+|   |   |       BusinessDocController.php
+|   |   |       ProductController.php
+|   |   |       
+|   |   +---Role
+|   |   \---ServiceProvider
+|   |           NotificationTypeController.php
+|   |           PortfolioController.php
+|   |           ServiceController.php
+|   |           ServiceProviderController.php
+|   |           UserEducationController.php
+|   |           UserExperienceController.php
+|   |           UserNotificationController.php
+|   |           UserPaymentController.php
+|   |           UserTransportationController.php
+|   |           
+|   +---Middleware
+|   |   |   EnsureActiveSubscription.php
+|   |   |   EnsureCheckUserStatus.php
+|   |   |   EnsureCountryStatus.php
+|   |   |   
+|   |   \---Admin
+|   \---Requests
+|           .DS_Store
+|           StoreOrderRequest.php
+|           StorePlanRequest.php
+|           
++---Imports
+|       ProductsImport.php
+|       
++---Jobs
+|       TranslateModelFields.php
+|       
++---Mail
+|       NotificationEmail.php
+|       ResetPasswordCodeMail.php
+|       
++---Models
+|       App.php
+|       AuditLog.php
+|       BlacklistedToken.php
+|       BusinessDoc.php
+|       Chat.php
+|       ChatMessage.php
+|       ConsultancyProfile.php
+|       ConsultantBooking.php
+|       ConsultantDayAvailability.php
+|       ConsultantWeekDay.php
+|       Country.php
+|       Currency.php
+|       Favourite.php
+|       NotificationType.php
+|       Order.php
+|       PasswordResetCode.php
+|       Payment.php
+|       Portfolio.php
+|       Product.php
+|       Promotion.php
+|       PromotionPurchase.php
+|       PromotionSlot.php
+|       Rating.php
+|       RiderEarning.php
+|       RiderLocationHistory.php
+|       RiderRequest.php
+|       RiderVehicle.php
+|       Service.php
+|       ServiceSubcategory.php
+|       Subscription.php
+|       SubscriptionEntitlement.php
+|       SubscriptionPlan.php
+|       SupportSlaLog.php
+|       SupportTicket.php
+|       TransportType.php
+|       UserCategory.php
+|       UserCertificate.php
+|       UserEducation.php
+|       UserExperience.php
+|       UserLanguage.php
+|       UserNotification.php
+|       UserPayment.php
+|       UserSkill.php
+|       UserSubcategory.php
+|       UserTransportation.php
+|       Wallet.php
+|       WalletTransaction.php
+|       
++---Notifications
+|       NewOrderNotification.php
+|       
++---Observers
+|       AutoTranslateObserver.php
+|       
++---Providers
+|       AppServiceProvider.php
+|       DomainRouteServiceProvider.php
+|       NotificationServiceProvider.php
+|       RouteServiceProvider.php
+|       
++---Services
+|       AuditLogService.php
+|       HierarchyService.php
+|       PhoneService.php
+|       ProfessionalService.php
+|       PromotionPurchaseService.php
+|       PromotionService.php
+|       PromotionSlotService.php
+|       SubscriptionEntitlementService.php
+|       SubscriptionPlanService.php
+|       SubscriptionService.php
+|       TranslationService.php
+|       
++---Traits
+|       HasTranslations.php
+|       
+\---View
+    \---Components
+        \---partials
+                Head.php
+                
+
+\---Routes
+|   api.php
+|   console.php
+|   web.php
+|   
++---Admin
+|       car.php
+|       cms.php
+|       codashboard.php
+|       consultant.php
+|       cooperation.php
+|       customer.php
+|       finance.php
+|       maintainance.php
+|       marketing.php
+|       mart.php
+|       notification.php
+|       platform_overview.php
+|       professional.php
+|       provider.php
+|       regional_controle.php
+|       report.php
+|       rider.php
+|       role_permission.php
+|       service.php
+|       subscription.php
+|       system_health.php
+|       
+\---User
+        consultant.php
+        professional.php
+        provider.php
+        rider.php
+        vendor.php
+        

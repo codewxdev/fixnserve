@@ -12,7 +12,11 @@ class Skill extends Model
 
     public array $translatable = ['name'];
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'translations'];
+
+    protected $casts = [
+        'translations' => 'array', // ✅ must be here
+    ];
 
     protected $hidden = [
         'created_at',
