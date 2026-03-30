@@ -64,7 +64,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             // });
         });
         // /////////middleware for blocking order for soft_disable country/////////
-        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders', 'platform.context'])->group(function () {
+        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders', 'platform.context', 'geo.checkLocation'])->group(function () {
             // //////////////////////////book slot for consultant////////////
             Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
         });
