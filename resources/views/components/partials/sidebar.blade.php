@@ -41,7 +41,8 @@
                 <button @click="toggle('command_centre')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'command_centre' ?
-                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                        'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'command_centre' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -63,13 +64,17 @@
                 </button>
                 <ul x-show="activeDropdown === 'command_centre' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"
                     x-cloak>
-                    <li><a href="{{route('platform_overview.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('platform_overview.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Platform Overview</a></li>
-                    <li><a href="{{ route('system_health.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('system_health.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">System Health</a></li>
-                    <li><a href="{{route('regional_controle.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('regional_controle.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Regional controle</a></li>
-                    <li><a href="{{route('maintainance_emergency.index')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('maintainance_emergency.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Maintainace & Emergency</a></li>
                 </ul>
             </li>
@@ -77,7 +82,8 @@
             <li>
                 <button @click="toggle('security')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'security' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'security' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -100,17 +106,23 @@
                 </button>
                 <ul x-show="activeDropdown === 'security' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"
                     x-cloak>
-                    <li><a href="{{ route('security.auth.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('security.auth.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Authentication</a></li>
-                    <li><a href="{{ route('security.sessions.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('security.sessions.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Sessions</a></li>
-                    <li><a href="{{ route('security.tokens.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('security.tokens.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Tokens</a></li>
-                    <li><a href="{{ route('security.devices.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('security.devices.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Devices</a></li>
-                    <li><a href="{{ route('security.network.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('security.network.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Network Security</a></li>
-                    <li><a href="{{ route('security.privileged_access.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('security.privileged_access.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Privileged Access</a></li>
                 </ul>
             </li>
@@ -118,7 +130,8 @@
             <li>
                 <button @click="toggle('rbac')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'rbac' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'rbac' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -140,13 +153,17 @@
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'rbac' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1" x-cloak>
-                    <li><a href="{{ route('roles.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('roles.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Roles</a></li>
-                    <li><a href="{{ route('permissions.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('permissions.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Permissions</a></li>
-                    <li><a href="{{ route('access-matrix.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('access-matrix.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Access Matrix</a></li>
-                    <li><a href="{{ route('audit-governance.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit-governance.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Audit & Governance</a></li>
                 </ul>
             </li>
@@ -154,7 +171,8 @@
             <li>
                 <button @click="toggle('audit')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'audit' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'audit' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -176,21 +194,29 @@
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'audit' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1" x-cloak>
-                    <li><a href="{{ route('audit.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Admin Action Audit Logs</a></li>
-                    <li><a href="{{ route('audit.financial_transaction') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.financial_transaction') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Financial & Transaction Audit</a></li>
-                    <li><a href="{{ route('audit.security_access') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.security_access') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Security & Access Audit</a></li>
-                    <li><a href="{{ route('audit.data_access_privacy_compliance') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.data_access_privacy_compliance') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Data Access & Privacy Compliance</a></li>
-                    <li><a href="{{ route('audit.regulatory_reporting_exports') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.regulatory_reporting_exports') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Regulatory Reporting & Exports</a></li>
-                    <li><a href="{{route('audit.data_retention_legal_holds')}}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.data_retention_legal_holds') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Data Retention & Legal Holds</a></li>
-                    <li><a href="{{ route('audit.user_activity_audit') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.user_activity_audit') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Audit Search, Replay & Forensics</a></li>
-                    <li><a href="{{ route('audit.compliance_monitoring_alerts') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('audit.compliance_monitoring_alerts') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Compliance Monitoring & Alerts</a></li>
                 </ul>
             </li>
@@ -198,7 +224,8 @@
             <li>
                 <button @click="toggle('settings')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'settings' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'settings' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -223,23 +250,31 @@
                 </button>
                 <ul x-show="activeDropdown === 'settings' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"
                     x-cloak>
-                    <li><a href="{{ route('settings.global') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.global') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Global Platform Preferences</a></li>
-                    <li><a href="{{ route('settings.feature_control') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.feature_control') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Feature Flag & Release Control</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Environment & Deployment Config</a></li>
-                    <li><a href="{{ route('settings.localization') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.localization') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Localization & Internationalization</a></li>
-                    <li><a href="{{ route('settings.geo') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.geo') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Geo & Map Configuration</a></li>
-                    <li><a href="{{ route('settings.rate_limit') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.rate_limit') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Rate Limits & Throttling</a></li>
-                    <li><a href="{{ route('settings.configuration_versioning') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.configuration_versioning') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Configuration Versioning & Rollback</a></li>
-                    <li><a href="{{ route('settings.configuration_impact_analysis') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.configuration_impact_analysis') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Configuration Impact Analysis</a></li>
-                    <li><a href="{{ route('settings.access_control') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('settings.access_control') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Access Control & Governance</a></li>
                 </ul>
             </li>
@@ -252,7 +287,8 @@
             <li>
                 <button @click="toggle('accounts')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'accounts' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'accounts' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -275,17 +311,23 @@
                 </button>
                 <ul x-show="activeDropdown === 'accounts' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"
                     x-cloak>
-                    <li><a href="{{ route('customer.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('customer.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Customers (Users)</a></li>
-                    <li><a href="{{ route('provider.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('provider.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Service Providers</a></li>
-                    <li><a href="{{ route('professional.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('professional.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Professional Experts</a></li>
-                    <li><a href="{{ route('consultant.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('consultant.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Consultants</a></li>
-                    <li><a href="{{ route('mart.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('mart.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Mart Vendors</a></li>
-                    <li><a href="{{ route('rider.index') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('rider.index') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Riders</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Future Verticals</a></li>
@@ -295,7 +337,8 @@
             <li>
                 <button @click="toggle('kyc')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'kyc' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'kyc' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -317,15 +360,20 @@
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'kyc' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1" x-cloak>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('admin.document.managment') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Document Management</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('admin.ai.verification.pipeline') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">AI Verification Pipeline</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('admin.orchestration.engine') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">KYC Orchestration Engine</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('admin.entity.specific.controls') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Entity-Specific KYC Controls</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('admin.compliance_governance') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Compliance & Governance</a></li>
                 </ul>
             </li>
@@ -338,7 +386,8 @@
             <li>
                 <button @click="toggle('catalog')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'catalog' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'catalog' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -378,7 +427,8 @@
                 <button @click="toggle('subscriptions')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'subscriptions' ?
-                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                        'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'subscriptions' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -416,7 +466,8 @@
             <li>
                 <button @click="toggle('monetization')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'monetization' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'monetization' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -462,7 +513,8 @@
             <li>
                 <button @click="toggle('orders')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'orders' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'orders' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -499,7 +551,8 @@
             <li>
                 <button @click="toggle('logistics')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'logistics' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'logistics' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -540,7 +593,8 @@
             <li>
                 <button @click="toggle('finance')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'finance' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'finance' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -582,7 +636,8 @@
                 <button @click="toggle('payment_gateways')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'payment_gateways' ?
-                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                        'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'payment_gateways' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -625,7 +680,8 @@
             <li>
                 <button @click="toggle('fraud')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'fraud' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'fraud' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -647,19 +703,25 @@
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'fraud' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1" x-cloak>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.risk_scoring_engine') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Risk Scoring Engine</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.session_Identity_Risk') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Session & Identity Risk</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.payment_wallet') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Payment & Wallet Abuse Detection</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.promotion_incentive_abuse') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Promotion & Incentive Abuse</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.collusion_networks') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Collusion & Network Fraud Detection</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.automated_enforcement_engine') }}"
+                            class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Automated Enforcement Engine</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('fraud.manual_overrides_governance') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Manual Overrides & Governance</a></li>
                 </ul>
             </li>
@@ -667,7 +729,8 @@
             <li>
                 <button @click="toggle('disputes')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'disputes' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'disputes' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -690,9 +753,9 @@
                 </button>
                 <ul x-show="activeDropdown === 'disputes' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"
                     x-cloak>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('dispute.complaint_intake_classification') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Complaint Intake & Classification</a></li>
-                    <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
+                    <li><a href="{{ route('dispute.evidence_context') }}" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Evidence & Context Management</a></li>
                     <li><a href="#" class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">AI Dispute Triage & Recommendations</a></li>
@@ -717,7 +780,8 @@
             <li>
                 <button @click="toggle('analytics')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'analytics' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'analytics' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -767,7 +831,8 @@
             <li>
                 <button @click="toggle('marketing')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'marketing' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'marketing' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -809,7 +874,8 @@
             <li>
                 <button @click="toggle('cms')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'cms' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'cms' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -856,7 +922,8 @@
                 <button @click="toggle('notifications')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
                     :style="activeDropdown === 'notifications' ?
-                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' : 'color: rgb(var(--text-muted));'">
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                        'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
                             :style="activeDropdown === 'notifications' ? 'color: rgb(var(--brand-primary))' : ''"
@@ -907,7 +974,8 @@
             <li>
                 <button @click="toggle('support')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'support' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'support' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -959,7 +1027,8 @@
             <li>
                 <button @click="toggle('ai')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'ai' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'ai' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -976,7 +1045,8 @@
                     <svg x-show="sidebarOpen" :class="activeDropdown === 'ai' ? 'rotate-180' : ''"
                         class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'ai' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1" x-cloak>
@@ -1011,7 +1081,8 @@
             <li>
                 <button @click="toggle('integrations')"
                     class="w-full group flex items-center justify-between py-3 px-3 rounded-lg transition-all duration-200 ease-in-out hover:bg-white/5"
-                    :style="activeDropdown === 'integrations' ? 'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
+                    :style="activeDropdown === 'integrations' ?
+                        'background-color: rgb(var(--item-active-bg)); color: rgb(var(--text-main));' :
                         'color: rgb(var(--text-muted));'">
                     <div class="flex items-center overflow-hidden">
                         <svg class="w-5 h-5 flex-shrink-0 transition-colors"
@@ -1029,7 +1100,8 @@
                     <svg x-show="sidebarOpen" :class="activeDropdown === 'integrations' ? 'rotate-180' : ''"
                         class="w-4 h-4 transition-transform duration-200 flex-shrink-0" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'integrations' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1"

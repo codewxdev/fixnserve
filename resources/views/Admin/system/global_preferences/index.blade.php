@@ -88,7 +88,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="theme-card theme-bg-card rounded-xl shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b theme-border">
                             <h5 class="text-lg font-bold flex items-center theme-text-main">Support Contact Details</h5>
@@ -238,176 +237,321 @@
 @endsection
 
 @push('scripts')
-    <script>
-        const API_BASE = "/api/admin/platform-preferences";
+<script>
+    const apiBase = '/api/admin/feature-flags';
+    let globalFlags = [];
 
-        function getHeaders() {
-            const token = localStorage.getItem('token');
-            const fingerprint = localStorage.getItem('device_fingerprint');
-            return {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content,
-                'X-Device-Fingerprint': fingerprint || '',
-                'Authorization': token ? `Bearer ${token}` : ''
-            };
+    // --- API Headers & CSRF ---
+    function getApiHeaders(includeContentType = false) {
+        const token = localStorage.getItem('token');
+        const fingerprint = localStorage.getItem('device_fingerprint');
+        const headers = {
+            'Accept': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+            'X-Device-Fingerprint': fingerprint || 'unknown',
+            'Authorization': token ? `Bearer ${token}` : ''
+        };
+        if (includeContentType) headers['Content-Type'] = 'application/json';
+        return headers;
+    }
+
+    // --- Toast Notification Logic ---
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toastMessage');
+        const text = document.getElementById('toastText');
+        text.innerText = message;
+        
+        toast.className = `fixed top-5 right-5 px-6 py-3 rounded shadow-lg transform transition-transform z-[100] flex items-center ${isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`;
+        toast.style.transform = "translateX(0)"; 
+
+        setTimeout(() => {
+            toast.style.transform = "translateX(150%)"; 
+        }, 3000);
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchFlags);
+
+    // --- Fetch Data (Bulletproof) ---
+    async function fetchFlags() {
+        try {
+            const res = await fetch(apiBase, { headers: getApiHeaders() });
+            const result = await res.json();
+            
+            // Accurately extract the array regardless of how Laravel wraps it
+            let extractedData = result?.data?.flags || result?.flags || result?.data || [];
+            if (extractedData.data && Array.isArray(extractedData.data)) {
+                extractedData = extractedData.data; // Catch Laravel pagination wrapper
+            }
+
+            globalFlags = Array.isArray(extractedData) ? extractedData : [];
+            
+            renderTable();
+            updateStats();
+        } catch (error) {
+            console.error('Error fetching flags:', error);
+            document.getElementById('flagsTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500 font-bold">Failed to load data. Check console.</td></tr>';
+        }
+    }
+
+    // --- Render Table & Action Buttons ---
+    function renderTable() {
+        const tbody = document.getElementById('flagsTableBody');
+        tbody.innerHTML = '';
+
+        if (globalFlags.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 theme-text-muted">No feature flags found. Create your first flag!</td></tr>';
+            return;
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadPreferences();
+        let rowsHTML = '';
+        globalFlags.forEach(flag => {
+            // Safely parse JSON value from DB
+            let val = {};
+            if (typeof flag.value === 'string') {
+                try { val = JSON.parse(flag.value); } catch(e) { console.error("Parse Error:", e); }
+            } else if (typeof flag.value === 'object' && flag.value !== null) {
+                val = flag.value;
+            }
+
+            let key = flag.key || 'N/A';
+            let name = val.name || key;
+            let type = flag.type || 'boolean';
+            let isEnabled = val.enabled == true; 
+            let dependencies = val.dependencies || '';
+
+            let typeBadgeColor = type === 'boolean' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
+                                 type === 'percentage' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
+            
+            let rolloutDisplay = '<span class="theme-text-main font-semibold">100% Global</span>';
+            if (type === 'percentage') {
+                let perc = val.rollout || 0;
+                rolloutDisplay = `
+                    <div class="flex items-center gap-2">
+                        <span class="theme-text-main font-bold w-10">${perc}%</span>
+                        <div class="w-full bg-gray-200/20 rounded-full h-1.5 border theme-border">
+                            <div class="bg-blue-500 h-1.5 rounded-full" style="width: ${perc}%"></div>
+                        </div>
+                    </div>`;
+            } else if(type === 'user_segment') {
+                rolloutDisplay = `<span class="theme-text-main font-semibold">${val.scope || 'All Segments'}</span>`;
+            }
+
+            // ADDED EDIT BUTTON HERE
+            rowsHTML += `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="px-5 py-4 border-b theme-border text-sm">
+                        <p class="theme-text-main font-bold">${name}</p>
+                        <p class="theme-text-muted text-xs mt-1 font-mono">Key: ${key} ${dependencies ? '<br>Dep: ' + dependencies : ''}</p>
+                    </td>
+                    <td class="px-5 py-4 border-b theme-border text-sm">
+                        <span class="${typeBadgeColor} border text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${type}</span>
+                    </td>
+                    <td class="px-5 py-4 border-b theme-border text-sm w-1/4">
+                        ${rolloutDisplay}
+                    </td>
+                    <td class="px-5 py-4 border-b theme-border text-sm">
+                        <label class="switch">
+                            <input type="checkbox" onchange="toggleStatus(${flag.id}, this.checked)" ${isEnabled ? 'checked' : ''}>
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <td class="px-5 py-4 border-b theme-border text-sm text-center">
+                        <button onclick="editFlag(${flag.id})" class="text-blue-500 hover:text-blue-400 mx-1 p-2 rounded hover:bg-white/5 transition-colors" title="Edit Flag">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteFlag(${flag.id})" class="text-red-500 hover:text-red-400 mx-1 p-2 rounded hover:bg-white/5 transition-colors" title="Delete Flag">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        tbody.innerHTML = rowsHTML;
+    }
+
+    // --- Update Stats ---
+    function updateStats() {
+        let activeCount = 0;
+        let rolloutCount = 0;
+
+        globalFlags.forEach(flag => {
+            let val = (typeof flag.value === 'string') ? JSON.parse(flag.value || '{}') : (flag.value || {});
+            if (val.enabled) activeCount++;
+            if (flag.type === 'percentage') rolloutCount++;
         });
 
-        async function loadPreferences() {
-            try {
-                // 1. Fetch current settings
-                const prefRes = await fetch(`${API_BASE}/current`, {
-                    headers: getHeaders()
-                });
-                const response = await prefRes.json();
+        document.getElementById('stat-total').innerText = globalFlags.length;
+        document.getElementById('stat-active').innerText = activeCount;
+        document.getElementById('stat-rollout').innerText = rolloutCount;
+        document.getElementById('stat-killed').innerText = globalFlags.length - activeCount;
+    }
 
-                // Ensure we work with the object structure provided by your controller
-                const data = response.settings || response;
+    // --- Modal Configuration ---
+    function openModal() {
+        document.getElementById('flagForm').reset();
+        document.getElementById('flagId').value = '';
+        
+        const keyInput = document.getElementById('flagKey');
+        keyInput.readOnly = false;
+        keyInput.classList.remove('opacity-50', 'cursor-not-allowed');
+        
+        document.getElementById('modalTitle').innerText = 'Create Feature Flag';
+        toggleDynamicFields();
+        document.getElementById('flagModal').classList.remove('hidden');
+    }
 
-                if (data) {
-                    // Fill Branding
-                    document.getElementById('platform_name').value = data.branding?.platform_name || '';
-                    document.getElementById('legal_name').value = data.branding?.legal_name || '';
+    function closeModal() { 
+        document.getElementById('flagModal').classList.add('hidden'); 
+    }
 
-                    // Fill Support
-                    document.getElementById('support_email').value = data.support?.email || '';
-                    document.getElementById('support_phone').value = data.support?.phone || '';
+    // --- Edit Flag Logic ---
+    function editFlag(id) {
+        const flag = globalFlags.find(f => f.id == id);
+        if (!flag) return;
 
-                    // Fill Regional (Dropdowns)
-                    document.getElementById('timezone').value = data.regional?.timezone || '';
-                    document.getElementById('currency').value = data.regional?.currency || '';
-                    document.getElementById('rounding_rules').value = data.regional?.rounding_rules || 'standard';
+        let val = (typeof flag.value === 'string') ? JSON.parse(flag.value || '{}') : (flag.value || {});
 
-                    // Fill Master Switches
-                    document.getElementById('flag_onboarding').checked = data.toggles?.allow_onboarding ?? false;
-                    document.getElementById('flag_major_flows').checked = data.toggles?.enable_major_flows ?? false;
+        document.getElementById('flagId').value = flag.id;
+        document.getElementById('flagName').value = val.name || flag.key;
+        
+        // Lock the key so it cannot be changed on edit
+        const keyInput = document.getElementById('flagKey');
+        keyInput.value = flag.key;
+        keyInput.readOnly = true;
+        keyInput.classList.add('opacity-50', 'cursor-not-allowed');
 
-                    if (data.rollout_mode) {
-                        document.getElementById('rollout_mode').value = data.rollout_mode;
-                    }
-                    // 2. Load Countries API and set value after options are populated
-                    await fetchCountries(data.regional?.country);
-                }
-            } catch (error) {
-                console.error("Error loading preferences:", error);
-            }
+        document.getElementById('flagType').value = flag.type;
+        document.getElementById('flagDependencies').value = val.dependencies || '';
+
+        if (flag.type === 'percentage') {
+            document.getElementById('flagPercentage').value = val.rollout || 50;
+            document.getElementById('percValue').innerText = val.rollout || 50;
+        } else if (flag.type === 'user_segment') {
+            document.getElementById('flagScope').value = val.scope || '';
         }
 
-        async function submitChanges() {
-            const btn = document.getElementById('confirmBtn');
-            const originalContent = btn.innerHTML;
-            setLoading(btn, true);
+        document.getElementById('modalTitle').innerText = 'Edit Feature Flag';
+        toggleDynamicFields();
+        document.getElementById('flagModal').classList.remove('hidden');
+    }
 
+    function generateKey() {
+        if(document.getElementById('flagId').value === '') {
+            let name = document.getElementById('flagName').value;
+            document.getElementById('flagKey').value = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '');
+        }
+    }
+
+    function toggleDynamicFields() {
+        const type = document.getElementById('flagType').value;
+        document.getElementById('fieldPercentage').classList.add('hidden');
+        document.getElementById('fieldScope').classList.add('hidden');
+
+        if (type === 'percentage') document.getElementById('fieldPercentage').classList.remove('hidden');
+        else if (type === 'user_segment') document.getElementById('fieldScope').classList.remove('hidden');
+    }
+
+    // --- Create/Update Logic ---
+    async function saveFlag(e) {
+        e.preventDefault();
+        const id = document.getElementById('flagId').value;
+        const type = document.getElementById('flagType').value;
+        
+        let valueData = {
+            name: document.getElementById('flagName').value.trim(),
+            enabled: true, 
+            dependencies: document.getElementById('flagDependencies').value.trim()
+        };
+
+        if(type === 'percentage') valueData.rollout = parseInt(document.getElementById('flagPercentage').value);
+        if(type === 'user_segment') valueData.scope = document.getElementById('flagScope').value.trim();
+
+        const payload = {
+            type: type,
+            value: valueData
+        };
+
+        // Key is only required for creation
+        if (!id) {
+            payload.key = document.getElementById('flagKey').value.trim();
+        }
+
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${apiBase}/${id}` : apiBase;
+
+        try {
+            const res = await fetch(url, {
+                method: method,
+                headers: getApiHeaders(true),
+                body: JSON.stringify(payload)
+            });
+            
+            const result = await res.json();
+
+            if(res.ok) {
+                showToast(id ? 'Flag Updated Successfully!' : 'New Flag Created Successfully!');
+                closeModal();
+                fetchFlags();
+            } else {
+                const errorMsg = result.errors ? Object.values(result.errors).flat().join('\n') : (result.message || 'Could not save flag');
+                showToast(`Validation Error: ${errorMsg}`, true);
+            }
+        } catch (error) {
+            showToast('Network error occurred.', true);
+        }
+    }
+
+    // --- Toggle Switch Logic (Kill-Switch) ---
+    async function toggleStatus(id, isActive) {
+        if (!id) return;
+        const flag = globalFlags.find(f => f.id == id);
+        if (!flag) return;
+        
+        let currentVal = (typeof flag.value === 'string') ? JSON.parse(flag.value || '{}') : (flag.value || {});
+        currentVal.enabled = isActive;
+
+        try {
+            const res = await fetch(`${apiBase}/${id}`, {
+                method: 'PUT',
+                headers: getApiHeaders(true),
+                body: JSON.stringify({ type: flag.type, value: currentVal })
+            });
+
+            if(res.ok) {
+                showToast(isActive ? 'Feature Enabled!' : 'Feature Disabled (Kill-Switched)!');
+                fetchFlags(); 
+            } else {
+                showToast('Failed to change status', true);
+            }
+        } catch (error) {
+            showToast('Network Error', true);
+        }
+    }
+
+    // --- Delete Logic ---
+    async function deleteFlag(id) {
+        if(!id) return;
+        const flag = globalFlags.find(f => f.id == id);
+        
+        if(confirm(`DANGER: Are you sure you want to permanently delete the flag "${flag.key}"?`)) {
             try {
-                // Building payload exactly as the Controller expects
-                const payload = {
-                    rollout_mode: document.getElementById('rollout_mode').value,
-                    settings: {
-                        branding: {
-                            platform_name: document.getElementById('platform_name').value,
-                            legal_name: document.getElementById('legal_name').value,
-                        },
-                        regional: {
-                            country: document.getElementById('country').value,
-                            timezone: document.getElementById('timezone').value,
-                            currency: document.getElementById('currency').value,
-                            rounding_rules: document.getElementById('rounding_rules').value
-                        },
-                        support: {
-                            email: document.getElementById('support_email').value,
-                            phone: document.getElementById('support_phone').value
-                        },
-                        toggles: {
-                            allow_onboarding: document.getElementById('flag_onboarding').checked,
-                            enable_major_flows: document.getElementById('flag_major_flows').checked
-                        },
-                        audit: {
-                            reason: document.getElementById('change_reason').value
-                        },
-                         
-                    },
-
-                };
-
-                const response = await fetch(`${API_BASE}/update`, {
-                    method: 'POST',
-                    headers: getHeaders(),
-                    body: JSON.stringify(payload)
+                const res = await fetch(`${apiBase}/${id}`, {
+                    method: 'DELETE',
+                    headers: getApiHeaders()
                 });
-
-                if (response.ok) {
-                    const resData = await response.json();
-                    alert(resData.message || 'Platform preferences updated successfully!');
-                    closeModal();
-                    window.location.reload();
+                
+                if(res.ok) {
+                    showToast('Flag deleted successfully.');
+                    fetchFlags();
                 } else {
-                    const errorData = await response.json();
-                    alert('Validation Error: ' + (errorData.message || 'Check your inputs.'));
+                    const err = await res.json();
+                    showToast(err.message || 'Failed to delete flag.', true);
                 }
             } catch (error) {
-                alert('Error syncing data: ' + error.message);
-            } finally {
-                setLoading(btn, false, originalContent);
+                showToast('Network Error', true);
             }
         }
-
-        function setLoading(btn, isLoading, content = "") {
-            if (isLoading) {
-                btn.innerHTML =
-                    `<svg class="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" viewBox="0 0 24 24"></svg> Processing...`;
-                btn.disabled = true;
-            } else {
-                btn.innerHTML = content;
-                btn.disabled = false;
-            }
-        }
-
-        async function fetchCountries(selectedCode = null) {
-            const countrySelect = document.getElementById('country');
-            const COUNTRIES_API = "http://127.0.0.1:8000/api/countries";
-
-            try {
-                const response = await fetch(COUNTRIES_API, {
-                    method: 'GET',
-                    headers: getHeaders()
-                });
-                const result = await response.json();
-                const countries = Array.isArray(result) ? result : result.data;
-
-                if (countries) {
-                    countrySelect.innerHTML = '<option value="">Select Country</option>';
-                    countries.forEach(country => {
-                        const option = document.createElement('option');
-                        option.value = country.code || country.id;
-                        option.textContent = country.name;
-                        option.className = "bg-slate-800";
-
-                        // If this is the saved country, select it
-                        if (option.value === selectedCode) {
-                            option.selected = true;
-                        }
-                        countrySelect.appendChild(option);
-                    });
-                }
-            } catch (error) {
-                console.error("Error fetching countries:", error);
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('validationModal').classList.add('hidden');
-        }
-
-        function confirmPublish() {
-            if (document.getElementById('preferencesForm').checkValidity()) {
-                document.getElementById('validationModal').classList.remove('hidden');
-            } else {
-                document.getElementById('preferencesForm').reportValidity();
-            }
-        }
-    </script>
+    }
+</script>
 @endpush

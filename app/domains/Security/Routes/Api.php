@@ -94,6 +94,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             });
         });
 
+        Route::get('/privileges', [PrivilegeRequestController::class, 'index']);
         Route::post('/privileges/request', [PrivilegeRequestController::class, 'requestElevation']);
         Route::post('/privileges/approve/{id}', [PrivilegeRequestController::class, 'approve']);
         Route::post('/privileges/deny/{id}', [PrivilegeRequestController::class, 'deny']);
