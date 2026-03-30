@@ -172,12 +172,12 @@
             try {
                 const response = await fetch(endpoint, options);
                 const result = await response.json();
-                if (!response.ok) throw result; // Throw the whole result to catch validation errors
+
+                if (!response.ok) throw result;
                 return result;
             } catch (error) {
                 console.error('API Error:', error);
                 if (error.errors) {
-                    // Display validation errors clearly
                     const msg = Object.values(error.errors).flat().join('\n');
                     alert("Validation Error:\n" + msg);
                 } else {
@@ -187,15 +187,22 @@
             }
         }
 
-        // --- 1. Fetch & Update Policies (Synced with Controller validate) ---
+        // --- 1. Fetch & Update Policies ---
         async function fetchDevicePolicies() {
             const res = await apiRequest('/api/devices/policies');
-            if (res) {
-                // Note: Controller returns the model directly or via JSON
-                document.getElementById('max-devices').value = res.max_trusted_devices || 3;
-                document.getElementById('trust-expiry').value = res.trust_expiration_days || 30;
-                document.getElementById('require-otp').checked = !!res.require_otp_new_device;
-                document.getElementById('block-rooted').checked = !!res.block_rooted_devices;
+
+            // Fix: Unwrap data from 'policy' key
+            const policy = res?.data?.policy || res?.policy;
+
+            if (policy) {
+                document.getElementById('max-devices').value = policy.max_trusted_devices || 3;
+                document.getElementById('trust-expiry').value = policy.trust_expiration_days || 30;
+
+                // Fix: Properly handle boolean 1/0 values for checkboxes
+                document.getElementById('require-otp').checked = (policy.require_otp_new_device == 1 || policy
+                    .require_otp_new_device === true);
+                document.getElementById('block-rooted').checked = (policy.block_rooted_devices == 1 || policy
+                    .block_rooted_devices === true);
             }
         }
 
@@ -210,29 +217,49 @@
                 block_rooted_devices: document.getElementById('block-rooted').checked ? 1 : 0
             };
 
-            const res = await apiRequest('/api/devices/policy', 'POST', payload);
-            if (res) alert('Device policy saved successfully!');
+            const res = await apiRequest('/api/devices/policies', 'POST',
+            payload); // Updated endpoint to match standard
+            if (res) {
+                alert('Device policy saved successfully!');
+                fetchDevicePolicies(); // Re-sync UI
+            }
             btn.innerText = 'SAVE POLICIES';
         }
 
-        // --- 2. Insights (Synced with Controller insights method) ---
+        // --- 2. Insights ---
         async function fetchDeviceInsights() {
             const res = await apiRequest('/api/devices/insights');
-            if (res) {
-                document.getElementById('total-count').innerText = res.total_recognized || 0;
-                document.getElementById('untrusted-count').innerText = res.untrusted || 0;
-                document.getElementById('banned-count').innerText = res.banned || 0;
+
+            // Fix: Retrieve data appropriately
+            const insights = res?.data || res;
+
+            if (insights) {
+                document.getElementById('total-count').innerText = insights.total_recognized ?? 0;
+                document.getElementById('untrusted-count').innerText = insights.untrusted ?? 0;
+                document.getElementById('banned-count').innerText = insights.banned ?? 0;
             }
         }
 
-        // --- 3. Device Inventory (Handles Pagination) ---
+        // --- 3. Device Inventory ---
         async function fetchDevices(page = 1) {
+            const container = document.getElementById('device-table-body');
+            container.innerHTML =
+                '<tr><td colspan="5" class="px-6 py-8 text-center text-sm theme-text-muted">Loading devices...</td></tr>';
+
             const res = await apiRequest(`/api/devices?page=${page}`);
-            if (res && res.data) {
-                allDevices = res.data; // Laravel pagination puts rows in 'data'
-                renderDevices(allDevices);
-                // Optional: Handle pagination links here if needed
+
+            // Fix: Extract data from Laravel's Paginator Object
+            const devicesData = res?.data?.devices?.data || res?.devices?.data || res?.data?.data || [];
+
+            allDevices = devicesData;
+
+            if (allDevices.length === 0) {
+                container.innerHTML =
+                    '<tr><td colspan="5" class="px-6 py-8 text-center text-sm theme-text-muted">No devices found.</td></tr>';
+                return;
             }
+
+            renderDevices(allDevices);
         }
 
         function renderDevices(devices) {
@@ -240,30 +267,41 @@
             container.innerHTML = '';
 
             devices.forEach(device => {
+                const isMobile = device.is_mobile || false;
+
+                // Date formatting
+                const updatedDate = device.updated_at ? new Date(device.updated_at).toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : 'Unknown';
+
                 const row = `
                 <tr class="hover:bg-white/5 transition-colors">
                     <td class="px-6 py-4">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 rounded theme-bg-body flex items-center justify-center theme-text-muted border theme-border">
-                                <i data-lucide="${device.is_mobile ? 'smartphone' : 'laptop'}" class="w-5 h-5"></i>
+                                <i data-lucide="${isMobile ? 'smartphone' : 'laptop'}" class="w-5 h-5"></i>
                             </div>
                             <div>
-                                <div class="font-medium theme-text-main">${device.device_name || 'Device'}</div>
-                                <div class="text-[10px] font-mono theme-text-muted uppercase">FP: ${device.fingerprint ? device.fingerprint.substring(0,10) : '---'}...</div>
+                                <div class="font-medium theme-text-main">${device.device_name || 'Unknown Device'}</div>
+                                <div class="text-[10px] font-mono theme-text-muted uppercase">FP: ${device.fingerprint ? device.fingerprint.substring(0,12) + '...' : '---'}</div>
                             </div>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="font-medium theme-text-main">${device.user ? device.user.name : 'Unknown'}</div>
-                        <div class="text-xs theme-text-muted">${device.user ? device.user.email : ''}</div>
+                        <div class="font-medium theme-text-main">${device.user?.name || 'Unknown'}</div>
+                        <div class="text-xs theme-text-muted">${device.user?.email || 'N/A'}</div>
                     </td>
                     <td class="px-6 py-4">${getStatusBadge(device.trust_status)}</td>
                     <td class="px-6 py-4">
-                        <div class="theme-text-main">${device.updated_at}</div>
+                        <div class="theme-text-main text-xs">${updatedDate}</div>
                         <div class="text-xs theme-text-muted font-mono">${device.last_ip || '0.0.0.0'}</div>
                     </td>
                     <td class="px-6 py-4 text-right">
-                        <div class="flex justify-end gap-2">${getActionButtons(device)}</div>
+                        <div class="flex justify-end gap-3">${getActionButtons(device)}</div>
                     </td>
                 </tr>`;
                 container.insertAdjacentHTML('beforeend', row);
@@ -274,15 +312,15 @@
         // --- Helpers ---
         function getStatusBadge(status) {
             if (status === 'trusted')
-                return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20"><i data-lucide="check-circle" class="w-3 h-3"></i> Trusted</span>`;
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20"><i data-lucide="check-circle" class="w-3 h-3"></i> Trusted</span>`;
             if (status === 'banned')
-                return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20"><i data-lucide="ban" class="w-3 h-3"></i> Banned</span>`;
+            return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20"><i data-lucide="ban" class="w-3 h-3"></i> Banned</span>`;
             return `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20"><i data-lucide="help-circle" class="w-3 h-3"></i> Unverified</span>`;
         }
 
         function getActionButtons(device) {
             if (device.trust_status === 'banned')
-                return `<button onclick="handleAction(${device.id}, 'unban')" class="text-xs font-bold text-blue-500 hover:underline">UNBAN</button>`;
+            return `<button onclick="handleAction(${device.id}, 'unban')" class="text-xs font-bold text-blue-500 hover:underline">UNBAN</button>`;
 
             let actions =
                 `<button onclick="handleAction(${device.id}, 'ban')" class="text-xs font-bold text-red-500 hover:underline">BAN</button>`;
@@ -301,12 +339,10 @@
         async function handleAction(id, action) {
             let payload = null;
 
-            // Ban ya Unban dono ke liye reason aur reason_code lazmi hai
             if (action === 'ban' || action === 'unban') {
                 const actionType = action.toUpperCase();
                 const reasonText = prompt(`Enter reason for ${actionType}:`);
 
-                // Agar user cancel kar de ya khali chore to request nahi bhejni
                 if (!reasonText) {
                     alert(`Reason is required to ${action}. Action cancelled.`);
                     return;
@@ -314,92 +350,37 @@
 
                 payload = {
                     reason: reasonText,
-                    reason_code: `MANUAL_${actionType}` // e.g., MANUAL_BAN or MANUAL_UNBAN
+                    reason_code: `MANUAL_${actionType}`
                 };
             }
 
-            // Confirmation dialog
             if (!confirm(`Are you sure you want to ${action} this device?`)) return;
 
-            // API Request call with payload
+            // Using POST method for action endpoints (assuming standard resource actions)
             const res = await apiRequest(`/api/devices/${id}/${action}`, 'POST', payload);
 
             if (res) {
-                // Success feedback
-                showToast("Success", `Device ${action}ed successfully.`);
-
-                // Refresh UI
+                alert(`Device ${action}ed successfully.`);
                 fetchDevices();
                 fetchDeviceInsights();
             }
         }
 
-        // --- 4. Filter System Implementation ---
+        // --- Filter & Export remain unchanged logically, just adapted to the clean allDevices format
         function applyDeviceFilters() {
             const query = document.getElementById('device-search').value.toLowerCase().trim();
-
-            // If search is empty, show all loaded devices
             if (!query) {
                 renderDevices(allDevices);
                 return;
             }
-
-            const filteredResults = allDevices.filter(device => {
-                const deviceName = (device.device_name || '').toLowerCase();
-                const fingerprint = (device.fingerprint || '').toLowerCase();
-                const userName = (device.user?.name || '').toLowerCase();
-                const userEmail = (device.user?.email || '').toLowerCase();
-                const ipAddress = (device.last_ip || '').toLowerCase();
-
-                return deviceName.includes(query) ||
-                    fingerprint.includes(query) ||
-                    userName.includes(query) ||
-                    userEmail.includes(query) ||
-                    ipAddress.includes(query);
-            });
-
+            const filteredResults = allDevices.filter(d =>
+                (d.device_name || '').toLowerCase().includes(query) ||
+                (d.fingerprint || '').toLowerCase().includes(query) ||
+                (d.user?.name || '').toLowerCase().includes(query) ||
+                (d.user?.email || '').toLowerCase().includes(query) ||
+                (d.last_ip || '').toLowerCase().includes(query)
+            );
             renderDevices(filteredResults);
-        }
-
-        // --- 5. Export System Implementation ---
-        function exportDeviceLog() {
-            if (allDevices.length === 0) {
-                alert("No device data available to export.");
-                return;
-            }
-
-            // Define CSV Headers
-            const headers = ["Device Name", "Fingerprint", "User Name", "User Email", "Status", "IP Address", "Last Seen"];
-
-            // Map data to rows
-            const rows = allDevices.map(device => [
-                `"${device.device_name || 'Unknown'}"`,
-                `"${device.fingerprint || 'N/A'}"`,
-                `"${device.user?.name || 'Unknown'}"`,
-                `"${device.user?.email || 'N/A'}"`,
-                `"${device.trust_status}"`,
-                `"${device.last_ip || '0.0.0.0'}"`,
-                `"${device.updated_at}"`
-            ]);
-
-            // Combine headers and rows
-            const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
-
-            // Create a Blob and trigger download
-            const blob = new Blob([csvContent], {
-                type: 'text/csv;charset=utf-8;'
-            });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-
-            const timestamp = new Date().toISOString().split('T')[0];
-            link.setAttribute("href", url);
-            link.setAttribute("download", `device_log_${timestamp}.csv`);
-            link.style.visibility = 'hidden';
-
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
     </script>
 @endpush

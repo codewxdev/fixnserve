@@ -8,6 +8,15 @@ use Illuminate\Http\Request;
 
 class PrivilegeRequestController extends BaseApiController
 {
+
+    public function index()
+    {
+        // Fetch all requests with their associated user data
+        $privileges = PrivilegeRequest::with('user')->latest()->get();
+
+        return $this->success(['privileges' => $privileges], 'Privileges fetched successfully');
+    }
+    
     public function requestElevation(Request $request)
     {
         $data = $request->validate([

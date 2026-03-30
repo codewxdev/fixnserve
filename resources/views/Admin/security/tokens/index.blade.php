@@ -181,7 +181,6 @@
         // --- API Helper ---
         async function apiRequest(endpoint, method = 'GET', body = null) {
             const token = localStorage.getItem('token');
-
             const fingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
 
             const options = {
@@ -198,7 +197,11 @@
             try {
                 const response = await fetch(endpoint, options);
                 const result = await response.json();
+                
+                // Assuming your BaseApiController's success method returns a status code or success flag
+                // Adjust this condition if your error format is different
                 if (!response.ok) throw new Error(result.message || 'Something went wrong');
+                
                 return result;
             } catch (error) {
                 console.error('API Error:', error);
@@ -210,12 +213,20 @@
         // --- 1. Fetch & Update Token Policies ---
         async function fetchPolicies() {
             const res = await apiRequest('/api/token-policy');
-            if (res && res.data) {
-                // Assuming first policy is the current one
-                const policy = res.data[0];
+            
+            // Fix: Access the 'token_policies' key from the response data
+            // Depending on how your BaseApiController formats the response, it might be in res.data.token_policies or res.token_policies
+            const policies = res?.data?.token_policies || res?.token_policies;
+
+            if (policies && policies.length > 0) {
+                const policy = policies[0]; // Get the first/current policy
+                
+                // Populate inputs dynamically
                 document.getElementById('policy-access-ttl').value = policy.access_token_ttl_minutes;
                 document.getElementById('policy-refresh-ttl').value = policy.refresh_token_ttl_days;
-                document.getElementById('policy-rotate').checked = !!policy.rotate_refresh_on_use;
+                
+                // Handle boolean for checkbox (Convert 1/0 to true/false)
+                document.getElementById('policy-rotate').checked = (policy.rotate_refresh_on_use == 1 || policy.rotate_refresh_on_use === true);
             }
         }
 
@@ -224,52 +235,73 @@
             btn.innerText = 'SAVING...';
 
             const payload = {
-                access_token_ttl_minutes: document.getElementById('policy-access-ttl').value,
-                refresh_token_ttl_days: document.getElementById('policy-refresh-ttl').value,
+                access_token_ttl_minutes: parseInt(document.getElementById('policy-access-ttl').value),
+                refresh_token_ttl_days: parseInt(document.getElementById('policy-refresh-ttl').value),
                 rotate_refresh_on_use: document.getElementById('policy-rotate').checked ? 1 : 0
             };
 
-            // As per your API: PUT /api/tokens
             const res = await apiRequest('/api/token-policy', 'PUT', payload);
-            if (res) alert('Policy updated successfully');
+            if (res) {
+                alert('Policy updated successfully');
+                // Optional: Re-fetch to ensure UI is in sync with DB
+                fetchPolicies(); 
+            }
             btn.innerText = 'SAVE POLICY CHANGES';
         }
 
         // --- 2. List Active Tokens ---
         async function fetchTokens() {
             const container = document.getElementById('tokens-table-body');
-            container.innerHTML = '<tr><td colspan="5" class="p-6 text-center">Loading tokens...</td></tr>';
+            container.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-sm theme-text-muted">Loading active tokens...</td></tr>';
 
-            const tokens = await apiRequest('/api/tokens'); // Mapping to your listTokens method
-            if (!tokens) return;
+            const res = await apiRequest('/api/tokens'); 
+            
+            // Fix: Access the 'tokens' array from the response object
+            const tokens = res?.data?.tokens || res?.tokens;
+
+            if (!tokens || !Array.isArray(tokens) || tokens.length === 0) {
+                container.innerHTML = '<tr><td colspan="5" class="px-6 py-8 text-center text-sm theme-text-muted">No active tokens found.</td></tr>';
+                return;
+            }
 
             container.innerHTML = '';
+            
             tokens.forEach(token => {
+                // Determine styling based on expiry
+                const isExpired = token.is_expired;
+                const statusBg = isExpired ? 'bg-red-500/10 text-red-500 border-red-500/20' : 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+                const statusText = isExpired ? 'EXPIRED' : 'ACTIVE';
+                
+                // Format Dates
+                const createdDate = new Date(token.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                const expireDate = token.expires_at ? new Date(token.expires_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'Never';
+                const lastUsed = token.last_used ? new Date(token.last_used).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) : 'Never used';
+
                 const row = `
                 <tr class="hover:bg-white/5 transition-colors">
                     <td class="px-6 py-4">
-                        <div class="font-medium theme-text-main">${token.device || 'Unknown Device'}</div>
+                        <div class="font-medium theme-text-main">${token.device || 'Unknown Device/Client'}</div>
                         <div class="font-mono text-xs theme-text-muted mt-1 flex items-center gap-1">
                             <span class="theme-bg-body border theme-border px-1 rounded">ID: ${token.id.substring(0,8)}...</span>
-                            <span class="px-1.5 py-0.5 rounded ${token.is_expired ? 'bg-red-500/10 text-red-500' : 'bg-blue-500/10 text-blue-500'} border border-blue-500/20 text-[10px] font-bold">
-                                ${token.is_expired ? 'EXPIRED' : 'ACTIVE'}
+                            <span class="px-1.5 py-0.5 rounded border text-[10px] font-bold ${statusBg}">
+                                ${statusText}
                             </span>
                         </div>
                     </td>
                     <td class="px-6 py-4">
                         <div class="flex flex-wrap gap-1">
-                            <span class="px-2 py-0.5 rounded-full theme-bg-body theme-text-muted text-xs border theme-border">standard:access</span>
+                            <span class="px-2 py-0.5 rounded-full theme-bg-body theme-text-muted text-xs border theme-border">API Access</span>
                         </div>
                     </td>
                     <td class="px-6 py-4">
-                        <div class="theme-text-main">${new Date(token.created_at).toLocaleDateString()}</div>
-                        <div class="text-xs ${token.is_expired ? 'text-red-500' : 'theme-text-muted'}">
-                            Exp: ${token.expires_at ? new Date(token.expires_at).toLocaleDateString() : 'Never'}
+                        <div class="theme-text-main">${createdDate}</div>
+                        <div class="text-xs ${isExpired ? 'text-red-500 font-bold' : 'theme-text-muted'}">
+                            Exp: ${expireDate}
                         </div>
                     </td>
                     <td class="px-6 py-4">
                         <span class="text-xs font-medium ${token.last_used ? 'text-green-500' : 'text-gray-500'}">
-                            ${token.last_used ? 'Active: ' + new Date(token.last_used).toLocaleTimeString() : 'Never used'}
+                            ${token.last_used ? 'Last active: ' + lastUsed : 'Never used'}
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right">
@@ -279,22 +311,19 @@
                         </div>
                     </td>
                 </tr>
-            `;
+                `;
                 container.insertAdjacentHTML('beforeend', row);
             });
         }
 
-        
         // --- 3. Actions: Rotate & Revoke ---
         async function rotateToken(id) {
             if (!confirm('Are you sure? Old tokens will be invalidated.')) return;
 
-            // LocalStorage se real fingerprint uthayen
             const realFingerprint = localStorage.getItem('device_fingerprint') || 'unknown';
-
             const deviceData = {
-                device_name: "Web Browser", // Aap navigation.userAgent se bhi nikal sakte hain
-                fingerprint: realFingerprint, // <-- Fake ki jagah Real fingerprint use karein
+                device_name: navigator.userAgent.substring(0, 50), 
+                fingerprint: realFingerprint,
                 os_version: navigator.platform,
                 app_version: '1.0.0'
             };
@@ -314,15 +343,6 @@
                 alert('Token revoked successfully');
                 fetchTokens();
             }
-        }
-
-        // Modal UI Logic
-        // function openCreateModal() {
-        //     document.getElementById('create-token-modal').classList.remove('hidden');
-        // }
-
-        function closeCreateModal() {
-            document.getElementById('create-token-modal').classList.add('hidden');
         }
     </script>
 @endpush
