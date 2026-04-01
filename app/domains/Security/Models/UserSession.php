@@ -18,7 +18,10 @@ class UserSession extends Model
         'expires_at',
         'revoked_at',
         'logout_at',
+        'longitude',
+        'latitude',
         'is_revoked',
+        'country',
         'device_id',
         'mfa_verified',
     ];

@@ -477,6 +477,7 @@ class AuthController extends BaseApiController
         // DO NOT use login() here
 
         $this->createSession($user, $token, $jwtId, $request);
+
         $this->audit->log([
             'action_type' => '2fa_verified',
             'target_type' => 'User',
@@ -583,7 +584,7 @@ class AuthController extends BaseApiController
             $longitude = null;
             $location = null;
         }
-
+        // dd($request->header('X-Latitude'));
         UserSession::create([
             'user_id' => $user->id,
             'jwt_id' => $jwtId,
@@ -591,10 +592,10 @@ class AuthController extends BaseApiController
             'device' => $device->device_name,
             'device_id' => $device->id,
             'ip_address' => $ip,
-            'country' => $country,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'location' => $location,
+            'country' => $country ?? $request->header('X-Country'),
+            'latitude' => $request->header('X-Latitude'),
+            'longitude' => $request->header('X-Longitude'),
+            'location' => $request->header('X-Location') ?? $location,
             'risk_score' => 0,
             'last_activity_at' => now(),
             'mfa_verified' => 1,
