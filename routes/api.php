@@ -64,12 +64,14 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             // });
         });
         // /////////middleware for blocking order for soft_disable country/////////
-        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders', 'platform.context', 'geo.checkLocation'])->group(function () {
-            // //////////////////////////book slot for consultant////////////
-            Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
-        });
+        Route::middleware(['block_soft_country_orders', 'check_maintenance:orders', 'kill:orders', 'platform.context', 'geo.checkLocation', 'risk.track',
+            'risk.velocity'])->group(function () {
+                // //////////////////////////book slot for consultant////////////
+                Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
+            });
         // ////////////////middleware for payment routes////////////////
-        Route::middleware('kill:payments', 'platform.context')->group(function () {});
+        Route::middleware('kill:payments', 'platform.context', 'risk.track',
+            'risk.velocity')->group(function () {});
 
         Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);

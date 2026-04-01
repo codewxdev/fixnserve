@@ -8,6 +8,11 @@ use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
 use App\Domains\Command\Middlewares\EnsureMaintenance;
 use App\Domains\Command\Models\KillSwitch;
+use App\Domains\Fraud\Middlewares\DetectDeviceReuse;
+use App\Domains\Fraud\Middlewares\DetectGeoInconsistency;
+use App\Domains\Fraud\Middlewares\DetectVelocityPattern;
+use App\Domains\Fraud\Middlewares\SessionRiskMiddleware;
+use App\Domains\Fraud\Middlewares\TrackRiskEvent;
 use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
 use App\Domains\Security\Middlewares\CheckDeviceBinding;
 use App\Domains\Security\Middlewares\CheckNetworkSecurity;
@@ -83,10 +88,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->appendToGroup('api', [
             CheckRateLimit::class,
+            DetectDeviceReuse::class,
+            DetectGeoInconsistency::class,
+            SessionRiskMiddleware::class,
         ]);
 
         $middleware->alias([
-
             'country.detect' => DetectCountry::class,
             'locale.set' => SetLocale::class,
             'currency.set' => SetCurrency::class,
@@ -117,8 +124,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'feature' => CheckFeatureFlag::class,
             'reason.code' => EnforceReasonCode::class,
             'version.capture' => CaptureConfigVersion::class,
+            'risk.track' => TrackRiskEvent::class,
+            'risk.device' => DetectDeviceReuse::class,
+            'risk.geo' => DetectGeoInconsistency::class,
+            'risk.velocity' => DetectVelocityPattern::class,
+            'session.risk' => SessionRiskMiddleware::class,
 
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
