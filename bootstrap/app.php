@@ -11,6 +11,9 @@ use App\Domains\Command\Models\KillSwitch;
 use App\Domains\Fraud\Middlewares\DetectDeviceReuse;
 use App\Domains\Fraud\Middlewares\DetectGeoInconsistency;
 use App\Domains\Fraud\Middlewares\DetectVelocityPattern;
+use App\Domains\Fraud\Middlewares\ScanCollusionAbuse;
+use App\Domains\Fraud\Middlewares\ScanPaymentAbuse;
+use App\Domains\Fraud\Middlewares\ScanPromoAbuse;
 use App\Domains\Fraud\Middlewares\SessionRiskMiddleware;
 use App\Domains\Fraud\Middlewares\TrackRiskEvent;
 use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
@@ -36,10 +39,11 @@ use App\Domains\System\Middlewares\SetCurrency;
 use App\Domains\System\Middlewares\SetLocale;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -129,12 +133,39 @@ return Application::configure(basePath: dirname(__DIR__))
             'risk.geo' => DetectGeoInconsistency::class,
             'risk.velocity' => DetectVelocityPattern::class,
             'session.risk' => SessionRiskMiddleware::class,
+            'payment.abuse.scan' => ScanPaymentAbuse::class,
+            'collusion.scan' => ScanCollusionAbuse::class,
+            'promo.abuse.scan' => ScanPromoAbuse::class,   // //////////use on promo application routes
 
         ]);
 
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function ($exceptions) {
+
+        // Model / Route not found
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data not found',
+                'language' => app()->getLocale(),
+                'data' => [],
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+            ], 404);
+        });
+
+        // Validation error
+        $exceptions->render(function (ValidationException $e, $request) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'language' => app()->getLocale(),
+                'data' => [
+                    'errors' => $e->errors(),
+                ],
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+            ], 422);
+        });
+
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         // $schedule->command('update:api-controllers')->weekly();

@@ -69,9 +69,11 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
                 // //////////////////////////book slot for consultant////////////
                 Route::post('bookSlot', [ConsultantBookingController::class, 'bookSlot']);
             });
+        // 'payment.abuse.scan' add to all payment related routes
         // ////////////////middleware for payment routes////////////////
-        Route::middleware('kill:payments', 'platform.context', 'risk.track',
-            'risk.velocity')->group(function () {});
+        // ////////collusion.scan will be added to all routes that need to be scanned for collusion abuse patterns (e.g., orders, reviews)//////////
+        Route::middleware('kill:payments', 'platform.context', 'risk.track', 'payment.abuse.scan',
+            'risk.velocity', 'collusion.scan')->group(function () {});
 
         Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
