@@ -8,6 +8,8 @@ use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
 use App\Domains\Command\Middlewares\EnsureMaintenance;
 use App\Domains\Command\Models\KillSwitch;
+use App\Domains\Command\Models\Maintenance;
+use App\Domains\Disputes\Middlewares\AutoGenerateComplaint;
 use App\Domains\Fraud\Middlewares\DetectDeviceReuse;
 use App\Domains\Fraud\Middlewares\DetectGeoInconsistency;
 use App\Domains\Fraud\Middlewares\DetectVelocityPattern;
@@ -135,6 +137,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'session.risk' => SessionRiskMiddleware::class,
             'payment.abuse.scan' => ScanPaymentAbuse::class,
             'collusion.scan' => ScanCollusionAbuse::class,
+            'complaint.auto' => AutoGenerateComplaint::class,
             'promo.abuse.scan' => ScanPromoAbuse::class,   // //////////use on promo application routes
 
         ]);
@@ -172,14 +175,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('promotions:expire')->everyMinute();
         $schedule->command('security:password-rotation')->daily();
         $schedule->command('privileges:revoke-expired')->everyMinute();
+        $schedule->command('complaints:check-sla')->everyFiveMinutes();
         $schedule->job(new CalculateApiMetrics)->everyMinute();
         $schedule->call(function () {
             // Activate scheduled maintenances
-            App\Domains\Command\Models\Maintenance::where('status', 'scheduled')
+            Maintenance::where('status', 'scheduled')
                 ->where('starts_at', '<=', now())
                 ->update(['status' => 'active']);
             // Auto-expire finished maintenances
-            App\Domains\Command\Models\Maintenance::where('status', 'active')
+            Maintenance::where('status', 'active')
                 ->whereNotNull('ends_at')
                 ->where('ends_at', '<=', now())
                 ->update(['status' => 'cancelled']);

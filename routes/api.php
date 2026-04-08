@@ -72,8 +72,9 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
         // 'payment.abuse.scan' add to all payment related routes
         // ////////////////middleware for payment routes////////////////
         // ////////collusion.scan will be added to all routes that need to be scanned for collusion abuse patterns (e.g., orders, reviews)//////////
+        // ////////////compaint.auto will be added to all routes that can generate complaints (e.g., orders, payments, support interactions)//////////
         Route::middleware('kill:payments', 'platform.context', 'risk.track', 'payment.abuse.scan',
-            'risk.velocity', 'collusion.scan')->group(function () {});
+            'risk.velocity', 'collusion.scan', 'complaint.auto')->group(function () {});
 
         Route::post('/favorite/toggle', [FavouriteController::class, 'toggleFavorite']);
         Route::get('/favorite/list', [FavouriteController::class, 'listFavorites']);
