@@ -47,18 +47,33 @@ class RefundProcessingService
     // ✅ Wallet Refund
     private function processWalletRefund(RefundRequest $refund): void
     {
+        $walletId = DB::table('wallets')
+            ->where('user_id', $refund->entity_id)
+            ->value('id');
+
+        if (! $walletId) {
+            $walletId = DB::table('wallets')->insertGetId([
+                'user_id' => $refund->entity_id,
+                'balance' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
         // dd($refund);
         DB::table('wallet_transactions')->insert([
             'user_id' => $refund->entity_id,
             'type' => 'refund',
             'amount' => $refund->approved_amount,
-            'wallet_id' => $refund->wallet_id, // <- add this
+            'wallet_id' => $walletId, // ✅ now coming from DB
 
             'reference_id' => $refund->refund_id,
             'description' => "Refund for {$refund->order_ref}",
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('wallets')
+            ->where('id', $walletId)
+            ->increment('balance', $refund->approved_amount);
 
         Log::info("💳 Wallet credited: Rs.{$refund->approved_amount} to user {$refund->entity_id}");
     }

@@ -1,10 +1,12 @@
 <?php
 
+use App\Domains\Disputes\Controllers\Api\AppealController;
 use App\Domains\Disputes\Controllers\Api\ComplaintIntakeController;
 use App\Domains\Disputes\Controllers\Api\RefundEngineController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
+    Route::post('refunds', [RefundEngineController::class, 'store']);
     Route::middleware(['auth:api', 'role:Super Admin', '2fa', 'user.active', 'active.session'])->group(function () {
 
         Route::prefix('complaints')->group(function () {
@@ -26,7 +28,6 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
 
             Route::get('/dashboard', [RefundEngineController::class, 'dashboard']);
             Route::get('/', [RefundEngineController::class, 'index']);
-            Route::post('/', [RefundEngineController::class, 'store']);
             Route::get('/preview', [RefundEngineController::class, 'calculatePreview']);
             Route::get('/policy', [RefundEngineController::class, 'getPolicy']);
             Route::put('/policy/{policy}', [RefundEngineController::class, 'updatePolicy']);
@@ -36,6 +37,35 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::post('/{refund}/partial', [RefundEngineController::class, 'partialRefund']);
             Route::post('/{refund}/escalate-finance', [RefundEngineController::class, 'escalateToFinance']);
         });
+        Route::prefix('appeals')
+            ->group(function () {
+
+                // ✅ Admin routes
+                Route::get('/dashboard', [AppealController::class, 'dashboard']);
+                Route::get('/', [AppealController::class, 'index']);
+                Route::get('/export', [AppealController::class, 'export']);
+                Route::get('/policy', [AppealController::class, 'getPolicy']);
+                Route::put('/policy/{policy}', [AppealController::class, 'updatePolicy']);
+
+                // ✅ User routes
+                Route::get('/check-eligibility', [AppealController::class, 'checkEligibility']);
+
+                Route::post(
+                    '/',
+                    [AppealController::class, 'store']
+                )->middleware('appeal.eligible'); 
+
+                // ✅ Detail & Evidence
+                Route::get('/{appeal}', [AppealController::class, 'show']);
+                Route::post('/{appeal}/add-evidence', [AppealController::class, 'addEvidence']);
+
+                // ✅ Review Actions (Admin)
+                Route::post('/{appeal}/assign-reviewer', [AppealController::class, 'assignReviewer']);
+                Route::post('/{appeal}/uphold', [AppealController::class, 'uphold']);
+                Route::post('/{appeal}/overturn', [AppealController::class, 'overturn']);
+                Route::post('/{appeal}/partial-decision', [AppealController::class, 'partialDecision']);
+                Route::post('/{appeal}/lock-case', [AppealController::class, 'lockCase']);
+            });
 
     });
 });
