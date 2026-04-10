@@ -3,6 +3,7 @@
 namespace App\Domains\Disputes\Console\Commands;
 
 use App\Domains\Disputes\Services\ComplaintClassificationService;
+use App\Domains\Disputes\Services\SlaEscalationService;
 use Illuminate\Console\Command;
 
 class CheckSlaBreaches extends Command
@@ -26,9 +27,18 @@ class CheckSlaBreaches extends Command
      */
     public function handle(): void
     {
-        $breached = app(ComplaintClassificationService::class)
+        $this->info('Starting SLA check...');
+
+        $classificationBreaches = app(ComplaintClassificationService::class)
             ->checkSlaBreaches();
 
-        $this->info("✅ SLA check complete. Breached: {$breached}");
+        $slaResults = app(SlaEscalationService::class)
+            ->checkBreaches();
+
+        $this->info("Classification breaches: {$classificationBreaches}");
+        $this->info("SLA breached: {$slaResults['breached']}");
+        $this->info("SLA approaching: {$slaResults['approaching']}");
+
+        $this->info('✅ SLA check finished');
     }
 }
