@@ -207,7 +207,9 @@ class AuthController extends BaseApiController
 
         if (
             $mfaPolicy->enforcement_policy === 'admins_only' &&
-            $user->hasRole(['Admin', 'Super Admin'])
+            $user->hasRole('Admin')
+
+            // $user->hasRole(['Admin', 'Super Admin'])
         ) {
             $mfaRequired = true;
         }

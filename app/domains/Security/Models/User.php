@@ -4,7 +4,7 @@ namespace App\Domains\Security\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Domains\Audit\Models\SecurityAuditLog;
-use App\Domains\Catalog\Admin\Models\Skill;
+use App\Domains\Catalog\Models\Skill;
 use App\Models\Country;
 use App\Models\Favourite;
 use App\Models\LoginHistory;
@@ -167,10 +167,10 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    public function loginHistories()
-    {
-        return $this->hasMany(LoginHistory::class);
-    }
+    // public function loginHistories()
+    // {
+    //     return $this->hasMany(LoginHistory::class);
+    // }
 
     public function skills()
     {

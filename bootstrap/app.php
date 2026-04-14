@@ -10,6 +10,9 @@ use App\Domains\Command\Middlewares\EnsureMaintenance;
 use App\Domains\Command\Models\KillSwitch;
 use App\Domains\Command\Models\Maintenance;
 use App\Domains\Disputes\Middlewares\AutoGenerateComplaint;
+use App\Domains\Disputes\Middlewares\CheckAbuseRestrictions;
+use App\Domains\Disputes\Middlewares\StartSlaTracking;
+use App\Domains\Disputes\Middlewares\ValidateAppealEligibility;
 use App\Domains\Fraud\Middlewares\DetectDeviceReuse;
 use App\Domains\Fraud\Middlewares\DetectGeoInconsistency;
 use App\Domains\Fraud\Middlewares\DetectVelocityPattern;
@@ -97,6 +100,7 @@ return Application::configure(basePath: dirname(__DIR__))
             DetectDeviceReuse::class,
             DetectGeoInconsistency::class,
             SessionRiskMiddleware::class,
+            CheckAbuseRestrictions::class,
         ]);
 
         $middleware->alias([
@@ -139,6 +143,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'collusion.scan' => ScanCollusionAbuse::class,
             'complaint.auto' => AutoGenerateComplaint::class,
             'promo.abuse.scan' => ScanPromoAbuse::class,   // //////////use on promo application routes
+            'appeal.eligible' => ValidateAppealEligibility::class, // / check on appeal submission routes
+            'sla.track' => StartSlaTracking::class,       // ///////`use on complaint/appeal/refund creation routes
+            'abuse.check' => CheckAbuseRestrictions::class,
+            'legal.hold' => \App\Domains\Disputes\Middlewares\CheckLegalHold::class, // / check on any route that modifies user/order data that could be under legal hold
 
         ]);
 
