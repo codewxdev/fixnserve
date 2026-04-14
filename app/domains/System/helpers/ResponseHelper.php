@@ -19,16 +19,13 @@ class ResponseHelper
 
     public static function error($message = 'error', $statusCode = 400, $data = [])
     {
-        http_response_code($statusCode);
-        header('Content-Type: application/json');
-
-        return json_encode([
+        return response()->json([
             'status' => LanguageMiddleware::getMessage('status_error'),
             'message' => LanguageMiddleware::getMessage($message),
             'language' => LanguageMiddleware::getCurrentLanguage(),
             'data' => $data,
-            'timestamp' => date('Y-m-d H:i:s'),
-        ], JSON_UNESCAPED_UNICODE);
+            'timestamp' => now()->format('Y-m-d H:i:s'),
+        ], $statusCode);
     }
 
     public static function notFound($message = 'not_found')

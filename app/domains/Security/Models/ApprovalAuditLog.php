@@ -19,5 +19,10 @@ class ApprovalAuditLog extends Model
         return $this->belongsTo(DualApproval::class);
     }
 
+    public function actor()
+    {
+        return $this->belongsTo(User::class, 'actor_id');
+    }
+
     protected $hidden = ['created_at', 'updated_at'];
 }

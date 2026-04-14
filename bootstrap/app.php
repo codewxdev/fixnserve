@@ -8,9 +8,14 @@ use App\Domains\Command\Middlewares\EnsureEmergencyOverrideMiddleware;
 use App\Domains\Command\Middlewares\EnsureKillSwitch;
 use App\Domains\Command\Middlewares\EnsureMaintenance;
 use App\Domains\Command\Models\KillSwitch;
+use App\Domains\Command\Models\Maintenance;
+use App\Domains\Disputes\Middlewares\AutoGenerateComplaint;
 use App\Domains\Fraud\Middlewares\DetectDeviceReuse;
 use App\Domains\Fraud\Middlewares\DetectGeoInconsistency;
 use App\Domains\Fraud\Middlewares\DetectVelocityPattern;
+use App\Domains\Fraud\Middlewares\ScanCollusionAbuse;
+use App\Domains\Fraud\Middlewares\ScanPaymentAbuse;
+use App\Domains\Fraud\Middlewares\ScanPromoAbuse;
 use App\Domains\Fraud\Middlewares\SessionRiskMiddleware;
 use App\Domains\Fraud\Middlewares\TrackRiskEvent;
 use App\Domains\RBAC\Middlewares\EnsureServiceProviderRole;
@@ -36,10 +41,11 @@ use App\Domains\System\Middlewares\SetCurrency;
 use App\Domains\System\Middlewares\SetLocale;
 use App\Http\Middleware\EnsureCheckUserStatus;
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -129,26 +135,55 @@ return Application::configure(basePath: dirname(__DIR__))
             'risk.geo' => DetectGeoInconsistency::class,
             'risk.velocity' => DetectVelocityPattern::class,
             'session.risk' => SessionRiskMiddleware::class,
+            'payment.abuse.scan' => ScanPaymentAbuse::class,
+            'collusion.scan' => ScanCollusionAbuse::class,
+            'complaint.auto' => AutoGenerateComplaint::class,
+            'promo.abuse.scan' => ScanPromoAbuse::class,   // //////////use on promo application routes
 
         ]);
 
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function ($exceptions) {
+
+        // Model / Route not found
+        $exceptions->render(function (NotFoundHttpException $e, $request) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data not found',
+                'language' => app()->getLocale(),
+                'data' => [],
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+            ], 404);
+        });
+
+        // Validation error
+        $exceptions->render(function (ValidationException $e, $request) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'language' => app()->getLocale(),
+                'data' => [
+                    'errors' => $e->errors(),
+                ],
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+            ], 422);
+        });
+
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
         // $schedule->command('update:api-controllers')->weekly();
         $schedule->command('promotions:expire')->everyMinute();
         $schedule->command('security:password-rotation')->daily();
         $schedule->command('privileges:revoke-expired')->everyMinute();
+        $schedule->command('complaints:check-sla')->everyFiveMinutes();
         $schedule->job(new CalculateApiMetrics)->everyMinute();
         $schedule->call(function () {
             // Activate scheduled maintenances
-            App\Domains\Command\Models\Maintenance::where('status', 'scheduled')
+            Maintenance::where('status', 'scheduled')
                 ->where('starts_at', '<=', now())
                 ->update(['status' => 'active']);
             // Auto-expire finished maintenances
-            App\Domains\Command\Models\Maintenance::where('status', 'active')
+            Maintenance::where('status', 'active')
                 ->whereNotNull('ends_at')
                 ->where('ends_at', '<=', now())
                 ->update(['status' => 'cancelled']);
