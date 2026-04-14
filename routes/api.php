@@ -73,6 +73,13 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
         // ////////////////middleware for payment routes////////////////
         // ////////collusion.scan will be added to all routes that need to be scanned for collusion abuse patterns (e.g., orders, reviews)//////////
         // ////////////compaint.auto will be added to all routes that can generate complaints (e.g., orders, payments, support interactions)//////////
+
+        // routes/api.php
+        // Route::middleware(['auth:api', 'sla.track'])->group(function () {
+        //     Route::post('/complaints', [ComplaintIntakeController::class, 'store']);
+        //     Route::post('/appeals',    [AppealController::class, 'store']);
+        //     Route::post('/refunds',    [RefundEngineController::class, 'store']);
+        // });
         Route::middleware('kill:payments', 'platform.context', 'risk.track', 'payment.abuse.scan',
             'risk.velocity', 'collusion.scan', 'complaint.auto')->group(function () {});
 
