@@ -10,6 +10,8 @@ class EvidenceShare extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['department', 'share_reason'];
+
     protected $fillable = [
         'evidence_id', 'shared_by', 'shared_with',
         'department', 'share_reason',

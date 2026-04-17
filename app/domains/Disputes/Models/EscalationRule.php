@@ -9,6 +9,8 @@ class EscalationRule extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['rule_key', 'from_role', 'to_role', 'trigger_on'];
+
     protected $fillable = [
         'rule_key', 'from_role', 'to_role',
         'trigger_after_hours', 'trigger_on',

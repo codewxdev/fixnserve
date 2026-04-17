@@ -9,7 +9,7 @@ class PaymentThreatPattern extends Model
 {
     use HasTranslations;
 
-    public array $translatable = ['name', 'description'];
+    public array $translatable = ['name', 'description', 'detection_rules', 'auto_action'];
 
     protected $fillable = [
         'pattern_key', 'name', 'description',

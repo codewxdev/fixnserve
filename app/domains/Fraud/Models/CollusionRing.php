@@ -9,6 +9,8 @@ class CollusionRing extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['ring_type', 'fraud_pattern_detail', 'status', 'system_enforcement'];
+
     protected $fillable = [
         'ring_id', 'ring_type', 'confidence_score',
         'actors_count', 'fraud_pattern_detail',

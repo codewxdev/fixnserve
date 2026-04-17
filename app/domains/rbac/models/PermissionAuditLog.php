@@ -9,7 +9,7 @@ class PermissionAuditLog extends Model
 {
     use HasTranslations;
 
-    public array $translatable = ['justification'];
+    public array $translatable = ['justification', 'event_type', 'target_role'];
 
     protected $fillable = [
         'actor_id',

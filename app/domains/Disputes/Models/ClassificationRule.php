@@ -2,12 +2,14 @@
 
 namespace App\Domains\Disputes\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class ClassificationRule extends Model
 {
     use HasTranslations;
+
+    public array $translatable = ['classification', 'keywords', 'rule_key'];
 
     protected $fillable = [
         'rule_key', 'classification', 'keywords',

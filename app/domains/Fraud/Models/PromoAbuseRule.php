@@ -9,6 +9,8 @@ class PromoAbuseRule extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['label', 'action'];
+
     protected $fillable = [
         'rule_key', 'label', 'action',
         'is_active', 'config', 'translations',

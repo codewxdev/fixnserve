@@ -9,6 +9,8 @@ class AbusePolicy extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['label'];
+
     protected $fillable = [
         'policy_key', 'label',
         'max_disputes_per_month',

@@ -2,10 +2,15 @@
 
 namespace App\Domains\Security\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class PasswordPolicy extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['min_length', 'require_uppercase', 'require_symbols'];
+
     protected $fillable = [
         'min_length',
         'require_uppercase',

@@ -10,6 +10,8 @@ class LegalHold extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['hold_type', 'entity_type', 'reason'];
+
     protected $fillable = [
         'legal_case_id', 'hold_type',
         'entity_type', 'entity_id', 'reason',

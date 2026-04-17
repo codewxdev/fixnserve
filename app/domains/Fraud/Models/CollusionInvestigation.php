@@ -10,6 +10,8 @@ class CollusionInvestigation extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['notes', 'status'];
+
     protected $fillable = [
         'ring_id', 'opened_by', 'notes',
         'status', 'assigned_to', 'closed_at',

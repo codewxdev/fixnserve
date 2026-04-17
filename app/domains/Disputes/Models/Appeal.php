@@ -10,6 +10,8 @@ class Appeal extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['appeal_reason', 'appeal_type', 'appellant_type', 'review_notes', 'status', 'final_decision'];
+
     protected $fillable = [
         'appeal_id', 'appeal_type',
         'complaint_id', 'refund_request_id',

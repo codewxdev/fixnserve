@@ -9,6 +9,8 @@ class SlaConfig extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['severity'];
+
     protected $fillable = [
         'severity', 'response_hours',
         'resolution_hours', 'auto_escalate',

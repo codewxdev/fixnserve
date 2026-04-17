@@ -2,10 +2,15 @@
 
 namespace App\Domains\Fraud\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class OverrideReasonCode extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['label', 'category'];
+
     protected $fillable = [
         'code',
         'label',

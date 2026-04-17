@@ -9,6 +9,8 @@ class InteractionGraph extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['interaction_type', 'actor_a_type', 'actor_b_type'];
+
     protected $fillable = [
         'actor_a_type', 'actor_a_id',
         'actor_b_type', 'actor_b_id',

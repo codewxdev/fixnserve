@@ -10,6 +10,8 @@ class ReferralGraph extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['same_device', 'same_ip', 'is_suspicious', 'status'];
+
     protected $fillable = [
         'referrer_id', 'referee_id',
         'device_hash', 'ip_address',

@@ -10,6 +10,8 @@ class ComplianceExport extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['export_type', 'export_format', 'file_path', 'file_url', 'included_sections'];
+
     protected $fillable = [
         'legal_case_id', 'export_type', 'export_format',
         'file_path', 'file_url', 'file_size', 'checksum',

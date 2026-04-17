@@ -2,10 +2,15 @@
 
 namespace App\Domains\Security\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class PrivilegeRequest extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['justification', 'scope'];
+
     protected $fillable = [
         'user_id',
         'requested_role',

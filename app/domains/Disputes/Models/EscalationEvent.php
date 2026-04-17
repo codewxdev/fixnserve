@@ -10,6 +10,8 @@ class EscalationEvent extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['from_role', 'to_role', 'trigger_type', 'notes'];
+
     protected $fillable = [
         'sla_tracking_id', 'from_role', 'to_role',
         'from_assignee', 'to_assignee',

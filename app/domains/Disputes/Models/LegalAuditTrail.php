@@ -10,6 +10,8 @@ class LegalAuditTrail extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['action', 'description', 'ip_address'];
+
     public $timestamps = false;
 
     const UPDATED_AT = null;

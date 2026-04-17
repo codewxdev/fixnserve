@@ -1,5 +1,9 @@
 <?php
 
+use App\Domains\Audit\Middlewares\RecordFinancialLedger;
+use App\Domains\Audit\Middlewares\SecurityAuditLogger;
+use App\Domains\Audit\Models\CodReconciliation;
+use App\Domains\Audit\Services\FinancialAuditService;
 use App\Domains\Command\Jobs\CalculateApiMetrics;
 use App\Domains\Command\Middlewares\EnsureApiHealthMetrics;
 use App\Domains\Command\Middlewares\EnsureBlockOrdersForSoftDisabledCountry;
@@ -101,6 +105,8 @@ return Application::configure(basePath: dirname(__DIR__))
             DetectGeoInconsistency::class,
             SessionRiskMiddleware::class,
             CheckAbuseRestrictions::class,
+            RecordFinancialLedger::class,  // // attach financial ledger middleware to all API routes for automatic ledger entries on relevant transactions
+            SecurityAuditLogger::class, // // attach security audit logger to all API routes for automatic logging of auth events and privilege usage
         ]);
 
         $middleware->alias([
@@ -147,6 +153,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'sla.track' => StartSlaTracking::class,       // ///////`use on complaint/appeal/refund creation routes
             'abuse.check' => CheckAbuseRestrictions::class,
             'legal.hold' => \App\Domains\Disputes\Middlewares\CheckLegalHold::class, // / check on any route that modifies user/order data that could be under legal hold
+            'financial.ledger' => RecordFinancialLedger::class,
+            'security.audit' => SecurityAuditLogger::class, // // attach security audit logger to all API routes for automatic logging of auth events and privilege usage
 
         ]);
 
@@ -218,6 +226,22 @@ return Application::configure(basePath: dirname(__DIR__))
             });
 
         })->everyMinute();
+        $schedule->call(function () {
+            app(FinancialAuditService::class)
+                ->generateSnapshot(
+                    type: 'daily',
+                    periodFrom: today()->subDay()->format('Y-m-d'),
+                    periodTo: today()->subDay()->format('Y-m-d'),
+                );
+        })->dailyAt('00:05');
+
+        // Check COD overdue every hour
+        $schedule->call(function () {
+            CodReconciliation::where('status', 'pending')
+                ->where('due_at', '<', now())
+                ->update(['is_overdue' => true, 'status' => 'late']);
+        })->hourly();
+
         $schedule->command('privileges:revoke')->everyMinute();
         DualApproval::where('status', 'pending')
             ->where('expires_at', '<', now())

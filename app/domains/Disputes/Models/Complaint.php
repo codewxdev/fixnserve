@@ -10,6 +10,8 @@ class Complaint extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['dispute_reason', 'initial_notes', 'classification_meta', 'source', 'reporter_type', 'reporter_ref', 'status'];
+
     protected $fillable = [
         'case_id', 'source', 'reporter_type',
         'reporter_id', 'reporter_ref',

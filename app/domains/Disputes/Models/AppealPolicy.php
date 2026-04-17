@@ -9,6 +9,8 @@ class AppealPolicy extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['label'];
+
     protected $fillable = [
         'policy_key', 'max_appeals_per_user',
         'appeal_window_days', 'cooldown_hours',

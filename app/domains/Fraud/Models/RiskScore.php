@@ -9,7 +9,7 @@ class RiskScore extends Model
 {
     use HasTranslations;
 
-    public array $translatable = [];
+    public array $translatable = ['reason_codes', 'signal_breakdown', 'tier', 'entity_type'];
 
     protected $fillable = [
         'entity_type', 'entity_id', 'score',
