@@ -118,8 +118,7 @@ class SecurityAuditController extends BaseApiController
     }
 
     // ✅ 5. All Anomalies
-    // Purpose: List of detected security anomalies
-    // When: Daily security review
+
     public function anomalies(Request $request)
     {
         $anomalies = SecurityAnomaly::with('user:id,name', 'reviewedBy:id,name')
@@ -223,8 +222,9 @@ class SecurityAuditController extends BaseApiController
     // ✅ 10. IP Activity
     // Purpose: All activity from specific IP
     // When: Investigating suspicious IP
-    public function ipActivity(string $ip)
+    public function ipActivity($ip)
     {
+
         $logs = SecurityAuditLog::byIp($ip)
             ->with('user:id,name')
             ->orderByDesc('occurred_at')
