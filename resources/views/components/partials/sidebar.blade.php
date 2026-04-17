@@ -8,14 +8,15 @@
     style="background-color: rgb(var(--sidebar-bg)); border-right: 1px solid rgb(var(--sidebar-border)); color: rgb(var(--text-main));">
 
     <div class="flex items-center pl-6 h-20 shrink-0 border-b sidebar" style="border-color: rgb(var(--sidebar-border));">
-        <div x-show="sidebarOpen" class="flex items-center gap-3 transition-opacity duration-300" x-cloak>
-            <div class="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
+        <div x-show="sidebarOpen" class="flex items-center transition-opacity duration-300" x-cloak>
+            {{-- <div class="w-8 h-8 rounded-lg flex items-center justify-center shadow-lg"
                 style="background: linear-gradient(135deg, rgb(var(--brand-primary)), rgb(var(--brand-secondary)));">
                 <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
-            </div>
+            </div> --}}
+            <img src="{{ asset('favicon.png') }}" alt="SahorOne Logo" width="50px" height="50px">
             <span class="text-xl font-bold tracking-wide nav-text" style="color: rgb(var(--text-main));">
                 SahorOne
             </span>
