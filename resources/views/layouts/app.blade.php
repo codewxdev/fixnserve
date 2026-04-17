@@ -4,11 +4,15 @@
 <head class="fn-head">
     <meta charset="UTF-8" class="fn-meta-charset">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" class="fn-meta-viewport">
     <title class="fn-title">SahorOne | Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com" class="fn-script-tailwind"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"
-        class="fn-link-font">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.png') }}" class="fn-link-favicon">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" class="fn-script-alpine"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
@@ -16,67 +20,31 @@
     <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}" class="fn-link-responsive">
     <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-
-    {{-- <style class="fn-style-custom">
-        ::-webkit-scrollbar {
-            width: 8px;
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            DEFAULT: 'rgb(var(--brand-primary) / <alpha-value>)',
+                            dark: 'rgb(var(--brand-secondary) / <alpha-value>)',
+                            wash: 'rgb(var(--item-active-bg) / <alpha-value>)',
+                        }
+                    },
+                    fontFamily: {
+                     sans: ['Poppins', 'sans-serif'],
+                }
+                }
+            }
         }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #94a3b8;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #64748b;
-        }
-
-        .pro-card {
-            transition: all 0.3s ease-in-out;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .pro-card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
-        }
-
-        /* Sidebar Transition Logic */
-        .fn-main-content-area {
-            transition-property: margin-left;
-            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-            transition-duration: 300ms;
-        }
-    </style> --}}
+    </script>
     @stack('styles')
 </head>
 
-<body class="antialiased fn-body theme-bg-body transition-colors duration-300" x-data="{
-    sidebarOpen: window.innerWidth >= 1024,
-    currentTheme: localStorage.getItem('s1_theme') || 'default',
-    setTheme(theme) {
-        this.currentTheme = theme;
-        localStorage.setItem('s1_theme', theme);
-    }
-}"
-    :class="{
-        'theme-saas': currentTheme === 'saas',
-        'theme-cyberpunk': currentTheme === 'cyberpunk',
-        'theme-fintech': currentTheme === 'fintech',
-        'theme-midnight': currentTheme === 'midnight',
-        'theme-crimson': currentTheme === 'crimson',
-        'theme-solar': currentTheme === 'solar',
-        'theme-obsidian': currentTheme === 'obsidian',
-        'theme-royal': currentTheme === 'royal',
-        'theme-forest': currentTheme === 'forest'
-    }">
+<body class="antialiased fn-body theme-bg-body transition-colors duration-300 theme-blue-ink" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
 
-    <div x-data="{ sidebarOpen: window.innerWidth >= 1024 }" class="fn-app-wrapper">
+    <div class="fn-app-wrapper">
 
         <x-partials.sidebar class="fn-sidebar-component" />
 
@@ -104,88 +72,7 @@
                 </div>
 
                 <div class="flex items-center space-x-4">
-                    <div x-data="{ showThemeMenu: false }" class="relative">
-                        <button @click="showThemeMenu = !showThemeMenu"
-                            class="relative p-2 text-slate-500 hover:text-blue-600 transition-colors focus:outline-none"
-                            title="Change Theme">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01">
-                                </path>
-                            </svg>
-                        </button>
 
-                        <div x-show="showThemeMenu" @click.outside="showThemeMenu = false"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                            class="absolute right-0 mt-2 w-48 rounded-xl shadow-2xl theme-bg-card border theme-border z-50 overflow-hidden py-1"
-                            style="display: none;">
-
-                            <div
-                                class="px-4 py-2 text-xs font-bold uppercase theme-text-muted opacity-70 tracking-wider">
-                                Select Theme</div>
-
-                            <button @click="setTheme('default'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Default (Dark)</span>
-                                <span x-show="currentTheme === 'default'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('saas'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Clean SaaS (Light)</span>
-                                <span x-show="currentTheme === 'saas'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('cyberpunk'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Cyberpunk Neon</span>
-                                <span x-show="currentTheme === 'cyberpunk'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('fintech'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Fintech Emerald</span>
-                                <span x-show="currentTheme === 'fintech'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('midnight'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Midnight Pro</span>
-                                <span x-show="currentTheme === 'midnight'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('crimson'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Crimson Ops</span>
-                                <span x-show="currentTheme === 'crimson'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('solar'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Solar Light (Warm)</span>
-                                <span x-show="currentTheme === 'solar'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('obsidian'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Obsidian Gold (Luxury)</span>
-                                <span x-show="currentTheme === 'obsidian'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('royal'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Royal Twilight</span>
-                                <span x-show="currentTheme === 'royal'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-
-                            <button @click="setTheme('forest'); showThemeMenu = false"
-                                class="w-full text-left px-4 py-2 text-sm theme-text-main hover:bg-white/5 flex items-center justify-between group transition-colors">
-                                <span>Deep Forest</span>
-                                <span x-show="currentTheme === 'forest'" class="text-blue-500 font-bold">✓</span>
-                            </button>
-                        </div>
-                    </div>
                     <div x-data="{ showNotifications: false }" class="relative">
                         <button @click="showNotifications = !showNotifications"
                             class="relative p-2 text-slate-500 hover:text-blue-600 transition-colors focus:outline-none">
@@ -201,9 +88,9 @@
 
                         <div x-show="showNotifications" @click.outside="showNotifications = false"
                             x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
-                            class="absolute right-0 mt-2 w-72 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden">
+                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                            class="absolute right-0 mt-2 w-72 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden"
+                            style="display: none;">
                             <div class="p-4 bg-slate-50 border-b border-gray-100">
                                 <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
                             </div>
@@ -234,7 +121,8 @@
                             x-transition:leave="transition ease-in duration-75"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-60 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden fn-profile-dropdown-menu">
+                            class="absolute right-0 mt-2 w-60 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden fn-profile-dropdown-menu"
+                            style="display: none;">
 
                             <div class="p-4 bg-blue-50 border-b border-blue-100 fn-dropdown-header"
                                 x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
@@ -295,7 +183,6 @@
         </div>
     </div>
 
-
     <script src="https://cdn.jsdelivr.net/npm/apexcharts" class="fn-script-apexcharts"></script>
 
     <script class="fn-script-logout">
@@ -317,10 +204,10 @@
                         "Content-Type": "application/json"
                     }
                 })
-                 
+
                 .then(response => response.json())
                 .then(data => {
-                     
+
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     window.location.href = "/auth/login";

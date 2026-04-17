@@ -237,321 +237,177 @@
 @endsection
 
 @push('scripts')
-<script>
-    const apiBase = '/api/admin/feature-flags';
-    let globalFlags = [];
+    <script>
+        // --- API & Auth Setup ---
+        function getApiHeaders() {
+            const token = localStorage.getItem('token');
+            return {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
+                'Authorization': token ? `Bearer ${token}` : ''
+            };
+        }
 
-    // --- API Headers & CSRF ---
-    function getApiHeaders(includeContentType = false) {
-        const token = localStorage.getItem('token');
-        const fingerprint = localStorage.getItem('device_fingerprint');
-        const headers = {
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || '',
-            'X-Device-Fingerprint': fingerprint || 'unknown',
-            'Authorization': token ? `Bearer ${token}` : ''
-        };
-        if (includeContentType) headers['Content-Type'] = 'application/json';
-        return headers;
-    }
-
-    // --- Toast Notification Logic ---
-    function showToast(message, isError = false) {
-        const toast = document.getElementById('toastMessage');
-        const text = document.getElementById('toastText');
-        text.innerText = message;
-        
-        toast.className = `fixed top-5 right-5 px-6 py-3 rounded shadow-lg transform transition-transform z-[100] flex items-center ${isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`;
-        toast.style.transform = "translateX(0)"; 
-
-        setTimeout(() => {
-            toast.style.transform = "translateX(150%)"; 
-        }, 3000);
-    }
-
-    document.addEventListener('DOMContentLoaded', fetchFlags);
-
-    // --- Fetch Data (Bulletproof) ---
-    async function fetchFlags() {
-        try {
-            const res = await fetch(apiBase, { headers: getApiHeaders() });
-            const result = await res.json();
-            
-            // Accurately extract the array regardless of how Laravel wraps it
-            let extractedData = result?.data?.flags || result?.flags || result?.data || [];
-            if (extractedData.data && Array.isArray(extractedData.data)) {
-                extractedData = extractedData.data; // Catch Laravel pagination wrapper
+        // --- Custom Toast Notification ---
+        function showToast(message, isError = false) {
+            // Creating toaster dynamically if it doesn't exist
+            let toast = document.getElementById('systemToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'systemToast';
+                toast.className =
+                    'fixed top-5 right-5 px-6 py-3 rounded shadow-lg transform transition-transform translate-x-[150%] z-[100] flex items-center text-white font-medium';
+                document.body.appendChild(toast);
             }
 
-            globalFlags = Array.isArray(extractedData) ? extractedData : [];
-            
-            renderTable();
-            updateStats();
-        } catch (error) {
-            console.error('Error fetching flags:', error);
-            document.getElementById('flagsTableBody').innerHTML = '<tr><td colspan="5" class="text-center py-4 text-red-500 font-bold">Failed to load data. Check console.</td></tr>';
-        }
-    }
+            toast.innerText = message;
+            toast.style.backgroundColor = isError ? '#ef4444' : '#10b981'; // Red for error, Green for success
 
-    // --- Render Table & Action Buttons ---
-    function renderTable() {
-        const tbody = document.getElementById('flagsTableBody');
-        tbody.innerHTML = '';
+            // Slide in
+            setTimeout(() => toast.style.transform = "translateX(0)", 10);
 
-        if (globalFlags.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 theme-text-muted">No feature flags found. Create your first flag!</td></tr>';
-            return;
+            // Slide out after 3 seconds
+            setTimeout(() => {
+                toast.style.transform = "translateX(150%)";
+            }, 3000);
         }
 
-        let rowsHTML = '';
-        globalFlags.forEach(flag => {
-            // Safely parse JSON value from DB
-            let val = {};
-            if (typeof flag.value === 'string') {
-                try { val = JSON.parse(flag.value); } catch(e) { console.error("Parse Error:", e); }
-            } else if (typeof flag.value === 'object' && flag.value !== null) {
-                val = flag.value;
+        // --- Modal Controls ---
+        function confirmPublish() {
+            // Form validation before opening modal
+            const form = document.getElementById('preferencesForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
             }
-
-            let key = flag.key || 'N/A';
-            let name = val.name || key;
-            let type = flag.type || 'boolean';
-            let isEnabled = val.enabled == true; 
-            let dependencies = val.dependencies || '';
-
-            let typeBadgeColor = type === 'boolean' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 
-                                 type === 'percentage' ? 'bg-purple-500/10 text-purple-500 border-purple-500/20' : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20';
-            
-            let rolloutDisplay = '<span class="theme-text-main font-semibold">100% Global</span>';
-            if (type === 'percentage') {
-                let perc = val.rollout || 0;
-                rolloutDisplay = `
-                    <div class="flex items-center gap-2">
-                        <span class="theme-text-main font-bold w-10">${perc}%</span>
-                        <div class="w-full bg-gray-200/20 rounded-full h-1.5 border theme-border">
-                            <div class="bg-blue-500 h-1.5 rounded-full" style="width: ${perc}%"></div>
-                        </div>
-                    </div>`;
-            } else if(type === 'user_segment') {
-                rolloutDisplay = `<span class="theme-text-main font-semibold">${val.scope || 'All Segments'}</span>`;
-            }
-
-            // ADDED EDIT BUTTON HERE
-            rowsHTML += `
-                <tr class="hover:bg-white/5 transition-colors">
-                    <td class="px-5 py-4 border-b theme-border text-sm">
-                        <p class="theme-text-main font-bold">${name}</p>
-                        <p class="theme-text-muted text-xs mt-1 font-mono">Key: ${key} ${dependencies ? '<br>Dep: ' + dependencies : ''}</p>
-                    </td>
-                    <td class="px-5 py-4 border-b theme-border text-sm">
-                        <span class="${typeBadgeColor} border text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">${type}</span>
-                    </td>
-                    <td class="px-5 py-4 border-b theme-border text-sm w-1/4">
-                        ${rolloutDisplay}
-                    </td>
-                    <td class="px-5 py-4 border-b theme-border text-sm">
-                        <label class="switch">
-                            <input type="checkbox" onchange="toggleStatus(${flag.id}, this.checked)" ${isEnabled ? 'checked' : ''}>
-                            <span class="slider"></span>
-                        </label>
-                    </td>
-                    <td class="px-5 py-4 border-b theme-border text-sm text-center">
-                        <button onclick="editFlag(${flag.id})" class="text-blue-500 hover:text-blue-400 mx-1 p-2 rounded hover:bg-white/5 transition-colors" title="Edit Flag">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="deleteFlag(${flag.id})" class="text-red-500 hover:text-red-400 mx-1 p-2 rounded hover:bg-white/5 transition-colors" title="Delete Flag">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
-        
-        tbody.innerHTML = rowsHTML;
-    }
-
-    // --- Update Stats ---
-    function updateStats() {
-        let activeCount = 0;
-        let rolloutCount = 0;
-
-        globalFlags.forEach(flag => {
-            let val = (typeof flag.value === 'string') ? JSON.parse(flag.value || '{}') : (flag.value || {});
-            if (val.enabled) activeCount++;
-            if (flag.type === 'percentage') rolloutCount++;
-        });
-
-        document.getElementById('stat-total').innerText = globalFlags.length;
-        document.getElementById('stat-active').innerText = activeCount;
-        document.getElementById('stat-rollout').innerText = rolloutCount;
-        document.getElementById('stat-killed').innerText = globalFlags.length - activeCount;
-    }
-
-    // --- Modal Configuration ---
-    function openModal() {
-        document.getElementById('flagForm').reset();
-        document.getElementById('flagId').value = '';
-        
-        const keyInput = document.getElementById('flagKey');
-        keyInput.readOnly = false;
-        keyInput.classList.remove('opacity-50', 'cursor-not-allowed');
-        
-        document.getElementById('modalTitle').innerText = 'Create Feature Flag';
-        toggleDynamicFields();
-        document.getElementById('flagModal').classList.remove('hidden');
-    }
-
-    function closeModal() { 
-        document.getElementById('flagModal').classList.add('hidden'); 
-    }
-
-    // --- Edit Flag Logic ---
-    function editFlag(id) {
-        const flag = globalFlags.find(f => f.id == id);
-        if (!flag) return;
-
-        let val = (typeof flag.value === 'string') ? JSON.parse(flag.value || '{}') : (flag.value || {});
-
-        document.getElementById('flagId').value = flag.id;
-        document.getElementById('flagName').value = val.name || flag.key;
-        
-        // Lock the key so it cannot be changed on edit
-        const keyInput = document.getElementById('flagKey');
-        keyInput.value = flag.key;
-        keyInput.readOnly = true;
-        keyInput.classList.add('opacity-50', 'cursor-not-allowed');
-
-        document.getElementById('flagType').value = flag.type;
-        document.getElementById('flagDependencies').value = val.dependencies || '';
-
-        if (flag.type === 'percentage') {
-            document.getElementById('flagPercentage').value = val.rollout || 50;
-            document.getElementById('percValue').innerText = val.rollout || 50;
-        } else if (flag.type === 'user_segment') {
-            document.getElementById('flagScope').value = val.scope || '';
+            document.getElementById('validationModal').classList.remove('hidden');
         }
 
-        document.getElementById('modalTitle').innerText = 'Edit Feature Flag';
-        toggleDynamicFields();
-        document.getElementById('flagModal').classList.remove('hidden');
-    }
-
-    function generateKey() {
-        if(document.getElementById('flagId').value === '') {
-            let name = document.getElementById('flagName').value;
-            document.getElementById('flagKey').value = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/(^_|_$)/g, '');
-        }
-    }
-
-    function toggleDynamicFields() {
-        const type = document.getElementById('flagType').value;
-        document.getElementById('fieldPercentage').classList.add('hidden');
-        document.getElementById('fieldScope').classList.add('hidden');
-
-        if (type === 'percentage') document.getElementById('fieldPercentage').classList.remove('hidden');
-        else if (type === 'user_segment') document.getElementById('fieldScope').classList.remove('hidden');
-    }
-
-    // --- Create/Update Logic ---
-    async function saveFlag(e) {
-        e.preventDefault();
-        const id = document.getElementById('flagId').value;
-        const type = document.getElementById('flagType').value;
-        
-        let valueData = {
-            name: document.getElementById('flagName').value.trim(),
-            enabled: true, 
-            dependencies: document.getElementById('flagDependencies').value.trim()
-        };
-
-        if(type === 'percentage') valueData.rollout = parseInt(document.getElementById('flagPercentage').value);
-        if(type === 'user_segment') valueData.scope = document.getElementById('flagScope').value.trim();
-
-        const payload = {
-            type: type,
-            value: valueData
-        };
-
-        // Key is only required for creation
-        if (!id) {
-            payload.key = document.getElementById('flagKey').value.trim();
+        function closeModal() {
+            document.getElementById('validationModal').classList.add('hidden');
         }
 
-        const method = id ? 'PUT' : 'POST';
-        const url = id ? `${apiBase}/${id}` : apiBase;
+        // --- Submit Data Logic ---
+        async function submitChanges() {
+            const btn = document.getElementById('confirmBtn');
+            const originalText = btn.innerText;
+            btn.innerText = 'Saving...';
+            btn.disabled = true;
 
-        try {
-            const res = await fetch(url, {
-                method: method,
-                headers: getApiHeaders(true),
-                body: JSON.stringify(payload)
-            });
-            
-            const result = await res.json();
+            // 1. Collect Data from the form
+            const settingsPayload = {
+                platform_name: document.getElementById('platform_name').value,
+                legal_name: document.getElementById('legal_name').value,
+                country: document.getElementById('country').value,
+                timezone: document.getElementById('timezone').value,
+                currency: document.getElementById('currency').value,
+                rounding_rules: document.getElementById('rounding_rules').value,
+                support_email: document.getElementById('support_email').value,
+                support_phone: document.getElementById('support_phone').value,
+                flag_onboarding: document.getElementById('flag_onboarding').checked,
+                flag_major_flows: document.getElementById('flag_major_flows').checked,
+                change_reason: document.getElementById('change_reason').value,
+            };
 
-            if(res.ok) {
-                showToast(id ? 'Flag Updated Successfully!' : 'New Flag Created Successfully!');
-                closeModal();
-                fetchFlags();
-            } else {
-                const errorMsg = result.errors ? Object.values(result.errors).flat().join('\n') : (result.message || 'Could not save flag');
-                showToast(`Validation Error: ${errorMsg}`, true);
-            }
-        } catch (error) {
-            showToast('Network error occurred.', true);
-        }
-    }
+            const rolloutMode = document.getElementById('rollout_mode').value;
 
-    // --- Toggle Switch Logic (Kill-Switch) ---
-    async function toggleStatus(id, isActive) {
-        if (!id) return;
-        const flag = globalFlags.find(f => f.id == id);
-        if (!flag) return;
-        
-        let currentVal = (typeof flag.value === 'string') ? JSON.parse(flag.value || '{}') : (flag.value || {});
-        currentVal.enabled = isActive;
+            // 2. Prepare Final Request Body
+            const requestBody = {
+                settings: settingsPayload,
+                rollout_mode: rolloutMode
+            };
 
-        try {
-            const res = await fetch(`${apiBase}/${id}`, {
-                method: 'PUT',
-                headers: getApiHeaders(true),
-                body: JSON.stringify({ type: flag.type, value: currentVal })
-            });
-
-            if(res.ok) {
-                showToast(isActive ? 'Feature Enabled!' : 'Feature Disabled (Kill-Switched)!');
-                fetchFlags(); 
-            } else {
-                showToast('Failed to change status', true);
-            }
-        } catch (error) {
-            showToast('Network Error', true);
-        }
-    }
-
-    // --- Delete Logic ---
-    async function deleteFlag(id) {
-        if(!id) return;
-        const flag = globalFlags.find(f => f.id == id);
-        
-        if(confirm(`DANGER: Are you sure you want to permanently delete the flag "${flag.key}"?`)) {
             try {
-                const res = await fetch(`${apiBase}/${id}`, {
-                    method: 'DELETE',
-                    headers: getApiHeaders()
+                // Update the URL to point to your PlatformPreferenceController route
+                const res = await fetch('/api/admin/platform-preferences/update', {
+                    method: 'POST', // or POST depending on your api.php routes
+                    headers: getApiHeaders(),
+                    body: JSON.stringify(requestBody)
                 });
-                
-                if(res.ok) {
-                    showToast('Flag deleted successfully.');
-                    fetchFlags();
+
+                const result = await res.json();
+
+                if (res.ok) {
+                    showToast('Platform preferences updated successfully!');
+                    closeModal();
+                    document.getElementById('change_reason').value = ''; // Reset audit field
                 } else {
-                    const err = await res.json();
-                    showToast(err.message || 'Failed to delete flag.', true);
+                    // Handle Validation Errors from Laravel
+                    const errorMsg = result.errors ? Object.values(result.errors).flat().join(' | ') : (result
+                        .message || 'Error saving preferences');
+                    showToast(`Validation Error: ${errorMsg}`, true);
+                    closeModal();
                 }
             } catch (error) {
-                showToast('Network Error', true);
+                console.error(error);
+                showToast('Network error occurred while saving.', true);
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
             }
         }
-    }
-</script>
+
+        // --- Optional: Fetch existing settings on page load ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const res = await fetch('/api/admin/platform-preferences/current', {
+                    headers: getApiHeaders()
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    // Logic to populate the form inputs with data.data if it exists
+                    // document.getElementById('platform_name').value = data.data.platform_name || '';
+                    // ... populate other fields similarly
+                }
+            } catch (error) {
+                console.log('No existing preferences found or network issue.');
+            }
+        });
+
+        // --- Fetch and Populate Existing Settings on Page Load ---
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            // Update this URL if your route is different in api.php
+            const res = await fetch('/api/admin/platform-preferences/current', { 
+                headers: getApiHeaders() 
+            });
+            
+            if (res.ok) {
+                const responseData = await res.json();
+                
+                // Laravel typically wraps responses in a 'data' object when using standard API resources
+                // Adjust this if your BaseApiController's success() method structures it differently
+                const settings = responseData.data || responseData;
+
+                if (settings && Object.keys(settings).length > 0) {
+                    // Populate Text & Select Inputs
+                    if (settings.platform_name) document.getElementById('platform_name').value = settings.platform_name;
+                    if (settings.legal_name) document.getElementById('legal_name').value = settings.legal_name;
+                    if (settings.country) document.getElementById('country').value = settings.country;
+                    if (settings.timezone) document.getElementById('timezone').value = settings.timezone;
+                    if (settings.currency) document.getElementById('currency').value = settings.currency;
+                    if (settings.rounding_rules) document.getElementById('rounding_rules').value = settings.rounding_rules;
+                    if (settings.support_email) document.getElementById('support_email').value = settings.support_email;
+                    if (settings.support_phone) document.getElementById('support_phone').value = settings.support_phone;
+
+                    // Populate Master Switches (Checkboxes)
+                    // Boolean check ensures it properly ticks or unticks the toggle
+                    if (settings.flag_onboarding !== undefined) {
+                        document.getElementById('flag_onboarding').checked = settings.flag_onboarding === true || settings.flag_onboarding === 'true' || settings.flag_onboarding === 1;
+                    }
+                    if (settings.flag_major_flows !== undefined) {
+                        document.getElementById('flag_major_flows').checked = settings.flag_major_flows === true || settings.flag_major_flows === 'true' || settings.flag_major_flows === 1;
+                    }
+                }
+            } else {
+                console.warn('No existing preferences found or API returned an error.');
+            }
+        } catch (error) {
+            console.error('Error fetching current preferences:', error);
+            // Using your custom modern toaster instead of alerts
+            showToast('Could not load existing settings. Network error.', true);
+        }
+    });
+    </script>
 @endpush

@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="mb-6">
+        {{-- <div class="mb-6">
             <nav class="flex space-x-4 border-b border-[rgb(var(--border-color))] overflow-x-auto pb-1">
                 <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
                     13.1 Risk Scoring Engine
@@ -46,7 +46,7 @@
                     13.7 Overrides
                 </a>
             </nav>
-        </div>
+        </div> --}}
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
             
