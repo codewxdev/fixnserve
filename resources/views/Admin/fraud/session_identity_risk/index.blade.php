@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
 <div class="min-h-screen bg-[rgb(var(--bg-body))] font-sans transition-colors duration-300">
     <div class="container mx-auto px-4 py-8">
 
@@ -15,38 +14,12 @@
                 <div class="bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm flex items-center">
                     <div class="mr-3">
                         <span class="block text-[10px] uppercase text-red-800 font-bold tracking-wider">Active Bot Threats</span>
-                        <span class="text-lg font-bold text-red-600">12 IP Blocks</span>
+                        <span id="bot-threats-count" class="text-lg font-bold text-red-600">Loading...</span>
                     </div>
                     <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
             </div>
         </div>
-
-        {{-- <div class="mb-6">
-            <nav class="flex space-x-4 border-b border-[rgb(var(--border-color))] overflow-x-auto pb-1">
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.1 Risk Scoring Engine
-                </a>
-                <a href="#" class="border-b-2 border-[rgb(var(--brand-primary))] text-[rgb(var(--brand-primary))] py-3 px-4 font-semibold text-sm transition-colors whitespace-nowrap">
-                    13.2 Session Identity
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.3 Payment Abuse
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.4 Promo Abuse
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.5 Collusion Networks
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.6 Enforcement
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.7 Overrides
-                </a>
-            </nav>
-        </div> --}}
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
             
@@ -59,27 +32,8 @@
                     </h3>
                     <p class="text-xs text-[rgb(var(--text-muted))] mb-4">Logins from distant locations in impossible timeframes.</p>
                     
-                    <div class="space-y-3">
-                        <div class="p-3 bg-[rgb(var(--item-active-bg))] rounded border border-orange-200">
-                            <div class="flex justify-between items-center mb-1">
-                                <span class="text-xs font-bold text-[rgb(var(--text-main))]">Provider #P-882</span>
-                                <span class="text-[10px] text-orange-600 font-bold bg-orange-100 px-1 rounded">High Risk</span>
-                            </div>
-                            <div class="flex items-center justify-between text-xs text-[rgb(var(--text-muted))] mt-2">
-                                <div class="text-center">
-                                    <span class="block text-xl">🇵🇰</span>
-                                    <span>LHE</span>
-                                </div>
-                                <div class="flex-1 px-2 text-center relative">
-                                    <div class="border-t-2 border-dashed border-gray-300 w-full absolute top-1/2 left-0"></div>
-                                    <span class="bg-[rgb(var(--item-active-bg))] relative px-1 text-[10px] text-red-500 font-bold">15 mins</span>
-                                </div>
-                                <div class="text-center">
-                                    <span class="block text-xl">🇦🇪</span>
-                                    <span>DXB</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div id="geo-alerts-container" class="space-y-3">
+                        <div class="text-xs text-gray-500 text-center py-2">Loading alerts...</div>
                     </div>
                 </div>
 
@@ -88,11 +42,11 @@
                     <div class="space-y-2 text-sm">
                         <div class="flex justify-between items-center p-2 bg-[rgb(var(--item-active-bg))] rounded">
                             <span class="text-[rgb(var(--text-muted))]">Known VPN/Proxies</span>
-                            <span class="font-bold text-red-600">83 Blocks</span>
+                            <span id="vpn-proxy-count" class="font-bold text-red-600">--</span>
                         </div>
                         <div class="flex justify-between items-center p-2 bg-[rgb(var(--item-active-bg))] rounded">
                             <span class="text-[rgb(var(--text-muted))]">TOR Exit Nodes</span>
-                            <span class="font-bold text-[rgb(var(--text-main))]">0 Detected</span>
+                            <span id="tor-node-count" class="font-bold text-[rgb(var(--text-main))]">--</span>
                         </div>
                     </div>
                 </div>
@@ -105,7 +59,7 @@
                             <h3 class="text-lg font-semibold text-[rgb(var(--text-main))]">Live Suspicious Sessions</h3>
                             <p class="text-xs text-[rgb(var(--text-muted))]">Real-time monitoring of device fingerprints and session anomalies.</p>
                         </div>
-                        <button class="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-main))] px-3 py-1.5 rounded text-xs font-semibold hover:bg-[rgb(var(--item-active-bg))] transition-colors">
+                        <button onclick="purgeBots()" class="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-main))] px-3 py-1.5 rounded text-xs font-semibold hover:bg-[rgb(var(--item-active-bg))] transition-colors">
                             Purge All Bot Sessions
                         </button>
                     </div>
@@ -117,87 +71,13 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Entity & Session</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Device Fingerprint</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Risk Indicators</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Auto-Action Applied</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-[rgb(var(--bg-card))] divide-y divide-[rgb(var(--border-color))]">
-                                
-                                <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors bg-red-50/10">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-bold text-[rgb(var(--text-main))]">Customer #C-4419</div>
-                                        <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">IP: 192.168.1.1 (VPN)</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center text-sm text-[rgb(var(--text-main))]">
-                                            <svg class="w-4 h-4 mr-2 text-[rgb(var(--text-muted))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                            Win / Chrome
-                                        </div>
-                                        <div class="text-[10px] text-red-500 font-bold mt-1">NEW DEVICE DETECTED</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-wrap gap-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800 border border-red-200">ATO Suspected</span>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-orange-50 text-orange-700 border border-orange-200">Data Center IP</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <span class="px-2 py-1 bg-red-600 text-white rounded text-xs font-bold shadow-sm">
-                                            Temporary Lock
-                                        </span>
-                                        <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">User Notified</p>
-                                    </td>
+                            <tbody id="live-sessions-tbody" class="bg-[rgb(var(--bg-card))] divide-y divide-[rgb(var(--border-color))]">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-[rgb(var(--text-muted))]">Loading live sessions...</td>
                                 </tr>
-
-                                <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-bold text-[rgb(var(--text-main))]">Unauthenticated</div>
-                                        <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">IP: 45.22.11.x (Russia)</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center text-sm text-[rgb(var(--text-main))]">
-                                            <span class="text-[10px] text-[rgb(var(--text-muted))] font-mono bg-[rgb(var(--item-active-bg))] px-1 rounded border border-[rgb(var(--border-color))]">Missing User-Agent</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-wrap gap-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-200 text-gray-800 border border-gray-300">High Request Velocity (API)</span>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-700 border border-red-200">Brute Force Try</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <span class="px-2 py-1 bg-gray-800 text-white rounded text-xs font-bold shadow-sm">
-                                            Session Terminated
-                                        </span>
-                                        <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">IP Blacklisted</p>
-                                    </td>
-                                </tr>
-
-                                <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-bold text-[rgb(var(--text-main))]">Mart Vendor #V-112</div>
-                                        <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">IP: 103.11.22.x (PK)</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center text-sm text-[rgb(var(--text-main))]">
-                                            <svg class="w-4 h-4 mr-2 text-[rgb(var(--text-muted))]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                            iOS / Safari
-                                        </div>
-                                        <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Known Device</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-wrap gap-1">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">Payout Action Attempted</span>
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">Off-hours Login</span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 border border-blue-200 rounded text-xs font-bold">
-                                            Step-up Auth Triggered
-                                        </span>
-                                        <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Awaiting 2FA OTP</p>
-                                    </td>
-                                </tr>
-
                             </tbody>
                         </table>
                     </div>
@@ -207,4 +87,185 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Define API Base URL (adjust prefixes as needed for your routes)
+        const apiBase = "{{ url('/api') }}"; 
+
+        // Add authentication headers (assuming Laravel Sanctum or default API token setup)
+        const getHeaders = () => ({
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        });
+
+        // 1. Fetch Dashboard & IP Blocks Stats
+        async function fetchDashboardStats() {
+            try {
+                // Fetch IP Blocks for Reputation Check
+                const ipRes = await fetch(`${apiBase}/session-risk/ip-blocks`, { headers: getHeaders() });
+                const ipData = await ipRes.json();
+                
+                if (ipData.success && ipData.data) {
+                    const blocks = ipData.data.data || [];
+                    const vpnCount = blocks.filter(b => b.type === 'vpn' || b.type === 'proxy').length;
+                    const torCount = blocks.filter(b => b.type === 'tor').length;
+                    const botCount = blocks.filter(b => b.type === 'bot').length;
+                    
+                    document.getElementById('vpn-proxy-count').textContent = `${vpnCount} Blocks`;
+                    document.getElementById('tor-node-count').textContent = `${torCount} Detected`;
+                    document.getElementById('bot-threats-count').textContent = `${botCount} IP Blocks`;
+                }
+            } catch (error) {
+                console.error("Error fetching dashboard stats:", error);
+            }
+        }
+
+        // 2. Fetch Geo Velocity Alerts
+        async function fetchGeoAlerts() {
+            try {
+                const res = await fetch(`${apiBase}/session-risk/geo-velocity-alerts?status=open`, { headers: getHeaders() });
+                const json = await res.json();
+                const container = document.getElementById('geo-alerts-container');
+                
+                if (json.success && json.data.data.length > 0) {
+                    container.innerHTML = json.data.data.map(alert => `
+                        <div class="p-3 bg-[rgb(var(--item-active-bg))] rounded border border-orange-200">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-xs font-bold text-[rgb(var(--text-main))]">${alert.user ? alert.user.name : 'Unknown'}</span>
+                                <span class="text-[10px] text-orange-600 font-bold bg-orange-100 px-1 rounded">${alert.risk_level.toUpperCase()}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs text-[rgb(var(--text-muted))] mt-2">
+                                <div class="text-center font-bold">${alert.origin_country || 'N/A'}</div>
+                                <div class="flex-1 px-2 text-center relative">
+                                    <div class="border-t-2 border-dashed border-gray-300 w-full absolute top-1/2 left-0"></div>
+                                    <span class="bg-[rgb(var(--item-active-bg))] relative px-1 text-[10px] text-red-500 font-bold">${alert.time_delta_mins} mins</span>
+                                </div>
+                                <div class="text-center font-bold">${alert.destination_country || 'N/A'}</div>
+                            </div>
+                            <div class="mt-3 flex gap-2">
+                                <button onclick="handleGeoAction(${alert.id}, 'dismiss')" class="flex-1 bg-gray-200 text-gray-700 text-[10px] py-1 rounded hover:bg-gray-300 transition">Dismiss</button>
+                                <button onclick="handleGeoAction(${alert.id}, 'review')" class="flex-1 bg-orange-100 text-orange-700 border border-orange-300 text-[10px] py-1 rounded hover:bg-orange-200 transition">Review</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `<div class="text-xs text-gray-500 py-2">No active alerts.</div>`;
+                }
+            } catch (error) {
+                console.error("Error fetching geo alerts:", error);
+            }
+        }
+
+        // 3. Fetch Live Sessions
+        async function fetchLiveSessions() {
+            try {
+                const res = await fetch(`${apiBase}/session-risk/sessions?risk_level=all`, { headers: getHeaders() });
+                const json = await res.json();
+                const tbody = document.getElementById('live-sessions-tbody');
+                
+                if (json.success && json.data.data.length > 0) {
+                    tbody.innerHTML = json.data.data.map(session => {
+                        const isHighRisk = session.risk_score >= 70;
+                        const rowClass = isHighRisk ? 'bg-red-50/10 hover:bg-[rgb(var(--item-active-bg))]' : 'hover:bg-[rgb(var(--item-active-bg))]';
+                        
+                        return `
+                        <tr class="${rowClass} transition-colors">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-bold text-[rgb(var(--text-main))]">${session.user_name || 'Unauthenticated'}</div>
+                                <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">IP: ${session.ip_address} (${session.country || 'Unknown'})</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center text-sm text-[rgb(var(--text-main))]">
+                                    ${session.device || 'Unknown Device'}
+                                </div>
+                                ${isHighRisk ? `<div class="text-[10px] text-red-500 font-bold mt-1">HIGH RISK (${session.risk_score})</div>` : `<div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Score: ${session.risk_score}</div>`}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-wrap gap-1">
+                                    ${isHighRisk ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-red-100 text-red-800 border border-red-200">Suspicious Activity</span>` : `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-800 border border-gray-200">Standard</span>`}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right space-x-1">
+                                <button onclick="sessionAction(${session.id}, 'lock')" class="px-2 py-1 bg-red-600 text-white rounded text-xs font-bold shadow-sm hover:bg-red-700">Lock</button>
+                                <button onclick="sessionAction(${session.id}, 'stepup-auth')" class="px-2 py-1 bg-blue-100 text-blue-800 border border-blue-200 rounded text-xs font-bold hover:bg-blue-200">2FA</button>
+                                <button onclick="sessionAction(${session.id}, 'notify')" class="px-2 py-1 bg-gray-800 text-white rounded text-xs font-bold shadow-sm hover:bg-gray-900">Notify</button>
+                            </td>
+                        </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-sm text-[rgb(var(--text-muted))]">No active sessions found.</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Error fetching sessions:", error);
+            }
+        }
+
+        // --- Action Handlers ---
+
+        window.purgeBots = async function() {
+            if(!confirm("Are you sure you want to terminate all high-risk bot sessions?")) return;
+            try {
+                const res = await fetch(`${apiBase}/session-risk/purge-bots`, { 
+                    method: 'DELETE', 
+                    headers: getHeaders() 
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert(data.message);
+                    fetchLiveSessions(); // Refresh table
+                }
+            } catch (error) {
+                alert("Error purging bots.");
+            }
+        };
+
+        window.sessionAction = async function(sessionId, action) {
+            try {
+                const res = await fetch(`${apiBase}/session-risk/sessions/${sessionId}/${action}`, { 
+                    method: 'POST', 
+                    headers: getHeaders(),
+                    
+                });
+                const data = await res.json();
+                if(data.success) {
+                    // Optional: Show toast notification
+                    console.log(`Action ${action} successful on session ${sessionId}`);
+                    fetchLiveSessions(); 
+                }
+            } catch (error) {
+                console.error(`Error performing ${action}:`, error);
+            }
+        };
+
+        window.handleGeoAction = async function(alertId, action) {
+            try {
+                // Action is either 'dismiss' or 'review' -> PATCH request
+                const res = await fetch(`${apiBase}/session-risk/geo-velocity-alerts/${alertId}/${action}`, { 
+                    method: 'PATCH', 
+                    headers: getHeaders() 
+                });
+                const data = await res.json();
+                if(data.success) {
+                    fetchGeoAlerts(); // Refresh alerts list
+                }
+            } catch (error) {
+                console.error(`Error on geo alert ${action}:`, error);
+            }
+        };
+
+        // Initialize App Data
+        fetchDashboardStats();
+        fetchGeoAlerts();
+        fetchLiveSessions();
+
+        // Set interval to poll for live sessions every 30 seconds
+        setInterval(fetchLiveSessions, 30000);
+    });
+</script>
+@endpush
 @endsection
