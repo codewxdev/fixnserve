@@ -3,6 +3,8 @@
 use App\Domains\Audit\Controllers\Front\AuditController;
 use Illuminate\Support\Facades\Route;
  
+
+Route::prefix('/cp-x9f7/v1')->group(function () {
 // admin action audit Routes
 Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
 
@@ -31,3 +33,5 @@ Route::get('/audit/user-activity-audit', [AuditController::class, 'auditSearchRe
 
 // compliance monitoring & alerts Routes
 Route::get('/audit/compliance-monitoring-alerts', [AuditController::class, 'complianceMonitoringAlerts'])->name('audit.compliance_monitoring_alerts');
+
+});

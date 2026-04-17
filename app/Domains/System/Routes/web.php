@@ -3,6 +3,8 @@
 use App\Domains\System\Controllers\Front\SystemController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::prefix('/cp-x9f7/v1')->group(function () {
 // System Settings Global Routes
 Route::get('/system', [SystemController::class, 'index'])->name('settings.global');
 
@@ -28,3 +30,6 @@ Route::get('/system/configuration-impact-analysis', [SystemController::class, 'c
 
 // system access control & governance Routes
 Route::get('/system/access-control', [SystemController::class, 'accessControl'])->name('settings.access_control');
+
+
+});

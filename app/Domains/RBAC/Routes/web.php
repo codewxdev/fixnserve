@@ -6,6 +6,8 @@ use App\Domains\RBAC\Controllers\Front\PermissionController;
 use App\Domains\RBAC\Controllers\Front\RoleController;
 use Illuminate\Support\Facades\Route;
 
+
+Route::prefix('/cp-x9f7/v1')->group(function () {
 // Roles Routes
 Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
@@ -20,3 +22,5 @@ Route::get('/access-matrix', [AccessMetrixController::class, 'index'])->name('ac
 
 // Audit & Governance Route
 Route::get('/audit-governance', [AuditGovernanceController::class, 'index'])->name('audit-governance.index');
+
+});

@@ -3,6 +3,7 @@
 use App\Domains\Security\Controllers\Front\SecuirtyController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('/cp-x9f7/v1')->group(function () {
 // Authentication Routes
 Route::get('/security/auth', [SecuirtyController::class, 'index'])->name('security.auth.index');
 
@@ -20,3 +21,5 @@ Route::get('/security/network', [SecuirtyController::class, 'network'])->name('s
 
 // Privileged Access Routes
 Route::get('/security/privileged-access', [SecuirtyController::class, 'privilegedAccess'])->name('security.privileged_access.index');
+
+});

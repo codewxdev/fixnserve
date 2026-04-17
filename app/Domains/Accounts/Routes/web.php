@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 // ====================================================
 // Customer Routes
 // ====================================================
+Route::prefix('/cp-x9f7/v1')->group(function () {
 Route::get('/customers', [CustomerController::class, 'index'])->name('customer.index');
 Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
 Route::put('/customers/{id}', [CustomerController::class, 'update'])->name('customers.update');
@@ -51,3 +52,5 @@ Route::post('/mart/vendors', [MartController::class, 'store'])->name('store.mart
 // ===================================================
 Route::get('/riders', [RiderController::class, 'index'])->name('rider.index');
 Route::post('/riders', [RiderController::class, 'store'])->name('store.rider');
+
+});
