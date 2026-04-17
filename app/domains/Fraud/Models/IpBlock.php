@@ -10,6 +10,8 @@ class IpBlock extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['reason', 'type'];
+
     protected $fillable = [
         'ip_address',
         'type',

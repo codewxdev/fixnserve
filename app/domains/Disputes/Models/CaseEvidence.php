@@ -10,6 +10,8 @@ class CaseEvidence extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['case_ref', 'title', 'description', 'meta'];
+
     protected $table = 'case_evidences';
 
     protected $fillable = [

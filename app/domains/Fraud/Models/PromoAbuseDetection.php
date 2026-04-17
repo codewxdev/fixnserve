@@ -9,6 +9,8 @@ class PromoAbuseDetection extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['entity_type', 'promo_type', 'abuse_pattern', 'pattern_detail', 'status'];
+
     protected $fillable = [
         'entity_type', 'entity_id', 'entity_ref',
         'promo_code', 'promo_type', 'promo_amount',

@@ -10,6 +10,8 @@ class SlaTracking extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['case_ref', 'current_assignee_role'];
+
     protected $fillable = [
         'trackable_type', 'trackable_id', 'case_ref',
         'sla_level', 'started_at',

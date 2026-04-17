@@ -2,10 +2,15 @@
 
 namespace App\Domains\Security\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['device_name', 'os_version', 'app_version', 'trust_status'];
+
     protected $fillable = [
         'user_id',
         'device_name',

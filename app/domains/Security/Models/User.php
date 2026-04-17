@@ -19,6 +19,7 @@ use App\Models\UserNotification;
 use App\Models\UserPayment;
 use App\Models\UserTransportation;
 use App\Models\Wallet;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -30,27 +31,12 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, HasTranslations, HasUuids,Notifiable;
 
-    // UUID ke liye trait use karein
-    use HasUuids;
+    public array $translatable = ['name', 'email', 'phone', 'current_address', 'address', 'city', 'state'];
 
-    /**
-     * Specify which column gets UUID
-     */
     protected $uuidColumn = 'uuid';
 
-    /**
-     * Remove these lines - auto-increment id use kareinge
-     * public $incrementing = false;
-     * protected $keyType = 'string';
-     */
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -106,11 +92,6 @@ class User extends Authenticatable implements JWTSubject
 
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -121,30 +102,16 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
-    // public function country()
-    // {
-    //     return $this->belongsTo(Country::class);
-    // }
-
-    /**
-     * Get columns that should receive UUIDs
-     */
     public function uniqueIds(): array
     {
-        return ['uuid']; // Sirf UUID column ko UUID assign karein
+        return ['uuid'];
     }
 
-    /**
-     * Use UUID for route model binding
-     */
     public function getRouteKeyName(): string
     {
-        return 'uuid'; // Routes mein UUID use karein
+        return 'uuid';
     }
 
-    /**
-     * Get the user's initials
-     */
     public function initials(): string
     {
         return Str::of($this->name)

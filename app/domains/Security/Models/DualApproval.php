@@ -2,10 +2,15 @@
 
 namespace App\Domains\Security\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class DualApproval extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = ['justification', 'action_type', 'status'];
+
     protected $table = 'dual_approval_requests';
 
     protected $fillable = [

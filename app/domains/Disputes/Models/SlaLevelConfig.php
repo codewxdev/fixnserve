@@ -9,6 +9,8 @@ class SlaLevelConfig extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['label'];
+
     protected $fillable = [
         'level', 'label',
         'first_response_hours',

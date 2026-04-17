@@ -9,6 +9,12 @@ class RefundPolicy extends Model
 {
     use HasTranslations;
 
+    public array $translatable = [
+        'label', 'max_auto_approve_amount', 'finance_approval_threshold',
+        'max_refunds_per_month', 'fraud_score_block_threshold',
+        'completion_refund_matrix', 'policy_key',
+    ];
+
     protected $fillable = [
         'policy_key', 'label',
         'max_auto_approve_amount',

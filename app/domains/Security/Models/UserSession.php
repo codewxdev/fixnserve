@@ -2,10 +2,17 @@
 
 namespace App\Domains\Security\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class UserSession extends Model
 {
+    use HasTranslations;
+
+    public array $translatable = [
+        'device', 'ip_address', 'location',
+    ];
+
     protected $fillable = [
         'user_id',
         'jwt_id',

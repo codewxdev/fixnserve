@@ -10,6 +10,8 @@ class GeoVelocityAlert extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['from_city', 'from_country', 'to_city', 'to_country', 'status'];
+
     protected $fillable = [
         'user_id',
         'from_city',

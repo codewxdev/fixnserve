@@ -9,6 +9,8 @@ class PaymentAbuseDetection extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['entity_type', 'transaction_type', 'abuse_pattern', 'pattern_detail', 'status'];
+
     protected $fillable = [
         'entity_type', 'entity_id', 'entity_ref',
         'transaction_type', 'amount', 'transaction_ref',

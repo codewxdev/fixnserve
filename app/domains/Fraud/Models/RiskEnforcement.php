@@ -10,6 +10,8 @@ class RiskEnforcement extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['entity_type', 'action', 'reason'];
+
     protected $fillable = [
         'entity_type', 'entity_id', 'action',
         'trigger', 'risk_score', 'reason',

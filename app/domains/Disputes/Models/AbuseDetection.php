@@ -9,6 +9,8 @@ class AbuseDetection extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['entity_type', 'abuse_type', 'pattern_detail', 'status', 'enforcement_action', 'severity', 'evidence'];
+
     protected $fillable = [
         'entity_type', 'entity_id', 'entity_ref',
         'abuse_type', 'confidence_score', 'pattern_detail',

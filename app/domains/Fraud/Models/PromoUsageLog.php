@@ -9,6 +9,8 @@ class PromoUsageLog extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['block_reason'];
+
     protected $fillable = [
         'user_id', 'promo_code', 'device_hash',
         'ip_address', 'was_blocked', 'block_reason',

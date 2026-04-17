@@ -29,6 +29,20 @@ return new class extends Migration
             $table->index(['user_id']);
             $table->index(['event_type']);
             $table->index(['risk_score']);
+            $table->string('device_fingerprint')->nullable(); // optional but powerful
+
+            // Location (optional but useful)
+            $table->string('country')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+
+            // Session tracking
+            $table->string('session_id')->nullable();
+
+            // Security
+            $table->string('checksum')->nullable(); // tamper-proof
+            $table->boolean('is_flagged')->default(false); // manual review flag
+            $table->boolean('is_flagged')->default(false); // manual review flag
         });
     }
 

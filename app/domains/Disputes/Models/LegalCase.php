@@ -10,6 +10,8 @@ class LegalCase extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['case_ref', 'case_type', 'status', 'legal_notes', 'regulator_ref', 'meta'];
+
     protected $fillable = [
         'legal_case_id', 'related_type', 'related_id',
         'case_ref', 'case_type', 'status',

@@ -9,6 +9,8 @@ class EvidenceTimeline extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['event_description', 'actor_ref', 'case_ref', 'event_type', 'case_type'];
+
     protected $fillable = [
         'case_type', 'case_id', 'case_ref',
         'evidence_id', 'event_time', 'event_type',

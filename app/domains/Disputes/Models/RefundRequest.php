@@ -10,6 +10,8 @@ class RefundRequest extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['notes', 'entity_ref', 'order_ref', 'transaction_ref', 'refund_type', 'rejection_reason', 'calculation_breakdown', 'psp_status', 'entity_type'];
+
     protected $fillable = [
         'refund_id', 'complaint_id',
         'entity_type', 'entity_id', 'entity_ref',

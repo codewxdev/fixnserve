@@ -2,12 +2,14 @@
 
 namespace App\Domains\Disputes\Models;
 
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class AppealEvidence extends Model
 {
     use HasTranslations;
+
+    public array $translatable = ['description'];
 
     protected $table = 'appeal_evidences';
 

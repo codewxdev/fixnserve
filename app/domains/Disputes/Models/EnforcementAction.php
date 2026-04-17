@@ -10,6 +10,8 @@ class EnforcementAction extends Model
 {
     use HasTranslations;
 
+    public array $translatable = ['action_type', 'reason', 'entity_type'];
+
     protected $fillable = [
         'abuse_detection_id', 'entity_type', 'entity_id',
         'action_type', 'reason', 'expires_at',
