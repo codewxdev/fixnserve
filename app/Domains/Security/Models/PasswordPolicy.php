@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Domains\Security\Models;
+
+use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Model;
+
+class PasswordPolicy extends Model
+{
+    use HasTranslations;
+
+    public array $translatable = ['min_length', 'require_uppercase', 'require_symbols'];
+
+    protected $fillable = [
+        'min_length',
+        'require_uppercase',
+        'require_symbols',
+        'prevent_reuse',
+        'check_breached',
+        'force_rotation_days',
+    ];
+
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public static function current()
+    {
+        return self::first() ?? self::create();
+    }
+}
