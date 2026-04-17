@@ -1,7 +1,7 @@
  
 
 /* --- DEFAULT THEME (Standard Dark) --- */
-:root {
+/* :root {
     --brand-primary: 59, 130, 246;
     --brand-secondary: 37, 99, 235;
     --bg-body: 15, 23, 42;
@@ -12,10 +12,10 @@
     --text-main: 248, 250, 252;
     --text-muted: 148, 163, 184;
     --item-active-bg: 51, 65, 85;
-}
+} */
 
 /* --- THEME: CLEAN SAAS (Light) --- */
-body.theme-saas {
+/* body.theme-saas {
     --brand-primary: 79, 70, 229;
     --brand-secondary: 67, 56, 202;
     --bg-body: 243, 244, 246;
@@ -26,10 +26,10 @@ body.theme-saas {
     --text-main: 17, 24, 39;
     --text-muted: 107, 114, 128;
     --item-active-bg: 243, 244, 246;
-}
+} */
 
 /* --- THEME: CYBERPUNK (Deep Dark) --- */
-body.theme-cyberpunk {
+/* body.theme-cyberpunk {
     --brand-primary: 192, 38, 211;
     --brand-secondary: 147, 51, 234;
     --bg-body: 9, 9, 11;
@@ -40,10 +40,10 @@ body.theme-cyberpunk {
     --text-main: 250, 250, 250;
     --text-muted: 161, 161, 170;
     --item-active-bg: 39, 39, 42;
-}
+} */
 
 /* --- THEME: FINTECH EMERALD (Pro Dark) --- */
-body.theme-fintech {
+/* body.theme-fintech {
     --brand-primary: 16, 185, 129;
     --brand-secondary: 5, 150, 105;
     --bg-body: 23, 23, 23;
@@ -54,137 +54,105 @@ body.theme-fintech {
     --text-main: 245, 245, 245;
     --text-muted: 163, 163, 163;
     --item-active-bg: 64, 64, 64;
-}
+} */
 
 
 /* --- THEME: MIDNIGHT PRO (Executive Blue) --- */
-body.theme-midnight {
+/* body.theme-midnight {
     --brand-primary: 56, 189, 248;
-    /* Sky 400 */
+     
     --brand-secondary: 2, 132, 199;
-    /* Sky 600 */
+    
     --bg-body: 2, 6, 23;
-    /* Slate 950 */
+     
     --bg-card: 15, 23, 42;
-    /* Slate 900 */
+     
     --bg-sidebar: 2, 6, 23;
-    /* Darker Sidebar */
+    
     --border-color: 30, 41, 59;
-    /* Slate 800 */
+     
     --sidebar-border: 30, 41, 59;
     --text-main: 241, 245, 249;
-    /* Slate 100 */
+    
     --text-muted: 148, 163, 184;
-    /* Slate 400 */
+     
     --item-active-bg: 30, 41, 59;
-}
+} */
 
 /* --- THEME: CRIMSON OPS (Security Red) --- */
-body.theme-crimson {
+/* body.theme-crimson {
     --brand-primary: 220, 38, 38;
-    /* Red 600 */
+    
     --brand-secondary: 153, 27, 27;
-    /* Red 800 */
+    
     --bg-body: 24, 24, 27;
-    /* Zinc 900 */
+    
     --bg-card: 39, 39, 42;
-    /* Zinc 800 */
+     
     --bg-sidebar: 24, 24, 27;
     --border-color: 63, 63, 70;
-    /* Zinc 700 */
+     
     --sidebar-border: 63, 63, 70;
     --text-main: 250, 250, 250;
     --text-muted: 161, 161, 170;
     --item-active-bg: 63, 63, 70;
-}
+} */
 
 /* --- THEME: SOLAR LIGHT (Warm/Sepia) --- */
-body.theme-solar {
+/* body.theme-solar {
     --brand-primary: 217, 119, 6;
-    /* Amber 600 */
     --brand-secondary: 180, 83, 9;
-    /* Amber 700 */
     --bg-body: 255, 251, 235;
-    /* Amber 50 (Cream) */
     --bg-card: 255, 255, 255;
-    /* White */
     --bg-sidebar: 255, 251, 235;
     --border-color: 231, 229, 228;
-    /* Stone 200 */
     --sidebar-border: 231, 229, 228;
     --text-main: 28, 25, 23;
-    /* Stone 900 */
     --text-muted: 120, 113, 108;
-    /* Stone 500 */
     --item-active-bg: 254, 243, 199;
-    /* Amber 100 */
-}
-
-/* --- THEME: OBSIDIAN GOLD (Luxury/VIP) --- */
-body.theme-obsidian {
-    --brand-primary: 234, 179, 8;
-    /* Gold (Yellow 500) */
-    --brand-secondary: 202, 138, 4;
-    /* Dark Gold */
-    --bg-body: 0, 0, 0;
-    /* Pure Black */
-    --bg-card: 23, 23, 23;
-    /* Neutral 900 */
-    --bg-sidebar: 0, 0, 0;
-    /* Pure Black */
-    --border-color: 64, 64, 64;
-    /* Neutral 700 */
-    --sidebar-border: 64, 64, 64;
-    --text-main: 255, 255, 255;
-    /* White */
-    --text-muted: 163, 163, 163;
-    /* Neutral 400 */
-    --item-active-bg: 38, 38, 38;
-    /* Neutral 800 */
-}
-
-/* --- THEME: ROYAL TWILIGHT (Creative Purple) --- */
-body.theme-royal {
-    --brand-primary: 139, 92, 246;
-    /* Violet 500 */
-    --brand-secondary: 124, 58, 237;
-    /* Violet 600 */
-    --bg-body: 10, 10, 28;
-    /* Very Dark Violet */
-    --bg-card: 22, 18, 45;
-    /* Deep Purple Card */
-    --bg-sidebar: 10, 10, 28;
-    --border-color: 46, 36, 80;
-    /* Purple Border */
-    --sidebar-border: 46, 36, 80;
-    --text-main: 237, 233, 254;
-    /* Violet 50 */
-    --text-muted: 167, 139, 250;
-    /* Violet 400 (Muted) */
-    --item-active-bg: 46, 36, 80;
-}
-
-/* --- THEME: DEEP FOREST (Nature/Growth) --- */
-body.theme-forest {
-    --brand-primary: 52, 211, 153;
-    /* Emerald 400 */
-    --brand-secondary: 16, 185, 129;
-    /* Emerald 500 */
-    --bg-body: 2, 20, 15;
-    /* Deep Jungle Green */
-    --bg-card: 6, 35, 25;
-    /* Dark Moss */
-    --bg-sidebar: 2, 20, 15;
-    --border-color: 20, 60, 45;
-    /* Green Border */
-    --sidebar-border: 20, 60, 45;
-    --text-main: 236, 253, 245;
-    /* Emerald 50 */
-    --text-muted: 110, 231, 183;
-    /* Emerald 300 */
-    --item-active-bg: 20, 60, 45;
-}
+     
+} */
  
+ 
+/* --- THEME: BLUE INK (Modern Light) --- */
+body.theme-blue-ink {
+    /* --- Mapped Core Variables (Converted HEX to RGB) --- */
+    --brand-primary: 74, 144, 217;      /* --blue: #4A90D9 */
+    --brand-secondary: 58, 123, 200;    /* --blue-dark: #3A7BC8 */
+    --bg-body: 245, 246, 248;           /* --surface: #F5F6F8 */
+    --bg-card: 255, 255, 255;           /* --white: #FFFFFF */
+    --bg-sidebar: 250, 251, 252;        /* --off-white: #FAFBFC */
+    --border-color: 228, 230, 235;      /* --border: #E4E6EB */
+    --sidebar-border: 228, 230, 235;    /* --border: #E4E6EB */
+    --text-main: 17, 19, 24;            /* --ink-1: #111318 */
+    --text-muted: 90, 97, 120;          /* --ink-3: #5A6178 */
+    --item-active-bg: 240, 246, 253;    /* --blue-wash: #F0F6FD */
+    
+    /* --- Additional Theme Properties --- */
+    --font-display: 'Montserrat', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+
+    /* Border Radii */
+    --radius: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --r-sm: var(--radius);
+    --r-md: var(--radius-lg);
+    --r-lg: var(--radius-xl);
+    --r-xl: 20px;
+    --r-2xl: 28px;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 3px rgba(17, 19, 24, 0.04);
+    --shadow-sm: 0 1px 2px rgba(17, 19, 24, 0.03), 0 4px 12px rgba(17, 19, 24, 0.04);
+    --shadow-md: 0 2px 4px rgba(17, 19, 24, 0.03), 0 8px 24px rgba(17, 19, 24, 0.06);
+    --shadow-lg: 0 4px 8px rgba(17, 19, 24, 0.03), 0 16px 48px rgba(17, 19, 24, 0.08);
+    --shadow-xl: 0 16px 48px rgba(17, 19, 24, 0.08);
+    
+    /* Animations / Easing */
+    --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
  
 /* --- UTILITY CLASSES (Use these in HTML) --- */
 
