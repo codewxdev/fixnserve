@@ -154,7 +154,7 @@
     <div class="max-w-5xl mx-auto" x-data="window.profileSettings()">
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-[#021056]">Profile Settings</h1>
-            <p class="text-gray-500 mt-1">Manage your account details, security, and preferences.</p>
+            <p class="text-gray-500 mt-1">Manage account details, security, and preferences.</p>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
