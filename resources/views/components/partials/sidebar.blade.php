@@ -154,7 +154,7 @@
                     </svg>
                 </button>
                 <ul x-show="activeDropdown === 'rbac' && sidebarOpen" x-collapse class="mt-1 space-y-1 px-1" x-cloak>
-                    <li><a href="{{ route('roles.index') }}"
+                    <li><a href="{{ route('roles.front') }}"
                             class="block py-2 pl-11 pr-2 rounded-lg text-sm hover:text-white nav-text"
                             style="color: rgb(var(--text-muted));">Roles</a></li>
                     <li><a href="{{ route('permissions.index') }}"

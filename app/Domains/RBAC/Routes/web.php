@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('/cp-x9f7/v1')->group(function () {
 // Roles Routes
-Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+Route::get('/roles', [RoleController::class, 'index'])->name('roles.front');
 
 
 // Permissions Routes
