@@ -14,6 +14,12 @@ class MFAPolicy extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
+    protected $attributes = [
+        'allowed_methods' => '["totp"]',
+    ];
+
+    
+
     public static function current()
     {
         return self::first() ?? self::create([

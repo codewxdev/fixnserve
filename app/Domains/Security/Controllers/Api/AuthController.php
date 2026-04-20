@@ -622,6 +622,7 @@ class AuthController extends BaseApiController
         $user = auth()->user();
 
         $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
             'dob' => 'nullable|date',
             'gender' => 'nullable|string',
             'current_address' => 'nullable|string',
@@ -800,4 +801,45 @@ class AuthController extends BaseApiController
             'message' => 'Token revoked successfully',
         ]);
     }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'password' => ['required', 'string', 'min:8', 'confirmed', new DynamicPasswordRule],
+        ]);
+
+        $user = auth()->user();
+
+        // Verify current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Your current password does not match our records.'
+            ], 400);
+        }
+
+        // Update password
+        $user->password = Hash::make($request->password);
+        $user->force_password_reset = false;
+        $user->save();
+
+        // 🔐 SECURITY AUDIT LOG
+        $this->securityAudit->log(
+            'password_changed',
+            [
+                'user_id' => $user->id,
+                'ip' => $request->ip(),
+            ],
+            $user 
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Password updated successfully.'
+        ]);
+    }
+
+    
+    
 }

@@ -22,4 +22,7 @@ Route::get('/security/network', [SecuirtyController::class, 'network'])->name('s
 // Privileged Access Routes
 Route::get('/security/privileged-access', [SecuirtyController::class, 'privilegedAccess'])->name('security.privileged_access.index');
 
+Route::get('/profile', [SecuirtyController::class, 'getProfile'])->name('profile.settings');
+
+
 });

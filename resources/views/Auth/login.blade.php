@@ -260,8 +260,14 @@
                     // Normal successful login
                     localStorage.setItem('token', accessToken);
                     document.cookie = `token=${accessToken}; path=/; SameSite=Lax`;
-                    window.location.href = "{{ route('platform_overview.index') }}";
                     localStorage.setItem('device_fingerprint', currentVisitorId);
+
+                    // 👇 ADD THESE 3 LINES 👇
+                    if (responseData.user || data.user) {
+                        localStorage.setItem("user", JSON.stringify(responseData.user || data.user));
+                    }
+
+                    window.location.href = "{{ route('platform_overview.index') }}";
                 } else {
                     throw new Error("Unexpected response from server.");
                 }

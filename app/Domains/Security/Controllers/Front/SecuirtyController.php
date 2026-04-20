@@ -36,4 +36,11 @@ class SecuirtyController extends Controller
     {
         return view('Admin.security.privileged_access.index');
     }
+
+     function getProfile()
+    {
+        
+      return view('Admin.profile.index');
+        
+    }
 }
