@@ -15,7 +15,7 @@
                 <div class="bg-red-50 p-3 rounded-lg border border-red-200 shadow-sm flex items-center">
                     <div class="mr-3 text-right">
                         <span class="block text-[10px] uppercase text-red-800 font-bold tracking-wider">Blocked Volume (24h)</span>
-                        <span class="text-lg font-bold text-red-600">Rs. 450,000</span>
+                        <span id="blocked-volume" class="text-lg font-bold text-red-600">Loading...</span>
                     </div>
                     <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-500">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
@@ -24,37 +24,11 @@
                 <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm flex items-center">
                     <div class="mr-3 text-right">
                         <span class="block text-[10px] uppercase text-yellow-800 font-bold tracking-wider">Frozen Wallets</span>
-                        <span class="text-lg font-bold text-yellow-700">18 Active</span>
+                        <span id="frozen-wallets-count" class="text-lg font-bold text-yellow-700">--</span>
                     </div>
                 </div>
             </div>
         </div>
-
-        {{-- <div class="mb-6">
-            <nav class="flex space-x-4 border-b border-[rgb(var(--border-color))] overflow-x-auto pb-1">
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.1 Risk Scoring Engine
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.2 Session Identity
-                </a>
-                <a href="#" class="border-b-2 border-[rgb(var(--brand-primary))] text-[rgb(var(--brand-primary))] py-3 px-4 font-semibold text-sm transition-colors whitespace-nowrap">
-                    13.3 Payment Abuse
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.4 Promo Abuse
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.5 Collusion Networks
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.6 Enforcement
-                </a>
-                <a href="#" class="border-b-2 border-transparent text-[rgb(var(--text-muted))] hover:text-[rgb(var(--text-main))] py-3 px-4 font-medium text-sm transition-colors whitespace-nowrap">
-                    13.7 Overrides
-                </a>
-            </nav>
-        </div> --}}
 
         <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
             
@@ -63,57 +37,15 @@
                 <div class="bg-[rgb(var(--bg-card))] p-5 rounded-lg shadow-sm border border-[rgb(var(--border-color))] transition-colors duration-300">
                     <h3 class="text-md font-semibold text-[rgb(var(--text-main))] mb-4">Active Threat Patterns</h3>
                     
-                    <div class="space-y-4">
-                        <div class="border-l-2 border-red-500 pl-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-[rgb(var(--text-main))]">Refund-Wallet Loops</span>
-                                <span class="bg-red-100 text-red-700 px-1.5 py-0.5 rounded text-[10px] font-bold">Critical</span>
-                            </div>
-                            <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Detects rapid order placement and immediate refund to wallet for cashing out.</p>
-                            <div class="mt-2 text-[10px] font-semibold text-[rgb(var(--brand-primary))]">Auto-Action: Freeze Wallet</div>
-                        </div>
-
-                        <div class="border-l-2 border-orange-500 pl-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-[rgb(var(--text-main))]">COD Manipulation</span>
-                                <span class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[10px] font-bold">High</span>
-                            </div>
-                            <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Rider marks COD collected but delays deposit, or customer rejects high-value COD repeatedly.</p>
-                            <div class="mt-2 text-[10px] font-semibold text-[rgb(var(--brand-primary))]">Auto-Action: Block COD Option</div>
-                        </div>
-
-                        <div class="border-l-2 border-yellow-500 pl-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-[rgb(var(--text-main))]">Chargeback Clustering</span>
-                                <span class="bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded text-[10px] font-bold">Medium</span>
-                            </div>
-                            <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Multiple chargebacks originating from the same device or IP block.</p>
-                            <div class="mt-2 text-[10px] font-semibold text-[rgb(var(--brand-primary))]">Auto-Action: Delay Payouts</div>
-                        </div>
+                    <div id="threat-patterns-container" class="space-y-4">
+                        <div class="text-xs text-gray-500 text-center py-2">Loading patterns...</div>
                     </div>
                 </div>
 
                 <div class="bg-[rgb(var(--bg-card))] p-5 rounded-lg shadow-sm border border-[rgb(var(--border-color))] transition-colors duration-300">
                     <h3 class="text-md font-semibold text-[rgb(var(--text-main))] mb-3">Velocity Limits</h3>
-                    <div class="space-y-3">
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-[rgb(var(--text-muted))]">Top-ups / 24h</span>
-                                <span class="text-[rgb(var(--text-main))] font-bold">Max 5</span>
-                            </div>
-                            <div class="w-full bg-[rgb(var(--item-active-bg))] rounded-full h-1.5">
-                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 100%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between text-xs mb-1">
-                                <span class="text-[rgb(var(--text-muted))]">Withdrawals / 24h</span>
-                                <span class="text-[rgb(var(--text-main))] font-bold">Max 2</span>
-                            </div>
-                            <div class="w-full bg-[rgb(var(--item-active-bg))] rounded-full h-1.5">
-                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: 100%"></div>
-                            </div>
-                        </div>
+                    <div id="velocity-limits-container" class="space-y-3">
+                         <div class="text-xs text-gray-500 text-center py-2">Loading limits...</div>
                     </div>
                 </div>
             </div>
@@ -125,7 +57,8 @@
                             <h3 class="text-lg font-semibold text-[rgb(var(--text-main))]">Transaction Risk Scan Feed</h3>
                             <p class="text-xs text-[rgb(var(--text-muted))]">Monitoring live transactions, top-ups, and COD settlements.</p>
                         </div>
-                        <button class="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-main))] px-3 py-1.5 rounded text-xs font-semibold hover:bg-[rgb(var(--item-active-bg))] transition-colors">
+                        <button onclick="exportAbuseLogs()" class="bg-[rgb(var(--bg-card))] border border-[rgb(var(--border-color))] text-[rgb(var(--text-main))] px-3 py-1.5 rounded text-xs font-semibold hover:bg-[rgb(var(--item-active-bg))] transition-colors flex items-center">
+                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             Export Abuse Logs
                         </button>
                     </div>
@@ -137,103 +70,13 @@
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Transaction / Entity</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Abuse Pattern Detected</th>
                                     <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Confidence</th>
-                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Enforcement Engine</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-[rgb(var(--text-muted))] uppercase tracking-wider">Enforcement Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="bg-[rgb(var(--bg-card))] divide-y divide-[rgb(var(--border-color))]">
-                                
-                                <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors bg-red-50/10">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="mr-3 p-2 bg-red-100 text-red-600 rounded">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-sm font-bold text-[rgb(var(--text-main))]">Customer #C-8821</div>
-                                                <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Withdrawal Attempt: Rs. 15,000</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-[rgb(var(--text-main))]">Refund-Wallet Loop</div>
-                                        <div class="text-[10px] text-red-500 mt-1">3 cancelled orders within 1 hour. Funds moved to wallet.</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 max-w-[80px]">
-                                            <div class="bg-red-600 h-1.5 rounded-full" style="width: 98%"></div>
-                                        </div>
-                                        <span class="text-[10px] font-bold text-red-600">98% Match</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <span class="px-2 py-1 bg-red-600 text-white rounded text-xs font-bold shadow-sm inline-block mb-1">
-                                            Wallet Freeze
-                                        </span>
-                                        <p class="text-[10px] text-[rgb(var(--text-muted))]">Finance Module Updated</p>
-                                    </td>
+                            <tbody id="transactions-tbody" class="bg-[rgb(var(--bg-card))] divide-y divide-[rgb(var(--border-color))]">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-sm text-[rgb(var(--text-muted))]">Loading transactions...</td>
                                 </tr>
-
-                                <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="mr-3 p-2 bg-orange-100 text-orange-600 rounded">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-sm font-bold text-[rgb(var(--text-main))]">Rider #R-109</div>
-                                                <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Pending Deposit: Rs. 42,000</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-[rgb(var(--text-main))]">COD Deposit Delay</div>
-                                        <div class="text-[10px] text-orange-600 mt-1">Threshold exceeded (48h). High risk of absconding.</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 max-w-[80px]">
-                                            <div class="bg-orange-500 h-1.5 rounded-full" style="width: 85%"></div>
-                                        </div>
-                                        <span class="text-[10px] font-bold text-orange-600">85% Match</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <span class="px-2 py-1 bg-orange-100 text-orange-800 border border-orange-200 rounded text-xs font-bold inline-block mb-1">
-                                            Manual Review Trigger
-                                        </span>
-                                        <div class="flex justify-end space-x-1 mt-1">
-                                            <button class="text-[10px] bg-[rgb(var(--brand-primary))] text-white px-2 py-0.5 rounded">Suspend Dispatch</button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex items-center">
-                                            <div class="mr-3 p-2 bg-yellow-100 text-yellow-600 rounded">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-sm font-bold text-[rgb(var(--text-main))]">Provider #P-334</div>
-                                                <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Payout Request: Rs. 8,500</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="text-sm font-medium text-[rgb(var(--text-main))]">Chargeback Risk Flag</div>
-                                        <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">Recent payments from high-risk BINs (Credit Cards).</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 max-w-[80px]">
-                                            <div class="bg-yellow-500 h-1.5 rounded-full" style="width: 60%"></div>
-                                        </div>
-                                        <span class="text-[10px] font-bold text-yellow-600">60% Match</span>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 border border-yellow-200 rounded text-xs font-bold inline-block mb-1">
-                                            Payout Delay (T+3)
-                                        </span>
-                                        <p class="text-[10px] text-[rgb(var(--text-muted))]">Escalated to Finance</p>
-                                    </td>
-                                </tr>
-
                             </tbody>
                         </table>
                     </div>
@@ -243,4 +86,238 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        const apiBase = "{{ url('/api') }}"; 
+
+        const getHeaders = () => {
+            const token = localStorage.getItem('token'); 
+            return {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                ...(token ? { 'Authorization': `Bearer ${token}` } : {}) 
+            };
+        };
+
+        // 1. Fetch Dashboard Stats
+        async function fetchDashboardStats() {
+            try {
+                const res = await fetch(`${apiBase}/payment-abuse/dashboard`, { headers: getHeaders() });
+                const json = await res.json();
+                if (json.success && json.data) {
+                    // Adjust keys based on your actual API response structure
+                    document.getElementById('blocked-volume').textContent = json.data.blocked_volume || 'Rs. 0';
+                    document.getElementById('frozen-wallets-count').textContent = `${json.data.frozen_wallets || 0} Active`;
+                }
+            } catch (error) {
+                console.error("Error fetching dashboard:", error);
+            }
+        }
+
+        // 2. Fetch Threat Patterns
+        async function fetchThreatPatterns() {
+            try {
+                const res = await fetch(`${apiBase}/payment-abuse/threat-patterns`, { headers: getHeaders() });
+                const json = await res.json();
+                const container = document.getElementById('threat-patterns-container');
+                
+                if (json.success && json.data.length > 0) {
+                    container.innerHTML = json.data.map(pattern => {
+                        // Map severity to colors
+                        let colorStr = pattern.severity === 'critical' ? 'red' : (pattern.severity === 'high' ? 'orange' : 'yellow');
+                        return `
+                        <div class="border-l-2 border-${colorStr}-500 pl-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs font-bold text-[rgb(var(--text-main))]">${pattern.name}</span>
+                                <span class="bg-${colorStr}-100 text-${colorStr}-700 px-1.5 py-0.5 rounded text-[10px] font-bold capitalize">${pattern.severity}</span>
+                            </div>
+                            <p class="text-[10px] text-[rgb(var(--text-muted))] mt-1">${pattern.description || 'Monitors for anomalous payment behavior.'}</p>
+                            <div class="mt-2 text-[10px] font-semibold text-[rgb(var(--brand-primary))]">Auto-Action: ${pattern.auto_action_name || 'Review'}</div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `<div class="text-xs text-gray-500">No active threat patterns.</div>`;
+                }
+            } catch (error) {
+                console.error("Error fetching patterns:", error);
+            }
+        }
+
+        // 3. Fetch Velocity Limits
+        async function fetchVelocityLimits() {
+            try {
+                const res = await fetch(`${apiBase}/payment-abuse/velocity-limits`, { headers: getHeaders() });
+                const json = await res.json();
+                const container = document.getElementById('velocity-limits-container');
+                
+                if (json.success && json.data.length > 0) {
+                    container.innerHTML = json.data.map(limit => {
+                        // Assuming API returns a current_count and max_count. Defaulting progress width to 100% if current_count is unavailable.
+                        let percentage = limit.current_count ? Math.min((limit.current_count / limit.max_count) * 100, 100) : 100;
+                        return `
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-[rgb(var(--text-muted))]">${limit.name || 'Limit'}</span>
+                                <span class="text-[rgb(var(--text-main))] font-bold">Max ${limit.max_count}</span>
+                            </div>
+                            <div class="w-full bg-[rgb(var(--item-active-bg))] rounded-full h-1.5">
+                                <div class="bg-blue-500 h-1.5 rounded-full" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = `<div class="text-xs text-gray-500">No velocity limits configured.</div>`;
+                }
+            } catch (error) {
+                console.error("Error fetching limits:", error);
+            }
+        }
+
+        // 4. Fetch Transaction Feed
+        async function fetchTransactions() {
+            try {
+                const res = await fetch(`${apiBase}/payment-abuse/transactions`, { headers: getHeaders() });
+                const json = await res.json();
+                const tbody = document.getElementById('transactions-tbody');
+                
+                if (json.success && json.data.data.length > 0) {
+                    tbody.innerHTML = json.data.data.map(txn => {
+                        const isCritical = txn.severity === 'critical';
+                        const isHigh = txn.severity === 'high';
+                        const rowClass = isCritical ? 'bg-red-50/10' : '';
+                        
+                        let barColor = isCritical ? 'bg-red-600' : (isHigh ? 'bg-orange-500' : 'bg-yellow-500');
+                        let badgeColor = isCritical ? 'bg-red-100 text-red-600' : (isHigh ? 'bg-orange-100 text-orange-600' : 'bg-yellow-100 text-yellow-600');
+                        
+                        // Default Actions based on status
+                        let actionButtons = '';
+                        if(txn.status !== 'resolved' && txn.status !== 'false_positive') {
+                            actionButtons = `
+                                <div class="flex justify-end space-x-1 mt-2">
+                                    <button onclick="takeAction(${txn.id}, 'freeze-wallet')" title="Freeze Wallet" class="text-[10px] bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded transition-colors">Freeze</button>
+                                    <button onclick="takeAction(${txn.id}, 'delay-payout')" title="Delay Payout" class="text-[10px] bg-yellow-600 hover:bg-yellow-700 text-white px-2 py-1 rounded transition-colors">Delay</button>
+                                    <button onclick="takeAction(${txn.id}, 'suspend-dispatch')" title="Suspend Dispatch" class="text-[10px] bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 rounded transition-colors">Suspend</button>
+                                </div>
+                                <div class="flex justify-end space-x-1 mt-1">
+                                    <button onclick="takeAction(${txn.id}, 'resolve')" class="text-[10px] bg-green-100 text-green-800 hover:bg-green-200 px-2 py-0.5 rounded transition-colors">Resolve</button>
+                                    <button onclick="takeAction(${txn.id}, 'false-positive')" class="text-[10px] bg-gray-200 text-gray-800 hover:bg-gray-300 px-2 py-0.5 rounded transition-colors">False Positive</button>
+                                </div>
+                            `;
+                        } else {
+                            actionButtons = `<span class="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs font-bold uppercase">${txn.status.replace('_', ' ')}</span>`;
+                        }
+
+                        return `
+                        <tr class="hover:bg-[rgb(var(--item-active-bg))] transition-colors ${rowClass}">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="mr-3 p-2 ${badgeColor} rounded">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-[rgb(var(--text-main))]">${txn.entity_ref || 'Unknown Entity'}</div>
+                                        <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1">${txn.transaction_type}: Rs. ${txn.amount || '0'}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-[rgb(var(--text-main))]">${txn.abuse_pattern || 'Anomaly Detected'}</div>
+                                <div class="text-[10px] text-[rgb(var(--text-muted))] mt-1 line-clamp-2">${txn.notes || 'No notes available.'}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="w-full bg-gray-200 rounded-full h-1.5 mb-1 max-w-[80px]">
+                                    <div class="${barColor} h-1.5 rounded-full" style="width: ${txn.confidence_score || 0}%"></div>
+                                </div>
+                                <span class="text-[10px] font-bold text-[rgb(var(--text-main))]">${txn.confidence_score || 0}% Match</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <span class="px-2 py-1 bg-gray-100 text-gray-800 border border-gray-200 rounded text-xs font-bold inline-block mb-1 capitalize">
+                                    ${txn.auto_action ? txn.auto_action.replace('_', ' ') : 'No Auto Action'}
+                                </span>
+                                ${actionButtons}
+                            </td>
+                        </tr>
+                        `;
+                    }).join('');
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="px-6 py-8 text-center text-sm text-[rgb(var(--text-muted))]">No active transactions detected.</td></tr>`;
+                }
+            } catch (error) {
+                console.error("Error fetching transactions:", error);
+            }
+        }
+
+        // --- Action Handlers ---
+
+        window.takeAction = async function(id, actionRoute) {
+            if(!confirm(`Are you sure you want to trigger: ${actionRoute.replace('-', ' ')}?`)) return;
+            
+            try {
+                const res = await fetch(`${apiBase}/payment-abuse/transactions/${id}/${actionRoute}`, { 
+                    method: 'POST', 
+                    headers: getHeaders() 
+                });
+                const data = await res.json();
+                
+                if(data.success) {
+                    fetchTransactions(); // Refresh table immediately 
+                    fetchDashboardStats(); // Numbers might have changed
+                } else {
+                    alert(data.message || 'Action failed.');
+                }
+            } catch (error) {
+                console.error(`Error executing ${actionRoute}:`, error);
+                alert('An error occurred while processing your request.');
+            }
+        };
+
+        window.exportAbuseLogs = async function() {
+            try {
+                // Fetch blob to pass authorization headers natively
+                const res = await fetch(`${apiBase}/payment-abuse/export`, {
+                    method: 'GET',
+                    headers: getHeaders()
+                });
+                
+                if (!res.ok) throw new Error("Export failed");
+                
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                
+                // Set default filename, can be overridden by content-disposition if desired
+                const date = new Date().toISOString().split('T')[0];
+                a.download = `payment_abuse_log_${date}.csv`;
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                // Cleanup
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+
+            } catch (error) {
+                console.error("Error exporting logs:", error);
+                alert("Could not export logs at this time.");
+            }
+        };
+
+        // Initialize App Data
+        fetchDashboardStats();
+        fetchThreatPatterns();
+        fetchVelocityLimits();
+        fetchTransactions();
+
+        // Optional: Set interval to poll for live transactions every 30 seconds
+        setInterval(fetchTransactions, 30000);
+    });
+</script>
+@endpush
 @endsection

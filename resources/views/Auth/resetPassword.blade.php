@@ -219,7 +219,7 @@
 @push('scripts')
     <script>
         document.getElementById("resetPasswordForm").addEventListener("submit", function(e) {
-            e.preventDefault();
+            e.preventDefault(); // This stops the browser from doing a standard POST to the current page URL
 
             const button = document.getElementById("submitButton");
             const messageContainer = document.getElementById("messageContainer");
@@ -228,8 +228,14 @@
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm_password").value;
 
+            // Retrieve the email and code saved from the OTP step
             const email = localStorage.getItem("reset_email");
             const code = localStorage.getItem("reset_code");
+
+            // Reset messages
+            messageContainer.classList.add("hidden");
+            messageContainer.classList.remove("bg-red-100", "border-red-400", "text-red-700", "bg-green-100",
+                "border-green-400", "text-green-700");
 
             if (!email || !code) {
                 messageContainer.classList.remove("hidden");
@@ -246,20 +252,22 @@
                 return;
             }
 
-            // Start loading
+            // Start loading state
             button.disabled = true;
             button.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Updating...
-        `;
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Updating...
+            `;
 
-            fetch("http://127.0.0.1:8000/api/password/reset", {
+            // Call your API endpoint
+            fetch("{{ url('/api/password/reset') }}", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
                     },
                     body: JSON.stringify({
                         email: email,
@@ -268,33 +276,44 @@
                         password_confirmation: confirmPassword
                     })
                 })
-                .then(res => res.json())
-                .then(data => {
-                    messageContainer.classList.remove("hidden");
-
-                    if (data.status === true) {
-                        messageContainer.classList.add("bg-green-100", "border-green-400", "text-green-700");
-                        feedbackMessage.innerText = "Success! Your password has been updated.";
-
-                        // Clear OTP storage
-                        localStorage.removeItem("reset_email");
-                        localStorage.removeItem("reset_code");
-
-                        setTimeout(() => {
-                            window.location.href = "{{ route('login.index') }}";
-                        }, 1500);
-
-                    } else {
-                        messageContainer.classList.add("bg-red-100", "border-red-400", "text-red-700");
-                        feedbackMessage.innerText = data.message || "An error occurred.";
+                .then(async res => {
+                    const data = await res.json();
+                    if (!res.ok || data.status === false) {
+                        // Extract error message exactly like your other script does
+                        let errorMsg = data.message || "An error occurred.";
+                        if (data.errors) {
+                            const firstKey = Object.keys(data.errors)[0];
+                            errorMsg = Array.isArray(data.errors[firstKey]) ? data.errors[firstKey][0] :
+                                data.errors[firstKey];
+                        }
+                        throw new Error(errorMsg);
                     }
+                    return data;
+                })
+                .then(data => {
+                    // Success
+                    messageContainer.classList.remove("hidden");
+                    messageContainer.classList.add("bg-green-100", "border-green-400", "text-green-700");
+                    feedbackMessage.innerText = "Success! Your password has been updated.";
+
+                    // Clear OTP storage so it can't be reused maliciously
+                    localStorage.removeItem("reset_email");
+                    localStorage.removeItem("reset_code");
+
+                    // Redirect to login
+                    setTimeout(() => {
+                        window.location.href =
+                        "{{ route('login') }}"; // Make sure you have a 'login' route named in web.php
+                    }, 1500);
                 })
                 .catch(err => {
+                    // Error
                     messageContainer.classList.remove("hidden");
                     messageContainer.classList.add("bg-red-100", "border-red-400", "text-red-700");
-                    feedbackMessage.innerText = "Network error occurred.";
+                    feedbackMessage.innerText = err.message;
                 })
                 .finally(() => {
+                    // Reset button state
                     button.disabled = false;
                     button.innerHTML = "Reset Password";
                 });
