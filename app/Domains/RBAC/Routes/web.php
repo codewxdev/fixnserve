@@ -13,7 +13,7 @@ Route::get('/roles', [RoleController::class, 'index'])->name('roles.front');
 
 
 // Permissions Routes
-Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
+Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.front');
 
 
 // Access Matrix Route
