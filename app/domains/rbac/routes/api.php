@@ -7,10 +7,8 @@ use App\Domains\RBAC\Controllers\Api\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
-
     // Main Authenticated Routes Group with User Status Check
     Route::middleware(['auth:api', 'user.active', 'active.session', 'validate.session', 'network.security'])->group(function () {
-
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {
             Route::apiResource('roles', RoleController::class);
@@ -28,9 +26,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             });
 
         });
-
     });
-
 });
 
 // Route::apiResource('roles', RoleController::class);
