@@ -1,0 +1,10 @@
+{
+  "welcome": "Bienvenue",
+  "success": "Opération réussie",
+  "error": "Une erreur s'est produite",
+  "not_found": "Ressource non trouvée",
+  "invalid_request": "Demande invalide",
+  "unauthorized": "Accès non autorisé",
+  "status_success": "succès",
+  "status_error": "erreur"
+}
