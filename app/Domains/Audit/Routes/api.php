@@ -42,28 +42,22 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             // ✅ Entity Statement
             Route::get('/statement/{entityType}/{entityId}', [FinancialAuditController::class, 'entityStatement']);
         });
-
         Route::prefix('security-audit')->group(function () {
-
             // ✅ Overview
             Route::get('/dashboard', [SecurityAuditController::class, 'dashboard']);
-
             // ✅ Audit Logs
             Route::get('/logs', [SecurityAuditController::class, 'auditLogs']);
             Route::get('/logs/{log}', [SecurityAuditController::class, 'showLog']);
             Route::get('/logs/user/{userId}', [SecurityAuditController::class, 'userTimeline']);
             Route::get('/logs/ip/{ip}', [SecurityAuditController::class, 'ipActivity']);
             Route::get('/export', [SecurityAuditController::class, 'exportLogs']);
-
             // ✅ Anomalies
             Route::get('/anomalies', [SecurityAuditController::class, 'anomalies']);
             Route::post('/anomalies/{anomaly}/investigate', [SecurityAuditController::class, 'investigateAnomaly']);
             Route::post('/anomalies/{anomaly}/resolve', [SecurityAuditController::class, 'resolveAnomaly']);
-
             // ✅ Privilege & Policy
             Route::get('/privilege-logs', [SecurityAuditController::class, 'privilegeLogs']);
             Route::get('/policy-changes', [SecurityAuditController::class, 'policyChanges']);
-
             // ✅ Reports
             Route::get('/reports/failed-logins', [SecurityAuditController::class, 'failedLoginReport']);
         });
