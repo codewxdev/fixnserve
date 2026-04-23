@@ -2,10 +2,10 @@
 
 use App\Domains\Fraud\Controllers\Api\CollusionDetectionController;
 use App\Domains\Fraud\Controllers\Api\ManualOverrideController;
+use App\Domains\Fraud\Controllers\Api\PaymentAbuseController;
 use App\Domains\Fraud\Controllers\Api\PromoAbuseController;
 use App\Domains\Fraud\Controllers\Api\RiskScoringController;
 use App\Domains\Fraud\Controllers\Api\SessionIdentityRiskController;
-use App\Domains\Fraud\Controllers\PaymentAbuseController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {

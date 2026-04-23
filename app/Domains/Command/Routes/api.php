@@ -40,11 +40,11 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
                     'response' => $res,
                 ]);
             });
-            // /////////////////maintance route/////////////////
+            // /////////////////maintenance route/////////////////
             Route::post('/maintenance', [MaintenanceController::class, 'store']);
             Route::get('/maintenance', [MaintenanceController::class, 'index']);
             Route::patch('/maintenance/{maintenance}', [MaintenanceController::class, 'updateStatus']);
-            // //////////////////switchkill route////////////////
+            // //////////////////switch kill route////////////////
             Route::post('/kill/switch', [KillSwitchController::class, 'store']);
             Route::get('/kill/switch', [KillSwitchController::class, 'index']);
             Route::post('kill/switch/cancel/{id}', [KillSwitchController::class, 'cancel']);

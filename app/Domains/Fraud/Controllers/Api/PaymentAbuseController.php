@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers;
+namespace App\Domains\Fraud\Controllers\Api;
 
 use App\Domains\Fraud\Models\PaymentAbuseDetection;
 use App\Domains\Fraud\Models\PaymentThreatPattern;
