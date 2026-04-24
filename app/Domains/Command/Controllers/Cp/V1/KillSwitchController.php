@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Command\Controllers\Api;
+namespace App\Domains\Command\Controllers\Cp\V1;
 
 use App\Domains\Command\Models\KillSwitch;
 use App\Http\Controllers\BaseApiController;
@@ -64,7 +64,7 @@ class KillSwitchController extends BaseApiController
      */
     public function index()
     {
-        $kills = KillSwitch::latest()->get();
+        $kills = KillSwitch::paginate(10);
 
         return $this->success(
             $kills,

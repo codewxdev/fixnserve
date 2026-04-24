@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Command\Controllers\Api;
+namespace App\Domains\Command\Controllers\Cp\V1;
 
 use App\Domains\Command\Models\Maintenance;
 use App\Http\Controllers\BaseApiController;
@@ -11,7 +11,7 @@ class MaintenanceController extends BaseApiController
 {
     public function index()
     {
-        $data = Maintenance::get();
+        $data = Maintenance::paginate(10);
 
         return $this->success(
             $data,

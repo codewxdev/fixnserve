@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Audit\Controllers\Api;
+namespace App\Domains\Audit\Controllers\Cp\V1;
 
 use App\Domains\Audit\Models\AdminActionLog;
 use App\Domains\Audit\Models\SecurityAuditLog;
@@ -14,7 +14,7 @@ class AuditAdminController extends BaseApiController
     {
         $audits = AdminActionLog::with('user')
             ->orderBy('performed_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return $this->success(
             $audits,
@@ -26,7 +26,7 @@ class AuditAdminController extends BaseApiController
     {
         $audit = PermissionAuditLog::with('permission')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return $this->success(
             $audit,
@@ -38,7 +38,7 @@ class AuditAdminController extends BaseApiController
     {
         $audit = SecurityAuditLog::with('user')
             ->orderBy('occurred_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return $this->success(
             $audit,

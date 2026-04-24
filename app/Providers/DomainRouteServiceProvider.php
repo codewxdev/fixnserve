@@ -46,10 +46,20 @@ class DomainRouteServiceProvider extends ServiceProvider
             | API Routes
             |--------------------------------------------------------------------------
             */
-            if (File::exists($routesPath.'/api.php')) {
-                Route::prefix('api')
+            if (File::exists($routesPath.'/api-v1.php')) {
+                Route::prefix('api/v1')
                     ->middleware('api')
-                    ->group($routesPath.'/api.php');
+                    ->group($routesPath.'/api-v1.php');
+            }
+            if (File::exists($routesPath.'/sys-v1.php')) {
+                Route::prefix('sys/v1')
+                    ->middleware('api')
+                    ->group($routesPath.'/sys-v1.php');
+            }
+            if (File::exists($routesPath.'/cp-v1.php')) {
+                Route::prefix('cp/v1')
+                    ->middleware('api')
+                    ->group($routesPath.'/cp-v1.php');
             }
         }
     }

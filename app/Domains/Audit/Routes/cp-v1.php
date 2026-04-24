@@ -1,16 +1,16 @@
 <?php
 
-use App\Domains\Audit\Controllers\Api\AuditAdminController;
-use App\Domains\Audit\Controllers\Api\FinancialAuditController;
-use App\Domains\Audit\Controllers\Api\SecurityAuditController;
+use App\Domains\Audit\Controllers\Cp\V1\AuditAdminController;
+use App\Domains\Audit\Controllers\Cp\V1\FinancialAuditController;
+use App\Domains\Audit\Controllers\Cp\V1\SecurityAuditController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
     Route::middleware('auth:api', 'user.active', 'active.session', 'validate.session', 'role:Super Admin')->group(function () {
         Route::get('/admin-actions', [AuditAdminController::class, 'adminAudit']);
         Route::get('/permission-audit', [AuditAdminController::class, 'permissionAudit']);
-        Route::get('/admin/security-audit/overview', [AuditAdminController::class, 'overview']);
-        Route::get('/admin/security-audit', [AuditAdminController::class, 'securityAudit']);
+        Route::get('/security-audit/overview', [AuditAdminController::class, 'overview']);
+        Route::get('/security-audit', [AuditAdminController::class, 'securityAudit']);
 
         Route::prefix('financial-audit')->group(function () {
             // ✅ Dashboard
