@@ -3,14 +3,36 @@
 use App\Domains\Fraud\Controllers\Front\FraudController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('/cp-x9f7/v1')->group(function () {
-Route::get('/fraud',[FraudController::class,'index'])->name('fraud.risk_scoring_engine');
-Route::get('/fraud/session-identity-risk',[FraudController::class,'SessionIdentityRisk'])->name('fraud.session_Identity_Risk');
-Route::get('/fraud/payment_wallet',[FraudController::class,'PaymentWallet'])->name('fraud.payment_wallet');
-Route::get('/fraud/promotion_incentive_abuse',[FraudController::class,'PromotionIncentiveAbuse'])->name('fraud.promotion_incentive_abuse');
-Route::get('/fraud/collusion_networks',[FraudController::class,'CollusionNetworks'])->name('fraud.collusion_networks');
-Route::get('/fraud/automated_enforcement_engine',[FraudController::class,'AutomatedEnforcementEngine'])->name('fraud.automated_enforcement_engine');
-Route::get('/fraud/manual_overrides_governance',[FraudController::class,'ManualOverridesGovernance'])->name('fraud.manual_overrides_governance');
+/*
+|--------------------------------------------------------------------------
+| SAHOR ONE CONTROL PANEL (MODULE 9: FRAUD & RISK)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware([
+    'web', 'auth.admin', 'admin.mfa', 'admin.ip_whitelist', 'admin.device_trust'
+])
+->prefix('cp-x9f7a2/v1/fraud-risk')
+->name('cp.fraud-risk.')
+->group(function () {
+
+    // Risk Scoring Engine
+    Route::get('/scoring', [FraudController::class, 'index'])->name('scoring');
+
+    // Session & Identity Risk
+    Route::get('/identity', [FraudController::class, 'SessionIdentityRisk'])->name('identity');
+
+    // Payment & Transaction Fraud
+    Route::get('/payments', [FraudController::class, 'PaymentWallet'])->name('payments');
+
+    // Automated Enforcement
+    Route::get('/enforcement', [FraudController::class, 'AutomatedEnforcementEngine'])->name('enforcement');
+
+    // Collusion & Abuse
+    Route::get('/abuse', [FraudController::class, 'PromotionIncentiveAbuse'])->name('abuse');
+    Route::get('/collusion', [FraudController::class, 'CollusionNetworks'])->name('collusion');
+
+    // Manual Overrides & Governance
+    Route::get('/overrides', [FraudController::class, 'ManualOverridesGovernance'])->name('overrides');
 
 });
-

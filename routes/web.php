@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 // Super Admin Routes (with additional checks)
 Route::middleware('auth')->group(function () {
     Route::get('/', function () {
-        return view('Admin.dashboard.index');
+        return view('admin.dashboard.index');
     })->name('dashboard.index');
 });
 

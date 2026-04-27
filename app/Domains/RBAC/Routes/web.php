@@ -6,21 +6,29 @@ use App\Domains\RBAC\Controllers\Front\PermissionController;
 use App\Domains\RBAC\Controllers\Front\RoleController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| SAHOR ONE CONTROL PANEL (MODULE 3: ROLES & PERMISSIONS)
+|--------------------------------------------------------------------------
+*/
 
-Route::prefix('/cp-x9f7/v1')->group(function () {
-// Roles Routes
-Route::get('/roles', [RoleController::class, 'index'])->name('roles.front');
+Route::middleware([
+    'web', 'auth.admin', 'admin.ip_whitelist'
+])
+->prefix('cp-x9f7a2/v1/rbac')
+->name('cp.rbac.')
+->group(function () {
 
+    // Roles Management
+    Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
 
-// Permissions Routes
-Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.front');
+    // Permissions Management
+    Route::get('/permissions', [PermissionController::class, 'index'])->name('permissions.index');
 
+    // Access Matrix (Role -> Permission Mapping)
+    Route::get('/matrix', [AccessMetrixController::class, 'index'])->name('matrix');
 
-// Access Matrix Route
-Route::get('/access-matrix', [AccessMetrixController::class, 'index'])->name('access-matrix.index');
-
-
-// Audit & Governance Route
-Route::get('/audit-governance', [AuditGovernanceController::class, 'index'])->name('audit-governance.index');
+    // RBAC Audit & Governance
+    Route::get('/governance', [AuditGovernanceController::class, 'index'])->name('governance');
 
 });

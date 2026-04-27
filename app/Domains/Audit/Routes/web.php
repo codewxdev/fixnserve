@@ -3,29 +3,41 @@
 use App\Domains\Audit\Controllers\Front\AuditController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('/cp-x9f7/v1')->group(function () {
-    // admin action audit Routes
-    Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
+/*
+|--------------------------------------------------------------------------
+| SAHOR ONE CONTROL PANEL (MODULE 13: AUDIT & COMPLIANCE)
+|--------------------------------------------------------------------------
+*/
 
-    // financial transaction audit Routes
-    Route::get('/audit/financial-transaction', [AuditController::class, 'financialTransactionAudit'])->name('audit.financial_transaction');
+Route::middleware([
+    'web', 'auth.admin', 'admin.mfa', 'admin.ip_whitelist', 'admin.device_trust'
+])
+->prefix('cp-x9f7a2/v1/audit-logs')
+->name('cp.audit-logs.')
+->group(function () {
 
-    // security access audit Routes
-    Route::get('/audit/security-access', [AuditController::class, 'securityAccessAudit'])->name('audit.security_access');
+    // Admin Action Audit Logs
+    Route::get('/actions', [AuditController::class, 'index'])->name('actions');
 
-    // data access privacy compliance Routes
-    Route::get('/audit/data-access-privacy-compliance', [AuditController::class, 'dataAccessPrivacyCompliance'])->name('audit.data_access_privacy_compliance');
+    // Financial & Transaction Audit
+    Route::get('/financial', [AuditController::class, 'financialTransactionAudit'])->name('financial');
 
-    // regulatory reporting & exports Routes
-    Route::get('/audit/regulatory-reporting-exports', [AuditController::class, 'regulatoryReportingExports'])->name('audit.regulatory_reporting_exports');
+    // Security & Access Audit
+    Route::get('/security', [AuditController::class, 'securityAccessAudit'])->name('security');
 
-    // data retention & legal holds Routes
-    Route::get('/audit/data-retention-legal-holds', [AuditController::class, 'dataRetentionLegalHolds'])->name('audit.data_retention_legal_holds');
+    // Data Access & Privacy Compliance (GDPR/UAE Law)
+    Route::get('/privacy', [AuditController::class, 'dataAccessPrivacyCompliance'])->name('privacy');
 
-    // audit search, replay & forensics Routes
-    Route::get('/audit/user-activity-audit', [AuditController::class, 'auditSearchReplayForensics'])->name('audit.user_activity_audit');
+    // Regulatory Reporting & Exports
+    Route::get('/exports', [AuditController::class, 'regulatoryReportingExports'])->name('exports');
 
-    // compliance monitoring & alerts Routes
-    Route::get('/audit/compliance-monitoring-alerts', [AuditController::class, 'complianceMonitoringAlerts'])->name('audit.compliance_monitoring_alerts');
+    // Data Retention & Legal Holds
+    Route::get('/retention', [AuditController::class, 'dataRetentionLegalHolds'])->name('retention');
+
+    // Audit Search, Replay & Forensics
+    Route::get('/forensics', [AuditController::class, 'auditSearchReplayForensics'])->name('forensics');
+
+    // Compliance Monitoring & Alerts
+    Route::get('/monitoring', [AuditController::class, 'complianceMonitoringAlerts'])->name('monitoring');
 
 });

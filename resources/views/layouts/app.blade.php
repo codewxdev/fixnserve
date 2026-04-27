@@ -1,40 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="antialiased">
 
 <head class="fn-head">
-    <meta charset="UTF-8" class="fn-meta-charset">
+    <meta charset="UTF-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" class="fn-meta-viewport">
-    <title class="fn-title">SahorOne | Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com" class="fn-script-tailwind"></script>
+    <title class="fn-title">SahorOne | Control Panel</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.png') }}" class="fn-link-favicon">
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" class="fn-script-alpine"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" class="fn-link-fontawesome" />
-    <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}" class="fn-link-responsive">
-    <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
+
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            DEFAULT: 'rgb(var(--brand-primary) / <alpha-value>)',
-                            dark: 'rgb(var(--brand-secondary) / <alpha-value>)',
-                            wash: 'rgb(var(--item-active-bg) / <alpha-value>)',
-                        }
+                        brand: { primary: 'var(--brand-primary)', hover: 'var(--brand-primary-hover)', active: 'var(--brand-primary-active)', secondary: 'var(--brand-secondary)', accent: 'var(--brand-accent)' },
+                        bg: { primary: 'var(--bg-primary)', secondary: 'var(--bg-secondary)', tertiary: 'var(--bg-tertiary)', muted: 'var(--bg-muted)' },
+                        border: { default: 'var(--border-default)', strong: 'var(--border-strong)' },
+                        text: { primary: 'var(--text-primary)', secondary: 'var(--text-secondary)', tertiary: 'var(--text-tertiary)', disabled: 'var(--text-disabled)' },
+                        semantic: { success: 'var(--color-success)', warning: 'var(--color-warning)', error: 'var(--color-error)', info: 'var(--color-info)' }
                     },
-                    fontFamily: {
-                     sans: ['Poppins', 'sans-serif'],
-                }
+                    fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+                    transitionDuration: { fast: '150ms', DEFAULT: '200ms', slow: '300ms' }
                 }
             }
         }
@@ -42,133 +41,108 @@
     @stack('styles')
 </head>
 
-<body class="antialiased fn-body theme-bg-body transition-colors duration-300 theme-blue-ink" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
+<body class="bg-bg-primary text-text-primary font-sans transition-colors duration-slow" x-data="{
+    sidebarOpen: window.innerWidth >= 1024,
+    isPageLoading: true, // Injecting loading state
+    theme: localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+    initTheme() {
+        if (this.theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('theme-dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.body.classList.remove('theme-dark');
+        }
+    },
+    toggleTheme() {
+        this.theme = this.theme === 'dark' ? 'light' : 'dark';
+        localStorage.setItem('theme', this.theme);
+        this.initTheme();
+    }
+}" x-init="
+    initTheme(); 
+    $watch('theme', () => initTheme());
+    // 3 Second Loader Timeout
+    setTimeout(() => { isPageLoading = false }, 500);
+">
 
-    <div class="fn-app-wrapper">
+    <div x-show="isPageLoading" 
+         x-transition.opacity.duration.500ms
+         class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-bg-primary"
+         style="display: flex;"> <div class="relative w-16 h-16 flex items-center justify-center mb-6">
+            <div class="absolute inset-0 rounded-full border-4 border-border-default"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-brand-primary border-t-transparent animate-spin"></div>
+            <img src="{{ asset('favicon.png') }}" class="w-6 h-6 animate-pulse" alt="Sahor One">
+        </div>
+        
+        <h2 class="text-h3 font-bold text-text-primary tracking-tight mb-2">SahorOne</h2>
+        <p class="text-caption text-text-tertiary animate-pulse uppercase tracking-widest font-semibold">Initializing Workspace...</p>
+    </div>
 
-        <x-partials.sidebar class="fn-sidebar-component" />
+    <div class="flex h-screen w-full overflow-hidden bg-bg-primary">
 
-        <div x-bind:class="{ 'ml-72': sidebarOpen, 'ml-20': !sidebarOpen }"
-            class="fn-main-content-area min-h-screen flex flex-col">
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity 
+             class="fixed inset-0 bg-black/50 z-30 lg:hidden" x-cloak></div>
 
-            <header
-                class="bg-white shadow-sm border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-20 fn-header-top-nav">
+        <x-partials.sidebar />
 
-                <div class="flex items-center fn-header-left-group">
-                    <button @click="sidebarOpen = !sidebarOpen"
-                        class="text-slate-600 hover:text-blue-500 transition-colors mr-4 focus:outline-none fn-btn-sidebar-toggle">
-                        <svg x-show="sidebarOpen" class="w-6 h-6 fn-icon-menu-open" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h7"></path>
-                        </svg>
-                        <svg x-show="!sidebarOpen" class="w-6 h-6 fn-icon-menu-closed" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
-                        </svg>
+        <div class="flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out h-screen overflow-y-auto relative z-10">
+
+            <header class="bg-bg-primary border-b border-border-default h-16 flex items-center justify-between px-6 sticky top-0 z-20 transition-colors duration-slow">
+                <div class="flex items-center">
+                    <button @click="sidebarOpen = !sidebarOpen" class="text-text-secondary hover:text-brand-primary transition-colors duration-fast mr-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary/20 rounded-md">
+                        <svg x-show="sidebarOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                        <svg x-show="!sidebarOpen" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path></svg>
                     </button>
-                    <h1 class="text-xl font-semibold text-slate-800 fn-header-title">Admin Panel</h1>
+                    <h1 class="text-h4 font-semibold text-text-primary">Admin Console</h1>
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-3">
+                    <button @click="toggleTheme()" class="p-2 text-text-secondary hover:text-brand-primary hover:bg-bg-secondary rounded-md transition-all duration-fast">
+                        <svg x-show="theme === 'light'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+                        <svg x-show="theme === 'dark'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" style="display: none;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" /></svg>
+                    </button>
 
                     <div x-data="{ showNotifications: false }" class="relative">
-                        <button @click="showNotifications = !showNotifications"
-                            class="relative p-2 text-slate-500 hover:text-blue-600 transition-colors focus:outline-none">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 17h5l-1.405-2.81A3 3 0 0018 11.237V9c0-1.368-.592-2.735-1.353-3.794m-9.792 0C7.592 5.265 8 6.632 8 8v3.237a3 3 0 00-.6 1.745L4 17h5m-1.892-4.276a1 1 0 011.784 0M12 21a2 2 0 002-2v-1.764c0-.92-.38-1.777-1.002-2.398M12 21v-2a4 4 0 00-4-4">
-                                </path>
-                            </svg>
-                            <span
-                                class="absolute top-2 right-2 block h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        <button @click="showNotifications = !showNotifications" class="relative p-2 text-text-secondary hover:text-brand-primary hover:bg-bg-secondary rounded-md transition-all duration-fast">
+                            <i data-lucide="bell" class="w-5 h-5"></i>
+                            <span class="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-semantic-error ring-2 ring-bg-primary"></span>
                         </button>
-
-                        <div x-show="showNotifications" @click.outside="showNotifications = false"
-                            x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                            class="absolute right-0 mt-2 w-72 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden"
-                            style="display: none;">
-                            <div class="p-4 bg-slate-50 border-b border-gray-100">
-                                <h3 class="text-sm font-semibold text-slate-800">Notifications</h3>
+                        <div x-show="showNotifications" @click.outside="showNotifications = false" x-transition:enter="transition ease-out duration-fast" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="absolute right-0 mt-2 w-80 rounded-lg shadow-lg bg-bg-secondary border border-border-default z-50 overflow-hidden" style="display: none;">
+                            <div class="p-4 bg-bg-secondary border-b border-border-default flex justify-between items-center">
+                                <h3 class="text-caption font-semibold text-text-primary uppercase tracking-wide">Notifications</h3>
+                                <button class="text-text-tertiary hover:text-brand-primary transition-colors text-xs font-medium">Mark all read</button>
                             </div>
-                            <div class="max-h-64 overflow-y-auto">
-                                <div class="p-4 text-center">
-                                    <p class="text-xs text-slate-500">You have no new notifications</p>
-                                </div>
+                            <div class="max-h-64 overflow-y-auto bg-bg-primary p-6 text-center">
+                                <i data-lucide="inbox" class="w-8 h-8 mx-auto text-text-tertiary mb-2"></i>
+                                <p class="text-body-sm text-text-secondary">You're all caught up.</p>
                             </div>
-                            <a href="#"
-                                class="block p-3 text-center text-xs font-medium text-blue-600 bg-slate-50 hover:bg-blue-50 transition-colors border-t border-gray-100">
-                                View All Notifications
-                            </a>
+                            <a href="#" class="block p-3 text-center text-caption font-medium text-brand-primary bg-bg-secondary hover:bg-bg-tertiary border-t border-border-default">View History</a>
                         </div>
                     </div>
-                    <div x-data="{ open: false }" @click.outside="open = false"
-                        class="relative fn-profile-dropdown-container">
-                        <button @click="open = !open"
-                            class="flex items-center space-x-2 focus:outline-none fn-btn-profile-trigger">
-                            <span class="text-slate-600 font-medium hidden sm:inline fn-profile-name">Super
-                                Admin</span>
-                            <img class="w-10 h-10 rounded-full object-cover border-2 border-blue-400 fn-profile-image"
-                                src="https://placehold.co/150x150/3b82f6/ffffff?text=SA" alt="Admin Profile">
+
+                    <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                        <button @click="open = !open" class="flex items-center space-x-2 p-1 rounded-md hover:bg-bg-secondary transition-colors">
+                            <img class="w-8 h-8 rounded-full object-cover border border-border-strong" src="https://ui-avatars.com/api/?name=Super+Admin&background=5B6AF0&color=fff&bold=true" alt="Profile">
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-text-tertiary"></i>
                         </button>
-
-                        <div x-show="open" x-transition:enter="transition ease-out duration-200"
-                            x-transition:enter-start="opacity-0 scale-95"
-                            x-transition:enter-end="opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="opacity-100 scale-100"
-                            x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 mt-2 w-60 rounded-xl shadow-2xl bg-white border border-gray-100 z-50 overflow-hidden fn-profile-dropdown-menu"
-                            style="display: none;">
-
-                            <div class="p-4 bg-blue-50 border-b border-blue-100 fn-dropdown-header"
-                                x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
-                                <p class="text-sm font-semibold text-slate-800 fn-dropdown-header-role"
-                                     >
-                                    {{ auth()->user()->name }}</p>
-                                <p class="text-xs text-slate-500 fn-dropdown-header-email">
-                                    {{ auth()->user()->email }}</p>
+                        <div x-show="open" x-transition:enter="transition ease-out duration-fast" x-transition:enter-start="opacity-0 scale-95 transform -translate-y-2" x-transition:enter-end="opacity-100 scale-100 transform translate-y-0" x-transition:leave="transition ease-in duration-fast" x-transition:leave-start="opacity-100 scale-100 transform translate-y-0" x-transition:leave-end="opacity-0 scale-95 transform -translate-y-2" class="absolute right-0 mt-2 w-64 rounded-lg shadow-lg bg-bg-secondary border border-border-default z-50 overflow-hidden" style="display: none;">
+                            <div class="px-4 py-3 bg-bg-tertiary border-b border-border-default">
+                                <p class="text-body-sm font-semibold text-text-primary truncate">{{ auth()->user()->name ?? 'Administrator' }}</p>
+                                <p class="text-caption text-text-secondary truncate">{{ auth()->user()->email ?? 'admin@sahorone.com' }}</p>
                             </div>
-                            <div class="py-1 fn-dropdown-body" x-data="{ user: JSON.parse(localStorage.getItem('user')) }">
-                                <div
-                                    class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center border-b border-gray-100 fn-dropdown-detail-role">
-                                    <span class="fn-dropdown-detail-label">Role:</span>
-                                    <span
-                                        class="font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full text-xs fn-dropdown-detail-role-value"
-                                        > {{ auth()->user()->roles->first()->name }}</span>
+                            <div class="py-2 bg-bg-secondary">
+                                <div class="px-4 py-1.5 flex justify-between items-center">
+                                    <span class="text-caption text-text-secondary">Access Level</span>
+                                    <span class="font-mono text-[10px] text-brand-primary bg-brand-primary/10 px-2 py-0.5 rounded-sm uppercase font-semibold border border-brand-primary/20">{{ auth()->user()->roles->first()->name ?? 'SUPER_ADMIN' }}</span>
                                 </div>
-                                <div
-                                    class="px-4 py-2 text-sm text-slate-600 flex justify-between items-center fn-dropdown-detail-id">
-                                    <span class="fn-dropdown-detail-label">User ID:</span>
-                                    <span class="font-mono text-xs text-slate-500 fn-dropdown-detail-id-value"
-                                         >{{ auth()->user()->id }}</span>
-                                </div>
-
-                                <hr class="border-gray-100 my-1 fn-dropdown-divider-1">
-                                <a href="{{ route('profile.settings') }}"
-                                    class="flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-gray-50 transition-colors fn-dropdown-link-profile">
-                                    <svg class="w-4 h-4 mr-2 text-blue-500 fn-icon-profile" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                        </path>
-                                    </svg>
-                                    Profile Settings
+                                <div class="h-px bg-border-default my-1"></div>
+                                <a href="#" class="flex items-center px-4 py-2 text-body-sm text-text-primary hover:bg-bg-tertiary hover:text-brand-primary transition-colors">
+                                    <i data-lucide="settings" class="w-4 h-4 mr-3 text-text-tertiary"></i> Preferences
                                 </a>
-                                <hr class="border-gray-100 my-1 fn-dropdown-divider-2">
-
-                                <button @click="logout"
-                                    class="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium text-left fn-btn-logout">
-                                    <svg class="w-4 h-4 mr-2 text-red-500 fn-icon-logout" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                                        </path>
-                                    </svg>
-                                    Logout
+                                <div class="h-px bg-border-default my-1"></div>
+                                <button @click="logout" class="w-full flex items-center px-4 py-2 text-body-sm text-semantic-error hover:bg-semantic-error/5 transition-colors font-medium text-left">
+                                    <i data-lucide="log-out" class="w-4 h-4 mr-3 text-semantic-error"></i> Sign out securely
                                 </button>
                             </div>
                         </div>
@@ -176,51 +150,45 @@
                 </div>
             </header>
 
-            <main class="p-6 lg:p-8 fn-main-page-content flex-1">
+            <main class="p-6 lg:p-8 flex-1 bg-bg-primary relative z-10">
                 @yield('content')
             </main>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts" class="fn-script-apexcharts"></script>
-
-    <script class="fn-script-logout">
-        function logout() {
-            const logoutBtn = event.target;
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        function logout(event) {
+            const logoutBtn = event.currentTarget;
             logoutBtn.disabled = true;
-            logoutBtn.innerText = "Logging out...";
+            logoutBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 mr-3 animate-spin"></i> Terminating session...';
+            lucide.createIcons();
+
             const token = localStorage.getItem("token");
-            console.log("Attempting to logout with token:", token);
             if (!token) {
                 localStorage.clear();
                 window.location.href = "/auth/login";
                 return;
             }
-            fetch("http://127.0.0.1:8000/api/auth/logout", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": "Bearer " + token,
-                        "Content-Type": "application/json"
-                    }
-                })
 
-                .then(response => response.json())
-                .then(data => {
-
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    window.location.href = "/auth/login";
-                })
-                .catch(error => {
-                    console.error("Logout Error:", error);
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("user");
-                    window.location.href = "/auth/login";
-                });
+            fetch("/api/auth/logout", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            }).then(() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                window.location.href = "/auth/login";
+            }).catch(() => {
+                localStorage.clear();
+                window.location.href = "/auth/login";
+            });
         }
+        document.addEventListener('alpine:initialized', () => lucide.createIcons());
     </script>
-
     @stack('scripts')
 </body>
-
 </html>

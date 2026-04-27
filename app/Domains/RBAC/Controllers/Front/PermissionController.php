@@ -9,6 +9,6 @@ class PermissionController extends Controller
 {
     public function index()
     {
-        return view('Admin.rbac.permissions.index');
+        return view('admin.rbac.permissions.index');
     }
 }
