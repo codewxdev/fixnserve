@@ -9,6 +9,6 @@ class RoleController extends Controller
 {
     public function index()
     {
-        return view('Admin.rbac.roles.index');
+        return view('admin.rbac.roles.index');
     }
 }

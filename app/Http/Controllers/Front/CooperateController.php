@@ -9,6 +9,6 @@ class CooperateController extends Controller
 {
     
     public function index(){
-        return view('Admin.cooperation.index');
+        return view('admin.cooperation.index');
     }
 }

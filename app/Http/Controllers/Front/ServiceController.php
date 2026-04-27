@@ -136,6 +136,6 @@ class ServiceController extends Controller
     public function index()
     {
         $categories = Category::with('subcategories.specialties.sub_specialties')->get();
-        return view('Admin.Service.index', compact('categories'));
+        return view('admin.Service.index', compact('categories'));
     }
 }

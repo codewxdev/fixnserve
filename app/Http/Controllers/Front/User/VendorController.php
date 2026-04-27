@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class VendorController extends Controller
 {
      public function index(){
-        return view('User.vendor.index');
+        return view('user.vendor.index');
     }
 }

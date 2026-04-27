@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class CodashboardController extends Controller
 {
     public function index(){
-        return view('Admin.COdashboard.index');
+        return view('admin.COdashboard.index');
     }
 }

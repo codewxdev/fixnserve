@@ -8,10 +8,10 @@ class DisputeController extends Controller{
 
     public function index(){
 
-         return view('Admin.dispute.complaint_intake_classification.index');
+         return view('admin.dispute.complaint_intake_classification.index');
     } 
 
     public function EvidenceContext(){
-        return view('Admin.dispute.evidence_context.index');
+        return view('admin.dispute.evidence_context.index');
     }
 }
