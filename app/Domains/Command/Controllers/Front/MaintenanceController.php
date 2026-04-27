@@ -8,6 +8,6 @@ use Illuminate\Http\Request;
 class MaintenanceController extends Controller
 {
     public function index(){
-        return view('admin.command_center.maintainance_emergency.index');
+        return view('Admin.Command.Maintenance.index');
     }
 }

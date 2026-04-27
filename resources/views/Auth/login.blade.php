@@ -212,7 +212,7 @@
                     is_rooted: deviceInfo.is_rooted
                 };
 
-                const res = await fetch("{{ url('/api/auth/login') }}", {
+                const res = await fetch("{{ url('/api/v1/auth/login') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
