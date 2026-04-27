@@ -1,6 +1,6 @@
 <?php
 
-use App\Domains\Security\Controllers\Cp\V1\AuthController;
+use App\Domains\Security\Controllers\Api\V1\AuthController;
 use App\Domains\Security\Controllers\Cp\V1\AuthGovernanceController;
 use App\Domains\Security\Controllers\Cp\V1\DeviceController;
 use App\Domains\Security\Controllers\Cp\V1\DualApprovalController;
@@ -27,11 +27,7 @@ Route::middleware(
     'session.risk'
 )->group(function () {
 
-    Route::post('/auth/register', [AuthController::class, 'register']);
-    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('login.policy');
-    Route::post('/password/forgot', [PasswordResetCodeController::class, 'sendResetCode']);
-    Route::post('/password/verify-code', [PasswordResetCodeController::class, 'verifyCode']);
-    Route::post('/password/reset', [PasswordResetCodeController::class, 'resetPassword']);
+
 
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
 
@@ -49,14 +45,7 @@ Route::middleware(
     ])->group(function () {
 
         // Auth Routes
-        Route::get('/auth/me', [AuthController::class, 'me']);
-        Route::post('/auth/logout', [AuthController::class, 'logout']);
-        Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-        Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
-        // Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
-        Route::post('/password/update', [AuthController::class, 'updatePassword']);
-        // Route::middleware(['service.provider'])->group(function () {
-        Route::post('/phone/verify', [AuthController::class, 'verifyPhoneOtp']);
+
 
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa', 'scope:admin:*'])->group(function () {

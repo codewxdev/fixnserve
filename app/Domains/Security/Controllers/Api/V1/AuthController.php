@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Security\Controllers\Cp\V1;
+namespace App\Domains\Security\Controllers\Api\V1;
 
 use App\Domains\Audit\Services\AdminAuditService;
 use App\Domains\Audit\Services\SecurityAuditService;
@@ -50,6 +50,7 @@ class AuthController extends BaseApiController
             'is_rooted' => 'nullable|boolean',
 
         ]);
+        dd($request);
 
         DB::transaction(function () use ($request, &$user, &$token) {
 
@@ -84,6 +85,7 @@ class AuthController extends BaseApiController
 
     public function login(Request $request)
     {
+        // dd($request);
         $request->validate([
             'login' => 'required',
             'password' => 'required',
