@@ -228,7 +228,7 @@
         </div>
 
         <div class="flex flex-col gap-4 sm:gap-5">
-            <div class="card p-4 flex items-center justify-between border-l-4 border-l-semantic-error flex-1">
+            <div class="card p-4 flex items-center justify-between   flex-1">
                 <div class="min-w-0 pr-4">
                     <span class="text-caption font-bold text-text-tertiary uppercase tracking-wider block mb-1 truncate">Failed Payments (7d)</span>
                     <h4 class="text-h2 font-bold text-text-primary">142</h4>
@@ -238,7 +238,7 @@
                 </div>
             </div>
             
-            <div class="card p-4 flex items-center justify-between border-l-4 border-l-semantic-warning flex-1">
+            <div class="card p-4 flex items-center justify-between   flex-1">
                 <div class="min-w-0 pr-4">
                     <span class="text-caption font-bold text-text-tertiary uppercase tracking-wider block mb-1 truncate">Pending Payouts</span>
                     <h4 class="text-h2 font-bold text-text-primary truncate">$45.2K</h4>

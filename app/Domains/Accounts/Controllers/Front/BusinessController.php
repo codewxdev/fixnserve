@@ -4,27 +4,24 @@ namespace App\Domains\Accounts\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Twilio\Rest\Intelligence;
 
 class BusinessController extends Controller
 {
     public function index()
     {
-        // Return your Business Directory view
-        return view('cp.businesses.index');
+         return view('Admin.Accounts.Registry.index');
     }
 
-    public function store(Request $request)
+     
+    public function lifecycle()
     {
-        // Handle new business creation
+         return view('Admin.Accounts.Lifecycle.index');
     }
 
-    public function update(Request $request, $id)
+    public function intelligence()
     {
-        // Handle business updates
+        return view('Admin.Accounts.Intelligence.index');
     }
-
-    public function destroy($id)
-    {
-        // Handle business deletion
-    }
+    
 }

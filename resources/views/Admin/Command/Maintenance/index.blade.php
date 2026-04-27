@@ -63,7 +63,7 @@
 
                     <div class="form-group mb-0">
                         <label class="form-label">Public Message (Multi-language Support)</label>
-                        <textarea x-model="form.message" class="form-input w-full" rows="2" placeholder="Platform is down for scheduled maintenance..."></textarea>
+                        <textarea x-model="form.message" class="form-input w-full " rows="2" placeholder="Platform is down for scheduled maintenance..."></textarea>
                     </div>
 
                     <label class="flex items-center gap-3 cursor-pointer">
@@ -71,7 +71,7 @@
                         <span class="text-body-sm font-bold text-text-primary">Send Pre-Notification Email to Businesses</span>
                     </label>
 
-                    <button @click="activateMaintenance()" class="btn btn-primary w-full">Schedule Maintenance</button>
+                    <button @click="activateMaintenance()" class="btn py-2 btn-primary w-full">Schedule Maintenance</button>
                 </div>
             </div>
         </div>
