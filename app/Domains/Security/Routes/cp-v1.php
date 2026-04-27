@@ -1,14 +1,15 @@
 <?php
 
-use App\Domains\Security\Controllers\Api\AuthController;
-use App\Domains\Security\Controllers\Api\AuthGovernanceController;
-use App\Domains\Security\Controllers\Api\DeviceController;
-use App\Domains\Security\Controllers\Api\DualApprovalController;
-use App\Domains\Security\Controllers\Api\GeoRuleController;
-use App\Domains\Security\Controllers\Api\IpRuleController;
-use App\Domains\Security\Controllers\Api\PasswordResetCodeController;
-use App\Domains\Security\Controllers\Api\PrivilegeRequestController;
-use App\Domains\Security\Controllers\Api\SessionController;
+use App\Domains\Security\Controllers\Cp\V1\AuthController;
+use App\Domains\Security\Controllers\Cp\V1\AuthGovernanceController;
+use App\Domains\Security\Controllers\Cp\V1\DeviceController;
+use App\Domains\Security\Controllers\Cp\V1\DualApprovalController;
+use App\Domains\Security\Controllers\Cp\V1\GeoRuleController;
+use App\Domains\Security\Controllers\Cp\V1\IpRuleController;
+use App\Domains\Security\Controllers\Cp\V1\PasswordResetCodeController;
+use App\Domains\Security\Controllers\Cp\V1\PrivilegeRequestController;
+use App\Domains\Security\Controllers\Cp\V1\SessionController;
+use App\Domains\Security\Controllers\Cp\V1\TokenPolicyController;
 use App\Http\Controllers\ServiceProvider\ServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -44,14 +45,14 @@ Route::middleware(
         'token.role',
         'network.security',
         'risk.track',
-        'risk.velocity'
+        'risk.velocity',
     ])->group(function () {
 
         // Auth Routes
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/refresh', [AuthController::class, 'refresh']);
-         Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
+        Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
         // Route::post('/update/profile/{id}', [AuthController::class, 'updateProfile']);
         Route::post('/password/update', [AuthController::class, 'updatePassword']);
         // Route::middleware(['service.provider'])->group(function () {
@@ -61,7 +62,7 @@ Route::middleware(
         Route::middleware(['role:Super Admin', '2fa', 'scope:admin:*'])->group(function () {
             Route::get('/login-history', [AuthController::class, 'loginHistory']);
             Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
-            // /////////////////////session managment//////////////////////////
+            // /////////////////////session management//////////////////////////
             Route::prefix('sessions')->group(function () {
                 Route::get('/', [SessionController::class, 'index']);
                 Route::get('{id}', [SessionController::class, 'show']);
@@ -86,9 +87,9 @@ Route::middleware(
 
                 Route::post('/force-reset', [AuthGovernanceController::class, 'forcePasswordReset']);
             });
-            Route::get('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'index']);
-            Route::put('/token-policy', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'updateTokenPolicy']);
-            Route::get('tokens', [\App\Domains\Security\Controllers\Api\TokenPolicyController::class, 'listTokens']);
+            Route::get('/token-policy', [TokenPolicyController::class, 'index']);
+            Route::put('/token-policy', [TokenPolicyController::class, 'updateTokenPolicy']);
+            Route::get('tokens', [TokenPolicyController::class, 'listTokens']);
             Route::post('/tokens/{jti}/rotate', [AuthController::class, 'rotateToken']);
             Route::delete('/auth/token/revoke/{jti}', [AuthController::class, 'revokeToken']);
 

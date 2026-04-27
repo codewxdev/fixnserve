@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Security\Controllers\Api;
+namespace App\Domains\Security\Controllers\Cp\V1;
 
 use App\Domains\Security\Models\PrivilegeRequest;
 use App\Http\Controllers\BaseApiController;
@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class PrivilegeRequestController extends BaseApiController
 {
-
     public function index()
     {
         // Fetch all requests with their associated user data
@@ -16,7 +15,7 @@ class PrivilegeRequestController extends BaseApiController
 
         return $this->success(['privileges' => $privileges], 'Privileges fetched successfully');
     }
-    
+
     public function requestElevation(Request $request)
     {
         $data = $request->validate([
