@@ -3,33 +3,45 @@
 use App\Domains\System\Controllers\Front\SystemController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| SAHOR ONE CONTROL PANEL (MODULE 14: SYSTEM CONFIGURATION)
+|--------------------------------------------------------------------------
+ */
 
-Route::prefix('/cp-x9f7/v1')->group(function () {
-// System Settings Global Routes
-Route::get('/system', [SystemController::class, 'index'])->name('settings.global');
+Route::middleware([
+    'web', 
+    'auth.admin', 
+    // 'admin.mfa', 
+    'admin.ip_whitelist', 
+    // 'admin.device_trust'
+])
+->prefix('cp-x9f7a2/v1/configurations')
+->name('cp.configurations.')
+->group(function () {
 
+    // Global Platform Settings
+    Route::get('/global', [SystemController::class, 'index'])->name('global');
 
-// System Settings feature Routes
-Route::get('/system/feature-control', [SystemController::class, 'featureControl'])->name('settings.feature_control'); 
+    // Feature Flags & Rollout Control
+    Route::get('/feature-flags', [SystemController::class, 'featureControl'])->name('flags');
 
-// System Settings localization Routes
-Route::get('/system/localization', [SystemController::class, 'localization'])->name('settings.localization'); 
+    // Localization & Internationalization
+    Route::get('/localization', [SystemController::class, 'localization'])->name('localization');
 
-// System Settings geo Routes
-Route::get('/system/geo', [SystemController::class, 'geo'])->name('settings.geo');
+    // Geo, Maps & Fencing Configuration
+    Route::get('/geo', [SystemController::class, 'geo'])->name('geo');
 
+    // Rate Limits & API Throttling
+    Route::get('/rate-limits', [SystemController::class, 'rateLimit'])->name('rate_limit');
 
-// system rate & limit Routes
-Route::get('/system/rate-limit', [SystemController::class, 'rateLimit'])->name('settings.rate_limit');
+    // Configuration Versioning & Rollback
+    Route::get('/versioning', [SystemController::class, 'configurationVersioning'])->name('versioning');
 
-// sytem configuration versioning & rollback Routes
-Route::get('/system/configuration-versioning', [SystemController::class, 'configurationVersioning'])->name('settings.configuration_versioning');
+    // AI Impact Analysis (Predicting blast radius of config changes)
+    Route::get('/impact-analysis', [SystemController::class, 'configurationImpactAnalysis'])->name('impact_analysis');
 
-// system configuration impact analysis Routes
-Route::get('/system/configuration-impact-analysis', [SystemController::class, 'configurationImpactAnalysis'])->name('settings.configuration_impact_analysis');
-
-// system access control & governance Routes
-Route::get('/system/access-control', [SystemController::class, 'accessControl'])->name('settings.access_control');
-
+    // Module Access Control & Governance
+    Route::get('/access-control', [SystemController::class, 'accessControl'])->name('access_control');
 
 });

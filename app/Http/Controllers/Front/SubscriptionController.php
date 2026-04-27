@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class SubscriptionController extends Controller
 {
     // public function index(){
-    //     return view('Admin.subscription.index');
+    //     return view('admin.subscription.index');
     // }
 
 
@@ -29,7 +29,7 @@ class SubscriptionController extends Controller
          
         $apps = App::with(['plans.entitlements'])->get();
 
-        return view('Admin.subscription.index', compact('apps'));
+        return view('admin.subscription.index', compact('apps'));
     }
 
 
