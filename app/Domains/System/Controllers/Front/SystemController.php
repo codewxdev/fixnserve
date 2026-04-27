@@ -7,42 +7,42 @@ class SystemController
 {
     public function index()
     {
-        return view('Admin.system.global_preferences.index');
+        return view('admin.system.global_preferences.index');
     }
 
     public function featureControl()
     {
-        return view('Admin.system.feature_control_&_release_control.index');  
+        return view('admin.system.feature_control_&_release_control.index');  
     }
 
     public function localization()
     {
-        return view('Admin.system.localization_&_internationalization.index'); 
+        return view('admin.system.localization_&_internationalization.index'); 
     }
 
     public function geo()
     {
-        return view('Admin.system.geo_&_map.index'); 
+        return view('admin.system.geo_&_map.index'); 
     }
 
     public function rateLimit()
     {
-        return view('Admin.system.rate_limit_&_throttling.index'); 
+        return view('admin.system.rate_limit_&_throttling.index'); 
     }   
 
     public function configurationVersioning()
     {
-        return view('Admin.system.configuration_versioning_&_rollback.index'); 
+        return view('admin.system.configuration_versioning_&_rollback.index'); 
     }
 
     public function configurationImpactAnalysis()
     {
-        return view('Admin.system.configuration_access_analysis.index'); 
+        return view('admin.system.configuration_access_analysis.index'); 
     }
 
     public function accessControl()
     {
-        return view('Admin.system.access_control_&_governance.index'); 
+        return view('admin.system.access_control_&_governance.index'); 
     }
 
 

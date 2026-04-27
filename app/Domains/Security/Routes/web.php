@@ -1,28 +1,41 @@
 <?php
 
-use App\Domains\Security\Controllers\Front\SecuirtyController;
+use App\Domains\Security\Controllers\Front\SecurityController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('/cp-x9f7/v1')->group(function () {
-// Authentication Routes
-Route::get('/security/auth', [SecuirtyController::class, 'index'])->name('security.auth.index');
+/*
+|--------------------------------------------------------------------------
+| SAHOR ONE CONTROL PANEL (MODULE 2: SECURITY & ACCESS)
+|--------------------------------------------------------------------------
+*/
 
-// Sessions Routes
-Route::get('/security/sessions', [SecuirtyController::class, 'sessions'])->name('security.sessions.index');
-
-// Tokens Routes
-Route::get('/security/tokens', [SecuirtyController::class, 'tokens'])->name('security.tokens.index');
-
-// Devices Routes
-Route::get('/security/devices', [SecuirtyController::class, 'devices'])->name('security.devices.index');
-
-// Network Security Routes
-Route::get('/security/network', [SecuirtyController::class, 'network'])->name('security.network.index');
-
-// Privileged Access Routes
-Route::get('/security/privileged-access', [SecuirtyController::class, 'privilegedAccess'])->name('security.privileged_access.index');
-
-Route::get('/profile', [SecuirtyController::class, 'getProfile'])->name('profile.settings');
-
+Route::middleware([
+    'web',                  // Standard Laravel web stack (CSRF, Cookies)
+    'auth.admin',           // Authenticated admin session
+    // 'admin.mfa',            // RequireMFA Middleware
+    'admin.ip_whitelist',   // VerifyIpWhitelist Middleware
+    // 'admin.device_trust',   // RequireDeviceTrust Middleware
+])
+->prefix('cp-x9f7a2/v1/security')
+->name('cp.security.')
+->group(function () {
+    
+    // Authentication & Policies
+    Route::get('/policies', [SecurityController::class, 'policies'])->name('policies');
+    
+    // Sessions Management
+    Route::get('/sessions', [SecurityController::class, 'sessions'])->name('sessions');
+    
+    // Token & API Key Management
+    Route::get('/tokens', [SecurityController::class, 'tokens'])->name('tokens');
+    
+    // Device Trust & Fingerprinting
+    Route::get('/devices', [SecurityController::class, 'devices'])->name('devices');
+    
+    // Network Security (IP Allow/Deny, Geo)
+    Route::get('/network', [SecurityController::class, 'network'])->name('network');
+    
+    // Privileged Access (Just-In-Time)
+    Route::get('/privileged-access', [SecurityController::class, 'jit'])->name('jit');
 
 });

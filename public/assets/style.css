@@ -1,238 +1,379 @@
- 
+@charset "UTF-8";
 
-/* --- DEFAULT THEME (Standard Dark) --- */
-/* :root {
-    --brand-primary: 59, 130, 246;
-    --brand-secondary: 37, 99, 235;
-    --bg-body: 15, 23, 42;
-    --bg-card: 30, 41, 59;
-    --bg-sidebar: 15, 23, 42;
-    --border-color: 51, 65, 85;
-    --sidebar-border: 30, 41, 59;
-    --text-main: 248, 250, 252;
-    --text-muted: 148, 163, 184;
-    --item-active-bg: 51, 65, 85;
-} */
+/**
+ * ==============================================================================
+ * SAHOR ONE - CORE DESIGN SYSTEM (LARAVEL + ALPINE.JS OPTIMIZED)
+ * ==============================================================================
+ * Concept: Enterprise-grade B2B SaaS. Clean, confident, precise.
+ * Principle: Trust through clarity. Every pixel earns its place.
+ * Architecture: CSS Custom Properties (Tokens) -> Utilities -> Components
+ * ==============================================================================
+ */
 
-/* --- THEME: CLEAN SAAS (Light) --- */
-/* body.theme-saas {
-    --brand-primary: 79, 70, 229;
-    --brand-secondary: 67, 56, 202;
-    --bg-body: 243, 244, 246;
-    --bg-card: 255, 255, 255;
-    --bg-sidebar: 255, 255, 255;
-    --border-color: 229, 231, 235;
-    --sidebar-border: 229, 231, 235;
-    --text-main: 17, 24, 39;
-    --text-muted: 107, 114, 128;
-    --item-active-bg: 243, 244, 246;
-} */
-
-/* --- THEME: CYBERPUNK (Deep Dark) --- */
-/* body.theme-cyberpunk {
-    --brand-primary: 192, 38, 211;
-    --brand-secondary: 147, 51, 234;
-    --bg-body: 9, 9, 11;
-    --bg-card: 24, 24, 27;
-    --bg-sidebar: 9, 9, 11;
-    --border-color: 39, 39, 42;
-    --sidebar-border: 39, 39, 42;
-    --text-main: 250, 250, 250;
-    --text-muted: 161, 161, 170;
-    --item-active-bg: 39, 39, 42;
-} */
-
-/* --- THEME: FINTECH EMERALD (Pro Dark) --- */
-/* body.theme-fintech {
-    --brand-primary: 16, 185, 129;
-    --brand-secondary: 5, 150, 105;
-    --bg-body: 23, 23, 23;
-    --bg-card: 38, 38, 38;
-    --bg-sidebar: 23, 23, 23;
-    --border-color: 64, 64, 64;
-    --sidebar-border: 64, 64, 64;
-    --text-main: 245, 245, 245;
-    --text-muted: 163, 163, 163;
-    --item-active-bg: 64, 64, 64;
-} */
-
-
-/* --- THEME: MIDNIGHT PRO (Executive Blue) --- */
-/* body.theme-midnight {
-    --brand-primary: 56, 189, 248;
-     
-    --brand-secondary: 2, 132, 199;
-    
-    --bg-body: 2, 6, 23;
-     
-    --bg-card: 15, 23, 42;
-     
-    --bg-sidebar: 2, 6, 23;
-    
-    --border-color: 30, 41, 59;
-     
-    --sidebar-border: 30, 41, 59;
-    --text-main: 241, 245, 249;
-    
-    --text-muted: 148, 163, 184;
-     
-    --item-active-bg: 30, 41, 59;
-} */
-
-/* --- THEME: CRIMSON OPS (Security Red) --- */
-/* body.theme-crimson {
-    --brand-primary: 220, 38, 38;
-    
-    --brand-secondary: 153, 27, 27;
-    
-    --bg-body: 24, 24, 27;
-    
-    --bg-card: 39, 39, 42;
-     
-    --bg-sidebar: 24, 24, 27;
-    --border-color: 63, 63, 70;
-     
-    --sidebar-border: 63, 63, 70;
-    --text-main: 250, 250, 250;
-    --text-muted: 161, 161, 170;
-    --item-active-bg: 63, 63, 70;
-} */
-
-/* --- THEME: SOLAR LIGHT (Warm/Sepia) --- */
-/* body.theme-solar {
-    --brand-primary: 217, 119, 6;
-    --brand-secondary: 180, 83, 9;
-    --bg-body: 255, 251, 235;
-    --bg-card: 255, 255, 255;
-    --bg-sidebar: 255, 251, 235;
-    --border-color: 231, 229, 228;
-    --sidebar-border: 231, 229, 228;
-    --text-main: 28, 25, 23;
-    --text-muted: 120, 113, 108;
-    --item-active-bg: 254, 243, 199;
-     
-} */
- 
- 
-/* --- THEME: BLUE INK (Modern Light) --- */
-body.theme-blue-ink {
-    /* --- Mapped Core Variables (Converted HEX to RGB) --- */
-    --brand-primary: 74, 144, 217;      /* --blue: #4A90D9 */
-    --brand-secondary: 58, 123, 200;    /* --blue-dark: #3A7BC8 */
-    --bg-body: 245, 246, 248;           /* --surface: #F5F6F8 */
-    --bg-card: 255, 255, 255;           /* --white: #FFFFFF */
-    --bg-sidebar: 250, 251, 252;        /* --off-white: #FAFBFC */
-    --border-color: 228, 230, 235;      /* --border: #E4E6EB */
-    --sidebar-border: 228, 230, 235;    /* --border: #E4E6EB */
-    --text-main: 17, 19, 24;            /* --ink-1: #111318 */
-    --text-muted: 90, 97, 120;          /* --ink-3: #5A6178 */
-    --item-active-bg: 240, 246, 253;    /* --blue-wash: #F0F6FD */
-    
-    /* --- Additional Theme Properties --- */
-    --font-display: 'Montserrat', sans-serif;
-    --font-body: 'Poppins', sans-serif;
-
-    /* Border Radii */
-    --radius: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-    --r-sm: var(--radius);
-    --r-md: var(--radius-lg);
-    --r-lg: var(--radius-xl);
-    --r-xl: 20px;
-    --r-2xl: 28px;
-
-    /* Shadows */
-    --shadow-xs: 0 1px 3px rgba(17, 19, 24, 0.04);
-    --shadow-sm: 0 1px 2px rgba(17, 19, 24, 0.03), 0 4px 12px rgba(17, 19, 24, 0.04);
-    --shadow-md: 0 2px 4px rgba(17, 19, 24, 0.03), 0 8px 24px rgba(17, 19, 24, 0.06);
-    --shadow-lg: 0 4px 8px rgba(17, 19, 24, 0.03), 0 16px 48px rgba(17, 19, 24, 0.08);
-    --shadow-xl: 0 16px 48px rgba(17, 19, 24, 0.08);
-    
-    /* Animations / Easing */
-    --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-}
- 
-/* --- UTILITY CLASSES (Use these in HTML) --- */
-
-/* Page Wrapper */
-.theme-bg-body {
-    background-color: rgb(var(--bg-body));
-    color: rgb(var(--text-main));
+/* --- ALPINE.JS ESSENTIALS --- */
+[x-cloak] {
+    display: none !important;
 }
 
-/* Cards / Panels / Modules */
-.theme-bg-card {
-    background-color: rgb(var(--bg-card));
-    border: 1px solid rgb(var(--border-color));
-    color: rgb(var(--text-main));
+:root {
+    /* ==========================================================================
+       01. COLOR SYSTEM (LIGHT MODE - DEFAULT)
+       ========================================================================== */
+    
+    /* --- Brand Identity --- */
+    --brand-primary: #5B6AF0;
+    --brand-primary-hover: #4755D6;
+    --brand-primary-active: #3A47BD;
+    --brand-secondary: #0F1729;
+    --brand-accent: #22D3EE;
+
+    /* --- Neutral Palette (Surfaces & Borders) --- */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FAFC;
+    --bg-tertiary: #F1F5F9;
+    --bg-muted: #E2E8F0;
+    
+    --border-default: #E2E8F0;
+    --border-strong: #CBD5E1;
+    
+    /* --- Typography Colors --- */
+    --text-primary: #0F1729;
+    --text-secondary: #475569;
+    --text-tertiary: #94A3B8;
+    --text-disabled: #CBD5E1;
+
+    /* --- Semantic Feedback States --- */
+    --color-success: #10B981;
+    --color-success-bg: #ECFDF5;
+    
+    --color-warning: #F59E0B;
+    --color-warning-bg: #FFFBEB;
+    
+    --color-error: #EF4444;
+    --color-error-bg: #FEF2F2;
+    
+    --color-info: #3B82F6;
+    --color-info-bg: #EFF6FF;
+
+    /* --- Business Vertical Accents --- */
+    --accent-agency: #3B82F6;     /* Digital Agency */
+    --accent-home: #14B8A6;       /* Home Services */
+    --accent-prof: #8B5CF6;       /* Professional Firm */
+    --accent-consultant: #F59E0B; /* Consultant */
+
+    /* ==========================================================================
+       02. TYPOGRAPHY SYSTEM
+       ========================================================================== */
+    
+    /* --- Font Stacks --- */
+    --font-sans: 'Inter', system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* --- Type Scale (Size / Line-Height / Weight) --- */
+    --text-display-xl-size: 48px; --text-display-xl-lh: 56px; --text-display-xl-weight: 600;
+    --text-display-lg-size: 36px; --text-display-lg-lh: 44px; --text-display-lg-weight: 600;
+    --text-h1-size: 30px;         --text-h1-lh: 38px;         --text-h1-weight: 600;
+    --text-h2-size: 24px;         --text-h2-lh: 32px;         --text-h2-weight: 600;
+    --text-h3-size: 20px;         --text-h3-lh: 28px;         --text-h3-weight: 600;
+    --text-h4-size: 18px;         --text-h4-lh: 26px;         --text-h4-weight: 600;
+    
+    --text-body-lg-size: 16px;    --text-body-lg-lh: 24px;    --text-body-lg-weight: 400;
+    --text-body-size: 14px;       --text-body-lh: 22px;       --text-body-weight: 400; /* Default */
+    --text-body-sm-size: 13px;    --text-body-sm-lh: 20px;    --text-body-sm-weight: 400;
+    
+    --text-caption-size: 12px;    --text-caption-lh: 16px;    --text-caption-weight: 500;
+    --text-label-size: 12px;      --text-label-lh: 16px;      --text-label-weight: 500;
+
+    /* ==========================================================================
+       03. SPACING SYSTEM (4px Baseline Grid)
+       ========================================================================== */
+    --space-0: 0px;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+
+    /* ==========================================================================
+       04. LAYOUT & GRID PARAMETERS
+       ========================================================================== */
+    --layout-container-max: 1440px;
+    --layout-content-max: 1280px;
+    --layout-reading-max: 720px;
+    
+    --sidebar-width: 240px;
+    --sidebar-collapsed: 64px;
+    
+    --grid-columns: 12;
+    --grid-gutter: 24px;
+
+    /* ==========================================================================
+       05. COMPONENT SPECIFICATIONS
+       ========================================================================== */
+    
+    /* --- Border Radius --- */
+    --radius-none: 0px;
+    --radius-sm: 4px;     /* Tags, pills */
+    --radius-md: 6px;     /* Inputs, buttons */
+    --radius-lg: 8px;     /* Cards, modals */
+    --radius-xl: 12px;    /* Featured cards */
+    --radius-2xl: 16px;   /* Containers */
+    --radius-full: 9999px;/* Avatars, badges */
+
+    /* --- Elevation & Depth (Shadows) --- */
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.08);
+    --shadow-xl: 0 20px 25px rgba(0,0,0,0.10);
+    --shadow-focus: 0 0 0 3px rgba(91,106,240,0.2);
+
+    /* --- Iconography (Lucide Specification) --- */
+    --icon-xs: 12px;
+    --icon-sm: 16px;
+    --icon-md: 20px;
+    --icon-lg: 24px;
+    --icon-xl: 32px;
+    --icon-stroke: 1.5px;
+
+    /* --- Motion & Choreography --- */
+    --motion-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --motion-default: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    --motion-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --motion-slower: 500ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Headings */
-.theme-text-main {
-    color: rgb(var(--text-main));
+/**
+ * ==============================================================================
+ * DARK MODE INVERSION TOKENS (Managed by Alpine.js)
+ * Note: @media (prefers-color-scheme) is removed to prevent specificity conflicts
+ * when the user manually overrides the OS theme using the Alpine toggle.
+ * ==============================================================================
+ */
+
+/* Targeting Tailwind's default .dark on <html>, and our custom .theme-dark on <body> */
+:root.dark,
+body.theme-dark {
+    /* Neutral Colors */
+    --bg-primary: #0A0E1A;
+    --bg-secondary: #0F1729;
+    --bg-tertiary: #1E293B;
+    --bg-muted: #334155;
+    
+    --border-default: #1E293B;
+    --border-strong: #334155;
+    
+    /* Typography Colors */
+    --text-primary: #F8FAFC;
+    --text-secondary: #CBD5E1;
+    --text-tertiary: #64748B;
+    --text-disabled: #475569;
+    
+    /* Semantic Colors */
+    --color-success: #34D399;
+    --color-success-bg: #064E3B;
+    --color-warning: #FBBF24;
+    --color-warning-bg: #451A03;
+    --color-error: #F87171;
+    --color-error-bg: #450A0A;
+    --color-info: #60A5FA;
+    --color-info-bg: #0C4A6E;
 }
 
-.theme-text-muted {
-    color: rgb(var(--text-muted));
+/**
+ * ==============================================================================
+ * GLOBAL DOCUMENT SETUP
+ * ==============================================================================
+ */
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
-.theme-text-brand {
-    color: rgb(var(--brand-primary));
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: var(--text-body-size);
+    line-height: var(--text-body-lh);
+    font-weight: var(--text-body-weight);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    transition: background-color var(--motion-slow), color var(--motion-slow);
 }
 
-/* Borders */
-.theme-border {
-    border-color: rgb(var(--border-color));
-}
+/**
+ * ==============================================================================
+ * TYPOGRAPHY UTILITIES
+ * ==============================================================================
+ */
+.text-display-xl { font-size: var(--text-display-xl-size); line-height: var(--text-display-xl-lh); font-weight: var(--text-display-xl-weight); letter-spacing: -0.02em; }
+.text-display-lg { font-size: var(--text-display-lg-size); line-height: var(--text-display-lg-lh); font-weight: var(--text-display-lg-weight); letter-spacing: -0.02em; }
+.text-h1 { font-size: var(--text-h1-size); line-height: var(--text-h1-lh); font-weight: var(--text-h1-weight); letter-spacing: -0.01em; }
+.text-h2 { font-size: var(--text-h2-size); line-height: var(--text-h2-lh); font-weight: var(--text-h2-weight); letter-spacing: -0.01em; }
+.text-h3 { font-size: var(--text-h3-size); line-height: var(--text-h3-lh); font-weight: var(--text-h3-weight); }
+.text-h4 { font-size: var(--text-h4-size); line-height: var(--text-h4-lh); font-weight: var(--text-h4-weight); }
 
-/* --- COMPONENT STYLES --- */
+.text-body-lg { font-size: var(--text-body-lg-size); line-height: var(--text-body-lg-lh); }
+.text-body-sm { font-size: var(--text-body-sm-size); line-height: var(--text-body-sm-lh); }
+.text-caption { font-size: var(--text-caption-size); line-height: var(--text-caption-lh); font-weight: var(--text-caption-weight); }
+.text-label { font-size: var(--text-label-size); line-height: var(--text-label-lh); font-weight: var(--text-label-weight); text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* Sidebar Navigation Text Truncation */
-.nav-text {
+.font-mono { font-family: var(--font-mono); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+
+/**
+ * ==============================================================================
+ * COMPONENTS
+ * ==============================================================================
+ */
+
+/* --- Buttons --- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all var(--motion-fast);
+    cursor: pointer;
+    border: 1px solid transparent;
+    user-select: none;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
-/* Custom Scrollbar */
-.custom-scrollbar::-webkit-scrollbar,
-::-webkit-scrollbar {
-    width: 6px;
+.btn:focus-visible { outline: none; box-shadow: var(--shadow-focus); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Button Sizing */
+.btn-sm { height: 32px; padding: 0 12px; font-size: var(--text-body-sm-size); }
+.btn-md { height: 40px; padding: 0 16px; font-size: var(--text-body-size); }
+.btn-lg { height: 48px; padding: 0 20px; font-size: var(--text-body-lg-size); }
+
+/* Button Variants */
+.btn-primary { background-color: var(--brand-primary); color: #FFFFFF; }
+.btn-primary:hover:not(:disabled) { background-color: var(--brand-primary-hover); }
+.btn-primary:active:not(:disabled) { background-color: var(--brand-primary-active); }
+
+.btn-secondary { background-color: #FFFFFF; color: var(--brand-secondary); border-color: var(--border-default); }
+.btn-secondary:hover:not(:disabled) { background-color: var(--bg-secondary); }
+
+.btn-tertiary { background-color: transparent; color: var(--text-secondary); }
+.btn-tertiary:hover:not(:disabled) { background-color: var(--bg-tertiary); }
+
+.btn-destructive { background-color: var(--color-error); color: #FFFFFF; }
+.btn-destructive:hover:not(:disabled) { background-color: #DC2626; }
+
+.btn-success { background-color: var(--color-success); color: #FFFFFF; }
+.btn-success:hover:not(:disabled) { background-color: #059669; }
+
+/* --- Form Inputs --- */
+.form-group { display: flex; flex-direction: column; gap: var(--space-2); margin-bottom: var(--space-4); }
+.form-label { font-size: var(--text-label-size); font-weight: var(--text-label-weight); line-height: var(--text-label-lh); color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.form-input {
+    height: 40px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    padding: 0 var(--space-3);
+    font-family: inherit;
+    font-size: var(--text-body-size);
+    color: var(--text-primary);
+    background-color: transparent;
+    transition: box-shadow var(--motion-fast), border-color var(--motion-fast);
 }
 
-.custom-scrollbar::-webkit-scrollbar-track,
-::-webkit-scrollbar-track {
-    background: transparent;
+.form-input::placeholder { color: var(--text-tertiary); }
+.form-input:focus { outline: none; border-color: var(--brand-primary); box-shadow: var(--shadow-focus); }
+.form-input:disabled { background-color: var(--bg-muted); color: var(--text-disabled); cursor: not-allowed; }
+
+/* --- Cards / Surfaces --- */
+.card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-6);
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb,
-::-webkit-scrollbar-thumb {
-    background-color: rgb(var(--border-color));
-    border-radius: 20px;
+/**
+ * ==============================================================================
+ * RESPONSIVE GRID & LAYOUT SYSTEM
+ * ==============================================================================
+ */
+
+.container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+    max-width: var(--layout-container-max);
 }
 
-.custom-scrollbar::-webkit-scrollbar-thumb:hover,
-::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(var(--text-muted));
+.content-container { max-width: var(--layout-content-max); }
+.reading-container { max-width: var(--layout-reading-max); }
+
+.grid {
+    display: grid;
+    gap: var(--grid-gutter);
+    grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-/* Card Hover Effects */
-.pro-card {
-    transition: all 0.3s ease-in-out;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+.app-layout { display: flex; min-height: 100vh; }
+
+.app-sidebar {
+    width: var(--sidebar-width);
+    flex-shrink: 0;
+    border-right: 1px solid var(--border-default);
+    background-color: var(--bg-secondary);
+    transition: width var(--motion-slow), transform var(--motion-slow);
 }
 
-.pro-card:hover {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
+.app-main { flex: 1; min-width: 0; }
+
+@media (min-width: 640px) {
+    .container { padding-left: var(--space-6); padding-right: var(--space-6); }
+    .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
-/* Transition Logic */
-.fn-main-content-area {
-    transition-property: margin-left;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 300ms;
+@media (min-width: 768px) { .grid { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+
+@media (min-width: 1024px) {
+    .container { padding-left: var(--space-8); padding-right: var(--space-8); }
+    .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .text-display-xl { font-size: 56px; line-height: 64px; }
+    .text-display-lg { font-size: 40px; line-height: 48px; }
+}
+
+@media (max-width: 1023px) {
+    .app-sidebar {
+        position: fixed;
+        z-index: 40;
+        height: 100%;
+        transform: translateX(-100%);
+    }
+    .app-sidebar.is-open { transform: translateX(0); }
+}
+
+/**
+ * ==============================================================================
+ * ACCESSIBILITY & MOTION PREFERENCES
+ * ==============================================================================
+ */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
