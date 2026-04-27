@@ -92,7 +92,6 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Correct way to register middleware aliases in Laravel 11/12
         $middleware->encryptCookies(except: [
             'token',
         ]);
@@ -105,11 +104,23 @@ return Application::configure(basePath: dirname(__DIR__))
             DetectGeoInconsistency::class,
             SessionRiskMiddleware::class,
             CheckAbuseRestrictions::class,
-            RecordFinancialLedger::class,  // // attach financial ledger middleware to all API routes for automatic ledger entries on relevant transactions
-            SecurityAuditLogger::class, // // attach security audit logger to all API routes for automatic logging of auth events and privilege usage
+            RecordFinancialLedger::class,  
+            SecurityAuditLogger::class, 
         ]);
 
         $middleware->alias([
+            // ==========================================
+            // NEW ADMIN ZERO-TRUST ALIASES ADDED HERE
+            // Mapped to your existing Domain middlewares
+            // ==========================================
+            'auth.admin'         => \Illuminate\Auth\Middleware\Authenticate::class, 
+            'admin.mfa'          => Ensure2FAEnabled::class,
+            'admin.ip_whitelist' => CheckNetworkSecurity::class,
+            'admin.device_trust' => CheckDeviceBinding::class,
+
+            // ==========================================
+            // YOUR EXISTING ALIASES
+            // ==========================================
             'country.detect' => DetectCountry::class,
             'locale.set' => SetLocale::class,
             'currency.set' => SetCurrency::class,
@@ -148,13 +159,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'payment.abuse.scan' => ScanPaymentAbuse::class,
             'collusion.scan' => ScanCollusionAbuse::class,
             'complaint.auto' => AutoGenerateComplaint::class,
-            'promo.abuse.scan' => ScanPromoAbuse::class,   // //////////use on promo application routes
-            'appeal.eligible' => ValidateAppealEligibility::class, // / check on appeal submission routes
-            'sla.track' => StartSlaTracking::class,       // ///////`use on complaint/appeal/refund creation routes
+            'promo.abuse.scan' => ScanPromoAbuse::class,   
+            'appeal.eligible' => ValidateAppealEligibility::class, 
+            'sla.track' => StartSlaTracking::class,       
             'abuse.check' => CheckAbuseRestrictions::class,
-            'legal.hold' => \App\Domains\Disputes\Middlewares\CheckLegalHold::class, // / check on any route that modifies user/order data that could be under legal hold
+            'legal.hold' => \App\Domains\Disputes\Middlewares\CheckLegalHold::class, 
             'financial.ledger' => RecordFinancialLedger::class,
-            'security.audit' => SecurityAuditLogger::class, // // attach security audit logger to all API routes for automatic logging of auth events and privilege usage
+            'security.audit' => SecurityAuditLogger::class, 
 
         ]);
 
@@ -187,7 +198,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule) {
-        // $schedule->command('update:api-controllers')->weekly();
         $schedule->command('promotions:expire')->everyMinute();
         $schedule->command('security:password-rotation')->daily();
         $schedule->command('privileges:revoke-expired')->everyMinute();
@@ -206,9 +216,7 @@ return Application::configure(basePath: dirname(__DIR__))
             cache()->forget('maintenance:active');
         })->everyMinute();
         $schedule->call(function () {
-            // 🔥 Push active kill switches to Redis
             KillSwitch::where('status', 'active')->get()->each(function ($kill) {
-                // ⏰ Auto-expire check
                 if ($kill->expires_at && $kill->expires_at->isPast()) {
                     $kill->update(['status' => 'expired']);
                     Redis::del("kill_switch:{$kill->scope}");

@@ -10,6 +10,6 @@ class AccessMetrixController extends Controller
 {
     public function index()
     {
-        return view('Admin.rbac.access_matrix.index');
+        return view('Admin.RBAC.Matrix.index');
     }
 }

@@ -8,18 +8,18 @@ use Illuminate\Http\Request;
 class MarketingController extends Controller
 {
      public function coupon(){
-        return view('Admin.marketing.coupons');
+        return view('admin.marketing.coupons');
      }
 
      public function campaign(){
-        return view('Admin.marketing.campaigns');
+        return view('admin.marketing.campaigns');
      }
 
      public function loyalty(){
-        return view('Admin.marketing.loyalty');
+        return view('admin.marketing.loyalty');
      }
 
      public function featured(){
-        return view('Admin.marketing.featured');
+        return view('admin.marketing.featured');
      }
 }

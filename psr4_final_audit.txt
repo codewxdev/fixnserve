@@ -1,0 +1,12 @@
+Generating optimized autoload files
+Class App\Domains\Fraud\Controllers\PaymentAbuseController located in ./app/Domains/Fraud/Controllers/Api/PaymentAbuseController.php does not comply with psr-4 autoloading standard (rule: App\ => ./app). Skipping.
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+Script Illuminate\Foundation\ComposerScripts::postAutoloadDump handling the post-autoload-dump event terminated with an exception
+
+In autoload_real.php line 41:
+                                                                                                                                              
+  require(/Applications/MAMP/htdocs/SahorOne/vendor/composer/../../app/Helpers/Global.php): Failed to open stream: No such file or directory  
+                                                                                                                                              
+
+dump-autoload [-o|--optimize] [-a|--classmap-authoritative] [--apcu] [--apcu-prefix APCU-PREFIX] [--dry-run] [--dev] [--no-dev] [--ignore-platform-req IGNORE-PLATFORM-REQ] [--ignore-platform-reqs] [--strict-psr] [--strict-ambiguous]
+
