@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Security\Controllers\Cp\V1;
+namespace App\Domains\Security\Controllers\Api\V1;
 
 use App\Domains\Security\Models\User;
 use App\Http\Controllers\BaseApiController;
