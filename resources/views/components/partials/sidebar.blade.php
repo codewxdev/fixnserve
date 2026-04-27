@@ -142,14 +142,14 @@
                 </button>
                 <ul x-show="activeDropdown === 'config' && sidebarOpen" x-collapse
                     class="mt-1 space-y-0.5 px-2 whitespace-nowrap" x-cloak>
-                    <li><a href="{{ route('cp.configurations.global') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.configurations.global') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Global Settings</a></li>
-                    <li><a href="{{ route('cp.configurations.flags') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.configurations.flags') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Feature Flags</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Environment Configuration</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Localization</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Geo Configuration</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Rate Limits</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Versioning & Rollback</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">AI Impact Analysis</a></li>
+                    <li><a href="{{ route('cp.configuration.global') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.configuration.global') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Global Settings</a></li>
+                    <li><a href="{{ route('cp.configuration.flags') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.configuration.flags') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Feature Flags</a></li>
+                    <li><a href="{{ route('cp.configuration.environment') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Environment Configuration</a></li>
+                    <li><a href="{{ route('cp.configuration.localization') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Localization</a></li>
+                    <li><a href="{{ route('cp.configuration.geo') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Geo Configuration</a></li>
+                    <li><a href="{{ route('cp.configuration.rate_limits') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Rate Limits</a></li>
+                    <li><a href="{{ route('cp.configuration.versioning') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Versioning & Rollback</a></li>
+                    <li><a href="{{ route('cp.configuration.ai_impact') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">AI Impact Analysis</a></li>
                 </ul>
             </li>
 
@@ -174,7 +174,7 @@
                     class="mt-1 space-y-0.5 px-2 whitespace-nowrap" x-cloak>
                     <li><a href="{{ route('cp.businesses.index') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.businesses.index') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Business Registry</a></li>
                     <li><a href="{{ route('cp.businesses.lifecycle') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.businesses.lifecycle') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Business Lifecycle</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Business Intelligence</a></li>
+                    <li><a href="{{ route('cp.businesses.intelligence') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.businesses.intelligence') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Business Intelligence</a></li>
                 </ul>
             </li>
 

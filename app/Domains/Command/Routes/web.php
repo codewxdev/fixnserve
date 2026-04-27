@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | SAHOR ONE CONTROL PANEL (MODULE 1: COMMAND CENTER)
 |--------------------------------------------------------------------------
-| Obscured path prefix for security through obfuscation. 
-| Main admin routes use a random slug prefix that changes quarterly.
-|--------------------------------------------------------------------------
 */
 
 Route::middleware([
@@ -44,8 +41,7 @@ Route::middleware([
     // SUB-MODULE 1.3: REGIONAL CONTROL
     // ========================================================
     Route::get('/regional-control', [RegionalController::class, 'index'])->name('regional.index');
-    // Spec Requirement: Dual approval logic required for hard disable
-    Route::patch('/regional-control/regions/{id}/status', [RegionalController::class, 'updateStatus'])->name('regional.update-status');
+     Route::patch('/regional-control/regions/{id}/status', [RegionalController::class, 'updateStatus'])->name('regional.update-status');
 
     // ========================================================
     // SUB-MODULE 1.4: MAINTENANCE & EMERGENCY
@@ -53,8 +49,7 @@ Route::middleware([
     Route::get('/maintenance', [MaintenanceController::class, 'index'])->name('maintenance.index');
     Route::post('/maintenance/schedule', [MaintenanceController::class, 'schedule'])->name('maintenance.schedule');
     
-    // Kill Switches (Requires dual approval middleware in controller)
-    Route::post('/maintenance/kill-switch', [MaintenanceController::class, 'executeKillSwitch'])->name('maintenance.kill-switch');
+     Route::post('/maintenance/kill-switch', [MaintenanceController::class, 'executeKillSwitch'])->name('maintenance.kill-switch');
     
     // Emergency Overrides (Time-bound 2 hours max)
     Route::post('/maintenance/override/activate', [MaintenanceController::class, 'activateOverride'])->name('maintenance.override.activate');

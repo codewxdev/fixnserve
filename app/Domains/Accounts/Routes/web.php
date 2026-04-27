@@ -1,30 +1,43 @@
 <?php
 
 use App\Domains\Accounts\Controllers\Front\BusinessController;
-use App\Domains\Accounts\Controllers\Front\BusinessLifecycleController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | SAHOR ONE CONTROL PANEL (MODULE 4: BUSINESS ACCOUNTS)
 |--------------------------------------------------------------------------
+| Handles Business Registry, Lifecycle, and Intelligence operations.
+|--------------------------------------------------------------------------
 */
 
 Route::middleware([
-    'web', 'auth.admin', 'admin.ip_whitelist',
+    'web',
+    'auth.admin',
+    'admin.ip_whitelist',
+    // 'admin.mfa',       // Recommended: Enforce MFA for administrative access
+    // 'audit_logger'     // Recommended: Immutable audit logging
 ])
-->prefix('cp-x9f7a2/v1/businesses')
-->name('cp.businesses.')
-->group(function () {
+    ->prefix('cp-x9f7a2/v1/businesses')
+    ->name('cp.businesses.')
+    ->group(function () {
 
-    // Unified Business Directory (Agencies, Consultants, Home Services, etc.)
-    // Route::get('/directory', [BusinessController::class, 'index'])->name('index');
-    // Route::post('/directory', [BusinessController::class, 'store'])->name('store');
-    // Route::put('/directory/{id}', [BusinessController::class, 'update'])->name('update');
-    // Route::delete('/directory/{id}', [BusinessController::class, 'destroy'])->name('destroy');
+        // ========================================================
+        // SUB-MODULE 4.1: BUSINESS REGISTRY
+        // ========================================================
+        // Main directory table, quick stats, and bulk actions
+        Route::get('/', [BusinessController::class, 'index'])->name('index');
 
-    // Business Lifecycle & State Management (Active, Suspended, Pending)
-    // Route::get('/lifecycle', [BusinessLifecycleController::class, 'index'])->name('lifecycle');
-    // Route::post('/lifecycle/{id}/suspend', [BusinessLifecycleController::class, 'suspend'])->name('suspend');
+        // ========================================================
+        // SUB-MODULE 4.2: BUSINESS LIFECYCLE
+        // ========================================================
+        // Dedicated view for lifecycle management and state transitions
+        Route::get('/lifecycle-management', [BusinessController::class, 'lifecycle'])->name('lifecycle');
+   
+        // ========================================================
+        // SUB-MODULE 4.3: BUSINESS INTELLIGENCE
+        // ========================================================
+        // Health scoring, risk analysis, and operations console
+        Route::get('/intelligence', [BusinessController::class, 'intelligence'])->name('intelligence');
 
-});
+    });
