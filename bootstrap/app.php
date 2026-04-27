@@ -88,8 +88,13 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::namespace('user')->group(base_path('routes/user/consultant.php'));
             Route::namespace('user')->group(base_path('routes/user/rider.php'));
             Route::namespace('user')->group(base_path('routes/user/vendor.php'));
+            // API versions
+            // Route::prefix('api/v1')->group(base_path('routes/api-v1.php'));
+            // Route::prefix('cp/v1')->group(base_path('routes/cp-v1.php'));
+            // Route::prefix('sys/v1')->group(base_path('routes/sys-v1.php'));
 
         }
+
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->encryptCookies(except: [

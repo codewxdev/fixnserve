@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Security\Controllers\Api;
+namespace App\Domains\Security\Controllers\Cp\V1;
 
 use App\Domains\Audit\Services\AdminAuditService;
 use App\Domains\Audit\Services\SecurityAuditService;
@@ -812,10 +812,10 @@ class AuthController extends BaseApiController
         $user = auth()->user();
 
         // Verify current password
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return response()->json([
                 'status' => false,
-                'message' => 'Your current password does not match our records.'
+                'message' => 'Your current password does not match our records.',
             ], 400);
         }
 
@@ -831,15 +831,12 @@ class AuthController extends BaseApiController
                 'user_id' => $user->id,
                 'ip' => $request->ip(),
             ],
-            $user 
+            $user
         );
 
         return response()->json([
             'status' => true,
-            'message' => 'Password updated successfully.'
+            'message' => 'Password updated successfully.',
         ]);
     }
-
-    
-    
 }

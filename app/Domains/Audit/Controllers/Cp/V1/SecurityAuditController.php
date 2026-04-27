@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Audit\Controllers\Api;
+namespace App\Domains\Audit\Controllers\Cp\V1;
 
 use App\Domains\Audit\Models\AccessPolicyChange;
 use App\Domains\Audit\Models\PrivilegeUsageLog;
@@ -67,7 +67,7 @@ class SecurityAuditController extends BaseApiController
                 ])
             )
             ->orderByDesc('occurred_at')
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($logs, 'audit_logs_fetched');
     }
@@ -91,7 +91,7 @@ class SecurityAuditController extends BaseApiController
         $events = SecurityAuditLog::byUser($userId)
             ->with('user:id,name')
             ->orderByDesc('occurred_at')
-            ->paginate(30);
+            ->paginate(10);
 
         $summary = [
             'total_logins' => SecurityAuditLog::byUser($userId)
@@ -133,7 +133,7 @@ class SecurityAuditController extends BaseApiController
             )
             ->when(! $request->status, fn ($q) => $q->open())
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($anomalies, 'anomalies_fetched');
     }
@@ -199,7 +199,7 @@ class SecurityAuditController extends BaseApiController
                 fn ($q) => $q->suspicious()
             )
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($logs, 'privilege_logs_fetched');
     }
@@ -214,7 +214,7 @@ class SecurityAuditController extends BaseApiController
                 fn ($q) => $q->where('policy_type', $request->policy_type)
             )
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($changes, 'policy_changes_fetched');
     }
@@ -228,7 +228,7 @@ class SecurityAuditController extends BaseApiController
         $logs = SecurityAuditLog::byIp($ip)
             ->with('user:id,name')
             ->orderByDesc('occurred_at')
-            ->paginate(20);
+            ->paginate(10);
 
         $summary = [
             'total_events' => SecurityAuditLog::byIp($ip)->count(),

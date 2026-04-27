@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Security\Controllers\Api;
+namespace App\Domains\Security\Controllers\Cp\V1;
 
 use App\Domains\Security\Models\TokenPolicy;
 use App\Domains\Security\Models\UserSession;

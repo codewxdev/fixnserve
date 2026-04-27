@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Audit\Controllers\Api;
+namespace App\Domains\Audit\Controllers\Cp\V1;
 
 use App\Domains\Audit\Models\CodReconciliation;
 use App\Domains\Audit\Models\CommissionLedger;
@@ -53,7 +53,7 @@ class FinancialAuditController extends BaseApiController
                 fn ($q) => $q->where('status', $request->status)
             )
             ->orderByDesc('posted_at')
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($entries, 'ledger_fetched');
     }
@@ -150,7 +150,7 @@ class FinancialAuditController extends BaseApiController
             ->when($request->status, fn ($q) => $q->where('status', $request->status))
             ->when($request->type, fn ($q) => $q->where('snapshot_type', $request->type))
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($snapshots, 'snapshots_fetched');
     }
@@ -183,7 +183,7 @@ class FinancialAuditController extends BaseApiController
             ->when($request->rider_id, fn ($q) => $q->where('rider_id', $request->rider_id))
             ->when($request->overdue, fn ($q) => $q->overdue())
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($cods, 'cod_reconciliation_fetched');
     }
@@ -234,7 +234,7 @@ class FinancialAuditController extends BaseApiController
             )
             ->when($request->status, fn ($q) => $q->where('status', $request->status))
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($commissions, 'commissions_fetched');
     }
@@ -247,7 +247,7 @@ class FinancialAuditController extends BaseApiController
             ->when($request->severity, fn ($q) => $q->where('severity', $request->severity))
             ->when(! $request->status, fn ($q) => $q->open())
             ->latest()
-            ->paginate(20);
+            ->paginate(10);
 
         return $this->success($flags, 'audit_flags_fetched');
     }
