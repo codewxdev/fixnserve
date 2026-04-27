@@ -77,7 +77,7 @@
                     <li><a href="{{ route('cp.dashboard') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.dashboard') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Executive Dashboard</a></li>
                     <li><a href="{{ route('cp.system-health.index') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.system-health.*') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">System Health</a></li>
                     <li><a href="{{ route('cp.regional.index') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.regional.*') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Regional Control</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Maintenance & Emergency</a></li>
+                    <li><a href="{{ route('cp.maintenance.index') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.maintenance.*') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Maintenance & Emergency</a></li>
                 </ul>
             </li>
 
