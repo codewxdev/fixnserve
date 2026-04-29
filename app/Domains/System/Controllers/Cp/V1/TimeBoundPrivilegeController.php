@@ -19,7 +19,7 @@ class TimeBoundPrivilegeController extends BaseApiController
             'role:id,name',
         ])
             ->active()
-            ->get()
+            ->paginate(10)
             ->map(function ($grant) {
                 return [
                     'id' => $grant->id,
@@ -132,7 +132,7 @@ class TimeBoundPrivilegeController extends BaseApiController
             'role:id,name',
         ])
             ->latest()
-            ->get()
+            ->paginate(10)
             ->map(function ($grant) {
                 return [
                     'id' => $grant->id,

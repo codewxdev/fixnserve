@@ -21,7 +21,7 @@ class RateLimitController extends BaseApiController
     public function getConfig()
     {
         $config = RateLimitConfiguration::first();
-        $overrides = TemporaryOverride::where('expires_at', '>', now())->get();
+        $overrides = TemporaryOverride::where('expires_at', '>', now())->paginate(10);
 
         return $this->success([
             'config' => $config,
@@ -54,22 +54,6 @@ class RateLimitController extends BaseApiController
         $this->rateLimitService->refreshConfig();
 
         return $this->success($config, 'rate_limits_saved');
-    }
-
-    // ✅ EMERGENCY throttling toggle
-    public function emergencyThrottling()
-    {
-        $config = RateLimitConfiguration::firstOrCreate(['id' => 1]);
-        $config->update(['emergency_throttling' => ! $config->emergency_throttling]);
-
-        $this->rateLimitService->refreshConfig();
-
-        return $this->success([
-            'emergency_throttling' => $config->emergency_throttling,
-            'message' => $config->emergency_throttling
-                ? '🚨 Emergency Throttling ENABLED'
-                : '✅ Emergency Throttling DISABLED',
-        ], 'emergency_throttling_toggled');
     }
 
     // ✅ ADD temporary override
@@ -110,7 +94,7 @@ class RateLimitController extends BaseApiController
     // ✅ GET active overrides
     public function getOverrides()
     {
-        $overrides = TemporaryOverride::where('expires_at', '>', now())->get();
+        $overrides = TemporaryOverride::where('expires_at', '>', now())->paginate(10);
 
         return $this->success($overrides, 'overrides_fetched');
     }

@@ -10,7 +10,7 @@ class DualApprovalRuleController extends BaseApiController
     // ✅ GET all rules
     public function index()
     {
-        $rules = DualApprovalRule::all();
+        $rules = DualApprovalRule::paginate(10);
 
         return $this->success($rules, 'approval_rules_fetched');
     }

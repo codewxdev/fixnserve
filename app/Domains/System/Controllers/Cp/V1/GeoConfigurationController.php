@@ -48,7 +48,7 @@ class GeoConfigurationController extends BaseApiController
     // ✅ GET all geofences
     public function getGeofences()
     {
-        $geofences = Geofence::all();
+        $geofences = Geofence::paginate(10);
 
         return $this->success($geofences, 'geofences_fetched');
     }
@@ -124,38 +124,5 @@ class GeoConfigurationController extends BaseApiController
         $this->geoService->refreshGeofences();
 
         return $this->success($geofence, 'geofence_toggled');
-    }
-
-    // ✅ EMERGENCY GEO LOCK
-    public function emergencyGeoLock(Request $request)
-    {
-        $config = GeoConfiguration::firstOrCreate(['id' => 1]);
-        $config->update(['emergency_geo_lock' => ! $config->emergency_geo_lock]);
-
-        // ✅ Broadcast emergency lock to all services
-        $this->geoService->handleEmergencyLock($config->emergency_geo_lock);
-
-        return $this->success([
-            'emergency_geo_lock' => $config->emergency_geo_lock,
-            'message' => $config->emergency_geo_lock
-                ? '🔒 Emergency Geo-Lock ACTIVATED'
-                : '🔓 Emergency Geo-Lock DEACTIVATED',
-        ], 'emergency_geo_lock_toggled');
-    }
-
-    // ✅ CHECK if location is serviceable (Global Use)
-    public function checkLocation(Request $request)
-    {
-        $request->validate([
-            'lat' => 'required|numeric',
-            'lng' => 'required|numeric',
-        ]);
-
-        $result = $this->geoService->checkLocation(
-            $request->lat,
-            $request->lng
-        );
-
-        return $this->success($result, 'location_checked');
     }
 }

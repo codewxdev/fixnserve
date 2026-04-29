@@ -27,7 +27,7 @@ class ConfigurationVersioningController extends BaseApiController
             $query->where('module', $request->module);
         }
 
-        $versions = $query->get()->map(function ($version) {
+        $versions = $query->paginate(10)->map(function ($version) {
             return [
                 'id' => $version->id,
                 'version_id' => $version->version_id,
@@ -51,31 +51,6 @@ class ConfigurationVersioningController extends BaseApiController
             $snapshot->load('author:id,name,email'),
             'version_fetched'
         );
-    }
-
-    // ✅ POST create manual snapshot
-    public function createManualSnapshot(Request $request)
-    {
-        $validated = $request->validate([
-            'module' => 'required|in:geo,rate_limits,geofences',
-            'change_summary' => 'nullable|string|max:500',
-        ]);
-
-        $currentConfig = $this->versioningService
-            ->getCurrentConfig($validated['module']);
-
-        if (empty($currentConfig)) {
-            return $this->error('no_config_found_for_module', 404);
-        }
-
-        $snapshot = $this->versioningService->createSnapshot(
-            module: $validated['module'],
-            newConfig: $currentConfig,
-            changeSummary: $validated['change_summary'] ?? 'Manual snapshot',
-            isManual: true
-        );
-
-        return $this->success($snapshot, 'manual_snapshot_created', 201);
     }
 
     // ✅ GET compare two versions
@@ -149,37 +124,5 @@ class ConfigurationVersioningController extends BaseApiController
                 ? '⚠️ High impact - many settings will change'
                 : null,
         ], 'rollback_impact_previewed');
-    }
-
-    // ✅ POST rollback
-    public function rollback(Request $request, ConfigurationSnapshot $snapshot)
-    {
-        $request->validate([
-            'reason' => 'required|string|max:500',
-        ]);
-
-        if ($snapshot->status === 'active') {
-            return $this->error('cannot_rollback_to_active_version', 422);
-        }
-
-        // ✅ Apply old config to DB
-        $this->versioningService->applyConfig(
-            $snapshot->module,
-            $snapshot->snapshot
-        );
-
-        // ✅ Create rollback snapshot
-        $rollbackSnapshot = $this->versioningService->createSnapshot(
-            module: $snapshot->module,
-            newConfig: $snapshot->snapshot,
-            changeSummary: "Rollback to {$snapshot->version_id}: {$request->reason}",
-            isManual: true
-        );
-
-        return $this->success([
-            'new_version' => $rollbackSnapshot,
-            'rolled_back_to' => $snapshot->version_id,
-            'message' => "✅ Rolled back to {$snapshot->version_id}",
-        ], 'rollback_successful');
     }
 }

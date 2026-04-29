@@ -13,7 +13,7 @@ class ReasonCodeController extends BaseApiController
     // ✅ GET all codes + policy
     public function index()
     {
-        $codes = ReasonCode::where('is_active', true)->get();
+        $codes = ReasonCode::where('is_active', true)->paginate(10);
         $policy = ReasonCodePolicy::firstOrCreate(
             ['id' => 1],
             ['enforcement_level' => 'moderate']

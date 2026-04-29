@@ -12,7 +12,7 @@ class FeatureFlagController extends BaseApiController
     public function index(Request $request)
     {
         $user = $request->user();
-        $flags = FeatureFlag::all();
+        $flags = FeatureFlag::paginate(10);
 
         $result = [];
 
