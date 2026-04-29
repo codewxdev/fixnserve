@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\System\Controllers\Api;
+namespace App\Domains\System\Controllers\Cp\V1;
 
 use App\Domains\System\Models\ReasonCode;
 use App\Domains\System\Models\ReasonCodePolicy;

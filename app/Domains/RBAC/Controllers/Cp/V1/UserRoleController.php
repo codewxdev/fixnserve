@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\RBAC\Controllers\Api;
+namespace App\Domains\RBAC\Controllers\Cp\V1;
 
 use App\Domains\RBAC\Services\Audit;
 use App\Domains\Security\Models\User;

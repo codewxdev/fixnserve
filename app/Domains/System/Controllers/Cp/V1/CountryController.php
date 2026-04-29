@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\System\Controllers\Api;
+namespace App\Domains\System\Controllers\Cp\V1;
 
 use App\Http\Controllers\BaseApiController;
 use App\Models\Country;

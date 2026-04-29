@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\System\Controllers\Api;
+namespace App\Domains\System\Controllers\Cp\V1;
 
 use App\Domains\System\Models\FeatureFlag;
 use App\Domains\System\Models\FeatureFlagLog;
@@ -9,13 +9,11 @@ use Illuminate\Http\Request;
 
 class FeatureFlagController extends BaseApiController
 {
-     
     public function index(Request $request)
     {
         $user = $request->user();
         $flags = FeatureFlag::all();
 
-         
         $result = [];
 
         foreach ($flags as $flag) {
@@ -28,7 +26,6 @@ class FeatureFlagController extends BaseApiController
         return $this->success($result);
     }
 
-    
     public function store(Request $request)
     {
         $request->validate([
@@ -48,7 +45,6 @@ class FeatureFlagController extends BaseApiController
         return $this->success($flag, 'Feature flag created', 201);
     }
 
-     
     public function update(Request $request, FeatureFlag $flag)
     {
         $flag->update($request->only('type', 'value'));

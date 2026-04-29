@@ -175,6 +175,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa'])->group(function () {
             Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
+
             // /////////////////////session management//////////////////////////
 
         });

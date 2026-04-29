@@ -1,23 +1,23 @@
 <?php
 
-use App\Domains\System\Controllers\Api\ConfigurationVersioningController;
-use App\Domains\System\Controllers\Api\CountryController;
-use App\Domains\System\Controllers\Api\DualApprovalRuleController;
-use App\Domains\System\Controllers\Api\FeatureFlagController;
-use App\Domains\System\Controllers\Api\GeoConfigurationController;
-use App\Domains\System\Controllers\Api\PlatformPreferenceController;
-use App\Domains\System\Controllers\Api\RateLimitController;
-use App\Domains\System\Controllers\Api\ReasonCodeController;
-use App\Domains\System\Controllers\Api\TimeBoundPrivilegeController;
+use App\Domains\System\Controllers\Cp\V1\ConfigurationVersioningController;
+use App\Domains\System\Controllers\Cp\V1\CountryController;
+use App\Domains\System\Controllers\Cp\V1\DualApprovalRuleController;
+use App\Domains\System\Controllers\Cp\V1\FeatureFlagController;
+use App\Domains\System\Controllers\Cp\V1\GeoConfigurationController;
+use App\Domains\System\Controllers\Cp\V1\PlatformPreferenceController;
+use App\Domains\System\Controllers\Cp\V1\RateLimitController;
+use App\Domains\System\Controllers\Cp\V1\ReasonCodeController;
+use App\Domains\System\Controllers\Cp\V1\TimeBoundPrivilegeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {
     Route::middleware(['auth:api', 'role:Super Admin', '2fa', 'user.active', 'active.session'])->group(function () {
-        Route::prefix('admin/platform-preferences')->group(function () {
+        Route::prefix('platform-preferences')->group(function () {
             Route::post('/update', [PlatformPreferenceController::class, 'update']);
             Route::get('/current', [PlatformPreferenceController::class, 'current']);
         });
-        Route::prefix('admin/feature-flags')->group(function () {
+        Route::prefix('feature-flags')->group(function () {
             Route::get('/', [FeatureFlagController::class, 'index']);
             Route::post('/', [FeatureFlagController::class, 'store']);
             Route::put('/{flag}', [FeatureFlagController::class, 'update']);
@@ -41,10 +41,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::patch('/geofences/{geofence}/toggle', [GeoConfigurationController::class, 'toggleGeofence']);
 
             // Emergency
-            Route::post('/emergency-lock', [GeoConfigurationController::class, 'emergencyGeoLock'])->middleware('version.capture');
 
-            // Check location
-            Route::post('/check-location', [GeoConfigurationController::class, 'checkLocation']);
         });
         // routes/api.php
         Route::prefix('rate-limits')->group(function () {
@@ -52,9 +49,6 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             // ✅ Get & Save limits
             Route::get('/', [RateLimitController::class, 'getConfig']);
             Route::post('/save', [RateLimitController::class, 'saveLimits'])->middleware(['reason.code', 'version.capture']);
-
-            // ✅ Emergency
-            Route::post('/emergency', [RateLimitController::class, 'emergencyThrottling'])->middleware('version.capture');
 
             // ✅ Overrides
             Route::get('/overrides', [RateLimitController::class, 'getOverrides']);
@@ -84,9 +78,6 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::get('/',
                 [ConfigurationVersioningController::class, 'index']);
 
-            Route::post('/manual-snapshot',
-                [ConfigurationVersioningController::class, 'createManualSnapshot']);
-
             Route::get('/compare',
                 [ConfigurationVersioningController::class, 'compare']);
 
@@ -96,14 +87,10 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::get('/{snapshot}/preview-rollback',
                 [ConfigurationVersioningController::class, 'previewRollback']);
 
-            Route::post('/{snapshot}/rollback',
-                [ConfigurationVersioningController::class, 'rollback']);
         });
     });
 
     Route::prefix('countries')->group(function () {
-
-        Route::get('/list', [CountryController::class, 'index']);
 
         Route::patch('{iso2}/locale', [CountryController::class, 'updateLocale']);
 
