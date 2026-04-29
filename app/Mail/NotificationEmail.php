@@ -32,7 +32,7 @@ class NotificationEmail extends Mailable
     public function build()
     {
         return $this->subject($this->data['subject'] ?? 'Notification')
-            ->markdown('emails.notification')
+            ->markdown('Emails.notification')
             ->with([
                 'user' => $this->data['user'] ?? null,
                 'content' => $this->data['content'] ?? $this->data['message'] ?? '',
