@@ -241,11 +241,11 @@
                 </button>
                 <ul x-show="activeDropdown === 'finance' && sidebarOpen" x-collapse
                     class="mt-1 space-y-0.5 px-2 whitespace-nowrap" x-cloak>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Revenue Ledger</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Wallets</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Commissions & Tax</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Payouts</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Refunds & Adjustments</a></li>
+                    <li><a href="{{ route('cp.finance.ledger') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Revenue Ledger</a></li>
+                    <li><a href="{{ route('cp.finance.wallets') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Wallets</a></li>
+                    <li><a href="{{ route('cp.finance.commissions') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Commissions & Tax</a></li>
+                    <li><a href="{{ route('cp.finance.payouts') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Payouts</a></li>
+                    <li><a href="{{ route('cp.finance.refunds') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Refunds & Adjustments</a></li>
                 </ul>
             </li>
 

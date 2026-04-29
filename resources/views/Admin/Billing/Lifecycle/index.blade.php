@@ -19,7 +19,7 @@
             <p class="text-caption font-bold text-text-tertiary uppercase">Active</p>
             <p class="text-h3 font-bold text-text-primary mt-1">1,240</p>
         </div>
-        <div class="card p-4 ">
+        <div class="card p-4">
             <p class="text-caption font-bold text-text-tertiary uppercase">Grace Period</p>
             <p class="text-h3 font-bold text-text-primary mt-1">22</p>
         </div>

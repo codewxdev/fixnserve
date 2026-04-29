@@ -84,7 +84,7 @@
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity 
              class="fixed inset-0 bg-black/50 z-30 lg:hidden" x-cloak></div>
 
-        <x-partials.sidebar />
+        <x-Partials.sidebar />
 
         <div class="flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out h-screen overflow-y-auto relative z-10">
 
