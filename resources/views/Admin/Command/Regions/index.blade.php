@@ -122,7 +122,7 @@
 
             <div class="p-4 border-t border-border-default rounded-b-lg bg-bg-tertiary flex flex-col sm:flex-row justify-end gap-3 shrink-0">
                 <button @click="modal.open = false" class="btn btn-tertiary w-full sm:w-auto order-2 sm:order-1">Cancel</button>
-                <button @click="saveStatus()" class="btn btn-primary w-full sm:w-auto order-1 sm:order-2 justify-center" :disabled="isSaving">
+                <button @click="saveStatus()" class="btn p-2 btn-primary w-full sm:w-auto order-1 sm:order-2 justify-center" :disabled="isSaving">
                     <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin" x-show="isSaving" x-cloak></i>
                     <span x-text="isSaving ? 'Updating...' : 'Update Status'"></span>
                 </button>
