@@ -1,37 +1,22 @@
 <?php
 
-use App\Domains\Billing\Controllers\Front\PlanController;
+use App\Domains\Billing\Controllers\Front\BillingController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| SAHOR ONE CONTROL PANEL (MODULE 6: BILLING & MONETIZATION)
-|--------------------------------------------------------------------------
-|--------------------------------------------------------------------------
-*/
-
 Route::middleware([
-    'web',                  // Standard Laravel web stack (CSRF, Cookies)
-    'auth.admin',           // Authenticated admin session
-    'admin.ip_whitelist',   // VerifyIpWhitelist Middleware
+    'web',
+    'auth.admin',
+    // 'admin.mfa',
+    // 'audit_logger'
 ])
-->prefix('cp-x9f7a2/v1/billing/plans')
-->name('cp.billing.plans.')
+->prefix('cp-x9f7a2/v1/billing')
+->name('cp.billing.')
 ->group(function () {
     
-    // ========================================================
-    // SUB-MODULE 6.1: GLOBAL BILLING CONFIGURATION
-    // ========================================================
-    
-    
-
-
-    // ========================================================
-    // SUB-MODULE 6.1: PLAN DIRECTORY & CRUD
-    // ========================================================
-    
-     Route::get('/', [PlanController::class, 'index'])->name('index');
-    
- 
+    Route::get('/plans', [BillingController::class, 'plans'])->name('plans');
+    Route::get('/entitlements', [BillingController::class, 'entitlements'])->name('entitlements');
+    Route::get('/lifecycle', [BillingController::class, 'lifecycle'])->name('lifecycle');
+    Route::get('/enforcement', [BillingController::class, 'enforcement'])->name('enforcement');
+    Route::get('/overrides', [BillingController::class, 'overrides'])->name('overrides');
 
 });

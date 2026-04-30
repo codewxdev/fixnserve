@@ -1,0 +1,456 @@
+@extends('layouts.auth')
+
+@section('content')
+    <div class="login-card-shadow w-full max-w-md p-10 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
+        style="background-color: white;">
+        <h1 class="text-4xl font-bold mb-10 text-center" style="color: #021056;">
+            Sign In
+        </h1>
+
+        <div id="errorMessageContainer"
+            class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+            <p id="errorMessage" class="font-medium text-sm"></p>
+        </div>
+
+        <form action="" method="POST" id="loginForm" class="space-y-6">
+
+            <div>
+                <zabel for="email" class="block text-sm font-medium mb-2" style="color: #021056;">Email
+                    Address</label>
+                    <input type="email" name="email" id="email" placeholder="you@example.com" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
+                        style="color: #021056; background-color: white;">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium mb-2" style="color: #021056;">Password</label>
+                <input type="password" name="password" id="password" placeholder="••••••••" required
+                    class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
+                    style="color: #021056; background-color: white;">
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" id="loginButton"
+                    class="w-full flex items-center justify-center py-3 px-4 rounded-lg text-lg font-semibold text-white shadow-md hover:shadow-lg transition duration-300 ease-in-out"
+                    style="background-color: #1169FB;">
+                    Log In
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-8 text-center text-sm">
+            <a href="{{ route('forget.password') }}" class="font-medium hover:underline" style="color: #1169FB;">
+                Forgot your password?
+            </a>
+
+        </div>
+    </div>
+
+    <div id="twoFactorModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
+            <h2 id="twoFactorTitle" class="text-2xl font-bold mb-6 text-center" style="color: #021056;">
+                2FA Verification
+            </h2>
+
+            <div id="twoFactorErrorMessageContainer"
+                class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+                <p id="twoFactorErrorMessage" class="font-medium text-sm"></p>
+            </div>
+
+            <div id="qrCodeSection" class="hidden text-center mb-6">
+                <p class="text-sm mb-4">Scan the QR code with your authenticator app (e.g., Google Authenticator, Authy) to
+                    set up Two-Factor Authentication.</p>
+                <div id="qrcode" class="mx-auto border p-2 rounded-lg mb-4">
+                </div>
+                <p class="text-xs font-mono break-all p-2 bg-gray-100 rounded">Secret: <span id="twoFactorSecret"></span>
+                </p>
+            </div>
+
+            <form id="twoFactorForm" class="space-y-6">
+                <input type="hidden" id="twoFactorEmail">
+
+                <div>
+                    <label for="otpCode" class="block text-sm font-medium mb-2" style="color: #021056;">
+                        Authentication Code
+                    </label>
+                    <input type="text" name="otpCode" id="otpCode" placeholder="Enter 6-digit code" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150 text-center tracking-widest"
+                        maxlength="6" pattern="\d{6}" style="color: #021056; background-color: white;">
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" id="verify2FAButton"
+                        class="w-full flex items-center justify-center py-3 px-4 rounded-lg text-lg font-semibold text-white shadow-md hover:shadow-lg transition duration-300 ease-in-out"
+                        style="background-color: #1169FB;">
+                        Verify & Log In
+                    </button>
+                </div>
+            </form>
+            <p id="twoFAModalBack" class="mt-4 text-center text-sm font-medium hover:underline cursor-pointer"
+                style="color: #1169FB;">
+                &larr; Back to Login
+            </p>
+        </div>
+    </div>
+@endsection
+@push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4').then(FingerprintJS => FingerprintJS.load());
+    </script>
+
+    <script>
+        // 1. Global Variables
+        let currentAuthEmail = '';
+        let tempAccessToken = '';
+        let currentVisitorId = '';
+        let currentDeviceInfo = null;
+
+        // 2. Helper Functions
+        function setButtonLoading(button, isLoading, originalText = 'Log In') {
+            if (!button) return;
+            button.disabled = isLoading;
+            button.innerHTML = isLoading ?
+                `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg> Processing...` : originalText;
+        }
+
+        function showTwoFAModal(title, email, isSetupMode = false, qrCodeUrl = null, secret = null) {
+            document.getElementById("twoFactorModal").style.display = 'flex';
+            document.getElementById("twoFactorTitle").innerText = title;
+            document.getElementById("twoFactorEmail").value = email;
+
+            if (isSetupMode) {
+                document.getElementById("qrcode").innerHTML = "";
+                new QRCode(document.getElementById("qrcode"), {
+                    text: qrCodeUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                document.getElementById("qrCodeSection").classList.remove('hidden');
+                document.getElementById("twoFactorSecret").innerText = secret;
+            } else {
+                document.getElementById("qrCodeSection").classList.add('hidden');
+            }
+        }
+
+        function hideTwoFAModal() {
+            document.getElementById("twoFactorModal").style.display = 'none';
+            document.getElementById("twoFactorErrorMessageContainer").classList.add('hidden');
+            document.getElementById("twoFactorErrorMessage").innerText = '';
+            document.getElementById("otpCode").value = '';
+        }
+
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let browserName = "Unknown Browser";
+            let osName = "Unknown OS";
+
+            if (ua.indexOf("Win") !== -1) osName = "Windows";
+            if (ua.indexOf("Mac") !== -1) osName = "MacOS";
+            if (ua.indexOf("Linux") !== -1) osName = "Linux";
+            if (ua.indexOf("Android") !== -1) osName = "Android";
+            if (ua.indexOf("like Mac") !== -1) osName = "iOS";
+
+            if (ua.indexOf("Firefox") > -1) browserName = "Firefox";
+            else if (ua.indexOf("SamsungBrowser") > -1) browserName = "Samsung Internet";
+            else if (ua.indexOf("Opera") > -1 || ua.indexOf("OPR") > -1) browserName = "Opera";
+            else if (ua.indexOf("Trident") > -1) browserName = "Internet Explorer";
+            else if (ua.indexOf("Edge") > -1) browserName = "Edge";
+            else if (ua.indexOf("Chrome") > -1) browserName = "Chrome";
+            else if (ua.indexOf("Safari") > -1) browserName = "Safari";
+
+            return {
+                os_version: osName,
+                device_name: browserName + " on " + osName,
+                app_version: navigator.appVersion,
+                is_rooted: false
+            };
+        }
+
+        // 3. Login Form Submission
+        document.getElementById("loginForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const loginButton = document.getElementById("loginButton");
+            const errorMessageContainer = document.getElementById("errorMessageContainer");
+            const errorMessage = document.getElementById("errorMessage");
+            currentAuthEmail = document.getElementById("email").value;
+
+            setButtonLoading(loginButton, true, 'Log In');
+            errorMessageContainer.classList.add('hidden');
+            errorMessage.innerText = '';
+
+            try {
+                // Get Fingerprint
+                let visitorId = "unknown-device-" + Math.random().toString(36).substring(2, 10);
+                try {
+                    const fp = await fpPromise;
+                    const result = await fp.get();
+                    visitorId = result.visitorId;
+                } catch (fpError) {
+                    console.warn("FingerprintJS fallback used.");
+                }
+
+                const deviceInfo = getDeviceInfo();
+                currentVisitorId = visitorId;
+                currentDeviceInfo = deviceInfo;
+
+                const payload = {
+                    login: currentAuthEmail,
+                    password: document.getElementById("password").value,
+                    fingerprint: visitorId,
+                    device_name: deviceInfo.device_name,
+                    os_version: deviceInfo.os_version,
+                    app_version: deviceInfo.app_version,
+                    is_rooted: deviceInfo.is_rooted
+                };
+
+                const res = await fetch("{{ url('/api/v1/auth/login') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]')?.getAttribute(
+                            'content') || ''
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const rawText = await res.text();
+                console.log("RAW SERVER RESPONSE:", rawText);
+
+                try {
+                    var data = JSON.parse(rawText);
+                } catch (e) {
+                    throw new Error(
+                        "Server returned HTML or an error instead of JSON. Press F12 and check the Console to see the exact PHP error."
+                        );
+                }
+
+
+                // --- FIXES APPLIED HERE ---
+
+                const responseData = data.data ? data.data : data;
+
+                const isEnable2FA = (res.status === 403 && (data.error === 'enable_2fa' || data.message ===
+                    'enable_2fa'));
+
+                if (!res.ok && !isEnable2FA) {
+                    throw new Error(data.error || data.message || "Invalid credentials.");
+                }
+
+                const logicalStatus = isEnable2FA ? 'enable_2fa' : responseData.status;
+                const accessToken = responseData.access_token || data.access_token;
+
+                if (logicalStatus === '2fa_required') {
+                    tempAccessToken = accessToken;
+                    localStorage.setItem('device_fingerprint', currentVisitorId);
+                    showTwoFAModal('2FA Verification Required', currentAuthEmail, false);
+
+                } else if (logicalStatus === 'enable_2fa') {
+                    tempAccessToken = accessToken;
+                    localStorage.setItem('device_fingerprint', currentVisitorId);
+                    enable2FA(accessToken);
+
+                } else if (accessToken) {
+                    localStorage.setItem('token', accessToken);
+                    document.cookie = `token=${accessToken}; path=/; SameSite=Lax`;
+                    localStorage.setItem('device_fingerprint', currentVisitorId);
+
+                    if (responseData.user || data.user) {
+                        localStorage.setItem("user", JSON.stringify(responseData.user || data.user));
+                    }
+
+                    window.location.href = "{{ route('cp.dashboard') }}";
+                } else {
+                    throw new Error("Unexpected response from server.");
+                }
+
+            } catch (err) {
+                errorMessage.innerText = err.message;
+                errorMessageContainer.classList.remove('hidden');
+            } finally {
+                setButtonLoading(loginButton, false, 'Log In');
+            }
+        });
+
+        function enable2FA(tempToken) {
+            fetch("{{ url('/api/2fa/enable') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${tempToken}`
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'setup_initiated' && data.qrcode_url) {
+                        showTwoFAModal('Setup Two-Factor Authentication', currentAuthEmail, true, data.qrcode_url, data
+                            .secret);
+                    } else {
+                        alert(data.error || "Failed to initiate 2FA setup.");
+                    }
+                })
+                .catch(err => console.error("2FA Enable Error:", err));
+        }
+
+        document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const verifyButton = document.getElementById("verify2FAButton");
+            const errorMessageContainer = document.getElementById("twoFactorErrorMessageContainer");
+            const errorMessage = document.getElementById("twoFactorErrorMessage");
+            const otpCode = document.getElementById("otpCode").value;
+
+            setButtonLoading(verifyButton, true, 'Verify & Log In');
+            errorMessageContainer.classList.add('hidden');
+
+            try {
+                if (!currentVisitorId || !currentDeviceInfo) {
+                    const fp = await fpPromise;
+                    const result = await fp.get();
+                    currentVisitorId = result.visitorId;
+                    currentDeviceInfo = getDeviceInfo();
+                }
+
+                const res = await fetch("{{ url('/api/2fa/verify') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById("twoFactorEmail").value,
+                        otp: otpCode,
+                        fingerprint: currentVisitorId,
+                        device_name: currentDeviceInfo.device_name,
+                        os_version: currentDeviceInfo.os_version,
+                        app_version: currentDeviceInfo.app_version,
+                        is_rooted: currentDeviceInfo.is_rooted
+                    })
+                });
+
+                const data = await res.json();
+                const responseData = data.data ? data.data : data;
+
+                if (responseData.status === 'success' && responseData.access_token) {
+                    localStorage.setItem('token', responseData.access_token);
+                    document.cookie = `token=${responseData.access_token}; path=/; max-age=86400; SameSite=Lax`;
+
+                    if (responseData.user) {
+                        localStorage.setItem("user", JSON.stringify(responseData.user));
+                    }
+
+                    window.location.href = "{{ route('cp.dashboard') }}";
+                } else {
+                    errorMessage.innerText = data.error || responseData.error ||
+                        "Verification failed. Check your code.";
+                    errorMessageContainer.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMessage.innerText = "Connection error. Please try again.";
+                errorMessageContainer.classList.remove('hidden');
+            } finally {
+                setButtonLoading(verifyButton, false, 'Verify & Log In');
+            }
+        });
+
+        function enable2FA(tempToken) {
+            fetch("{{ url('/api/2fa/enable') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "Authorization": `Bearer ${tempToken}`
+                    },
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'setup_initiated' && data.qrcode_url) {
+                        showTwoFAModal('Setup Two-Factor Authentication', currentAuthEmail, true, data.qrcode_url, data
+                            .secret);
+                    } else {
+                        alert(data.error || "Failed to initiate 2FA setup.");
+                    }
+                })
+                .catch(err => console.error("2FA Enable Error:", err));
+        }
+
+        document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+
+            const verifyButton = document.getElementById("verify2FAButton");
+            const errorMessageContainer = document.getElementById("twoFactorErrorMessageContainer");
+            const errorMessage = document.getElementById("twoFactorErrorMessage");
+            const otpCode = document.getElementById("otpCode").value;
+
+            setButtonLoading(verifyButton, true, 'Verify & Log In');
+            errorMessageContainer.classList.add('hidden');
+
+            try {
+                if (!currentVisitorId) {
+                    const fp = await fpPromise;
+                    const result = await fp.get();
+                    currentVisitorId = result.visitorId;
+                    currentDeviceInfo = getDeviceInfo();
+                }
+
+                const res = await fetch("{{ url('/api/2fa/verify') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: document.getElementById("twoFactorEmail").value,
+                        otp: otpCode,
+                        fingerprint: currentVisitorId,
+                        device_name: currentDeviceInfo.device_name,
+                        os_version: currentDeviceInfo.os_version,
+                        app_version: currentDeviceInfo.app_version,
+                        is_rooted: currentDeviceInfo.is_rooted
+                    })
+                });
+
+                const data = await res.json();
+
+                if (data.status === 'success' && data.access_token) {
+                    localStorage.setItem('token', data.access_token);
+                    document.cookie = `token=${data.access_token}; path=/; max-age=86400; SameSite=Lax`;
+
+                    if (data.user) {
+                        localStorage.setItem("user", JSON.stringify(data.user));
+                    }
+
+                    window.location.href = "{{ route('cp.dashboard') }}";
+                } else {
+                    errorMessage.innerText = data.error || "Verification failed. Check your code.";
+                    errorMessageContainer.classList.remove('hidden');
+                }
+            } catch (err) {
+                errorMessage.innerText = "Connection error. Please try again.";
+                errorMessageContainer.classList.remove('hidden');
+            } finally {
+                setButtonLoading(verifyButton, false, 'Verify & Log In');
+            }
+        });
+
+        document.getElementById("twoFAModalBack").addEventListener("click", hideTwoFAModal);
+    </script>
+@endpush
+
+@push('styles')
+    <style>
+        body {
+            font-family: 'Poppins';
+        }
+    </style>
+@endpush

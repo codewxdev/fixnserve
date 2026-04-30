@@ -178,8 +178,8 @@
                 </div>
                 
                 <div class="p-5 border-t border-border-default flex flex-col sm:flex-row justify-end gap-3 rounded-b-xl bg-bg-tertiary">
-                    <button type="button" @click="cancelAction()" class="btn btn-tertiary w-full sm:w-auto order-2 sm:order-1 px-6">Cancel</button>
-                    <button type="submit" class="btn btn-primary bg-semantic-warning border-none hover:bg-orange-500 text-white shadow-lg w-full sm:w-auto order-1 sm:order-2 px-6" :disabled="!pendingAction.justification">Confirm & Execute</button>
+                    <button type="button" @click="cancelAction()" class="btn p-2 btn-tertiary w-full sm:w-auto order-2 sm:order-1 px-6">Cancel</button>
+                    <button type="submit" class="btn p-2btn-primary bg-semantic-warning border-none hover:bg-orange-500 text-white shadow-lg w-full sm:w-auto order-1 sm:order-2 px-6" :disabled="!pendingAction.justification">Confirm & Execute</button>
                 </div>
             </form>
         </div>

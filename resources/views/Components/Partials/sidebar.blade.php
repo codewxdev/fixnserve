@@ -218,11 +218,11 @@
                 </button>
                 <ul x-show="activeDropdown === 'subs' && sidebarOpen" x-collapse
                     class="mt-1 space-y-0.5 px-2 whitespace-nowrap" x-cloak>
-                     <li><a href="{{ route('cp.billing.plans.index') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.subscriptions.plans') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Plan Management</a></li>
-                     <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Entitlement Keys</a></li>
-                     <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Subscription Lifecycle</a></li>
-                     <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Enforcement Engine</a></li>
-                     <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Admin Overrides</a></li>
+                     <li><a href="{{ route('cp.billing.plans') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.billing.plans') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Plan Management</a></li>
+                     <li><a href="{{ route('cp.billing.entitlements') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.billing.entitlements') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Entitlement Keys</a></li>
+                     <li><a href="{{ route('cp.billing.lifecycle') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.billing.lifecycle') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Subscription Lifecycle</a></li>
+                     <li><a href="{{ route('cp.billing.enforcement') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.billing.enforcement') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Enforcement Engine</a></li>
+                     <li><a href="{{ route('cp.billing.overrides') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors {{ request()->routeIs('cp.billing.overrides') ? 'font-semibold text-brand-primary bg-brand-primary/5' : 'text-text-secondary hover:text-text-primary hover:bg-bg-tertiary' }}">Admin Overrides</a></li>
                 </ul>
             </li>
 
@@ -241,11 +241,11 @@
                 </button>
                 <ul x-show="activeDropdown === 'finance' && sidebarOpen" x-collapse
                     class="mt-1 space-y-0.5 px-2 whitespace-nowrap" x-cloak>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Revenue Ledger</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Wallets</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Commissions & Tax</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Payouts</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Refunds & Adjustments</a></li>
+                    <li><a href="{{ route('cp.finance.ledger') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Revenue Ledger</a></li>
+                    <li><a href="{{ route('cp.finance.wallets') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Wallets</a></li>
+                    <li><a href="{{ route('cp.finance.commissions') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Commissions & Tax</a></li>
+                    <li><a href="{{ route('cp.finance.payouts') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Platform Payouts</a></li>
+                    <li><a href="{{ route('cp.finance.refunds') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Refunds & Adjustments</a></li>
                 </ul>
             </li>
 

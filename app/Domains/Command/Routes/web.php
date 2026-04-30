@@ -51,8 +51,7 @@ Route::middleware([
     
      Route::post('/maintenance/kill-switch', [MaintenanceController::class, 'executeKillSwitch'])->name('maintenance.kill-switch');
     
-    // Emergency Overrides (Time-bound 2 hours max)
-    Route::post('/maintenance/override/activate', [MaintenanceController::class, 'activateOverride'])->name('maintenance.override.activate');
+     Route::post('/maintenance/override/activate', [MaintenanceController::class, 'activateOverride'])->name('maintenance.override.activate');
     Route::post('/maintenance/override/terminate', [MaintenanceController::class, 'terminateOverride'])->name('maintenance.override.terminate');
 
 });
