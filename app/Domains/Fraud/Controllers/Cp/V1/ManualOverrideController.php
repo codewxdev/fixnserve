@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers\Api;
+namespace App\Domains\Fraud\Controllers\Cp\V1;
 
 use App\Domains\Fraud\Models\OverrideReasonCode;
 use App\Domains\Fraud\Services\ManualOverrideService;
@@ -16,7 +16,7 @@ class ManualOverrideController extends BaseApiController
         protected ManualOverrideService $overrideService
     ) {}
 
-    // ✅ 1. Dashboard
+    //  1. Dashboard
     public function dashboard()
     {
         $metrics = $this->overrideService->getMetrics();
@@ -32,7 +32,7 @@ class ManualOverrideController extends BaseApiController
         ], 'override_dashboard_fetched');
     }
 
-    // ✅ 2. All Overrides
+    //  2. All Overrides
     public function index(Request $request)
     {
         $overrides = DualApproval::with([
@@ -48,7 +48,7 @@ class ManualOverrideController extends BaseApiController
         return $this->success($overrides, 'overrides_fetched');
     }
 
-    // ✅ 3. Pending Dual Approvals
+    //  3. Pending Dual Approvals
     public function pendingDualApprovals()
     {
         $pending = DualApproval::needsDualApproval()
@@ -59,7 +59,7 @@ class ManualOverrideController extends BaseApiController
         return $this->success($pending, 'pending_dual_approvals_fetched');
     }
 
-    // ✅ 4. Single Detail
+    //  4. Single Detail
     public function show(DualApproval $override)
     {
         return $this->success(
@@ -73,7 +73,7 @@ class ManualOverrideController extends BaseApiController
         );
     }
 
-    // ✅ 5. Initiate Override Request
+    // 5. Initiate Override Request
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -95,7 +95,7 @@ class ManualOverrideController extends BaseApiController
         );
     }
 
-    // ✅ 6. Approve Level 1
+    // 6. Approve Level 1
     public function approveLevel1(Request $request, DualApproval $override)
     {
         if ($override->status !== 'pending') {
@@ -111,7 +111,7 @@ class ManualOverrideController extends BaseApiController
         }
     }
 
-    // ✅ 7. Approve Level 2
+    // 7. Approve Level 2
     public function approveLevel2(Request $request, DualApproval $override)
     {
         if ($override->status !== 'approved_level_1') {
@@ -127,7 +127,7 @@ class ManualOverrideController extends BaseApiController
         }
     }
 
-    // ✅ 8. Reject
+    // 8. Reject
     public function reject(Request $request, DualApproval $override)
     {
         $request->validate([
@@ -147,7 +147,7 @@ class ManualOverrideController extends BaseApiController
         return $this->success($result, 'override_rejected');
     }
 
-    // ✅ 9. Execute
+    // 9. Execute
     public function execute(Request $request, DualApproval $override)
     {
         if ($override->status !== 'approved') {
@@ -163,7 +163,7 @@ class ManualOverrideController extends BaseApiController
         }
     }
 
-    // ✅ 10. Audit Log
+    // 10. Audit Log
     public function auditLog()
     {
         $logs = ApprovalAuditLog::with([
@@ -176,7 +176,7 @@ class ManualOverrideController extends BaseApiController
         return $this->success($logs, 'audit_log_fetched');
     }
 
-    // ✅ 11. Export Immutable Log
+    // 11. Export Immutable Log
     public function exportLog()
     {
         $logs = ApprovalAuditLog::with([
@@ -219,7 +219,7 @@ class ManualOverrideController extends BaseApiController
         return Response::stream($callback, 200, $headers);
     }
 
-    // ✅ 12. Reason Codes
+    // 12. Reason Codes
     // public function getReasonCodes()
     // {
     //     $codes = OverrideReasonCode::get();

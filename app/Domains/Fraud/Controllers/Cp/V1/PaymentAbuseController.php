@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers\Api;
+namespace App\Domains\Fraud\Controllers\Cp\V1;
 
 use App\Domains\Fraud\Models\PaymentAbuseDetection;
 use App\Domains\Fraud\Models\PaymentThreatPattern;
@@ -37,7 +37,7 @@ class PaymentAbuseController extends BaseApiController
         return null;
     }
 
-    // ✅ 1. Dashboard
+    // 1. Dashboard
     public function dashboard()
     {
         $data = $this->abuseService->getDashboardStats();
@@ -49,7 +49,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($data, 'payment_abuse_dashboard_fetched');
     }
 
-    // ✅ 2. Transaction Risk Feed
+    // 2. Transaction Risk Feed
     public function transactionFeed(Request $request)
     {
         $request->validate([
@@ -72,7 +72,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($detections, 'transaction_feed_fetched');
     }
 
-    // ✅ 3. Get Active Threat Patterns
+    // 3. Get Active Threat Patterns
     public function threatPatterns()
     {
         $patterns = PaymentThreatPattern::active()->get();
@@ -84,7 +84,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($patterns, 'threat_patterns_fetched');
     }
 
-    // ✅ 4. Get Velocity Limits
+    // 4. Get Velocity Limits
     public function getVelocityLimits()
     {
         $limits = PaymentVelocityLimit::all();
@@ -96,7 +96,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($limits, 'velocity_limits_fetched');
     }
 
-    // ✅ 5. Update Velocity Limits
+    // 5. Update Velocity Limits
     public function updateVelocityLimits(Request $request)
     {
         $request->validate([
@@ -124,7 +124,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($limits, 'velocity_limits_updated');
     }
 
-    // ✅ 6. Freeze Wallet
+    // 6. Freeze Wallet
     public function freezeWallet($id)
     {
         $detection = PaymentAbuseDetection::find($id);
@@ -143,26 +143,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($detection, 'wallet_frozen');
     }
 
-    // ✅ 7. Delay Payout
-    public function delayPayout($id)
-    {
-        $detection = PaymentAbuseDetection::find($id);
-
-        if ($response = $this->checkNotFound($detection, 'detection_not_found')) {
-            return $response;
-        }
-
-        $this->abuseService->delayPayout($detection);
-
-        $detection->update([
-            'auto_action' => 'payout_delay',
-            'status' => 'confirmed',
-        ]);
-
-        return $this->success($detection, 'payout_delayed');
-    }
-
-    // ✅ 8. Manual Review Trigger
+    //  8. Manual Review Trigger
     public function manualReview($id)
     {
         $detection = PaymentAbuseDetection::find($id);
@@ -176,26 +157,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($detection->fresh(), 'manual_review_triggered');
     }
 
-    // ✅ 9. Suspend Dispatch
-    public function suspendDispatch($id)
-    {
-        $detection = PaymentAbuseDetection::find($id);
-
-        if ($response = $this->checkNotFound($detection, 'detection_not_found')) {
-            return $response;
-        }
-
-        $this->abuseService->suspendDispatch($detection);
-
-        $detection->update([
-            'auto_action' => 'suspend_dispatch',
-            'status' => 'confirmed',
-        ]);
-
-        return $this->success($detection, 'dispatch_suspended');
-    }
-
-    // ✅ 10. Mark False Positive
+    // 10. Mark False Positive
     public function markFalsePositive($id)
     {
         $detection = PaymentAbuseDetection::find($id);
@@ -209,7 +171,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($detection, 'marked_false_positive');
     }
 
-    // ✅ 11. Resolve Detection
+    // 11. Resolve Detection
     public function resolve($id)
     {
         $detection = PaymentAbuseDetection::find($id);
@@ -223,7 +185,7 @@ class PaymentAbuseController extends BaseApiController
         return $this->success($detection, 'detection_resolved');
     }
 
-    // ✅ 12. Export Abuse Logs
+    // 12. Export Abuse Logs
     public function exportLogs()
     {
         $logs = PaymentAbuseDetection::latest()->get();

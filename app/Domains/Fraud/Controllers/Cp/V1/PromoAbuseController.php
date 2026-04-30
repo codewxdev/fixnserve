@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers\Api;
+namespace App\Domains\Fraud\Controllers\Cp\V1;
 
 use App\Domains\Fraud\Models\PromoAbuseDetection;
 use App\Domains\Fraud\Models\PromoAbuseRule;
@@ -16,7 +16,7 @@ class PromoAbuseController extends BaseApiController
         protected PromoAbuseService $promoService
     ) {}
 
-    // ✅ 1. Dashboard
+    // 1. Dashboard
     public function dashboard()
     {
         return $this->success(
@@ -25,7 +25,7 @@ class PromoAbuseController extends BaseApiController
         );
     }
 
-    // ✅ 2. Live Incentive Abuse Monitor
+    // 2. Live Incentive Abuse Monitor
     public function liveMonitor(Request $request)
     {
         $request->validate([
@@ -44,7 +44,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($detections, 'live_monitor_fetched');
     }
 
-    // ✅ 3. Referral Graph Analysis
+    // 3. Referral Graph Analysis
     public function referralGraph(Request $request)
     {
         $suspicious = ReferralGraph::suspicious()
@@ -66,7 +66,7 @@ class PromoAbuseController extends BaseApiController
         ], 'referral_graph_fetched');
     }
 
-    // ✅ 4. Get Promo Rules
+    // 4. Get Promo Rules
     public function getPromoRules()
     {
         $rules = PromoAbuseRule::active()->get();
@@ -74,7 +74,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($rules, 'promo_rules_fetched');
     }
 
-    // ✅ 5. Configure Promo Rules
+    // 5. Configure Promo Rules
     public function configurePromoRules(Request $request)
     {
         $request->validate([
@@ -99,7 +99,7 @@ class PromoAbuseController extends BaseApiController
         );
     }
 
-    // ✅ 6. Invalidate Promo
+    // 6. Invalidate Promo
     public function invalidatePromo(PromoAbuseDetection $detection)
     {
         $this->promoService->applySystemAction($detection, $detection->promo_amount);
@@ -107,7 +107,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($detection->fresh(), 'promo_invalidated');
     }
 
-    // ✅ 7. Reward Clawback
+    //  7. Reward Clawback
     public function rewardClawback(Request $request, PromoAbuseDetection $detection)
     {
         $request->validate([
@@ -120,7 +120,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($detection->fresh(), 'reward_clawback_applied');
     }
 
-    // ✅ 8. Account Restriction
+    //  8. Account Restriction
     public function restrictAccount(PromoAbuseDetection $detection)
     {
         $detection->update(['system_action' => 'account_restricted']);
@@ -129,7 +129,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($detection->fresh(), 'account_restricted');
     }
 
-    // ✅ 9. Mark False Positive
+    // 9. Mark False Positive
     public function markFalsePositive(Request $request, PromoAbuseDetection $detection)
     {
         $request->validate([
@@ -148,7 +148,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($detection, 'marked_false_positive');
     }
 
-    // ✅ 10. Resolve Detection
+    // 10. Resolve Detection
     public function resolve(PromoAbuseDetection $detection)
     {
         $detection->update(['status' => 'resolved']);
@@ -156,7 +156,7 @@ class PromoAbuseController extends BaseApiController
         return $this->success($detection, 'detection_resolved');
     }
 
-    // ✅ 11. Export Abuse Logs
+    // 11. Export Abuse Logs
     public function exportLogs()
     {
         $logs = PromoAbuseDetection::latest()->get();

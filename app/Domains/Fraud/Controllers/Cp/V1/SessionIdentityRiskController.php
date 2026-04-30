@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers\Api;
+namespace App\Domains\Fraud\Controllers\Cp\V1;
 
 use App\Domains\Fraud\Models\GeoVelocityAlert;
-use App\Domains\Fraud\Models\IpBlock;
 use App\Domains\Fraud\Services\SessionRiskService;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
@@ -122,23 +121,6 @@ class SessionIdentityRiskController extends BaseApiController
     }
 
     // ═══════════════════════════════════════════
-    // 5. PURGE ALL BOT SESSIONS
-    // ═══════════════════════════════════════════
-
-    public function purgeBotSessions()
-    {
-        $count = DB::table('user_sessions')
-            ->where('risk_score', '>=', 90)
-            ->whereNull('revoked_at')
-            ->update(['revoked_at' => now()]);
-
-        return $this->success([
-            'purged_count' => $count,
-            'message' => "{$count} bot sessions terminated",
-        ], 'bot_sessions_purged');
-    }
-
-    // ═══════════════════════════════════════════
     // 6. TEMPORARY LOCK
     // ═══════════════════════════════════════════
 
@@ -225,70 +207,6 @@ class SessionIdentityRiskController extends BaseApiController
             'user_id' => $session->user_id,
             'message' => 'User notified successfully',
         ], 'user_notified');
-    }
-
-    // ═══════════════════════════════════════════
-    // 10. GET IP BLOCKS
-    // ═══════════════════════════════════════════
-
-    public function getIpBlocks(Request $request)
-    {
-        $request->validate([
-            'type' => 'nullable|in:vpn,proxy,tor,datacenter,manual,bot',
-        ]);
-
-        $blocks = IpBlock::with('blockedBy:id,name')
-            ->active()
-            ->when($request->type, fn ($q) => $q->byType($request->type))
-            ->latest()
-            ->paginate(20);
-
-        return $this->success($blocks, 'ip_blocks_fetched');
-    }
-
-    // ═══════════════════════════════════════════
-    // 11. BLOCK IP
-    // ═══════════════════════════════════════════
-
-    public function blockIp(Request $request)
-    {
-        $validated = $request->validate([
-            'ip_address' => 'required|ip',
-            'type' => 'required|in:vpn,proxy,tor,datacenter,manual,bot',
-            'reason' => 'nullable|string|max:500',
-            'expires_at' => 'nullable|date|after:now',
-        ]);
-
-        $block = IpBlock::updateOrCreate(
-            ['ip_address' => $validated['ip_address']],
-            [
-                'type' => $validated['type'],
-                'reason' => $validated['reason'] ?? 'Manual block',
-                'blocked_by' => auth()->id(),
-                'expires_at' => $validated['expires_at'] ?? null,
-                'is_active' => true,
-                'block_count' => DB::raw('block_count + 1'),
-            ]
-        );
-
-        return $this->success($block, 'ip_blocked', 201);
-    }
-
-    // ═══════════════════════════════════════════
-    // 12. UNBLOCK IP
-    // ═══════════════════════════════════════════
-
-    public function unblockIp(string $ip)
-    {
-        $block = IpBlock::where('ip_address', $ip)->first();
-
-        if (! $block) {
-            return $this->error('ip_not_found', 404);
-        }
-
-        $block->update(['is_active' => false]);
-
-        return $this->success(null, 'ip_unblocked');
     }
 
     // ═══════════════════════════════════════════
