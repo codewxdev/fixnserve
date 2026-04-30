@@ -22,11 +22,8 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::get('/critical', [RiskScoringController::class, 'criticalEntities']);
 
             // ✅ Signal Weights
-            Route::get('/signals/weights', [RiskScoringController::class, 'getSignalWeights']);
-            Route::put('/signals/weights', [RiskScoringController::class, 'updateSignalWeights']);
-
-            // ✅ Submit Event
-            Route::post('/events', [RiskScoringController::class, 'submitEvent']);
+            Route::get('/signals-weights', [RiskScoringController::class, 'getSignalWeights']);
+            Route::put('/signals-weights', [RiskScoringController::class, 'updateSignalWeights']);
 
             // ✅ Entity specific
             Route::prefix('entities/{entityType}/{entityId}')->group(function () {
@@ -52,9 +49,6 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::delete('/sessions/{sessionId}',
                 [SessionIdentityRiskController::class, 'terminateSession']);
 
-            Route::delete('/sessions/purge-bots',
-                [SessionIdentityRiskController::class, 'purgeBotSessions']);
-
             // ✅ Session Actions
             Route::post('/sessions/{sessionId}/lock',
                 [SessionIdentityRiskController::class, 'temporaryLock']);
@@ -67,16 +61,6 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
 
             Route::post('/sessions/{sessionId}/notify',
                 [SessionIdentityRiskController::class, 'notifyUser']);
-
-            // ✅ IP Blocks
-            Route::get('/ip-blocks',
-                [SessionIdentityRiskController::class, 'getIpBlocks']);
-
-            Route::post('/ip-blocks',
-                [SessionIdentityRiskController::class, 'blockIp']);
-
-            Route::delete('/ip-blocks/{ip}',
-                [SessionIdentityRiskController::class, 'unblockIp']);
 
             // ✅ Geo Velocity Alerts
             Route::get('/geo-velocity-alerts',
@@ -127,9 +111,9 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
 
             // ✅ Detection Actions
             Route::post('/transactions/{detection}/freeze-wallet', [PaymentAbuseController::class, 'freezeWallet']);
-            Route::post('/transactions/{detection}/delay-payout', [PaymentAbuseController::class, 'delayPayout']);
+
             Route::post('/transactions/{detection}/manual-review', [PaymentAbuseController::class, 'manualReview']);
-            Route::post('/transactions/{detection}/suspend-dispatch', [PaymentAbuseController::class, 'suspendDispatch']);
+
             Route::post('/transactions/{detection}/false-positive', [PaymentAbuseController::class, 'markFalsePositive']);
             Route::post('/transactions/{detection}/resolve', [PaymentAbuseController::class, 'resolve']);
 
@@ -164,7 +148,7 @@ Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set',
             Route::post('/rings/{ring}/suppress-ranking', [CollusionDetectionController::class, 'suppressRanking']);
             Route::post('/rings/{ring}/open-investigation', [CollusionDetectionController::class, 'openInvestigation']);
             Route::post('/rings/{ring}/quarantine-reviews', [CollusionDetectionController::class, 'quarantineReviews']);
-            Route::post('/rings/{ring}/freeze-payouts', [CollusionDetectionController::class, 'freezePayouts']);
+
             Route::post('/rings/{ring}/false-positive', [CollusionDetectionController::class, 'markFalsePositive']);
             Route::post('/rings/{ring}/resolve', [CollusionDetectionController::class, 'resolve']);
 

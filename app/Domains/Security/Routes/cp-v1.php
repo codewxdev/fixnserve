@@ -14,15 +14,8 @@ use Illuminate\Support\Facades\Route;
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 
 Route::middleware(
-    'health_api',
-    'check_country',
-    'country.detect',
-    'locale.set',
-    'currency.set',
-    'language.initialize',
-    'risk.track',
-    'risk.velocity',
-    'session.risk'
+    'health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set',
+    'language.initialize', 'risk.track', 'risk.velocity', 'session.risk'
 )->group(function () {
 
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);

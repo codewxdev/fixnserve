@@ -2,12 +2,12 @@
 
 namespace App\Domains\System\Controllers\Sys\V1;
 
+use App\Domains\System\Models\ConfigurationSnapshot;
+use App\Domains\System\Models\GeoConfiguration;
+use App\Domains\System\Models\RateLimitConfiguration;
 use App\Domains\System\Services\GeoService;
 use App\Domains\System\Services\RateLimitService;
 use App\Domains\System\Services\VersioningService;
-use App\Domains\System\Models\GeoConfiguration;
-use App\Domains\System\Models\RateLimitConfiguration;
-use App\Domains\System\Models\ConfigurationSnapshot;
 use App\Http\Controllers\BaseApiController;
 use Illuminate\Http\Request;
 
@@ -17,16 +17,16 @@ class GeoConfigurationController extends BaseApiController
 
     protected RateLimitService $rateLimitService;
 
-    public function __construct(protected VersioningService $versioningService) {}
+    protected VersioningService $versioningService;
 
-    public function __construct(RateLimitService $rateLimitService)
-    {
-        $this->rateLimitService = $rateLimitService;
-    }
-
-    public function __construct(GeoService $geoService)
-    {
+    public function __construct(
+        GeoService $geoService,
+        RateLimitService $rateLimitService,
+        VersioningService $versioningService
+    ) {
         $this->geoService = $geoService;
+        $this->rateLimitService = $rateLimitService;
+        $this->versioningService = $versioningService;
     }
     // ✅ CHECK if location is serviceable (Global Use)
 
@@ -46,7 +46,7 @@ class GeoConfigurationController extends BaseApiController
     public function emergencyGeoLock(Request $request)
     {
         $config = GeoConfiguration::firstOrCreate(['id' => 1]);
-        $config->update(['emergency_geo_lock' => !$config->emergency_geo_lock]);
+        $config->update(['emergency_geo_lock' => ! $config->emergency_geo_lock]);
 
         // ✅ Broadcast emergency lock to all services
         $this->geoService->handleEmergencyLock($config->emergency_geo_lock);
@@ -64,7 +64,7 @@ class GeoConfigurationController extends BaseApiController
     public function emergencyThrottling()
     {
         $config = RateLimitConfiguration::firstOrCreate(['id' => 1]);
-        $config->update(['emergency_throttling' => !$config->emergency_throttling]);
+        $config->update(['emergency_throttling' => ! $config->emergency_throttling]);
 
         $this->rateLimitService->refreshConfig();
 
