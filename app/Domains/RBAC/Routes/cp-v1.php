@@ -1,9 +1,9 @@
 <?php
 
-use App\Domains\RBAC\Controllers\Api\PermissionController;
-use App\Domains\RBAC\Controllers\Api\RoleController;
-use App\Domains\RBAC\Controllers\Api\RolePermissionController;
-use App\Domains\RBAC\Controllers\Api\UserRoleController;
+use App\Domains\RBAC\Controllers\Cp\V1\PermissionController;
+use App\Domains\RBAC\Controllers\Cp\V1\RoleController;
+use App\Domains\RBAC\Controllers\Cp\V1\RolePermissionController;
+use App\Domains\RBAC\Controllers\Cp\V1\UserRoleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize')->group(function () {

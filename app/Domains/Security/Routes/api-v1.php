@@ -4,7 +4,7 @@ use App\Domains\Security\Controllers\Api\V1\AuthController;
 use App\Domains\Security\Controllers\Api\V1\PasswordResetCodeController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize', 'risk.track', 'risk.velocity', 'session.risk')->group(function () {
+Route::middleware(['health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set', 'language.initialize', 'risk.track', 'risk.velocity', 'session.risk'])->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
 
     Route::post('/auth/register', [AuthController::class, 'register']);

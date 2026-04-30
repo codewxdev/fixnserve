@@ -11,7 +11,7 @@ class PrivilegeRequestController extends BaseApiController
     public function index()
     {
         // Fetch all requests with their associated user data
-        $privileges = PrivilegeRequest::with('user')->latest()->get();
+        $privileges = PrivilegeRequest::with('user')->paginate(10);
 
         return $this->success(['privileges' => $privileges], 'Privileges fetched successfully');
     }

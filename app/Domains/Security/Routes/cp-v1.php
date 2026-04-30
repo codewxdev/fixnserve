@@ -6,28 +6,17 @@ use App\Domains\Security\Controllers\Cp\V1\DeviceController;
 use App\Domains\Security\Controllers\Cp\V1\DualApprovalController;
 use App\Domains\Security\Controllers\Cp\V1\GeoRuleController;
 use App\Domains\Security\Controllers\Cp\V1\IpRuleController;
-use App\Domains\Security\Controllers\Cp\V1\PasswordResetCodeController;
 use App\Domains\Security\Controllers\Cp\V1\PrivilegeRequestController;
 use App\Domains\Security\Controllers\Cp\V1\SessionController;
 use App\Domains\Security\Controllers\Cp\V1\TokenPolicyController;
-use App\Http\Controllers\ServiceProvider\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/2fa/verify', [AuthController::class, 'verify2FA']);
 
 Route::middleware(
-    'health_api',
-    'check_country',
-    'country.detect',
-    'locale.set',
-    'currency.set',
-    'language.initialize',
-    'risk.track',
-    'risk.velocity',
-    'session.risk'
+    'health_api', 'check_country', 'country.detect', 'locale.set', 'currency.set',
+    'language.initialize', 'risk.track', 'risk.velocity', 'session.risk'
 )->group(function () {
-
-
 
     Route::post('/2fa/enable', [AuthController::class, 'enable2FA']);
 
@@ -46,11 +35,9 @@ Route::middleware(
 
         // Auth Routes
 
-
         // Super Admin Routes (with additional checks)
         Route::middleware(['role:Super Admin', '2fa', 'scope:admin:*'])->group(function () {
             Route::get('/login-history', [AuthController::class, 'loginHistory']);
-            Route::put('/updateStatus', [ServiceController::class, 'updateStatus']);
             // /////////////////////session management//////////////////////////
             Route::prefix('sessions')->group(function () {
                 Route::get('/', [SessionController::class, 'index']);
@@ -63,8 +50,8 @@ Route::middleware(
                 Route::post('revoke-role', [SessionController::class, 'revokeByRole']);
                 // Route::post('revoke-region', [SessionController::class, 'revokeByRegion']);
             });
-            // ///////////////////////auth governance route//////////////////////
-            Route::prefix('auth/governance')->group(function () {
+            // //////////////////////auth governance route//////////////////////
+            Route::prefix('auth-governance')->group(function () {
 
                 Route::get('/', [AuthGovernanceController::class, 'index']);
 
@@ -76,11 +63,14 @@ Route::middleware(
 
                 Route::post('/force-reset', [AuthGovernanceController::class, 'forcePasswordReset']);
             });
-            Route::get('/token-policy', [TokenPolicyController::class, 'index']);
-            Route::put('/token-policy', [TokenPolicyController::class, 'updateTokenPolicy']);
-            Route::get('tokens', [TokenPolicyController::class, 'listTokens']);
-            Route::post('/tokens/{jti}/rotate', [AuthController::class, 'rotateToken']);
-            Route::delete('/auth/token/revoke/{jti}', [AuthController::class, 'revokeToken']);
+
+            Route::prefix('token-policy')->group(function () {
+                Route::get('/', [TokenPolicyController::class, 'index']);
+                Route::put('/', [TokenPolicyController::class, 'updateTokenPolicy']);
+                Route::get('/tokens', [TokenPolicyController::class, 'listTokens']);
+                Route::post('/{jti}/rotate', [AuthController::class, 'rotateToken']);
+                Route::delete('/revoke/{jti}', [AuthController::class, 'revokeToken']);
+            });
 
             Route::prefix('devices')->group(function () {
                 Route::get('/policies', [DeviceController::class, 'getPolicies']);
@@ -94,28 +84,31 @@ Route::middleware(
                 Route::post('{device}/unban', [DeviceController::class, 'unban']);
             });
 
-            Route::prefix('admin/security/network')->group(function () {
+            Route::prefix('security-network')->group(function () {
 
                 Route::apiResource('ip-rules', IpRuleController::class);
 
                 Route::get('geo-rules', [GeoRuleController::class, 'index']);
                 Route::post('geo-rules/country', [GeoRuleController::class, 'updateCountry']);
-                Route::patch('geo-rules/default-policy', [GeoRuleController::class, 'updateDefault']);
+                Route::patch('geo-rules/default/policy', [GeoRuleController::class, 'updateDefault']);
             });
         });
 
-        Route::get('/privileges', [PrivilegeRequestController::class, 'index']);
-        Route::post('/privileges/request', [PrivilegeRequestController::class, 'requestElevation']);
-        Route::post('/privileges/approve/{id}', [PrivilegeRequestController::class, 'approve']);
-        Route::post('/privileges/deny/{id}', [PrivilegeRequestController::class, 'deny']);
-        Route::post('/privileges/extend/{id}', [PrivilegeRequestController::class, 'extend']);
-        Route::post('/privileges/terminate/{id}', [PrivilegeRequestController::class, 'terminate']);
+        Route::prefix('privileges')->group(function () {
+            Route::get('/', [PrivilegeRequestController::class, 'index']);
+            Route::post('/request', [PrivilegeRequestController::class, 'requestElevation']);
+            Route::post('/approve/{id}', [PrivilegeRequestController::class, 'approve']);
+            Route::post('/deny/{id}', [PrivilegeRequestController::class, 'deny']);
+            Route::post('/extend/{id}', [PrivilegeRequestController::class, 'extend']);
+            Route::post('/terminate/{id}', [PrivilegeRequestController::class, 'terminate']);
+        });
+        Route::prefix('dual-approval')->group(function () {
+            Route::post('/request', [DualApprovalController::class, 'requestAction']);
+            Route::post('/approve-level1/{id}', [DualApprovalController::class, 'approveLevel1']);
+            Route::post('/approve-level2/{id}', [DualApprovalController::class, 'approveLevel2']);
+            Route::post('/execute/{id}', [DualApprovalController::class, 'execute']);
 
-        Route::post('/dual-approval/request', [DualApprovalController::class, 'requestAction']);
-        Route::post('/dual-approval/approve-level1/{id}', [DualApprovalController::class, 'approveLevel1']);
-        Route::post('/dual-approval/approve-level2/{id}', [DualApprovalController::class, 'approveLevel2']);
-        Route::post('/dual-approval/execute/{id}', [DualApprovalController::class, 'execute']);
-
-        Route::get('/dual-approval/audit-logs', [DualApprovalController::class, 'auditApprovalLogs']);
+            Route::get('/audit-logs', [DualApprovalController::class, 'auditApprovalLogs']);
+        });
     });
 });
