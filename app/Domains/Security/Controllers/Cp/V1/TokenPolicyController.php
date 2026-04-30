@@ -11,7 +11,7 @@ class TokenPolicyController extends BaseApiController
 {
     public function index()
     {
-        $token = TokenPolicy::get();
+        $token = TokenPolicy::paginate(10);
 
         return $this->success([
             'token_policies' => $token,

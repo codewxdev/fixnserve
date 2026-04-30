@@ -109,8 +109,8 @@ return Application::configure(basePath: dirname(__DIR__))
             DetectGeoInconsistency::class,
             SessionRiskMiddleware::class,
             CheckAbuseRestrictions::class,
-            RecordFinancialLedger::class,  
-            SecurityAuditLogger::class, 
+            RecordFinancialLedger::class,
+            SecurityAuditLogger::class,
         ]);
 
         $middleware->alias([
@@ -118,8 +118,8 @@ return Application::configure(basePath: dirname(__DIR__))
             // NEW ADMIN ZERO-TRUST ALIASES ADDED HERE
             // Mapped to your existing Domain middlewares
             // ==========================================
-            'auth.admin'         => \Illuminate\Auth\Middleware\Authenticate::class, 
-            'admin.mfa'          => Ensure2FAEnabled::class,
+            'auth.admin' => \Illuminate\Auth\Middleware\Authenticate::class,
+            'admin.mfa' => Ensure2FAEnabled::class,
             'admin.ip_whitelist' => CheckNetworkSecurity::class,
             'admin.device_trust' => CheckDeviceBinding::class,
 
@@ -164,13 +164,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'payment.abuse.scan' => ScanPaymentAbuse::class,
             'collusion.scan' => ScanCollusionAbuse::class,
             'complaint.auto' => AutoGenerateComplaint::class,
-            'promo.abuse.scan' => ScanPromoAbuse::class,   
-            'appeal.eligible' => ValidateAppealEligibility::class, 
-            'sla.track' => StartSlaTracking::class,       
+            'promo.abuse.scan' => ScanPromoAbuse::class,
+            'appeal.eligible' => ValidateAppealEligibility::class,
+            'sla.track' => StartSlaTracking::class,
             'abuse.check' => CheckAbuseRestrictions::class,
-            'legal.hold' => \App\Domains\Disputes\Middlewares\CheckLegalHold::class, 
+            'legal.hold' => \App\Domains\Disputes\Middlewares\CheckLegalHold::class,
             'financial.ledger' => RecordFinancialLedger::class,
-            'security.audit' => SecurityAuditLogger::class, 
+            'security.audit' => SecurityAuditLogger::class,
 
         ]);
 
