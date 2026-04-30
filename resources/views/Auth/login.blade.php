@@ -46,7 +46,7 @@
         </div>
     </div>
 
-     <div id="twoFactorModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
+    <div id="twoFactorModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
         <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm">
             <h2 id="twoFactorTitle" class="text-2xl font-bold mb-6 text-center" style="color: #021056;">
                 2FA Verification
@@ -174,7 +174,7 @@
             };
         }
 
-         // 3. Login Form Submission
+        // 3. Login Form Submission
         document.getElementById("loginForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
@@ -223,21 +223,30 @@
                     body: JSON.stringify(payload)
                 });
 
-                const data = await res.json();
-                console.log("Login Response:", data);
+                const rawText = await res.text();
+                console.log("RAW SERVER RESPONSE:", rawText);
+
+                try {
+                    var data = JSON.parse(rawText);
+                } catch (e) {
+                    throw new Error(
+                        "Server returned HTML or an error instead of JSON. Press F12 and check the Console to see the exact PHP error."
+                        );
+                }
+
 
                 // --- FIXES APPLIED HERE ---
 
-                 const responseData = data.data ? data.data : data;
+                const responseData = data.data ? data.data : data;
 
-                 const isEnable2FA = (res.status === 403 && (data.error === 'enable_2fa' || data.message ===
+                const isEnable2FA = (res.status === 403 && (data.error === 'enable_2fa' || data.message ===
                     'enable_2fa'));
 
-                 if (!res.ok && !isEnable2FA) {
+                if (!res.ok && !isEnable2FA) {
                     throw new Error(data.error || data.message || "Invalid credentials.");
                 }
 
-                 const logicalStatus = isEnable2FA ? 'enable_2fa' : responseData.status;
+                const logicalStatus = isEnable2FA ? 'enable_2fa' : responseData.status;
                 const accessToken = responseData.access_token || data.access_token;
 
                 if (logicalStatus === '2fa_required') {
@@ -251,11 +260,11 @@
                     enable2FA(accessToken);
 
                 } else if (accessToken) {
-                     localStorage.setItem('token', accessToken);
+                    localStorage.setItem('token', accessToken);
                     document.cookie = `token=${accessToken}; path=/; SameSite=Lax`;
                     localStorage.setItem('device_fingerprint', currentVisitorId);
 
-                     if (responseData.user || data.user) {
+                    if (responseData.user || data.user) {
                         localStorage.setItem("user", JSON.stringify(responseData.user || data.user));
                     }
 
@@ -272,7 +281,7 @@
             }
         });
 
-         function enable2FA(tempToken) {
+        function enable2FA(tempToken) {
             fetch("{{ url('/api/2fa/enable') }}", {
                     method: "POST",
                     headers: {
@@ -293,7 +302,7 @@
                 .catch(err => console.error("2FA Enable Error:", err));
         }
 
-         document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
+        document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
             const verifyButton = document.getElementById("verify2FAButton");
@@ -305,7 +314,7 @@
             errorMessageContainer.classList.add('hidden');
 
             try {
-                 if (!currentVisitorId || !currentDeviceInfo) {
+                if (!currentVisitorId || !currentDeviceInfo) {
                     const fp = await fpPromise;
                     const result = await fp.get();
                     currentVisitorId = result.visitorId;
@@ -354,7 +363,7 @@
             }
         });
 
-         function enable2FA(tempToken) {
+        function enable2FA(tempToken) {
             fetch("{{ url('/api/2fa/enable') }}", {
                     method: "POST",
                     headers: {
@@ -375,7 +384,7 @@
                 .catch(err => console.error("2FA Enable Error:", err));
         }
 
-         document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
+        document.getElementById("twoFactorForm").addEventListener("submit", async function(e) {
             e.preventDefault();
 
             const verifyButton = document.getElementById("verify2FAButton");
@@ -387,7 +396,7 @@
             errorMessageContainer.classList.add('hidden');
 
             try {
-                 if (!currentVisitorId) {
+                if (!currentVisitorId) {
                     const fp = await fpPromise;
                     const result = await fp.get();
                     currentVisitorId = result.visitorId;
@@ -413,7 +422,7 @@
 
                 const data = await res.json();
 
-                 if (data.status === 'success' && data.access_token) {
+                if (data.status === 'success' && data.access_token) {
                     localStorage.setItem('token', data.access_token);
                     document.cookie = `token=${data.access_token}; path=/; max-age=86400; SameSite=Lax`;
 
