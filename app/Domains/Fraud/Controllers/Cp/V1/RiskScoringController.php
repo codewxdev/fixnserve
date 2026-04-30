@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers\Api;
+namespace App\Domains\Fraud\Controllers\Cp\V1;
 
 use App\Domains\Fraud\Models\RiskEnforcement;
 use App\Domains\Fraud\Models\RiskEvent;
@@ -16,7 +16,7 @@ class RiskScoringController extends BaseApiController
         protected RiskScoringService $riskService
     ) {}
 
-    // ✅ 1. GET Dashboard Stats
+    //  1. GET Dashboard Stats
     public function dashboard()
     {
         $stats = [
@@ -60,7 +60,7 @@ class RiskScoringController extends BaseApiController
         ], 'dashboard_fetched');
     }
 
-    // ✅ 2. GET Live Risk Feed
+    // 2. GET Live Risk Feed
     public function liveRiskFeed(Request $request)
     {
         $request->validate([
@@ -101,7 +101,7 @@ class RiskScoringController extends BaseApiController
         return $this->success($entities, 'live_feed_fetched');
     }
 
-    // ✅ 3. GET Single Entity Risk Detail
+    // 3. GET Single Entity Risk Detail
     public function entityDetail(
         string $entityType,
         int $entityId
@@ -128,7 +128,7 @@ class RiskScoringController extends BaseApiController
         ], 'entity_risk_detail_fetched');
     }
 
-    // ✅ 4. POST Manual Rescore
+    // 4. POST Manual Rescore
     public function manualRescore(
         Request $request,
         string $entityType,
@@ -144,7 +144,7 @@ class RiskScoringController extends BaseApiController
         return $this->success($riskScore, 'entity_rescored');
     }
 
-    // ✅ 5. GET Signal Weights
+    // 5. GET Signal Weights
     public function getSignalWeights()
     {
         $weights = RiskSignalWeight::all();
@@ -152,7 +152,7 @@ class RiskScoringController extends BaseApiController
         return $this->success($weights, 'signal_weights_fetched');
     }
 
-    // ✅ 6. PUT Update Signal Weights
+    // 6. PUT Update Signal Weights
     public function updateSignalWeights(Request $request)
     {
         $request->validate([
@@ -180,31 +180,7 @@ class RiskScoringController extends BaseApiController
         );
     }
 
-    // ✅ 7. POST Submit New Event
-    public function submitEvent(Request $request)
-    {
-        $validated = $request->validate([
-            'entity_type' => 'required|in:customer,rider,vendor,provider',
-            'entity_id' => 'required|integer',
-            'event_type' => 'required|string',
-            'event_data' => 'nullable|array',
-        ]);
-
-        $riskScore = $this->riskService->processEvent(
-            entityType: $validated['entity_type'],
-            entityId: $validated['entity_id'],
-            eventType: $validated['event_type'],
-            eventData: $validated['event_data'] ?? []
-        );
-
-        return $this->success([
-            'score' => $riskScore->score,
-            'tier' => $riskScore->tier,
-            'reason_codes' => $riskScore->reason_codes,
-        ], 'event_processed', 201);
-    }
-
-    // ✅ 8. GET Entity History
+    //  8. GET Entity History
     public function entityHistory(
         string $entityType,
         int $entityId
@@ -217,7 +193,7 @@ class RiskScoringController extends BaseApiController
         return $this->success($history, 'entity_history_fetched');
     }
 
-    // ✅ 9. POST Manual Enforcement
+    // 9. POST Manual Enforcement
     public function manualEnforce(
         Request $request,
         string $entityType,
@@ -252,7 +228,7 @@ class RiskScoringController extends BaseApiController
         return $this->success($enforcement, 'enforcement_applied', 201);
     }
 
-    // ✅ 10. GET Critical Entities
+    // 10. GET Critical Entities
     public function criticalEntities()
     {
         $critical = RiskScore::critical()
@@ -281,7 +257,7 @@ class RiskScoringController extends BaseApiController
         ], 'critical_entities_fetched');
     }
 
-    // ✅ Helper
+    // Helper
     private function getPercentage(string $tier): float
     {
         $total = RiskScore::count();

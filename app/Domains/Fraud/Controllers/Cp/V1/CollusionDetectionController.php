@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domains\Fraud\Controllers\Api;
+namespace App\Domains\Fraud\Controllers\Cp\V1;
 
 use App\Domains\Fraud\Models\CollusionInvestigation;
 use App\Domains\Fraud\Models\CollusionRing;
@@ -17,7 +17,7 @@ class CollusionDetectionController extends BaseApiController
         protected CollusionDetectionService $collusionService
     ) {}
 
-    // ✅ 1. Dashboard
+    // 1. Dashboard
     public function dashboard()
     {
         return $this->success(
@@ -26,7 +26,7 @@ class CollusionDetectionController extends BaseApiController
         );
     }
 
-    // ✅ 2. Live Detected Rings
+    // 2. Live Detected Rings
     public function liveRings(Request $request)
     {
         $request->validate([
@@ -43,7 +43,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($rings, 'live_rings_fetched');
     }
 
-    // ✅ 3. Ring Detail
+    // 3. Ring Detail
     public function ringDetail(CollusionRing $ring)
     {
         return $this->success(
@@ -52,7 +52,7 @@ class CollusionDetectionController extends BaseApiController
         );
     }
 
-    // ✅ 4. Interaction Graph
+    // 4. Interaction Graph
     public function interactionGraph(Request $request)
     {
         $suspicious = InteractionGraph::suspicious()
@@ -72,7 +72,7 @@ class CollusionDetectionController extends BaseApiController
         ], 'interaction_graph_fetched');
     }
 
-    // ✅ 5. Shadow Ban
+    // 5. Shadow Ban
     public function shadowBan(Request $request, CollusionRing $ring)
     {
         $ring->update(['system_enforcement' => 'shadow_ban']);
@@ -81,7 +81,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($ring, 'shadow_ban_applied');
     }
 
-    // ✅ 6. Suppress Ranking
+    // 6. Suppress Ranking
     public function suppressRanking(CollusionRing $ring)
     {
         $ring->update(['system_enforcement' => 'ranking_suppressed']);
@@ -90,7 +90,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($ring, 'ranking_suppressed');
     }
 
-    // ✅ 7. Open Investigation
+    // 7. Open Investigation
     public function openInvestigation(Request $request, CollusionRing $ring)
     {
         $request->validate([
@@ -113,7 +113,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($investigation, 'investigation_opened', 201);
     }
 
-    // ✅ 8. Quarantine Reviews
+    // 8. Quarantine Reviews
     public function quarantineReviews(CollusionRing $ring)
     {
         $ring->update(['system_enforcement' => 'reviews_quarantined']);
@@ -122,16 +122,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($ring, 'reviews_quarantined');
     }
 
-    // ✅ 9. Freeze Payouts
-    public function freezePayouts(CollusionRing $ring)
-    {
-        $ring->update(['system_enforcement' => 'payouts_frozen']);
-        $this->collusionService->applyEnforcement($ring->load('actors'));
-
-        return $this->success($ring, 'payouts_frozen');
-    }
-
-    // ✅ 10. Bulk Ban
+    //  10. Bulk Ban
     public function bulkBan(Request $request)
     {
         $request->validate([
@@ -150,7 +141,7 @@ class CollusionDetectionController extends BaseApiController
         ], 'bulk_ban_applied');
     }
 
-    // ✅ 11. Mark False Positive
+    //  11. Mark False Positive
     public function markFalsePositive(Request $request, CollusionRing $ring)
     {
         $request->validate([
@@ -176,7 +167,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($ring, 'marked_false_positive');
     }
 
-    // ✅ 12. Resolve Ring
+    // 12. Resolve Ring
     public function resolve(CollusionRing $ring)
     {
         $ring->update(['status' => 'resolved', 'is_active' => false]);
@@ -191,7 +182,7 @@ class CollusionDetectionController extends BaseApiController
         return $this->success($ring, 'ring_resolved');
     }
 
-    // ✅ 13. Export Logs
+    // 13. Export Logs
     public function exportLogs()
     {
         $rings = CollusionRing::with('actors')->latest()->get();
@@ -224,5 +215,14 @@ class CollusionDetectionController extends BaseApiController
         };
 
         return Response::stream($callback, 200, $headers);
+    }
+
+    //  9. Freeze Payouts
+    public function freezePayouts(CollusionRing $ring)
+    {
+        $ring->update(['system_enforcement' => 'payouts_frozen']);
+        $this->collusionService->applyEnforcement($ring->load('actors'));
+
+        return $this->success($ring, 'payouts_frozen');
     }
 }
