@@ -1,9 +1,7 @@
- 
-
 @extends('layouts.auth')
 
 @section('content')
-     <div class="w-full max-w-md p-10 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
+    <div class="w-full max-w-md p-10 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
         style="background-color: white;">
         <h1 class="text-3xl font-bold mb-4 text-center" style="color: #021056;">
             Set New Password
@@ -12,25 +10,29 @@
             Choose a strong, new password for your account.
         </p>
 
-         <div id="messageContainer" class="hidden px-4 py-3 rounded relative mb-6" role="alert">
+        <div id="messageContainer" class="hidden px-4 py-3 rounded relative mb-6" role="alert">
             <p id="feedbackMessage" class="font-medium text-sm"></p>
         </div>
 
         <form action="" method="POST" id="resetPasswordForm" class="space-y-6">
 
             <div>
-                <label for="password" class="block text-sm font-medium mb-2" style="color: #021056;">New
-                    Password</label>
+                <label for="password" class="block text-sm font-medium mb-2" style="color: #021056;">New Password</label>
+                <!-- HTML5 Pattern Validation Added Here -->
                 <input type="password" name="password" id="password" placeholder="••••••••" required minlength="8"
+                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&]).+"
+                    title="Must contain at least one uppercase, one lowercase, one number and one special character"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
                     style="color: #021056; background-color: white;">
+                <!-- Helper Text -->
+                <p class="text-[11px] text-gray-500 mt-2 leading-tight">
+                    Must be at least 8 characters and include 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*#?&).
+                </p>
             </div>
 
             <div>
-                <label for="confirm_password" class="block text-sm font-medium mb-2" style="color: #021056;">Confirm
-                    Password</label>
-                <input type="password" name="confirm_password" id="confirm_password" placeholder="••••••••" required
-                    minlength="8"
+                <label for="confirm_password" class="block text-sm font-medium mb-2" style="color: #021056;">Confirm Password</label>
+                <input type="password" name="confirm_password" id="confirm_password" placeholder="••••••••" required minlength="8"
                     class="w-full px-4 py-3 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#1169FB] focus:border-transparent transition duration-150"
                     style="color: #021056; background-color: white;">
             </div>
@@ -46,7 +48,7 @@
 
         <div class="mt-8 text-center text-sm">
             <p class="mt-4 text-gray-600">
-                <a href="login.html" class="font-bold hover:underline" style="color: #1169FB;">Back to Login</a>
+                <a href="{{ route('login') }}" class="font-bold hover:underline" style="color: #1169FB;">Back to Login</a>
             </p>
         </div>
     </div>
@@ -72,13 +74,12 @@
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm_password").value;
 
-             const email = localStorage.getItem("reset_email");
+            const email = localStorage.getItem("reset_email");
             const code = localStorage.getItem("reset_code");
 
             // Reset messages
             messageContainer.classList.add("hidden");
-            messageContainer.classList.remove("bg-red-100", "border-red-400", "text-red-700", "bg-green-100",
-                "border-green-400", "text-green-700");
+            messageContainer.classList.remove("bg-red-100", "border-red-400", "text-red-700", "bg-green-100", "border-green-400", "text-green-700");
 
             if (!email || !code) {
                 messageContainer.classList.remove("hidden");
@@ -95,7 +96,7 @@
                 return;
             }
 
-             button.disabled = true;
+            button.disabled = true;
             button.innerHTML = `
                 <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -104,7 +105,7 @@
                 Updating...
             `;
 
-             fetch("{{ url('/api/password/reset') }}", {
+            fetch("{{ url('/api/v1/password/reset') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -120,12 +121,18 @@
                 .then(async res => {
                     const data = await res.json();
                     if (!res.ok || data.status === false) {
-                         let errorMsg = data.message || "An error occurred.";
+                        let errorMsg = data.message || "An error occurred.";
+                        
                         if (data.errors) {
                             const firstKey = Object.keys(data.errors)[0];
-                            errorMsg = Array.isArray(data.errors[firstKey]) ? data.errors[firstKey][0] :
-                                data.errors[firstKey];
+                            errorMsg = Array.isArray(data.errors[firstKey]) ? data.errors[firstKey][0] : data.errors[firstKey];
                         }
+
+                        // 🔴 FRONTEND INTERCEPTION HACK: Replace the ugly backend message
+                        if (errorMsg.includes("The password field format is invalid")) {
+                            errorMsg = "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.";
+                        }
+
                         throw new Error(errorMsg);
                     }
                     return data;
@@ -136,22 +143,20 @@
                     messageContainer.classList.add("bg-green-100", "border-green-400", "text-green-700");
                     feedbackMessage.innerText = "Success! Your password has been updated.";
 
-                     localStorage.removeItem("reset_email");
+                    localStorage.removeItem("reset_email");
                     localStorage.removeItem("reset_code");
 
-                     setTimeout(() => {
-                        window.location.href =
-                        "{{ route('login') }}";  
+                    setTimeout(() => {
+                        window.location.href = "{{ route('login') }}";  
                     }, 1500);
                 })
                 .catch(err => {
-                     
                     messageContainer.classList.remove("hidden");
                     messageContainer.classList.add("bg-red-100", "border-red-400", "text-red-700");
                     feedbackMessage.innerText = err.message;
                 })
                 .finally(() => {
-                     button.disabled = false;
+                    button.disabled = false;
                     button.innerHTML = "Reset Password";
                 });
         });

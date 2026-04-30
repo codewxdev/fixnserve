@@ -164,7 +164,7 @@
             clearMessage(modalMessageContainer);
             setLoadingState(otpSubmitButton, true, 'Verifying...');
 
-            fetch("{{ url('/api/password/verify-code') }}", {
+            fetch("{{ url('/api/v1/password/verify-code') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -199,7 +199,7 @@
             clearMessage(messageContainer);
             setLoadingState(submitButton, true, 'Sending...');
 
-            fetch("{{ url('/api/password/forgot') }}", {
+            fetch("{{ url('/api/v1/password/forgot') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -257,7 +257,7 @@
             clearMessage(modalMessageContainer);
             displayMessage(modalMessageContainer, "Sending new code...", false);
 
-            fetch("{{ url('/api/password/forgot') }}", {
+            fetch("{{ url('/api/v1/password/forgot') }}", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

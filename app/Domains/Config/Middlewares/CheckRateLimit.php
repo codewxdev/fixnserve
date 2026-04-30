@@ -2,7 +2,7 @@
 
 namespace App\Domains\Config\Middlewares;
 
-use App\Domains\System\Services\RateLimitService;
+use App\Domains\Config\Services\RateLimitService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;

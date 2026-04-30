@@ -55,7 +55,7 @@ class AuthController extends BaseApiController
         DB::transaction(function () use ($request, &$user, &$token) {
 
             $user = User::create([
-                'name' => $request->first_name.' '.$request->last_name,
+                'name' => $request->first_name . ' ' . $request->last_name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
@@ -269,6 +269,8 @@ class AuthController extends BaseApiController
         return $this->respondWithToken($token);
     }
 
+     
+
     protected function resolveDevice(User $user, Request $request)
     {
         $fingerprint = $request->fingerprint;
@@ -363,7 +365,6 @@ class AuthController extends BaseApiController
             auth()->logout();
 
             return $this->success(['message' => 'Logged out successfully']);
-
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return $this->error('Token has expired', 401);
         } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
@@ -373,40 +374,7 @@ class AuthController extends BaseApiController
         }
     }
 
-    // javed
-    // public function logout(Request $request)
-    // {
-    //     // 1. Token get karein
-    //     $token = $request->bearerToken();
 
-    //     if (! $token) {
-    //         return response()->json(['message' => 'Token not provided'], 400);
-    //     }
-
-    //     // --- MAIN FIX IS HERE ---
-
-    //     // 2. Token ka Hash banayen (Kyunki DB mein hash saved hai)
-    //     // Hum JTI decode nahi karenge, kyunki agar token expired hua to wo crash ho jayega.
-    //     $hashedToken = hash('sha256', $token);
-
-    //     // 3. Database mein Session ko "Logged Out" mark karein
-    //     UserSession::where('token', $hashedToken)
-    //         ->whereNull('logout_at')
-    //         ->update([
-    //             'logout_at' => now(),
-    //             'is_revoked' => true,
-    //         ]);
-
-    //     // 4. JWT Token ko Blacklist karein (Optional but Recommended)
-    //     try {
-    //         auth()->logout(); // Ye token ko invalid kar dega
-    //     } catch (\Exception $e) {
-    //         // Agar token pehly se expired hai to koi masla nahi,
-    //         // humne DB update kar diya hai, wo zaroori tha.
-    //     }
-
-    //     return response()->json(['message' => 'Logged out successfully']);
-    // }
 
     public function refresh()
     {
@@ -498,66 +466,7 @@ class AuthController extends BaseApiController
         ]);
     }
 
-    // public function verify2FA(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|email',
-    //         'otp' => 'required',
-    //     ]);
 
-    //     $policy = TokenPolicy::current();
-
-    //     auth()->factory()->setTTL($policy->access_token_ttl_minutes);
-
-    //     $user = User::where('email', $request->email)->first();
-    //     if (! $user) {
-    //         return response()->json(['error' => 'User not found'], 404);
-    //     }
-
-    //     $google2fa = new Google2FA;
-    //     $valid = $google2fa->verifyKey($user->google2fa_secret, $request->otp);
-
-    //     if (! $valid) {
-    //         return response()->json(['error' => 'Invalid OTP'], 401);
-    //     }
-
-    //     // Enable 2FA after first successful verification
-    //     if (! $user->is_2fa_enabled) {
-    //         $user->is_2fa_enabled = 1;
-    //         $user->save();
-    //     }
-    //     auth()->login($user);
-
-    //     $jwtId = (string) Str::uuid();
-    //     $scopes = $this->resolveScopes($user);
-
-    //     $token = JWTAuth::claims([
-    //         'jti' => $jwtId,
-    //         'role' => $user->role,
-    //         'scopes' => $scopes,
-    //         'mfa_verified' => true,
-    //     ])->fromUser($user);
-    //     // $token = JWTAuth::claims(['jti' => $jwtId,])->fromUser($user);
-
-    //     // Create user session after successful 2FA
-    //     $this->createSession($user, $token, $jwtId, $request);
-    //     $this->audit->log([
-    //         'action_type' => '2fa_verified',
-    //         'target_type' => 'User',
-    //         'target_id' => $user->id,
-    //         'reason_code' => 'MFA verification successful',
-    //     ]);
-
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'token' => $token,
-    //         'user' => $user,
-    //     ]);
-    // }
-
-    /**
-     * Helper: Create User Session
-     */
     protected function createSession(User $user, $token, $jwtId, Request $request)
     {
         $policy = TokenPolicy::current();
@@ -609,6 +518,8 @@ class AuthController extends BaseApiController
 
         ]);
     }
+
+    
 
     protected function respondWithToken($token)
     {
@@ -668,13 +579,13 @@ class AuthController extends BaseApiController
         if ($request->hasFile('image')) {
 
             // Delete old image if exists
-            if ($user->image && \Storage::exists('public/profile_images/'.$user->image)) {
-                \Storage::delete('public/profile_images/'.$user->image);
+            if ($user->image && \Storage::exists('public/profile_images/' . $user->image)) {
+                \Storage::delete('public/profile_images/' . $user->image);
             }
 
             // Save new image
             $file = $request->file('image');
-            $filename = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
             $file->storeAs('public/profile_images/', $filename);
 
@@ -695,7 +606,7 @@ class AuthController extends BaseApiController
             'data' => [
                 'user' => $user,
                 'profile_image_url' => $user->image
-                    ? asset('storage/profile_images/'.$user->image)
+                    ? asset('storage/profile_images/' . $user->image)
                     : null,
             ],
         ]);

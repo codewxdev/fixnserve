@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Domains\System\Helpers\ResponseHelper;
+use App\Domains\Config\Helpers\ResponseHelper;
 
 class BaseApiController extends Controller
 {
