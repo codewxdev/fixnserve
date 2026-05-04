@@ -264,12 +264,12 @@
                 </button>
                 <ul x-show="activeDropdown === 'payments' && sidebarOpen" x-collapse
                     class="mt-1 space-y-0.5 px-2 whitespace-nowrap" x-cloak>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Stripe Connect Configuration</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Transaction Monitoring</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Webhook Management</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Key Management</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Failure & Fallback</a></li>
-                    <li><a href="#" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Instant Payouts</a></li>
+                    <li><a href="{{ route('cp.payments.connect') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Stripe Connect Configuration</a></li>
+                    <li><a href="{{ route('cp.payments.monitoring') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Transaction Monitoring</a></li>
+                    <li><a href="{{ route('cp.payments.webhooks') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Webhook Management</a></li>
+                    <li><a href="{{ route('cp.payments.keys') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Key Management</a></li>
+                    <li><a href="{{ route('cp.payments.fallbacks') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Failure & Fallback</a></li>
+                    <li><a href="{{ route('cp.payments.instant') }}" class="block py-1.5 pl-9 pr-3 rounded-md text-caption transition-colors text-text-secondary hover:text-text-primary hover:bg-bg-tertiary">Instant Payouts</a></li>
                 </ul>
             </li>
 
