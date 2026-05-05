@@ -168,7 +168,7 @@
                                         </button>
                                         
                                         <button @click="forceMfa(session.id); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-text-primary hover:bg-bg-tertiary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-semantic-warning"></i> Force MFA Re-challenge
+                                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-semantic-warning"></i> Force MFA
                                         </button>
                                         
                                         <button @click="flagSession(session.id); dropOpen = false" class="w-full text-left px-4 py-2 text-body-sm text-text-primary hover:bg-bg-tertiary flex items-center gap-2">

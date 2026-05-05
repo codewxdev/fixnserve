@@ -222,8 +222,8 @@
                 </div>
             </div>
             <div class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-lg bg-bg-tertiary">
-                <button @click="modals.extendTtl = false" class="btn btn-tertiary">Cancel</button>
-                <button @click="submitExtendRequest()" class="btn btn-primary" :disabled="!extendData.reason">Request Approval</button>
+                <button @click="modals.extendTtl = false" class="btn p-2 btn-tertiary">Cancel</button>
+                <button @click="submitExtendRequest()" class="btn p-2 btn-primary" :disabled="!extendData.reason">Request Approval</button>
             </div>
         </div>
     </div>

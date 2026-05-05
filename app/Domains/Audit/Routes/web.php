@@ -1,43 +1,25 @@
 <?php
 
-use App\Domains\Audit\Controllers\Front\AuditController;
+use App\Domains\Audit\Controllers\Front\AuditComplianceController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| SAHOR ONE CONTROL PANEL (MODULE 13: AUDIT & COMPLIANCE)
+| MODULE 13: AUDIT, COMPLIANCE & REGULATORY
 |--------------------------------------------------------------------------
 */
 
-Route::middleware([
-    'web', 'auth.admin', 'admin.mfa', 'admin.ip_whitelist', 'admin.device_trust'
-])
-->prefix('cp-x9f7a2/v1/audit-logs')
-->name('cp.audit-logs.')
+Route::middleware(['web', 'auth.admin'])
+->prefix('cp-x9f7a2/v1/compliance')
+->name('cp.audit.')
 ->group(function () {
-
-    // Admin Action Audit Logs
-    Route::get('/actions', [AuditController::class, 'index'])->name('actions');
-
-    // Financial & Transaction Audit
-    Route::get('/financial', [AuditController::class, 'financialTransactionAudit'])->name('financial');
-
-    // Security & Access Audit
-    Route::get('/security', [AuditController::class, 'securityAccessAudit'])->name('security');
-
-    // Data Access & Privacy Compliance (GDPR/UAE Law)
-    Route::get('/privacy', [AuditController::class, 'dataAccessPrivacyCompliance'])->name('privacy');
-
-    // Regulatory Reporting & Exports
-    Route::get('/exports', [AuditController::class, 'regulatoryReportingExports'])->name('exports');
-
-    // Data Retention & Legal Holds
-    Route::get('/retention', [AuditController::class, 'dataRetentionLegalHolds'])->name('retention');
-
-    // Audit Search, Replay & Forensics
-    Route::get('/forensics', [AuditController::class, 'auditSearchReplayForensics'])->name('forensics');
-
-    // Compliance Monitoring & Alerts
-    Route::get('/monitoring', [AuditController::class, 'complianceMonitoringAlerts'])->name('monitoring');
+    
+    Route::get('/admin-actions', [AuditComplianceController::class, 'actions'])->name('actions');
+    Route::get('/financial', [AuditComplianceController::class, 'financial'])->name('financial');
+    Route::get('/security', [AuditComplianceController::class, 'security'])->name('security');
+    Route::get('/data-access', [AuditComplianceController::class, 'access'])->name('access');
+    Route::get('/reporting', [AuditComplianceController::class, 'reporting'])->name('reporting');
+    Route::get('/retention', [AuditComplianceController::class, 'retention'])->name('retention');
+    Route::get('/forensics', [AuditComplianceController::class, 'forensics'])->name('forensics');
 
 });

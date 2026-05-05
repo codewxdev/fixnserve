@@ -5,21 +5,21 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| SAHOR ONE CONTROL PANEL (MODULE 10: PLATFORM DISPUTES)
+| MODULE 10: PLATFORM DISPUTES
+|--------------------------------------------------------------------------
+| Handles B2B disputes between Sahor One and connected businesses.
 |--------------------------------------------------------------------------
 */
 
-Route::middleware([
-    'web', 'auth.admin', 'admin.mfa', 'admin.ip_whitelist', 'admin.device_trust'
-])
-->prefix('cp-x9f7a2/v1/disputes')
+Route::middleware(['web', 'auth.admin'])
+->prefix('cp-x9f7a2/v1/platform-disputes')
 ->name('cp.disputes.')
 ->group(function () {
+    
+    Route::get('/categories', [DisputeController::class, 'types'])->name('types');
+    Route::get('/active-workflow', [DisputeController::class, 'workflow'])->name('workflow');
+    Route::get('/evidence-vault', [DisputeController::class, 'evidence'])->name('evidence');
+    Route::get('/ai-triage', [DisputeController::class, 'triage'])->name('triage');
+    Route::get('/legal-escalations', [DisputeController::class, 'escalations'])->name('escalations');
 
-    // Dispute Intake & Workflow
-    Route::get('/workflow', [DisputeController::class, 'index'])->name('workflow');
-
-    // Evidence & Context Management
-    Route::get('/evidence', [DisputeController::class, 'EvidenceContext'])->name('evidence');
-
- });
+});
