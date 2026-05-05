@@ -1,4 +1,4 @@
-@extends('layouts.auth')
+@extends('Layouts.auth')
 
 @section('content')
     <div class="w-full max-w-md p-10 rounded-2xl shadow-xl transition-all duration-300 hover:shadow-2xl"
