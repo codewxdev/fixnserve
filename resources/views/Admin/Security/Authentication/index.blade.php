@@ -208,8 +208,8 @@
                     </div>
 
                     <div class="pt-4 border-t border-border-default space-y-2">
-                        <button class="btn btn-secondary text-text-primary w-full text-xs flex justify-center"><i data-lucide="file-text" class="w-3.5 h-3.5 mr-2"></i> Export Compliance Report</button>
-                        <button class="btn btn-secondary text-semantic-error border-semantic-error/30 hover:bg-semantic-error hover:text-white w-full text-xs flex justify-center transition-colors"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-2"></i> Enforce Global Reset</button>
+                        <button class="btn p-2 btn-secondary text-text-primary w-full text-xs flex justify-center"><i data-lucide="file-text" class="w-3.5 h-3.5 mr-2"></i> Export Compliance Report</button>
+                        <button class="btn p-2 btn-secondary text-semantic-error border-semantic-error/30 hover:bg-semantic-error hover:text-white w-full text-xs flex justify-center transition-colors"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-2"></i> Enforce Global Reset</button>
                     </div>
                 </div>
             </div>
