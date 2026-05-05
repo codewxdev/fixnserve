@@ -8,14 +8,14 @@ use Illuminate\Http\Request;
 class AuthController extends Controller
 {
    public function index(){
-        return view('auth.login');
+        return view('Auth.Login');
     }
 
     public function forget(){
-        return view('auth.forgetPassword');
+        return view('Auth.forgetPassword');
     }
 
     public function reset(){
-        return view('auth.resetPassword');
+        return view('Auth.resetPassword');
     }
 }
