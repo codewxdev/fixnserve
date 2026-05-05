@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('Layouts.app')
 
 @section('title', 'System Health Monitor')
 

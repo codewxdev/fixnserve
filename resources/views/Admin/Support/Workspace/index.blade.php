@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('Layouts.app')
 @section('title', 'Agent Workspace | Support')
 @section('content')
 <div class="p-0 bg-bg-primary min-h-screen flex flex-col md:flex-row h-screen">

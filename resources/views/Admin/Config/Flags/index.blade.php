@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('Layouts.app')
 @section('title', 'Feature Flags | Configuration')
 @section('content')
 <div class="p-4 sm:p-6 lg:p-8 bg-bg-primary min-h-screen" x-data="{ flags: [

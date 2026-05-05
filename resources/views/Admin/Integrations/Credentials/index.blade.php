@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('Layouts.app')
 @section('title', 'Credential Management | External Integrations')
 @section('content')
 <div class="p-4 sm:p-6 lg:p-8 bg-bg-primary min-h-screen">
