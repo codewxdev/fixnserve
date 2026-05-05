@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class RegionalController extends Controller
 {
     public function index(){
-        return view('Admin.Command.regions.index');
+        return view('Admin.Command.Regions.index');
     }
 
     public function updateStatus(Request $request, $id)
