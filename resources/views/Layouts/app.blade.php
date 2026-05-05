@@ -18,7 +18,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <link rel="stylesheet" href="{{ asset('assets/responsive.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/style.css') }}">
+   <link rel="stylesheet" href="{{ asset('assets/style.css?v=' . time()) }}">
 
     <script>
         tailwind.config = {
