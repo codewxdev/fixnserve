@@ -343,8 +343,8 @@
             </div>
 
             <div class="p-5 border-t border-border-default bg-bg-tertiary flex gap-3 shrink-0">
-                <button @click="clearAdvancedFilters()" class="btn btn-tertiary flex-1">Clear Form</button>
-                <button @click="modals.advancedFilters = false" class="btn btn-primary flex-1">Apply Filters</button>
+                <button @click="clearAdvancedFilters()" class="btn p-2 btn-tertiary flex-1">Clear Form</button>
+                <button @click="modals.advancedFilters = false" class="btn p-2 btn-primary flex-1">Apply Filters</button>
             </div>
         </div>
     </div>

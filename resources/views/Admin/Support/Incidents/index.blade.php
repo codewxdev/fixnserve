@@ -35,8 +35,8 @@
                 </div>
             </div>
             <div class="mt-6 pt-6 border-t border-border-default flex gap-3">
-                <button class="btn btn-secondary text-brand-primary border-brand-primary/30 py-2 transition-colors">Update Public Status</button>
-                <button class="btn btn-secondary text-semantic-success border-semantic-success/30 py-2 transition-colors">Mark Mitigated</button>
+                <button class="btn btn-secondary p-2 text-brand-primary border-brand-primary/30 py-2 transition-colors">Update Public Status</button>
+                <button class="btn btn-secondary p-2 text-semantic-success border-semantic-success/30 py-2 transition-colors">Mark Mitigated</button>
             </div>
         </div>
     </div>

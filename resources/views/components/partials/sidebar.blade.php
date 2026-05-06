@@ -1,37 +1,43 @@
+@php
+    $activeMenu = 'null';
+    
+    if (request()->routeIs('cp.dashboard', 'cp.system-health.*', 'cp.regional.*', 'cp.maintenance.*')) {
+        $activeMenu = 'command_center';
+    } elseif (request()->routeIs('cp.security.*')) {
+        $activeMenu = 'security';
+    } elseif (request()->routeIs('cp.rbac.*')) {
+        $activeMenu = 'rbac';
+    } elseif (request()->routeIs('cp.configuration.*', 'cp.configurations.*')) {
+        $activeMenu = 'config';
+    } elseif (request()->routeIs('cp.businesses.*')) {
+        $activeMenu = 'businesses';
+    } elseif (request()->routeIs('cp.kyc.*')) {
+        $activeMenu = 'kyc';
+    } elseif (request()->routeIs('cp.billing.*', 'cp.subscriptions.*')) {
+        $activeMenu = 'subs';
+    } elseif (request()->routeIs('cp.finance.*')) {
+        $activeMenu = 'finance';
+    } elseif (request()->routeIs('cp.payments.*')) {
+        $activeMenu = 'payments';
+    } elseif (request()->routeIs('cp.fraud.*', 'cp.fraud-risk.*')) {
+        $activeMenu = 'fraud';
+    } elseif (request()->routeIs('cp.disputes.*')) {
+        $activeMenu = 'disputes';
+    } elseif (request()->routeIs('cp.audit.*', 'cp.audit-logs.*')) {
+        $activeMenu = 'audit';
+    } elseif (request()->routeIs('cp.analytics.*')) {
+        $activeMenu = 'analytics';
+    } elseif (request()->routeIs('cp.support.*')) {
+        $activeMenu = 'support';
+    } elseif (request()->routeIs('cp.ai.*', 'cp.ai-ops.*')) {
+        $activeMenu = 'ai';
+    } elseif (request()->routeIs('cp.integrations.*')) {
+        $activeMenu = 'integrations';
+    }
+@endphp
+
 <div x-data="{
-    activeDropdown: '{{ request()->routeIs('cp.dashboard', 'cp.system-health', 'cp.regional', 'cp.maintenance')
-        ? 'command_center'
-        : (request()->routeIs('cp.security.*')
-            ? 'security'
-            : (request()->routeIs('cp.rbac.*')
-                ? 'rbac'
-                : (request()->routeIs('cp.configurations.*')
-                    ? 'config'
-                    : (request()->routeIs('cp.businesses.*')
-                        ? 'businesses'
-                        : (request()->routeIs('cp.kyc.*')
-                            ? 'kyc'
-                            : (request()->routeIs('cp.subscriptions.*')
-                                ? 'subs'
-                                : (request()->routeIs('cp.finance.*')
-                                    ? 'finance'
-                                    : (request()->routeIs('cp.payments.*')
-                                        ? 'payments'
-                                        : (request()->routeIs('cp.fraud-risk.*')
-                                            ? 'fraud'
-                                            : (request()->routeIs('cp.disputes.*')
-                                                ? 'disputes'
-                                                : (request()->routeIs('cp.audit-logs.*')
-                                                    ? 'audit'
-                                                    : (request()->routeIs('cp.analytics.*')
-                                                        ? 'analytics'
-                                                        : (request()->routeIs('cp.support.*')
-                                                            ? 'support'
-                                                            : (request()->routeIs('cp.ai-ops.*')
-                                                                ? 'ai'
-                                                                : (request()->routeIs('cp.integrations.*')
-                                                                    ? 'integrations'
-                                                                    : 'null'))))))))))))))) }}',
+    activeDropdown: '{{ $activeMenu }}',
     toggle(key) {
         this.activeDropdown = (this.activeDropdown === key) ? null : key;
     }
@@ -40,10 +46,8 @@
     x-bind:class="sidebarOpen ? 'w-[240px] translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-[64px]'"
     style="color: rgb(var(--text-primary));">
 
-    <div
-        class="flex items-center pl-4 h-16 flex-shrink-0 border-b border-border-default overflow-hidden whitespace-nowrap">
-        <div
-            class="flex items-center justify-center w-8 h-8 rounded border border-border-strong bg-bg-primary flex-shrink-0">
+    <div class="flex items-center pl-4 h-16 flex-shrink-0 border-b border-border-default overflow-hidden whitespace-nowrap">
+        <div class="flex items-center justify-center w-8 h-8 rounded border border-border-strong bg-bg-primary flex-shrink-0">
             <img src="{{ asset('favicon.png') }}" alt="S1" class="w-6 h-6">
         </div>
         <span x-show="sidebarOpen" x-transition.opacity.duration.300ms
@@ -51,6 +55,8 @@
             SahorOne
         </span>
     </div>
+
+    <!-- The rest of your <nav> and <ul> stays exactly the same below this -->
 
     <nav class="flex-1 overflow-y-auto overflow-x-hidden py-4 custom-scrollbar px-3">
         <ul class="space-y-1 w-full">

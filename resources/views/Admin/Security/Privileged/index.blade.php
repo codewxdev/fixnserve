@@ -160,7 +160,7 @@
                                     <p class="text-caption text-text-secondary mt-1 italic break-words border-l-2 border-border-strong pl-2 py-0.5" x-text="'&quot;' + req.justification + '&quot;'"></p>
                                 </div>
                                 <div class="flex flex-row md:flex-col gap-2 w-full md:w-auto shrink-0">
-                                    <button @click="approveJit(req.id)" class="btn btn-sm btn-secondary text-semantic-success border-semantic-success/30 hover:bg-semantic-success hover:text-white flex-1 md:flex-none justify-center">Approve</button>
+                                    <button @click="approveJit(req.id)" class="btn btn-sm btn-secondary text-semantic-success border-semantic-success/30 hover:bg-semantic-success   flex-1 md:flex-none justify-center">Approve</button>
                                     <button @click="denyJit(req.id)" class="btn btn-sm btn-destructive flex-1 md:flex-none justify-center">Deny</button>
                                 </div>
                             </div>
@@ -284,8 +284,8 @@
                     </div>
                 </div>
                 <div class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-lg bg-bg-tertiary">
-                    <button type="button" @click="modals.requestJit = false" class="btn btn-tertiary">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Request</button>
+                    <button type="button" @click="modals.requestJit = false" class="btn p-2 btn-tertiary">Cancel</button>
+                    <button type="submit" class="btn p-2 btn-primary">Submit Request</button>
                 </div>
             </form>
         </div>

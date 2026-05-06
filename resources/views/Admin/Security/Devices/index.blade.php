@@ -194,9 +194,9 @@
                             <td class="px-5 py-4 text-right">
                                 <button @click="viewContext(device)" class="btn btn-sm btn-secondary text-xs mr-1" title="View Full Footprint"><i data-lucide="fingerprint" class="w-4 h-4"></i></button>
 
-                                <button x-show="device.status === 'unverified'" @click="handleAction(device.id, 'trust')" class="btn btn-sm btn-secondary text-semantic-info border-semantic-info/30 hover:bg-semantic-info hover:text-white text-xs mr-1">Trust</button>
+                                <button x-show="device.status === 'unverified'" @click="handleAction(device.id, 'trust')"  class="btn btn-sm bg-transparent text-brand-primary border-brand-primary/30 hover:bg-brand-primary hover:text-white transition-colors duration-200 text-xs">Trust</button>
                                 
-                                <button x-show="device.status === 'trusted'" @click="handleAction(device.id, 'revoke')" class="btn btn-sm btn-secondary text-semantic-warning border-semantic-warning/30 hover:bg-semantic-warning hover:text-white text-xs mr-1">Revoke</button>
+                                <button x-show="device.status === 'trusted'" @click="handleAction(device.id, 'revoke')"  class="btn btn-sm bg-transparent text-brand-primary border-brand-primary/30 hover:bg-brand-primary hover:text-white transition-colors duration-200 text-xs">Revoke</button>
                                 
                                 <button x-show="device.status !== 'banned'" @click="handleAction(device.id, 'ban')" class="btn btn-sm btn-destructive text-xs">Ban</button>
                                 

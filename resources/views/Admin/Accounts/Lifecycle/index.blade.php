@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('Layouts.app')
 
 @section('title', 'Business Lifecycle Management')
 
@@ -219,8 +219,8 @@
                 </div>
                 
                 <div class="p-5 border-t border-border-default flex justify-end gap-3 rounded-b-xl bg-bg-tertiary">
-                    <button type="button" @click="closeTransitionModal()" class="btn btn-tertiary">Cancel</button>
-                    <button type="submit" class="btn" :class="isDestructiveState(transitionData.targetState) ? 'btn-destructive' : 'btn-primary'" :disabled="!transitionData.targetState || !transitionData.justification || isSaving">
+                    <button type="button" @click="closeTransitionModal()" class="btn p-2 btn-tertiary">Cancel</button>
+                    <button type="submit" class="btn p-2" :class="isDestructiveState(transitionData.targetState) ? 'btn-destructive' : 'btn-primary'" :disabled="!transitionData.targetState || !transitionData.justification || isSaving">
                         <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin" x-show="isSaving"></i>
                         <span x-text="isDestructiveState(transitionData.targetState) ? 'Submit for Approval' : 'Force Transition'"></span>
                     </button>

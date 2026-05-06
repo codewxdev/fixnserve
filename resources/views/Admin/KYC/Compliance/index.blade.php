@@ -163,12 +163,12 @@
 
                                 <td class="px-5 py-4 text-right align-middle">
                                     <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button @click="openOverrideModal(biz)" class="btn btn-sm btn-secondary text-brand-primary border-brand-primary/30 hover:bg-brand-primary hover:text-white text-[10px]">Override Status</button>
+                                        <button @click="openOverrideModal(biz)" class="btn p-2 btn-sm btn-secondary text-brand-primary border-brand-primary/30 hover:bg-brand-primary   text-[10px]">Override Status</button>
                                         
-                                        <button x-show="!biz.escalated" @click="escalateBusiness(biz)" class="btn btn-sm btn-secondary text-semantic-info border-semantic-info/30 hover:bg-semantic-info hover:text-white text-[10px]">Escalate</button>
+                                        <button x-show="!biz.escalated" @click="escalateBusiness(biz)" class="btn p-2 btn-sm btn-secondary text-semantic-info border-semantic-info/30 hover:bg-semantic-info   text-[10px]">Escalate</button>
                                         
-                                        <button x-show="biz.status !== 'Locked'" @click="openLockModal(biz)" class="btn btn-sm btn-destructive text-[10px]">Lock Entity</button>
-                                        <button x-show="biz.status === 'Locked'" @click="unlockEntity(biz)" class="btn btn-sm btn-secondary text-semantic-success border-semantic-success/30 hover:bg-semantic-success hover:text-white text-[10px]">Unlock</button>
+                                        <button x-show="biz.status !== 'Locked'" @click="openLockModal(biz)" class="btn p-2 btn-sm btn-destructive text-[10px]">Lock Entity</button>
+                                        <button x-show="biz.status === 'Locked'" @click="unlockEntity(biz)" class="btn p-2 btn-sm btn-secondary text-semantic-success border-semantic-success/30 hover:bg-semantic-success   text-[10px]">Unlock</button>
                                     </div>
                                 </td>
 

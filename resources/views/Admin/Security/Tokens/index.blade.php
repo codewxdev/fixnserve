@@ -19,7 +19,7 @@
 
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <button x-show="activeTab === 'apikeys'" @click="modals.generateKey = true"
-                    class="btn btn-primary w-full md:w-auto flex justify-center items-center gap-2" x-cloak>
+                    class="btn p-2 btn-primary w-full md:w-auto flex justify-center items-center gap-2" x-cloak>
                     <i data-lucide="plus" class="w-4 h-4"></i> Generate API Key
                 </button>
                 <button x-show="activeTab === 'tokens'" @click="savePolicy()"
@@ -220,7 +220,7 @@
                                                 title="Usage Logs"><i data-lucide="activity"
                                                     class="w-4 h-4"></i></button>
                                             <button @click="rotateApiKey(key.id)"
-                                                class="btn btn-sm btn-secondary text-brand-primary border-brand-primary/30 hover:bg-brand-primary hover:text-white text-xs">Rotate</button>
+                                                class="btn btn-sm bg-transparent text-brand-primary border-brand-primary/30 hover:bg-brand-primary hover:text-white transition-colors duration-200 text-xs">Rotate</button>
                                             <button @click="revokeApiKey(key.id)"
                                                 class="btn btn-sm btn-destructive text-xs"><i data-lucide="trash-2"
                                                     class="w-4 h-4"></i></button>
