@@ -280,8 +280,8 @@
 
                     <div
                         class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-lg bg-bg-tertiary shrink-0">
-                        <button type="button" @click="modals.form = false" class="btn btn-tertiary">Cancel</button>
-                        <button type="submit" class="btn btn-primary" :disabled="isSaving">
+                        <button type="button" @click="modals.form = false" class="btn p-2 btn-tertiary">Cancel</button>
+                        <button type="submit" class="btn p-2 btn-primary" :disabled="isSaving">
                             <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin" x-show="isSaving" x-cloak></i>
                             <span
                                 x-text="isSaving ? 'Saving...' : (form.id ? 'Update Catalog' : 'Create Permission')"></span>

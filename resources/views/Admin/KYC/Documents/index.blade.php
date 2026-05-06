@@ -125,7 +125,7 @@
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-full mt-auto" :disabled="!uploadForm.file || !uploadForm.businessId || !uploadForm.docType || isUploading">
+                    <button type="submit" class="btn p-2 btn-primary w-full mt-auto" :disabled="!uploadForm.file || !uploadForm.businessId || !uploadForm.docType || isUploading">
                         <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin" x-show="isUploading" x-cloak></i>
                         <span x-text="isUploading ? 'Encrypting & Uploading...' : 'Upload to KMS Vault'"></span>
                     </button>

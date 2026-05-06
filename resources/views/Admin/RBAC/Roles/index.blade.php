@@ -60,7 +60,7 @@
                         <p class="text-caption text-text-secondary mt-0.5">2 roles detected with over-privileged scopes. 14 unused permissions flagged across custom roles.</p>
                     </div>
                 </div>
-                <button class="btn btn-sm btn-secondary text-semantic-warning border-semantic-warning/30 bg-bg-primary hover:bg-semantic-warning hover:text-white whitespace-nowrap">View Recommendations</button>
+                <button class="btn btn-sm btn-secondary text-semantic-warning border-semantic-warning/30 bg-bg-primary hover:bg-semantic-warning   whitespace-nowrap">View Recommendations</button>
             </div>
         </div>
 
@@ -222,8 +222,8 @@
                 </div>
                 
                 <div class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-lg bg-bg-tertiary shrink-0">
-                    <button type="button" @click="closeFormModal()" class="btn btn-tertiary">Cancel</button>
-                    <button type="submit" class="btn btn-primary" :disabled="isSubmitting">
+                    <button type="button" @click="closeFormModal()" class="btn p-2 btn-tertiary">Cancel</button>
+                    <button type="submit" class="btn p-2 btn-primary" :disabled="isSubmitting">
                         <i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin" x-show="isSubmitting" x-cloak></i>
                         <span x-text="isSubmitting ? 'Saving...' : (form.id ? 'Save Changes' : 'Create Role')"></span>
                     </button>

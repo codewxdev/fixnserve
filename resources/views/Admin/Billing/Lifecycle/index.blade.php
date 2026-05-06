@@ -40,7 +40,7 @@
                 <h3 class="text-body font-bold text-semantic-error">AI Churn Risk Prediction</h3>
             </div>
             <p class="text-body-sm text-text-primary mb-4">12 businesses exhibit high probability of cancellation before next billing cycle.</p>
-            <button class="btn btn-sm btn-secondary text-semantic-error border-semantic-error/30 hover:bg-semantic-error hover:text-white px-4 py-2 transition-colors">View At-Risk Accounts</button>
+            <button class="btn btn-sm p-2 btn-secondary text-semantic-error border-semantic-error/30 hover:bg-semantic-error px-4 py-2 transition-colors">View At-Risk Accounts</button>
         </div>
         <div class="card p-5 border-semantic-success/20 bg-semantic-success-bg/30">
             <div class="flex items-center gap-2 mb-3">
@@ -48,7 +48,7 @@
                 <h3 class="text-body font-bold text-semantic-success">Upgrade Likelihood Scoring</h3>
             </div>
             <p class="text-body-sm text-text-primary mb-4">45 'Starter' accounts are consistently hitting soft limits. Ready for Growth tier.</p>
-            <button class="btn btn-sm btn-secondary text-semantic-success border-semantic-success/30 hover:bg-semantic-success hover:text-white px-4 py-2 transition-colors">Review Upgrade Targets</button>
+            <button class="btn btn-sm p-2 btn-secondary text-semantic-success border-semantic-success/30 hover:bg-semantic-success px-4 py-2 transition-colors">Review Upgrade Targets</button>
         </div>
     </div>
 

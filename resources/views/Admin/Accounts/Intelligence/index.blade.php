@@ -325,8 +325,8 @@
                             placeholder="Write internal compliance or context note..."></textarea>
                     </div>
                     <div class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-xl bg-bg-tertiary">
-                        <button type="button" @click="modals.addNote = false" class="btn btn-tertiary">Cancel</button>
-                        <button type="submit" class="btn btn-primary" :disabled="!newNote">Save Note</button>
+                        <button type="button" @click="modals.addNote = false" class="btn p-2 btn-tertiary">Cancel</button>
+                        <button type="submit" class="btn p-2 btn-primary" :disabled="!newNote">Save Note</button>
                     </div>
                 </form>
             </div>
@@ -347,8 +347,8 @@
                             placeholder="e.g. VIP, High Risk, Demo">
                     </div>
                     <div class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-xl bg-bg-tertiary">
-                        <button type="button" @click="modals.addTag = false" class="btn btn-tertiary">Cancel</button>
-                        <button type="submit" class="btn btn-primary" :disabled="!newTag">Apply</button>
+                        <button type="button" @click="modals.addTag = false" class="btn p-2 btn-tertiary">Cancel</button>
+                        <button type="submit" class="btn p-2 btn-primary" :disabled="!newTag">Apply</button>
                     </div>
                 </form>
             </div>

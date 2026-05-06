@@ -260,8 +260,8 @@
                 </div>
                 
                 <div class="p-4 border-t border-border-default flex justify-end gap-3 rounded-b-lg bg-bg-tertiary">
-                    <button type="button" @click="modals.addIpRule = false" class="btn btn-tertiary">Cancel</button>
-                    <button type="submit" class="btn btn-primary" :disabled="!newRule.cidr">Save Network Rule</button>
+                    <button type="button" @click="modals.addIpRule = false" class="btn p-2 btn-tertiary">Cancel</button>
+                    <button type="submit" class="btn p-2 btn-primary" :disabled="!newRule.cidr">Save Network Rule</button>
                 </div>
             </form>
         </div>

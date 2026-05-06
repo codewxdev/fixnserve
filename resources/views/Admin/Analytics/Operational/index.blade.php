@@ -12,22 +12,22 @@
 
     <!-- Core Metrics -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <div class="card p-5 border-l-4 border-l-semantic-success text-center">
+        <div class="card p-5 text-center">
             <p class="text-caption font-bold text-text-tertiary uppercase">System Uptime</p>
             <h2 class="text-h2 font-black text-text-primary mt-1">99.98%</h2>
             <p class="text-caption text-text-secondary mt-1">0 Incidents</p>
         </div>
-        <div class="card p-5 border-l-4 border-l-semantic-warning text-center">
+        <div class="card p-5 text-center">
             <p class="text-caption font-bold text-text-tertiary uppercase">Avg Ticket Resolution</p>
             <h2 class="text-h2 font-black text-text-primary mt-1">4h 12m</h2>
             <p class="text-caption text-text-secondary mt-1">Volume: 1,420</p>
         </div>
-        <div class="card p-5 border-l-4 border-l-brand-primary text-center">
+        <div class="card p-5 text-center">
             <p class="text-caption font-bold text-text-tertiary uppercase">Avg KYC Processing</p>
             <h2 class="text-h2 font-black text-text-primary mt-1">12 Mins</h2>
             <p class="text-caption text-text-secondary mt-1">Auto-approval: 88%</p>
         </div>
-        <div class="card p-5 border-l-4 border-l-semantic-success text-center">
+        <div class="card p-5 text-center">
             <p class="text-caption font-bold text-text-tertiary uppercase">Payment Success</p>
             <h2 class="text-h2 font-black text-text-primary mt-1">94.5%</h2>
             <p class="text-caption text-text-secondary mt-1">Stripe Network</p>

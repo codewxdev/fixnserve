@@ -139,9 +139,9 @@
                         </div>
                     </div>
                     <div class="flex gap-2 shrink-0 w-full md:w-auto">
-                        <button @click="modals.action = true; actionType = 'Re-upload'" class="btn btn-secondary text-semantic-warning border-semantic-warning/30 hover:bg-semantic-warning hover:text-white flex-1 md:flex-none">Request Re-upload</button>
-                        <button @click="modals.action = true; actionType = 'Reject'" class="btn btn-destructive flex-1 md:flex-none">Reject</button>
-                        <button @click="approveDocument()" class="btn btn-primary bg-semantic-success border-semantic-success hover:bg-green-600 text-white shadow-lg flex-1 md:flex-none">Approve</button>
+                        <button @click="modals.action = true; actionType = 'Re-upload'" class="btn p-2 btn-secondary text-semantic-warning border-semantic-warning/30 hover:bg-semantic-warning flex-1 md:flex-none">Request Re-upload</button>
+                        <button @click="modals.action = true; actionType = 'Reject'" class="btn p-2 btn-destructive flex-1 md:flex-none">Reject</button>
+                        <button @click="approveDocument()" class="btn p-2 btn-primary bg-semantic-success border-semantic-success hover:bg-green-600 text-white shadow-lg flex-1 md:flex-none">Approve</button>
                     </div>
                 </div>
 

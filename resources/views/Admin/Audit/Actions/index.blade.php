@@ -8,7 +8,7 @@
             <p class="text-body-sm text-text-secondary mt-1">Immutable, write-once event logs with cryptographical hash chain verification.</p>
         </div>
         <div class="flex items-center gap-3">
-            <span class="px-3 py-1 bg-semantic-success-bg border border-semantic-success/20 text-semantic-success text-[10px] uppercase font-bold rounded flex items-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i> Hash Chain Intact</span>
+            <span class="px-3 py-3 bg-semantic-success-bg border border-semantic-success/20 text-semantic-success text-[10px] uppercase font-bold rounded flex items-center gap-1"><i data-lucide="shield-check" class="w-3 h-3"></i> Hash Chain Intact</span>
             <button class="btn btn-secondary py-2.5 px-4"><i data-lucide="download" class="w-4 h-4 mr-2"></i> Export Log</button>
         </div>
     </div>

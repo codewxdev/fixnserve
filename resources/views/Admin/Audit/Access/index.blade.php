@@ -14,12 +14,12 @@
         <div class="card p-6 border-purple-500/30 bg-purple-500/5">
             <h3 class="text-body font-bold text-text-primary mb-2 flex items-center gap-2"><i data-lucide="file-check" class="w-5 h-5 text-purple-500"></i> Subject Access Requests (SAR)</h3>
             <p class="text-caption text-text-secondary mb-4">Export raw data requested by data subjects within SLA.</p>
-            <button class="btn btn-secondary p-1 w-full text-purple-500 border-purple-500/30 hover:bg-purple-500/10">Process Pending SARs (2)</button>
+            <button class="btn btn-secondary p-2 w-full text-purple-500 border-purple-500/30 hover:bg-purple-500/10">Process Pending SARs (2)</button>
         </div>
         <div class="card p-6 border-semantic-error/30 bg-semantic-error-bg/20">
             <h3 class="text-body font-bold text-text-primary mb-2 flex items-center gap-2"><i data-lucide="trash-2" class="w-5 h-5 text-semantic-error"></i> Right to be Forgotten (RTBF)</h3>
             <p class="text-caption text-text-secondary mb-4">Process permanent data erasure requests (excl. financial logs).</p>
-            <button class="btn btn-secondary p-1 w-full text-semantic-error border-semantic-error/30 hover:bg-semantic-error/10">Process Pending Ernsures (0)</button>
+            <button class="btn btn-secondary p-2 w-full text-semantic-error border-semantic-error/30 hover:bg-semantic-error/10">Process Pending Ernsures (0)</button>
         </div>
     </div>
 
