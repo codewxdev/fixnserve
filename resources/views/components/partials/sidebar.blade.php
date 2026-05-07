@@ -50,10 +50,12 @@
         <div class="flex items-center justify-center w-8 h-8 rounded border border-border-strong bg-bg-primary flex-shrink-0">
             <img src="{{ asset('favicon.png') }}" alt="S1" class="w-6 h-6">
         </div>
-        <span x-show="sidebarOpen" x-transition.opacity.duration.300ms
-            class="ml-3 text-body-lg font-semibold tracking-tight text-text-primary" x-cloak>
-            SahorOne
-        </span>
+        <a href="{{ route('cp.dashboard') }}" class="flex items-center">
+            <span x-show="sidebarOpen" x-transition.opacity.duration.300ms
+                class="ml-3 text-body-lg font-semibold tracking-tight text-text-primary" x-cloak>
+                Executive Dashboard
+            </span>
+        </a>
     </div>
 
     <!-- The rest of your <nav> and <ul> stays exactly the same below this -->
