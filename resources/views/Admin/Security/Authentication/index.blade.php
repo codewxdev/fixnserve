@@ -17,7 +17,7 @@
                 style="background-color: #1169FB;">
                 <i data-lucide="save" class="w-4 h-4" x-show="!isSaving"></i>
                 <i data-lucide="loader-2" class="w-4 h-4 animate-spin" x-show="isSaving" x-cloak></i>
-                <span x-text="isSaving ? 'Saving Policies...' : 'Deploy Policies'">Deploy Policies</span>
+                <span>Deploy Policies</span>
             </button>
         </div>
     </div>

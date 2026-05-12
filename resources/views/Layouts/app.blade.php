@@ -99,6 +99,8 @@
     // 3 Second Loader Timeout
     setTimeout(() => { isPageLoading = false }, 500);">
 
+    
+
     <div x-show="isPageLoading" x-transition.opacity.duration.500ms
         class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-bg-primary" style="display: flex;">
         <div class="relative w-16 h-16 flex items-center justify-center mb-6">
