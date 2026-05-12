@@ -3,6 +3,7 @@
 @section('title', 'Network Security')
 
 @section('content')
+<!-- MAIN WRAPPER START -->
 <div class="p-4 sm:p-6 lg:p-8 bg-bg-primary min-h-screen flex flex-col" x-data="networkSecurity()">
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 sm:mb-8 gap-4 shrink-0">
@@ -16,7 +17,7 @@
             <p class="text-text-secondary text-body-sm mt-2">Configure IP firewalls, geo-blocking, and AI travel detection.</p>
         </div>
 
-        <button @click="togglePanicMode()" 
+        <button @click="confirmPanicMode()" 
                 class="btn w-full md:w-auto bg-semantic-error-bg text-semantic-error border border-semantic-error/30 hover:bg-semantic-error hover:text-white flex items-center justify-center gap-2 shadow-lg transition-colors p-2">
             <i data-lucide="siren" class="w-4 h-4"></i>
             <span>Panic Mode: Block Non-Domestic</span>
@@ -76,10 +77,10 @@
                                     </td>
                                     <td class="px-5 py-4">
                                         <span x-show="!rule.expiry" class="text-text-secondary text-xs">Permanent</span>
-                                        <span x-show="rule.expiry" class="text-semantic-warning font-bold text-xs" x-text="'Expires: ' + rule.expiry"></span>
+                                        <span x-show="rule.expiry" class="text-semantic font-bold text-xs" x-text="'Expires: ' + rule.expiry"></span>
                                     </td>
                                     <td class="px-5 py-4 text-right">
-                                        <button @click="deleteIpRule(rule.id)" class="p-1.5 text-text-tertiary hover:text-semantic-error rounded transition-colors" title="Remove Rule">
+                                        <button @click="confirmDeleteIpRule(rule.id)" class="p-1.5 text-text-tertiary hover:text-semantic-error rounded transition-colors" title="Remove Rule">
                                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                                         </button>
                                     </td>
@@ -98,8 +99,8 @@
                     
                     <div class="flex items-center gap-2 bg-bg-primary p-1 rounded-md border border-border-default w-full sm:w-auto">
                         <span class="text-caption text-text-secondary pl-2 pr-1 uppercase font-bold tracking-wider">Default:</span>
-                        <button @click="updateGlobalGeo('allow_all')" :class="globalGeo === 'allow_all' ? 'bg-semantic-success text-white shadow-sm' : 'text-text-tertiary hover:text-text-primary'" class="px-3 py-1 text-xs font-bold rounded transition-colors uppercase">Allow All</button>
-                        <button @click="updateGlobalGeo('deny_all')" :class="globalGeo === 'deny_all' ? 'bg-semantic-error text-white shadow-sm' : 'text-text-tertiary hover:text-text-primary'" class="px-3 py-1 text-xs font-bold rounded transition-colors uppercase">Deny All</button>
+                        <button @click="confirmGlobalGeo('allow_all')" :class="globalGeo === 'allow_all' ? 'bg-semantic-success text-white shadow-sm' : 'text-text-tertiary hover:text-text-primary'" class="px-3 py-1 text-xs font-bold rounded transition-colors uppercase">Allow All</button>
+                        <button @click="confirmGlobalGeo('deny_all')" :class="globalGeo === 'deny_all' ? 'bg-semantic-error text-white shadow-sm' : 'text-text-tertiary hover:text-text-primary'" class="px-3 py-1 text-xs font-bold rounded transition-colors uppercase">Deny All</button>
                     </div>
                 </div>
 
@@ -157,14 +158,14 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <p class="text-body-sm font-bold text-text-primary">Impossible Travel Detection</p>
-                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-semantic-warning-bg text-semantic-warning border border-semantic-warning/20 uppercase tracking-wider" x-text="aiThreats.travelIncidents.length + ' Active'"></span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-semantic-warning-bg text-semantic border border-semantic/20 uppercase tracking-wider" x-text="aiThreats.travelIncidents.length + ' Active'"></span>
                         </div>
 
                         <div class="space-y-3">
                             <template x-for="incident in aiThreats.travelIncidents" :key="incident.id">
                                 <div class="p-3 bg-semantic-warning-bg/40 border border-semantic-warning/30 rounded-lg">
                                     <div class="flex items-start gap-3">
-                                        <i data-lucide="alert-triangle" class="w-5 h-5 text-semantic-warning shrink-0 mt-0.5"></i>
+                                        <i data-lucide="alert-triangle" class="w-5 h-5 text-semantic shrink-0 mt-0.5"></i>
                                         <div class="flex-1 min-w-0">
                                             <p class="text-body-sm font-bold text-text-primary truncate" x-text="'User: ' + incident.user"></p>
                                             
@@ -179,11 +180,11 @@
                                                 </div>
                                             </div>
                                             
-                                            <p class="text-[10px] font-mono text-semantic-warning mt-2" x-text="`Distance: ${incident.distance}km in ${incident.duration}m`"></p>
+                                            <p class="text-[10px] font-mono text-semantic mt-2" x-text="`Distance: ${incident.distance}km in ${incident.duration}m`"></p>
                                             
                                             <div class="mt-3 flex gap-2">
-                                                <button @click="freezeAccount(incident.user_id)" class="btn btn-sm btn-destructive py-1 px-2 text-[10px]">Freeze Account</button>
-                                                <button @click="dismissAlert(incident.id)" class="btn btn-sm btn-secondary text-[10px] py-1 px-2">Dismiss</button>
+                                                <button @click="confirmFreezeAccount(incident.user_id)" class="btn btn-sm btn-destructive py-1 px-2 text-[10px]">Freeze Account</button>
+                                               <button @click="dismissAlert(incident.id)" class="inline-flex items-center justify-center text-[10px] py-1 px-2 rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors duration-200">Dismiss</button>
                                             </div>
                                         </div>
                                     </div>
@@ -202,6 +203,7 @@
         </div>
     </div>
 
+    <!-- MODAL: ADD IP RULE -->
     <div x-show="modals.addIpRule" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-secondary/80 backdrop-blur-sm p-4" x-cloak>
         <div class="card w-full max-w-lg p-0 shadow-2xl" @click.away="modals.addIpRule = false">
             <div class="p-5 border-b border-border-default bg-bg-tertiary flex justify-between items-center rounded-t-lg">
@@ -267,7 +269,34 @@
         </div>
     </div>
 
-</div>
+    <!-- MODAL: CONFIRM ACTION -->
+    <div x-show="modals.confirm" x-transition class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" x-cloak>
+        <div class="card max-w-sm w-full p-5 bg-bg-primary shadow-2xl" @click.away="modals.confirm = false">
+            <h2 class="text-h4 font-bold text-text-primary mb-2" x-text="confirmData.title"></h2>
+            <p class="text-body-sm text-text-secondary mb-4" x-text="confirmData.message"></p>
+            <div class="flex justify-end gap-2">
+                <button @click="modals.confirm = false" class="btn p-2 btn-secondary">Cancel</button>
+                <button @click="modals.confirm = false; confirmData.onConfirm && confirmData.onConfirm()" class="btn p-2 btn-destructive">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATIONS -->
+    <div class="fixed bottom-4 right-4 z-[110] space-y-2 pointer-events-none">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div class="p-4 rounded-lg shadow-lg border flex items-center gap-3 min-w-[280px] pointer-events-auto transition-all"
+                 :class="{
+                    'bg-semantic-success-bg border-semantic-success text-semantic-success': toast.type === 'success',
+                    'bg-semantic-error-bg border-semantic-error text-semantic-error': toast.type === 'error',
+                    'bg-semantic-warning-bg border-semantic text-semantic': toast.type === 'warning'
+                 }">
+                <i :data-lucide="toast.type === 'success' ? 'check-circle' : 'alert-circle'" class="w-5 h-5"></i>
+                <span class="text-body-sm font-bold" x-text="toast.message"></span>
+            </div>
+        </template>
+    </div>
+
+</div> <!-- MAIN WRAPPER END -->
 
 @push('scripts')
 <script>
@@ -276,16 +305,42 @@ document.addEventListener('alpine:init', () => {
         isLoading: true,
         globalGeo: 'allow_all',
         geoSearch: '',
+        toasts: [],
         
-        modals: { addIpRule: false },
-        newRule: { cidr: '', type: 'allow', appliesTo: 'Global', expiry: '', comment: '' },
+        modals: { 
+            addIpRule: false,
+            confirm: false 
+        },
 
+        confirmData: {
+            title: '',
+            message: '',
+            onConfirm: () => {}
+        },
+
+        newRule: { cidr: '', type: 'allow', appliesTo: 'Global', expiry: '', comment: '' },
         ipRules: [],
         geoRules: [],
         aiThreats: { blockVpn: true, travelIncidents: [] },
 
         init() {
             this.fetchData();
+        },
+
+        // Helper: Notifications
+        notify(message, type = 'success') {
+            const id = Date.now();
+            this.toasts.push({ id, message, type });
+            this.$nextTick(() => lucide.createIcons());
+            setTimeout(() => {
+                this.toasts = this.toasts.filter(t => t.id !== id);
+            }, 4000);
+        },
+
+        // Helper: Confirm Modal
+        confirm(title, message, onConfirm) {
+            this.confirmData = { title, message, onConfirm };
+            this.modals.confirm = true;
         },
 
         get filteredGeo() {
@@ -296,16 +351,14 @@ document.addEventListener('alpine:init', () => {
 
         async fetchData() {
             this.isLoading = true;
-            await new Promise(r => setTimeout(r, 600)); // Simulate API
+            await new Promise(r => setTimeout(r, 600)); 
             
-            // Mock IP Rules
             this.ipRules = [
                 { id: 1, cidr: '194.23.11.0/24', type: 'allow', appliesTo: 'Admin Panel', expiry: null, comment: 'Dubai Main Office' },
-                { id: 2, cidr: '82.11.44.2/32', type: 'allow', appliesTo: 'API Clients', expiry: '2026-05-01 12:00', comment: 'Partner Integration Endpoint (Temp)' },
+                { id: 2, cidr: '82.11.44.2/32', type: 'allow', appliesTo: 'API Clients', expiry: '5/1/2026, 12:00:00 PM', comment: 'Partner Integration Endpoint (Temp)' },
                 { id: 3, cidr: '45.33.22.0/16', type: 'deny', appliesTo: 'Global', expiry: null, comment: 'Known Botnet Range' },
             ];
 
-            // Mock Geo Rules
             this.geoRules = [
                 { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪', status: 'allowed' },
                 { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦', status: 'allowed' },
@@ -314,7 +367,6 @@ document.addEventListener('alpine:init', () => {
                 { code: 'KP', name: 'North Korea', flag: '🇰🇵', status: 'denied' },
             ];
 
-            // Mock AI Incidents
             this.aiThreats.travelIncidents = [
                 { id: 101, user_id: 42, user: 'Sarah Jenkins', loc1: 'London, UK', time1: '10:00 AM', loc2: 'Dubai, UAE', time2: '10:15 AM', distance: '5,470', duration: 15 }
             ];
@@ -325,7 +377,6 @@ document.addEventListener('alpine:init', () => {
 
         // IP Actions
         submitIpRule() {
-            // Format expiry for UI
             const formattedExpiry = this.newRule.expiry ? new Date(this.newRule.expiry).toLocaleString() : null;
             
             this.ipRules.unshift({
@@ -339,47 +390,66 @@ document.addEventListener('alpine:init', () => {
             
             this.modals.addIpRule = false;
             this.newRule = { cidr: '', type: 'allow', appliesTo: 'Global', expiry: '', comment: '' };
-            this.$nextTick(() => lucide.createIcons());
-            alert('IP Rule Added successfully.');
+            this.notify('IP Rule Added successfully.', 'success');
         },
 
-        deleteIpRule(id) {
-            if(confirm('Remove this IP rule?')) {
-                this.ipRules = this.ipRules.filter(r => r.id !== id);
-            }
+        confirmDeleteIpRule(id) {
+            this.confirm(
+                "Remove Rule?", 
+                "This will immediately change firewall permissions for this IP range. Continue?", 
+                () => {
+                    this.ipRules = this.ipRules.filter(r => r.id !== id);
+                    this.notify("IP rule removed", "warning");
+                }
+            );
         },
 
         // Geo Actions
-        updateGlobalGeo(policy) {
-            if(confirm(`Change default global routing policy to ${policy.toUpperCase()}?`)) {
-                this.globalGeo = policy;
-            }
+        confirmGlobalGeo(policy) {
+            this.confirm(
+                "Change Policy?", 
+                `Are you sure you want to change default global routing to ${policy.toUpperCase()}?`, 
+                () => {
+                    this.globalGeo = policy;
+                    this.notify(`Global policy updated to ${policy}`, "success");
+                }
+            );
         },
 
         toggleGeo(code, status) {
             const country = this.geoRules.find(c => c.code === code);
             if(country) {
                 country.status = status;
+                this.notify(`${country.name} status updated`, "success");
             }
         },
 
-        togglePanicMode() {
-            if(confirm("CRITICAL: This will instantly drop all connections originating from outside the UAE. Are you sure?")) {
-                this.globalGeo = 'deny_all';
-                alert("Panic Mode Activated. Foreign traffic blocked at Gateway.");
-            }
+        confirmPanicMode() {
+            this.confirm(
+                "ACTIVATE PANIC MODE?", 
+                "CRITICAL: This will instantly drop all connections originating from outside the UAE. Gateway will be locked down.", 
+                () => {
+                    this.globalGeo = 'deny_all';
+                    this.notify("Panic Mode Activated! Foreign traffic blocked.", "error");
+                }
+            );
         },
 
         // AI Actions
-        freezeAccount(userId) {
-            if(confirm('Freeze account and revoke all sessions for this user?')) {
-                this.aiThreats.travelIncidents = this.aiThreats.travelIncidents.filter(i => i.user_id !== userId);
-                alert('Account frozen. SecOps notified.');
-            }
+        confirmFreezeAccount(userId) {
+            this.confirm(
+                "Freeze Account?", 
+                "This will revoke all active sessions and block login for this user immediately.", 
+                () => {
+                    this.aiThreats.travelIncidents = this.aiThreats.travelIncidents.filter(i => i.user_id !== userId);
+                    this.notify('Account frozen. SecOps has been notified.', 'error');
+                }
+            );
         },
 
         dismissAlert(id) {
             this.aiThreats.travelIncidents = this.aiThreats.travelIncidents.filter(i => i.id !== id);
+            this.notify("Alert dismissed", "success");
         }
     }));
 });

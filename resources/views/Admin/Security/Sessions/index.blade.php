@@ -3,8 +3,31 @@
 @section('title', 'Session Management')
 
 @section('content')
-<div class="p-4 sm:p-6 lg:p-8 bg-bg-primary min-h-screen flex flex-col" x-data="sessionManagement()">
+<div class="p-4 sm:p-6 lg:p-8 bg-bg-primary min-h-screen flex flex-col relative" x-data="sessionManagement()">
+    
+    <!-- 1. Toast Notifications (Popups) -->
+    <div class="fixed top-4 right-4 z-[100] flex flex-col gap-3">
+        <template x-for="toast in toasts" :key="toast.id">
+            <div x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 transform translate-x-8"
+                 x-transition:enter-end="opacity-100 transform translate-x-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 transform translate-x-0"
+                 x-transition:leave-end="opacity-0 transform translate-x-8"
+                 class="flex items-center gap-3 px-4 py-3 rounded-lg shadow-2xl border text-white min-w-[320px]"
+                 :class="{
+                    'bg-semantic-success border-semantic-success': toast.type === 'success',
+                    'bg-semantic-error border-semantic-error': toast.type === 'error',
+                    'bg-semantic-warning border-semantic-warning text-black': toast.type === 'warning',
+                    'bg-brand-primary border-brand-primary': toast.type === 'info'
+                 }">
+                <i :data-lucide="toast.type === 'success' ? 'check-circle' : (toast.type === 'error' ? 'x-circle' : 'alert-circle')" class="w-5 h-5"></i>
+                <span class="text-body-sm font-bold" x-text="toast.message"></span>
+            </div>
+        </template>
+    </div>
 
+    <!-- Header Section -->
     <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-6 sm:mb-8 gap-4 shrink-0">
         <div>
             <h1 class="text-h3 sm:text-h2 font-bold tracking-tight text-text-primary flex items-center gap-3">
@@ -17,18 +40,40 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-            <button @click="modals.revokeRole = true" class="btn btn-secondary flex-1 p-2 sm:flex-none justify-center gap-2">
-                <i data-lucide="shield-minus" class="w-4 h-4"></i> Revoke by Role
-            </button>
-            <button @click="modals.revokeRegion = true" class="btn btn-secondary flex-1 p-2 sm:flex-none justify-center gap-2">
-                <i data-lucide="globe" class="w-4 h-4"></i> Revoke by Region
-            </button>
-            <button @click="emergencyLogoutAll()" class="btn btn-destructive p-2 flex-1 sm:flex-none justify-center gap-2 shadow-lg shadow-semantic-error/20">
+<button
+    @click="modals.revokeRole = true"
+    class="inline-flex items-center justify-center gap-2
+           flex-1 sm:flex-none p-2 rounded-md text-sm
+           border border-slate-300 dark:border-slate-700
+           bg-white dark:bg-slate-900
+           text-slate-700 dark:text-slate-200
+           hover:bg-slate-100 dark:hover:bg-slate-800
+           hover:text-slate-900 dark:hover:text-white
+           transition-colors duration-200">
+    <i data-lucide="shield-minus" class="w-4 h-4"></i>
+    Revoke by Role
+</button>
+            <button
+    @click="modals.revokeRegion = true"
+    class="inline-flex items-center justify-center gap-2
+           flex-1 sm:flex-none p-2 rounded-md text-sm
+           border border-slate-300 dark:border-slate-700
+           bg-white dark:bg-slate-900
+           text-slate-700 dark:text-slate-200
+           hover:bg-slate-100 dark:hover:bg-slate-800
+           hover:text-slate-900 dark:hover:text-white
+           transition-colors duration-200">
+    <i data-lucide="globe" class="w-4 h-4"></i>
+    Revoke by Region
+</button>
+            <button @click="confirmAction('Emergency Logout All', 'This will instantly log out every single user and flush the session store. Proceed?', () => emergencyLogoutAll())" 
+                    class="btn btn-destructive p-2 flex-1 sm:flex-none justify-center gap-2 shadow-lg shadow-semantic-error/20">
                 <i data-lucide="alert-octagon" class="w-4 h-4"></i> Emergency Logout All
             </button>
         </div>
     </div>
 
+    <!-- Filters -->
     <div class="card p-4 mb-6 flex flex-col lg:flex-row gap-4 items-center justify-between z-10 relative">
         <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto flex-1">
             <div class="relative w-full sm:max-w-xs">
@@ -63,6 +108,7 @@
         </div>
     </div>
 
+    <!-- Sessions Table -->
     <div class="card p-0 overflow-hidden flex-1 flex flex-col min-h-[400px]">
         <div class="overflow-x-auto custom-scrollbar flex-1">
             <table class="w-full text-left min-w-[1000px]">
@@ -95,7 +141,6 @@
 
                     <template x-for="session in filteredSessions" :key="session.id">
                         <tr class="hover:bg-bg-secondary transition-colors group">
-                            
                             <td class="px-5 py-3">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-[10px] shrink-0" 
@@ -167,8 +212,8 @@
                                             <i data-lucide="eye" class="w-3.5 h-3.5 text-text-secondary"></i> View Details
                                         </button>
                                         
-                                        <button @click="forceMfa(session.id); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-text-primary hover:bg-bg-tertiary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-semantic-warning"></i> Force MFA
+                                        <button @click="confirmAction('Force MFA', 'Push authentication challenge?', () => forceMfa(session.id)); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-text-primary hover:bg-bg-tertiary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                            <i data-lucide="shield-alert" class="w-3.5 h-3.5 text-semantic"></i> Force MFA
                                         </button>
                                         
                                         <button @click="flagSession(session.id); dropOpen = false" class="w-full text-left px-4 py-2 text-body-sm text-text-primary hover:bg-bg-tertiary flex items-center gap-2">
@@ -177,11 +222,11 @@
 
                                         <div class="h-px bg-border-default my-1"></div>
 
-                                        <button @click="revokeSingle(session.id); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-semantic-error hover:bg-semantic-error-bg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                        <button @click="confirmAction('Revoke Session', 'Terminate this access immediately?', () => revokeSingle(session.id)); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-semantic-error hover:bg-semantic-error-bg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                             <i data-lucide="x-circle" class="w-3.5 h-3.5"></i> Revoke This Session
                                         </button>
 
-                                        <button @click="revokeUserAll(session.user.id, session.user.name); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-semantic-error hover:bg-semantic-error-bg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-bold">
+                                        <button @click="confirmAction('Revoke All Devices', `Terminate all access for ${session.user.name}?`, () => revokeUserAll(session.user.id, session.user.name)); dropOpen = false" :disabled="session.status === 'revoked'" class="w-full text-left px-4 py-2 text-body-sm text-semantic-error hover:bg-semantic-error-bg flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-bold">
                                             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Revoke All Devices
                                         </button>
                                     </div>
@@ -194,6 +239,24 @@
         </div>
     </div>
 
+    <!-- 2. Confirmation Modal (Generic for all alerts) -->
+    <div x-show="modals.confirm" class="fixed inset-0 bg-brand-secondary/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4" x-cloak>
+        <div class="card max-w-sm w-full p-0 shadow-2xl border-semantic-error" @click.away="modals.confirm = false">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-semantic-error-bg text-semantic-error rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-h4 font-bold text-text-primary mb-2" x-text="confirmData.title"></h3>
+                <p class="text-body-sm text-text-secondary" x-text="confirmData.message"></p>
+            </div>
+            <div class="p-4 border-t border-border-default bg-bg-tertiary flex gap-3 rounded-b-lg">
+                <button @click="modals.confirm = false" class="btn btn-tertiary flex-1 p-2">Cancel</button>
+                <button @click="confirmData.onConfirm(); modals.confirm = false" class="btn btn-destructive flex-1 p-2">Confirm Action</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Revoke by Role -->
     <div x-show="modals.revokeRole" class="fixed inset-0 bg-brand-secondary/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
         <div class="card max-w-md w-full p-0 shadow-2xl border-semantic-error" @click.away="modals.revokeRole = false">
             <div class="p-5 border-b border-border-default bg-bg-tertiary rounded-t-lg">
@@ -217,10 +280,11 @@
         </div>
     </div>
 
+    <!-- MODAL: Revoke by Region -->
     <div x-show="modals.revokeRegion" class="fixed inset-0 bg-brand-secondary/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
-        <div class="card max-w-md w-full p-0 shadow-2xl border-semantic-warning" @click.away="modals.revokeRegion = false">
+        <div class="card max-w-md w-full p-0 shadow-2xl border-semantic" @click.away="modals.revokeRegion = false">
             <div class="p-5 border-b border-border-default bg-bg-tertiary rounded-t-lg">
-                <h3 class="text-h4 font-bold text-text-primary flex items-center gap-2"><i data-lucide="globe" class="w-5 h-5 text-semantic-warning"></i> Revoke by Region</h3>
+                <h3 class="text-h4 font-bold text-text-primary flex items-center gap-2"><i data-lucide="globe" class="w-5 h-5 text-semantic"></i> Revoke by Region</h3>
             </div>
             <div class="p-6">
                 <p class="text-body-sm text-text-secondary mb-4">Terminate sessions originating from a specific geographic region based on IP resolution.</p>
@@ -236,11 +300,12 @@
             </div>
             <div class="p-4 border-t border-border-default bg-bg-tertiary flex justify-end gap-3 rounded-b-lg">
                 <button @click="modals.revokeRegion = false" class="btn p-1.5 btn-tertiary">Cancel</button>
-                <button @click="executeRevokeRegion()" class="btn p-1.5 btn-primary bg-semantic-warning hover:bg-orange-600 text-white border-none">Execute Purge</button>
+                <button @click="executeRevokeRegion()" class="btn p-1.5 btn-primary bg-semantic hover:bg-orange-600 text-white border-none">Execute Purge</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL: Session Details -->
     <div x-show="modals.sessionDetails" class="fixed inset-0 bg-brand-secondary/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" x-cloak>
         <div class="card max-w-2xl w-full p-0 shadow-2xl" @click.away="modals.sessionDetails = false">
             <div class="p-5 border-b border-border-default bg-bg-tertiary rounded-t-lg flex justify-between items-center">
@@ -285,8 +350,8 @@
                 </div>
             </div>
             <div class="p-4 border-t border-border-default bg-bg-tertiary flex justify-end gap-3 rounded-b-lg">
-                <button @click="forceMfa(modals.selectedSession?.id); modals.sessionDetails = false" class="btn btn-secondary text-semantic-warning border-semantic-warning/30">Force MFA</button>
-                <button @click="revokeSingle(modals.selectedSession?.id); modals.sessionDetails = false" class="btn btn-destructive">Revoke Session</button>
+                <button @click="confirmAction('Force MFA', 'Challenge user now?', () => forceMfa(modals.selectedSession?.id)); modals.sessionDetails = false" class="btn p-2 btn-secondary text-semantic border-semantic-warning/30">Force MFA</button>
+                <button @click="confirmAction('Revoke', 'Terminate now?', () => revokeSingle(modals.selectedSession?.id)); modals.sessionDetails = false" class="btn p-2 btn-destructive">Revoke Session</button>
             </div>
         </div>
     </div>
@@ -299,38 +364,53 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('sessionManagement', () => ({
         isLoading: true,
         sessions: [],
+        toasts: [],
         roles: ['Finance Admin', 'Support Agent', 'Operations Admin', 'Developer'],
         
         filters: { search: '', status: 'active', risk: 'all', auth: 'all' },
         
-        modals: { revokeRole: false, revokeRegion: false, sessionDetails: false, selectedSession: null },
+        modals: { revokeRole: false, revokeRegion: false, sessionDetails: false, selectedSession: null, confirm: false },
+        confirmData: { title: '', message: '', onConfirm: () => {} },
         actionState: { targetRole: 'Finance Admin', targetRegion: 'UNKNOWN' },
 
         init() {
             this.fetchSessions();
         },
 
+        // Custom Notification Logic
+        notify(message, type = 'success') {
+            const id = Date.now();
+            this.toasts.push({ id, message, type });
+            this.$nextTick(() => lucide.createIcons());
+            setTimeout(() => {
+                this.toasts = this.toasts.filter(t => t.id !== id);
+            }, 3500);
+        },
+
+        // Custom Confirmation Logic
+        confirmAction(title, message, callback) {
+            this.confirmData = { title, message, onConfirm: callback };
+            this.modals.confirm = true;
+            this.$nextTick(() => lucide.createIcons());
+        },
+
         get filteredSessions() {
             return this.sessions.filter(s => {
-                // Search
                 const q = this.filters.search.toLowerCase();
                 const matchSearch = s.user.name.toLowerCase().includes(q) || 
                                     s.user.email.toLowerCase().includes(q) || 
                                     s.ip.includes(q) || 
                                     s.fingerprint.toLowerCase().includes(q);
                 
-                // Status
                 let matchStatus = true;
                 if(this.filters.status === 'active') matchStatus = s.status === 'active';
                 if(this.filters.status === 'revoked') matchStatus = s.status === 'revoked';
 
-                // Risk
                 let matchRisk = true;
                 if(this.filters.risk === 'critical') matchRisk = s.risk >= 75;
                 if(this.filters.risk === 'medium') matchRisk = s.risk >= 25 && s.risk < 75;
                 if(this.filters.risk === 'low') matchRisk = s.risk < 25;
 
-                // Auth
                 let matchAuth = true;
                 if(this.filters.auth === 'pwd_mfa') matchAuth = s.auth_method === 'PWD + MFA';
                 if(this.filters.auth === 'sso') matchAuth = s.auth_method === 'SSO';
@@ -342,8 +422,7 @@ document.addEventListener('alpine:init', () => {
 
         async fetchSessions() {
             this.isLoading = true;
-            
-             await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 800));
             
             this.sessions = [
                 { id: 101, user: { id: 1, name: 'Sarah Jenkins', email: 'sarah@sahorone.com', role: 'Finance Admin' }, ip: '194.23.11.9', location: 'Dubai, UAE', device_type: 'desktop', device_os: 'macOS / Chrome', fingerprint: 'fx92_88a1b2c', auth_method: 'PWD + MFA', risk: 12, status: 'active', last_active: '2 mins ago' },
@@ -357,40 +436,39 @@ document.addEventListener('alpine:init', () => {
             this.$nextTick(() => lucide.createIcons());
         },
 
-        // --- ACTIONS ---
+        // --- UPDATED ACTIONS ---
 
         openDetails(session) {
             this.modals.selectedSession = session;
             this.modals.sessionDetails = true;
+            this.$nextTick(() => lucide.createIcons());
         },
 
         forceMfa(id) {
-            if(!confirm("Force this session to re-authenticate with MFA immediately?")) return;
-            alert(`MFA Challenge pushed via WebSocket to session ${id}`);
+            this.notify(`MFA Challenge pushed to session #${id}`, 'info');
         },
 
         flagSession(id) {
-            let score = prompt("Enter manual risk score adjustment (0-100):", "99");
-            if(score) {
-                const s = this.sessions.find(x => x.id === id);
-                if(s) s.risk = parseInt(score);
-                alert("Risk score adjusted and flagged for SecOps review.");
+            const s = this.sessions.find(x => x.id === id);
+            if(s) {
+                s.risk = 99;
+                this.notify("Risk score adjusted to 99 and flagged for review.", "warning");
             }
         },
 
         async revokeSingle(id) {
-            if(!confirm("Terminate this specific session?")) return;
             const s = this.sessions.find(x => x.id === id);
-            if(s) s.status = 'revoked';
-            alert("Session revoked and token blacklisted.");
+            if(s) {
+                s.status = 'revoked';
+                this.notify(`Session for ${s.user.name} has been revoked.`);
+            }
         },
 
         async revokeUserAll(userId, name) {
-            if(!confirm(`DANGER: Terminate ALL active sessions across all devices for ${name}?`)) return;
             this.sessions.forEach(s => {
                 if(s.user.id === userId) s.status = 'revoked';
             });
-            alert(`All tokens for ${name} blacklisted.`);
+            this.notify(`All device tokens for ${name} have been blacklisted.`, "error");
         },
 
         async executeRevokeRole() {
@@ -399,19 +477,20 @@ document.addEventListener('alpine:init', () => {
             this.sessions.forEach(s => {
                 if(s.user.role === role) s.status = 'revoked';
             });
-            alert(`Purged all active sessions for role: ${role}`);
+            this.notify(`Purged all active sessions for ${role}.`, "error");
         },
 
         async executeRevokeRegion() {
             this.modals.revokeRegion = false;
             const region = this.actionState.targetRegion;
-            alert(`Command sent: Revoke all tokens originating from ISO: ${region}`);
+            this.notify(`Kill-command sent for Region: ${region}`, "warning");
         },
 
         async emergencyLogoutAll() {
-            if(!confirm("CRITICAL WARNING: This will instantly log out every single user (including you) and flush the entire Redis session store. Proceed?")) return;
-            alert("Executing Platform-Wide Kill Switch. Redirecting to login...");
-            
+            this.notify("Executing Platform-Wide Kill Switch. Logging out...", "error");
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 2000);
         }
     }));
 });
